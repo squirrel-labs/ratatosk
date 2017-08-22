@@ -29,17 +29,14 @@ namespace DiscoBot
 
     public class Abfrage : ModuleBase
     {
+        Char test = new Char();
         // ~say hello -> hello
         [Command("t"), Summary("tests a talent.")]
         public async Task Say([Remainder, Summary("The text to echo")] string talent)
         {
-            //
-            //a.talente.First(x=>)
-            
-
             // ReplyAsync is a method on ModuleBase
 
-            await ReplyAsync(talent);
+            await ReplyAsync("```xl\n" + test.TestTalent(talent) + "\n```");
 
         }
     }

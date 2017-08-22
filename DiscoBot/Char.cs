@@ -64,23 +64,34 @@ namespace DiscoBot
             Proptable.Add("IN", "Intuition");
             Proptable.Add("CH", "Charisma");
             Proptable.Add("FF", "Fingerfertigkeit");
-            Proptable.Add("GE", "Gewandheit");
+            Proptable.Add("GE", "Gewandtheit");
             Proptable.Add("KO", "Konstitution");
             Proptable.Add("KK", "Körperkraft");
 
         }
-        string TestTalent(string talent)
+        public string TestTalent(string talent)
         {
-            var props =talente.Find(v => v.name.Equals(talent)).Test();
-            
-            return "";
+            var output = new StringBuilder();
+            var ttalent = talente.Find(v => v.name.Equals(talent));
+            var props =ttalent.Test();
+            int tap = ttalent.value;
+            for (int i = 0; i <= 2; i++)
+            {
+                int temp = dice.Rolld20();
+                int eigenschaft = eigenschaften[Proptable[props[i]]];
+                if (eigenschaft < temp)
+                    tap -= temp - eigenschaft ;
+                output.Append(temp+" ");
+            }
+            output.Append("tap: "+ tap);
+            return output.ToString();
         }
 
     }
     public class Talent
     {
         public string name, probe;
-        private int value;
+        public int value;
         public Talent(string name, string probe, int value) { this.name = name; this.probe = probe; this.value = value; }
         public string[] Test()
         {
@@ -100,10 +111,10 @@ namespace DiscoBot
     }
     public static class dice
     {
+        static System.Random rnd = new System.Random();
         public static int Rolld20()
         {
-            System.Random rnd = new System.Random();
-            return rnd.Next(19) + 1;
+            return rnd.Next(1,21) ;
         }
     }
 }
