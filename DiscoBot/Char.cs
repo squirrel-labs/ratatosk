@@ -10,30 +10,30 @@ namespace DiscoBot
     public class Char
     {
 
-        public string name;
-        public Dictionary<string, int> eigenschaften = new Dictionary<string, int>();
-        public List<Talent> talente = new List<Talent>();
-        public List<Kampf> kampftalente = new List<Kampf>();
+        public string name; //charname
+        public Dictionary<string, int> eigenschaften = new Dictionary<string, int>();   //char porperties
+        public List<Talent> talente = new List<Talent>();       //ist of talent objects (talents and spells)
+        public List<Kampf> kampftalente = new List<Kampf>();    //list of combat objects
 
-        public Dictionary<string, string> Proptable = new Dictionary<string, string>();
+        public Dictionary<string, string> Proptable = new Dictionary<string, string>(); //KK -> Körperkraft
 
 
         public Char(String path )
         {
 
-            Load(path);
+            Load(path); //load
         }
 
         private void Load(string path)
         {
             XmlTextReader reader = new XmlTextReader(path);
-            while (reader.Read())
+            while (reader.Read())   //read until he hits keywords
             {
                 if (reader.NodeType == XmlNodeType.Element)
                     switch (reader.Name)
                     {
                         case "held":
-                            name = reader.GetAttribute("name");
+                            name = reader.GetAttribute("name"); //name
                             break;
                         case "eigenschaft":
                             eigenschaften.Add(reader.GetAttribute("name"), Convert.ToInt32(reader.GetAttribute("value")) + Convert.ToInt32(reader.GetAttribute("mod")));
@@ -59,7 +59,7 @@ namespace DiscoBot
 
 
             }
-            Proptable.Add("MU", "Mut");
+            Proptable.Add("MU", "Mut");             //routing
             Proptable.Add("KL", "Klugheit");
             Proptable.Add("IN", "Intuition");
             Proptable.Add("CH", "Charisma");
@@ -69,24 +69,24 @@ namespace DiscoBot
             Proptable.Add("KK", "Körperkraft");
 
         }
-        public string TestTalent(string talent)
+        public string TestTalent(string talent)     //Talentprobe
         {
             var output = new StringBuilder();
-            var ttalent = talente.Find(v => v.name.Equals(talent));
-            var props = ttalent.Test();
-            int tap = ttalent.value;
-            for (int i = 0; i <= 2; i++)
+            var ttalent = talente.Find(v => v.name.Equals(talent)); //find the talent
+            var props = ttalent.Test();                             //get the required properties
+            int tap = ttalent.value;        //get tap
+            for (int i = 0; i <= 2; i++)    //foreach property, dice and tap 
             {
                 int temp = dice.Rolld20();
                 int eigenschaft = eigenschaften[Proptable[props[i]]];
                 if (eigenschaft < temp)
                     tap -= temp - eigenschaft;
-                output.Append(temp + " ");
+                output.Append(temp + " ");      //add to string
             }
             output.Append("tap: " + tap);
-            return output.ToString();
+            return output.ToString();       //return output
         }
-        public string Angriff(string talent)
+        public string Angriff(string talent)    //prety self explanetory
         {
             var attack = kampftalente.Find(x => x.name.Equals(talent));
             int tap = attack.at/*+eigenschaften["at"]*/;
@@ -112,12 +112,12 @@ namespace DiscoBot
         }
 
     }
-    public class Talent
+    public class Talent     //talent objekt
     {
         public string name, probe;
         public int value;
         public Talent(string name, string probe, int value) { this.name = name; this.probe = probe; this.value = value; }
-        public string[] Test()
+        public string[] Test()      //turn XX/XX/XX into string[]{XX,XX,XX}
         {
             var temp = probe.Split('/');
             foreach (string s in temp)
@@ -133,7 +133,7 @@ namespace DiscoBot
         public Kampf(string name, int at, int pa) { this.name = name; this.at = at; this.pa = pa; }
         void Test() { }
     }
-    public static class dice
+    public static class dice//roll it!
     {
         static System.Random rnd = new System.Random();
         public static int Rolld20()

@@ -12,13 +12,13 @@ namespace DiscoBot
 {
     public static class DSA
     {
-        public static Dictionary<string, string> relation = new Dictionary<string, string>();
-        public static List<Char> chars = new List<Char>();
-        public static void Startup()
+        public static Dictionary<string, string> relation = new Dictionary<string, string>(); //dictionary to match the char
+        public static List<Char> chars = new List<Char>();                                      //list of all charackters
+        public static void Startup()    
         {
-            relation.Add("The Doctor", "Felis Exodus Schattenwald");
+            relation.Add("The Doctor", "Felis Exodus Schattenwald");//Relation
             relation.Add("Tardis", "Numeri Illuminus");
-            chars.Add(new Char(@"helden\Felis.xml"));
+            chars.Add(new Char(@"helden\Felis.xml"));       //Savefile
             chars.Add(new Char(@"helden\Numeri.xml"));
 
         }
