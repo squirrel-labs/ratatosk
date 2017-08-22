@@ -17,14 +17,14 @@ namespace DiscoBot
         private CommandService commands;
         private DiscordSocketClient client;
         private IServiceProvider services;
-
-        public Char a = new Char();
+        
 
 
         static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
 
         public async Task Start()
         {
+            DSA.Startup();
             client = new DiscordSocketClient();
             commands = new CommandService();
 

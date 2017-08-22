@@ -10,8 +10,18 @@ using Discord.WebSocket;
 
 namespace DiscoBot
 {
-    class Commands
+    public static class DSA
     {
+        public static Dictionary<string, string> relation = new Dictionary<string, string>();
+        public static List<Char> chars = new List<Char>();
+        public static void Startup()
+        {
+            relation.Add("The Doctor", "Felis Exodus Schattenwald");
+            relation.Add("Tardis", "Numeri Illuminus");
+            chars.Add(new Char(@"helden\Felis.xml"));
+            chars.Add(new Char(@"helden\Numeri.xml"));
+
+        }
     }
     public class Info : ModuleBase
     {
@@ -19,7 +29,7 @@ namespace DiscoBot
         [Command("say"), Summary("Echos a message.")]
         public async Task Say([Remainder, Summary("The text to echo")] string echo)
         {
-            
+            var a = Context.User.Username;   
 
             // ReplyAsync is a method on ModuleBase
             await ReplyAsync(echo);
@@ -27,16 +37,51 @@ namespace DiscoBot
         }
     }
 
-    public class Abfrage : ModuleBase
+    public class TestTalent : ModuleBase
     {
-        Char test = new Char();
         // ~say hello -> hello
         [Command("t"), Summary("tests a talent.")]
         public async Task Say([Remainder, Summary("The text to echo")] string talent)
         {
             // ReplyAsync is a method on ModuleBase
 
-            await ReplyAsync("```xl\n" + test.TestTalent(talent) + "\n```");
+            await ReplyAsync("```xl\n" + DSA.chars.Find(x=>x.name.Equals(DSA.relation[Context.User.Username])).TestTalent(talent) + "\n```");
+
+        }
+    }
+    public class Angriff : ModuleBase
+    {
+        // ~say hello -> hello
+        [Command("a"), Summary("tests a attack.")]
+        public async Task Say([Remainder, Summary("The text to echo")] string talent)
+        {
+            // ReplyAsync is a method on ModuleBase
+
+            await ReplyAsync("```xl\n" + DSA.chars.Find(x => x.name.Equals(DSA.relation[Context.User.Username])).Angriff(talent) + "\n```");
+
+        }
+    }
+    public class Parade : ModuleBase
+    {
+        // ~say hello -> hello
+        [Command("p"), Summary("tests a parade.")]
+        public async Task Say([Remainder, Summary("The text to echo")] string talent)
+        {
+            // ReplyAsync is a method on ModuleBase
+
+            await ReplyAsync("```xl\n" + DSA.chars.Find(x => x.name.Equals(DSA.relation[Context.User.Username])).Parade(talent) + "\n```");
+
+        }
+    }
+    public class Fernkampf : ModuleBase
+    {
+        // ~say hello -> hello
+        [Command("f"), Summary("tests a shot.")]
+        public async Task Say([Remainder, Summary("The text to echo")] string talent)
+        {
+            // ReplyAsync is a method on ModuleBase
+
+            await ReplyAsync("```xl\n" + DSA.chars.Find(x => x.name.Equals(DSA.relation[Context.User.Username])).Fernkampf(talent) + "\n```");
 
         }
     }

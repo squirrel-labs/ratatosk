@@ -10,7 +10,7 @@ namespace DiscoBot
     public class Char
     {
 
-        string name;
+        public string name;
         public Dictionary<string, int> eigenschaften = new Dictionary<string, int>();
         public List<Talent> talente = new List<Talent>();
         public List<Kampf> kampftalente = new List<Kampf>();
@@ -18,7 +18,7 @@ namespace DiscoBot
         public Dictionary<string, string> Proptable = new Dictionary<string, string>();
 
 
-        public Char(String path = "Felis.xml")
+        public Char(String path )
         {
 
             Load(path);
@@ -73,18 +73,42 @@ namespace DiscoBot
         {
             var output = new StringBuilder();
             var ttalent = talente.Find(v => v.name.Equals(talent));
-            var props =ttalent.Test();
+            var props = ttalent.Test();
             int tap = ttalent.value;
             for (int i = 0; i <= 2; i++)
             {
                 int temp = dice.Rolld20();
                 int eigenschaft = eigenschaften[Proptable[props[i]]];
                 if (eigenschaft < temp)
-                    tap -= temp - eigenschaft ;
-                output.Append(temp+" ");
+                    tap -= temp - eigenschaft;
+                output.Append(temp + " ");
             }
-            output.Append("tap: "+ tap);
+            output.Append("tap: " + tap);
             return output.ToString();
+        }
+        public string Angriff(string talent)
+        {
+            var attack = kampftalente.Find(x => x.name.Equals(talent));
+            int tap = attack.at/*+eigenschaften["at"]*/;
+            int temp = dice.Rolld20();
+            tap -= temp;
+            return temp + " " + tap;
+        }
+        public string Parade(string talent)
+        {
+            var attack = kampftalente.Find(x => x.name.Equals(talent));
+            int tap = attack.pa /*+ eigenschaften["pa"]*/;
+            int temp = dice.Rolld20();
+            tap -= temp;
+            return temp + " " + tap;
+        }
+        public string Fernkampf(string talent,int erschwernis=0)
+        {
+            var attack = talente.Find(v => v.name.Equals(talent));
+            int tap = attack.value + eigenschaften["fk"]-erschwernis;
+            int temp = dice.Rolld20();
+            tap -= -temp;
+            return temp + " " + tap;
         }
 
     }
@@ -104,8 +128,8 @@ namespace DiscoBot
     }
     public class Kampf
     {
-        string name;
-        private int at, pa;
+        public string name;
+        public int at, pa;
         public Kampf(string name, int at, int pa) { this.name = name; this.at = at; this.pa = pa; }
         void Test() { }
     }
@@ -114,7 +138,7 @@ namespace DiscoBot
         static System.Random rnd = new System.Random();
         public static int Rolld20()
         {
-            return rnd.Next(1,21) ;
+            return rnd.Next(1, 21);
         }
     }
 }
