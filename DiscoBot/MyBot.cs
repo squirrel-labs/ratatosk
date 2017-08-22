@@ -35,8 +35,8 @@ namespace DiscoBot
             });
 
             commands = discord.GetService<CommandService>();
-            Mandelbrot();
-            Server();
+            //Mandelbrot();
+            //Server();
             DSA();
 
             discord.ExecuteAndWait(async () =>
