@@ -3,20 +3,69 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
+using Discord;
+using Discord.WebSocket;
+using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace DiscoBot
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        private CommandService commands;
+        private DiscordSocketClient client;
+        private IServiceProvider services;
+
+        public Char a = new Char();
+
+
+        static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
+
+        public async Task Start()
         {
-            //new Form1();
-            new System.Threading.Thread(Launch).Start();
-            //MyBot Bot2 = new MyBot("MjU1NDM1MDUyMTg2MzM3Mjkw.Cydmeg.AV2aEAwrM9UHqOUnmmUXaC5TBm4");
+            client = new DiscordSocketClient();
+            commands = new CommandService();
+
+            string token = "Mjk0NTU0MDU4Nzg4NzAwMTYx.C7XGwQ.VwCAM10lDmwUe01NhBvDKNbd17I";
+
+            services = new ServiceCollection()
+                    .BuildServiceProvider();
+
+            await InstallCommands();
+
+            await client.LoginAsync(TokenType.Bot, token);
+            await client.StartAsync();
+
+            await Task.Delay(-1);
         }
-        public static void Launch()
+
+        public async Task InstallCommands()
         {
-            new MyBot();
+            // Hook the MessageReceived Event into our Command Handler
+            client.MessageReceived += HandleCommand;
+            // Discover all of the commands in this assembly and load them.
+            await commands.AddModulesAsync(Assembly.GetEntryAssembly());
+        }
+
+        public async Task HandleCommand(SocketMessage messageParam)
+        {
+            // Don't process the command if it was a System Message
+            var message = messageParam as SocketUserMessage;
+            if (message == null) return;
+            // Create a number to track where the prefix ends and the command begins
+            int argPos = 0;
+            // Determine if the message is a command, based on if it starts with '!' or a mention prefix
+            if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos))) return;
+            // Create a Command Context
+            var context = new CommandContext(client, message);
+            // Execute the command. (result does not indicate a return value, 
+            // rather an object stating if the command executed successfully)
+            var result = await commands.ExecuteAsync(context, argPos, services);
+            if (!result.IsSuccess)
+                await context.Channel.SendMessageAsync(result.ErrorReason);
         }
     }
+
 }
