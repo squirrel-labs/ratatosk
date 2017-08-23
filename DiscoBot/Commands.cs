@@ -18,6 +18,7 @@ namespace DiscoBot
         {
             relation.Add("The Doctor", "Felis Exodus Schattenwald");//Relation
             relation.Add("Tardis", "Numeri Illuminus");
+            relation.Add("DSA Bot", "Numeri Illuminus");
             chars.Add(new Char(@"helden\Felis.xml"));       //Savefile
             chars.Add(new Char(@"helden\Numeri.xml"));
 
@@ -25,25 +26,34 @@ namespace DiscoBot
     }
     public class Info : ModuleBase
     {
-        // ~say hello -> hello
         [Command("say"), Summary("Echos a message.")]
         public async Task Say([Remainder, Summary("The text to echo")] string echo)
         {
             var a = Context.User.Username;   
-
-            // ReplyAsync is a method on ModuleBase
+            
             await ReplyAsync(echo);
             
         }
     }
 
+    public class Roll : ModuleBase
+    {
+        [Command("r"), Summary("Würfelt ")]
+        [Alias("R", "Roll", "roll", "Würfle")]
+        public async Task Say([Remainder, Summary("Weapon")] string roll)
+        {
+
+            await ReplyAsync("```xl\n**" + Misc.Roll(roll) + "**\n```");
+
+        }
+    }
+
     public class TestTalent : ModuleBase
     {
-        // ~say hello -> hello
-        [Command("t"), Summary("tests a talent.")]
-        public async Task Say([Remainder, Summary("The text to echo")] string talent)
+        [Command("t"), Summary("Würfelt ein Talent-/Zauberprobe")]
+        [Alias("T", "Talent", "talent","zauber","z", "versuche")]
+        public async Task Say([Remainder, Summary("Talent oder Zaubername")] string talent)
         {
-            // ReplyAsync is a method on ModuleBase
 
             await ReplyAsync("```xl\n" + DSA.chars.Find(x=>x.name.Equals(DSA.relation[Context.User.Username])).TestTalent(talent) + "\n```");
 
@@ -51,24 +61,22 @@ namespace DiscoBot
     }
     public class Angriff : ModuleBase
     {
-        // ~say hello -> hello
-        [Command("a"), Summary("tests a attack.")]
-        public async Task Say([Remainder, Summary("The text to echo")] string talent)
+        [Command("a"), Summary("Würfelt ein Angriff")]
+        [Alias("A", "Angriff", "angriff", "attackiere_mit","attacke","Attacke")]
+        public async Task Say([Remainder, Summary("Weapon")] string weapon)
         {
-            // ReplyAsync is a method on ModuleBase
 
-            await ReplyAsync("```xl\n" + DSA.chars.Find(x => x.name.Equals(DSA.relation[Context.User.Username])).Angriff(talent) + "\n```");
+            await ReplyAsync("```xl\n" + DSA.chars.Find(x => x.name.Equals(DSA.relation[Context.User.Username])).Angriff(weapon) + "\n```");
 
         }
     }
     public class Parade : ModuleBase
     {
         // ~say hello -> hello
-        [Command("p"), Summary("tests a parade.")]
-        public async Task Say([Remainder, Summary("The text to echo")] string talent)
+        [Command("p"), Summary("Würfelt eine Parade Probe")]
+        [Alias("P", "Parade", "parade","pariere_mit")]
+        public async Task Say([Remainder, Summary("Parade Weapon")] string talent)
         {
-            // ReplyAsync is a method on ModuleBase
-
             await ReplyAsync("```xl\n" + DSA.chars.Find(x => x.name.Equals(DSA.relation[Context.User.Username])).Parade(talent) + "\n```");
 
         }
@@ -76,12 +84,13 @@ namespace DiscoBot
     public class Fernkampf : ModuleBase
     {
         // ~say hello -> hello
-        [Command("f"), Summary("tests a shot.")]
-        public async Task Say([Remainder, Summary("The text to echo")] string talent)
+        [Command("f"), Summary("Führt eine Fernkampfprobe aus")]
+        [Alias("F", "fernkampf", "Fernkampf", "schieße", "schieße_mit")]
+        public async Task Say([Summary("Fernkampfwaffe")] string talent,int erschwernis=0)
         {
             // ReplyAsync is a method on ModuleBase
 
-            await ReplyAsync("```xl\n" + DSA.chars.Find(x => x.name.Equals(DSA.relation[Context.User.Username])).Fernkampf(talent) + "\n```");
+            await ReplyAsync("```xl\n" + DSA.chars.Find(x => x.name.Equals(DSA.relation[Context.User.Username])).Fernkampf(talent,erschwernis) + "\n```");
 
         }
     }

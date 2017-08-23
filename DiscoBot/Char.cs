@@ -46,6 +46,14 @@ namespace DiscoBot
                                 reader.Read();
                             }
                             break;
+                        case "zauberliste":
+                            reader.Read();
+                            while (reader.Name.Equals("zauber"))
+                            {
+                                talente.Add(new Talent(reader.GetAttribute("name"), reader.GetAttribute("probe").Remove(0, 2).Trim(')'), Convert.ToInt32(reader.GetAttribute("value"))));
+                                reader.Read();
+                            }
+                            break;
                         case "kampfwerte":
                             string atname = reader.GetAttribute("name");
                             reader.Read();
@@ -72,73 +80,59 @@ namespace DiscoBot
         public string TestTalent(string talent)     //Talentprobe
         {
             var output = new StringBuilder();
-            var ttalent = talente.Find(v => v.name.Equals(talent)); //find the talent
+            var ttalentlist = talente.Select(v => v.CheckName(talent)).ToList(); //find the talent
+            int error = ttalentlist.Min();
+            var ttalent = talente[ttalentlist.IndexOf(error)];
             var props = ttalent.Test();                             //get the required properties
             int tap = ttalent.value;        //get tap
+            output.AppendFormat("{0} {1} taw:{2} error: \n", ttalent.name,ttalent.probe,ttalent.value,error);
             for (int i = 0; i <= 2; i++)    //foreach property, dice and tap 
             {
-                int temp = dice.Rolld20();
+                int temp = dice.Roll();
                 int eigenschaft = eigenschaften[Proptable[props[i]]];
                 if (eigenschaft < temp)
                     tap -= temp - eigenschaft;
                 output.Append(temp + " ");      //add to string
             }
-            output.Append("tap: " + tap);
+            output.AppendFormat("tap: {0}",tap);
+            if (error == 100)
+                return talent + " nicht gefunden!";
             return output.ToString();       //return output
         }
         public string Angriff(string talent)    //prety self explanetory
         {
-            var attack = kampftalente.Find(x => x.name.Equals(talent));
-            int tap = attack.at/*+eigenschaften["at"]*/;
-            int temp = dice.Rolld20();
-            tap -= temp;
-            return temp + " " + tap;
+            var output = new StringBuilder();
+            var attack = kampftalente.Find(x => x.name.ToLower().Equals(talent.ToLower()));
+            int tap = attack.at;
+            output.AppendFormat("{0}-Angriff taw:{1}  \n", attack.name, tap);
+            int temp = dice.Roll();
+            output.Append(temp );
+            return output.ToString();
         }
         public string Parade(string talent)
         {
-            var attack = kampftalente.Find(x => x.name.Equals(talent));
-            int tap = attack.pa /*+ eigenschaften["pa"]*/;
-            int temp = dice.Rolld20();
-            tap -= temp;
-            return temp + " " + tap;
+            var output = new StringBuilder();
+            var attack = kampftalente.Find(x => x.name.ToLower().Equals(talent.ToLower()));
+            int tap = attack.pa;
+            output.AppendFormat("{0}-Parade taw:{1} \n", attack.name, tap);
+            int temp = dice.Roll();
+            output.Append(temp);
+            return output.ToString();
         }
         public string Fernkampf(string talent,int erschwernis=0)
         {
-            var attack = talente.Find(v => v.name.Equals(talent));
-            int tap = attack.value + eigenschaften["fk"]-erschwernis;
-            int temp = dice.Rolld20();
-            tap -= -temp;
-            return temp + " " + tap;
+            var output = new StringBuilder();
+            int fk = eigenschaften["fk"];
+            var attack = talente.Find(v => v.name.ToLower().Equals(talent.ToLower()));
+            int tap = attack.value ;
+            output.AppendFormat("{0} taw:{1} erschwernis:{2} \n", attack.name, tap,erschwernis);
+            tap -= erschwernis;
+            int temp = dice.Roll();
+            tap -= temp>fk?temp-fk:0;
+            output.Append(temp + " tap:" + tap);
+            return output.ToString();
         }
 
     }
-    public class Talent     //talent objekt
-    {
-        public string name, probe;
-        public int value;
-        public Talent(string name, string probe, int value) { this.name = name; this.probe = probe; this.value = value; }
-        public string[] Test()      //turn XX/XX/XX into string[]{XX,XX,XX}
-        {
-            var temp = probe.Split('/');
-            foreach (string s in temp)
-                s.Replace("/", "");
-            return temp;
-        }
-
-    }
-    public class Kampf
-    {
-        public string name;
-        public int at, pa;
-        public Kampf(string name, int at, int pa) { this.name = name; this.at = at; this.pa = pa; }
-        void Test() { }
-    }
-    public static class dice//roll it!
-    {
-        static System.Random rnd = new System.Random();
-        public static int Rolld20()
-        {
-            return rnd.Next(1, 21);
-        }
-    }
+    
 }
