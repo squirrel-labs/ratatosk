@@ -12,7 +12,7 @@ namespace DiscoBot
         {
             int count = 1, d,mod=0;
             var Output = new StringBuilder();
-            List<string> strings = input.Split('d').ToList();
+            List<string> strings = input.Split('w','d').ToList();
             count = Convert.ToInt32(strings[0]);
             strings = strings[1].Split(' ').ToList();
             d = Convert.ToInt32(strings[0]);
@@ -24,7 +24,7 @@ namespace DiscoBot
             {
                 var roll = dice.Roll(d);
                 sum += roll;
-                Output.Append(roll + " ");
+                Output.Append("["+roll + "] ");
             }
             if (count > 1)
                 Output.Append("sum: " + (sum));

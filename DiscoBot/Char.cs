@@ -85,16 +85,23 @@ namespace DiscoBot
             var ttalent = talente[ttalentlist.IndexOf(error)];
             var props = ttalent.Test();                             //get the required properties
             int tap = ttalent.value;        //get tap
-            output.AppendFormat("{0} {1} taw:{2} error: \n", ttalent.name,ttalent.probe,ttalent.value,error);
+            List<int> werte = new List<int>();
+            foreach (string p in props)
+            {
+                werte.Add(eigenschaften[Proptable[p]]);
+            }
+            output.AppendFormat("{0} würfelt: {1} \n{2} - {3}   taw:{4}  \n", this.name,ttalent.name,ttalent.probe,String.Join("/",werte),ttalent.value);
+            output.Append("         ");
             for (int i = 0; i <= 2; i++)    //foreach property, dice and tap 
             {
                 int temp = dice.Roll();
                 int eigenschaft = eigenschaften[Proptable[props[i]]];
                 if (eigenschaft < temp)
                     tap -= temp - eigenschaft;
-                output.Append(temp + " ");      //add to string
+                output.Append("["+temp + "]");      //add to string
             }
-            output.AppendFormat("tap: {0}",tap);
+            
+            output.AppendFormat(" tap: {0,20}",tap);
             if (error == 100)
                 return talent + " nicht gefunden!";
             return output.ToString();       //return output

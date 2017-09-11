@@ -16,11 +16,14 @@ namespace DiscoBot
         public static List<Char> chars = new List<Char>();                                      //list of all charackters
         public static void Startup()    
         {
-            relation.Add("The Doctor", "Felis Exodus Schattenwald");//Relation
+            relation.Add("The Doctor", "Numeri Illuminus");//Relation
             relation.Add("Tardis", "Numeri Illuminus");
-            relation.Add("DSA Bot", "Numeri Illuminus");
+            relation.Add("DSA Bot", "Felis Exodus Schattenwald");
+            relation.Add("Papo","Gwendelson");
+            relation.Add("Potus","Volant");
             chars.Add(new Char(@"helden\Felis.xml"));       //Savefile
             chars.Add(new Char(@"helden\Numeri.xml"));
+            chars.Add(new Char(@"helden\Volant.xml"));
 
         }
     }
@@ -43,7 +46,7 @@ namespace DiscoBot
         public async Task Say([Remainder, Summary("Weapon")] string roll)
         {
 
-            await ReplyAsync("```xl\n**" + Misc.Roll(roll) + "**\n```");
+            await ReplyAsync("```xl\n" + Misc.Roll(roll) + "\n```");
 
         }
     }
