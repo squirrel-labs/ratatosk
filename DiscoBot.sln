@@ -1,11 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6857735-6707-4A33-A7F8-3A06E354D7F3}"
 	ProjectSection(SolutionItems) = preProject
 		Felis.xml = Felis.xml
+		Voice.cs = Voice.cs
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscoBot", "DiscoBot\DiscoBot.csproj", "{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}"
@@ -23,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CADA01A3-B80B-4979-8397-7CB5B825CE34}
 	EndGlobalSection
 EndGlobal

@@ -28,7 +28,7 @@ namespace DiscoBot
             client = new DiscordSocketClient();
             commands = new CommandService();
 
-            string token = "";
+            string token = Properties.Settings.Default.Token;
 
             services = new ServiceCollection()
                     .BuildServiceProvider();

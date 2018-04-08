@@ -1,0 +1,107 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DiscoBot
+{
+    public class NPC : ICharacter
+    {
+        private int mean, stDv;
+
+        public NPC(string name, int mean, int stDv)
+        {
+            this.mean = mean;
+            this.stDv = stDv;
+            this.Name = name;
+        }
+
+        public string Name { get; set; }
+        
+        public string TestTalent(string talent, int tap = 3)
+        {
+            for (int i = 0; i <= 2; i++) //foreach property, dice and tap 
+            {
+                int temp = dice.Roll();
+                int eigenschaft = (int)Math.Round(Misc.Random(this.stDv, this.mean));
+
+                if (eigenschaft < temp)
+                {
+                    tap -= temp - eigenschaft;
+                }
+            }
+
+            if (tap >= 0)
+            {
+                return $"{this.Name} vollführt {talent} erfolgreich";
+            }
+
+            return $"{this.Name} scheitert an {talent}";
+        }
+
+        public string TestEigenschaft(string eigenschaft, int erschwernis = 0)
+        {
+            int temp = dice.Roll();
+            int prop = (int)Math.Round(Misc.Random(this.stDv, this.stDv));
+            
+            if (temp + erschwernis < prop)
+            {
+                return $"{this.Name} vollführt {eigenschaft} erfolgreich";
+            }
+
+            return $"{this.Name} scheitert an {eigenschaft}";
+        }
+
+        public string Angriff(string waffe, int erschwernis = 0)
+        {
+            int temp = dice.Roll();
+
+            if (temp == 1)
+            {
+                return $"{this.Name} greift kritisch mit {waffe} an";
+            }
+
+            if (temp < erschwernis)
+            {
+                return $"{this.Name} greift mit {waffe} an";
+            }
+
+            return $"{this.Name} haut mit {waffe} daneben";
+        }
+
+        public string Parade(string waffe, int erschwernis = 0)
+        {
+            int temp = dice.Roll();
+
+            if (temp == 1)
+            {
+                return $"{this.Name} pariert mit {waffe} meisterlich";
+            }
+
+            if (temp < erschwernis)
+            {
+                return $"{this.Name} pariert mit {waffe} an";
+            }
+
+            return $"{this.Name} schafft es nicht mit {waffe} zu parieren";
+        }
+
+        public string Fernkampf(string waffe, int erschwernis = 0)
+        {
+            int temp = dice.Roll();
+
+            if (temp == 1)
+            {
+                return $"{this.Name} trifft kritisch mit {waffe}";
+            }
+
+            if (temp < erschwernis)
+            {
+                return $"{this.Name} greift mit {waffe} an";
+            }
+
+            return $"{this.Name} schießt mit {waffe} daneben";
+        }
+    }
+}
