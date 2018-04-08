@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Discord.Commands;
 
@@ -14,7 +15,7 @@
 
         public static List<Talent> Talente { get; set; } = new List<Talent>();
 
-        public static void Startup()
+        public static async Task Startup()
         {
             relation.Add("The Doctor", "Numeri Illuminus");//Relation
             relation.Add("Tardis", "Morla");//"Numeri Illuminus");

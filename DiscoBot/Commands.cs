@@ -11,8 +11,11 @@ using Discord.WebSocket;
 namespace DiscoBot
 {
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+
+    using Discord.Audio;
 
     public class Info : ModuleBase
     {
@@ -123,23 +126,56 @@ namespace DiscoBot
 
     public class Voice : ModuleBase
     {
-        [Command("join")]
+        public static IAudioClient client { get; set; }
+        [Command("join", RunMode = RunMode.Async)]
         public async Task JoinChannel(IVoiceChannel channel = null)
         {
+            var msg = this.Context.Message;
             // Get the audio channel
-            channel = channel ?? (this.Context.User as IGuildUser)?.VoiceChannel;
-            if (channel == null)
-            {
-                await this.Context.Channel.SendMessageAsync(
-                    "User must be in a voice channel, or a voice channel must be passed as an argument.");
-                return;
-            }
+            channel = channel ?? (msg.Author as IGuildUser)?.VoiceChannel;
+            if (channel == null) { await msg.Channel.SendMessageAsync("User must be in a voice channel, or a voice channel must be passed as an argument."); return; }
 
             // For the next step with transmitting audio, you would want to pass this Audio Client in to a service.
             var audioClient = await channel.ConnectAsync();
-            
+            client = audioClient;
+        }
+
+        [Command("leave", RunMode = RunMode.Async)]
+        public async Task LeaveChannel(IVoiceChannel channel = null)
+        {
+            // For the next step with transmitting audio, you would want to pass this Audio Client in to a service.
+            client.StopAsync();
+        }
+
+        [Command("play")]
+        public async Task PlayAudio(string path)
+        {
+            SendAsync(client, path);
+        }
+
+        private Process CreateStream(string path)
+        {
+            var ffmpeg = new ProcessStartInfo
+                             {
+                                 FileName = "ffmpeg",
+                                 Arguments = $"-i {path}  -ac 2 -f s16le -ar 48000 -ab 620000 pipe:1",
+                                 UseShellExecute = false,
+                                 RedirectStandardOutput = true,
+                             };
+            return Process.Start(ffmpeg);
+        }
+
+        private async Task SendAsync(IAudioClient client, string path)
+        {
+            // Create FFmpeg using the previous example
+            var ffmpeg = CreateStream(path);
+            var output = ffmpeg.StandardOutput.BaseStream;
+            var discord = client.CreatePCMStream(AudioApplication.Music);
+            await output.CopyToAsync(discord);
+            await discord.FlushAsync();
         }
     }
+
 
     [Group("gmtr")]
     public class Sample : ModuleBase
@@ -364,6 +400,42 @@ namespace DiscoBot
         }
     }
 
+    /*public class AudioModule : ModuleBase<ICommandContext>
+    {
+        // Scroll down further for the AudioService.
+        // Like, way down
+        private readonly AudioService _service;
+
+        // Remember to add an instance of the AudioService
+        // to your IServiceCollection when you initialize your bot
+        public AudioModule(AudioService service)
+        {
+            _service = service;
+        }
+
+        // You *MUST* mark these commands with 'RunMode.Async'
+        // otherwise the bot will not respond until the Task times out.
+        [Command("join", RunMode = RunMode.Async)]
+        public async Task JoinCmd()
+        {
+            await _service.JoinAudio(Context.Guild, (Context.User as IVoiceState).VoiceChannel);
+        }
+
+        // Remember to add preconditions to your commands,
+        // this is merely the minimal amount necessary.
+        // Adding more commands of your own is also encouraged.
+        [Command("leave", RunMode = RunMode.Async)]
+        public async Task LeaveCmd()
+        {
+            await _service.LeaveAudio(Context.Guild);
+        }
+
+        [Command("play", RunMode = RunMode.Async)]
+        public async Task PlayCmd([Remainder] string song)
+        {
+            await _service.SendAudioAsync(Context.Guild, Context.Channel, song);
+        }
+    }*/
 
     public enum Commands
     {

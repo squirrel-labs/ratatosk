@@ -24,7 +24,7 @@ namespace DiscoBot
 
         public async Task Start()
         {
-            DSA.Startup();
+            var loading = DSA.Startup();
             client = new DiscordSocketClient();
             commands = new CommandService();
 
@@ -32,12 +32,14 @@ namespace DiscoBot
 
             services = new ServiceCollection()
                     .BuildServiceProvider();
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
 
             await InstallCommands();
 
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
 
+            await loading;
             await Task.Delay(-1);
         }
 
@@ -65,6 +67,11 @@ namespace DiscoBot
             var result = await commands.ExecuteAsync(context, argPos, services);
             if (!result.IsSuccess)
                 await context.Channel.SendMessageAsync(result.ErrorReason);
+        }
+        static void OnProcessExit(object sender, EventArgs e)
+        {
+            Console.WriteLine("I'm out of here");
+            Voice.client.StopAsync();
         }
     }
 
