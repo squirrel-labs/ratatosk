@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DiscoBot
+﻿namespace DiscoBot.Characters
 {
-    public class NPC : ICharacter
-    {
-        private int mean, stDv;
+    using System;
 
-        public NPC(string name, int mean, int stDv)
+    using DiscoBot.Auxiliary;
+
+    public class Npc : ICharacter
+    {
+        private readonly int mean, stDv;
+
+        public Npc(string name, int mean, int stDv)
         {
             this.mean = mean;
             this.stDv = stDv;
@@ -21,9 +19,10 @@ namespace DiscoBot
         
         public string TestTalent(string talent, int tap = 3)
         {
-            for (int i = 0; i <= 2; i++) //foreach property, dice and tap 
+            for (int i = 0; i <= 2; i++)
             {
-                int temp = dice.Roll();
+                // foreach property, dice and tap 
+                int temp = Dice.Roll();
                 int eigenschaft = (int)Math.Round(Misc.Random(this.stDv, this.mean));
 
                 if (eigenschaft < temp)
@@ -42,7 +41,7 @@ namespace DiscoBot
 
         public string TestEigenschaft(string eigenschaft, int erschwernis = 0)
         {
-            int temp = dice.Roll();
+            int temp = Dice.Roll();
             int prop = (int)Math.Round(Misc.Random(this.stDv, this.stDv));
             
             if (temp + erschwernis < prop)
@@ -55,7 +54,7 @@ namespace DiscoBot
 
         public string Angriff(string waffe, int erschwernis = 0)
         {
-            int temp = dice.Roll();
+            int temp = Dice.Roll();
 
             if (temp == 1)
             {
@@ -72,7 +71,7 @@ namespace DiscoBot
 
         public string Parade(string waffe, int erschwernis = 0)
         {
-            int temp = dice.Roll();
+            int temp = Dice.Roll();
 
             if (temp == 1)
             {
@@ -89,7 +88,7 @@ namespace DiscoBot
 
         public string Fernkampf(string waffe, int erschwernis = 0)
         {
-            int temp = dice.Roll();
+            int temp = Dice.Roll();
 
             if (temp == 1)
             {

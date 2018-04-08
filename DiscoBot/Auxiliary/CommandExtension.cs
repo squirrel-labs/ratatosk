@@ -1,37 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DiscoBot
+﻿namespace DiscoBot.Auxiliary
 {
+    using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
+
     using Discord;
     using Discord.Commands;
 
     public static class CommandExtension
     {
-        public static async Task ReplyTimed(this ModuleBase m, string message, TimeSpan time)
+        public static async Task ReplyTimedAsync(this ModuleBase m, string message, TimeSpan time)
         {
             var token = message.GetHashCode();
             var send = m.Context.Channel.SendMessageAsync($"#{token}\n```xl\n{message}```", true);
 
-            BackgroundWorker barInvoker = new BackgroundWorker();
+            var barInvoker = new BackgroundWorker();
             barInvoker.DoWork += delegate
                 {
                     Thread.Sleep(time);
-                    delete(token, m);
+                    Delete(token, m);
                 };
 
             await send;
             barInvoker.RunWorkerAsync();
         }
 
-        private static async void delete(int token, ModuleBase m)
+        private static void Delete(int token, ModuleBase m)
         {
-            var messagesAsync = m.Context.Channel.GetMessagesAsync(100);
+            var messagesAsync = m.Context.Channel.GetMessagesAsync();
             Task.WaitAll(messagesAsync.ToArray());
             var list = messagesAsync.ToEnumerable().ToList();
             var messages = new List<IMessage>();
@@ -40,8 +39,8 @@ namespace DiscoBot
                 messages.AddRange(task.ToList());
             }
 
-            await m.Context.Channel.DeleteMessagesAsync(messages.Where(x => x.Content.StartsWith($"#{token}\n") && x.Author.IsBot));
+            m.Context.Channel.DeleteMessagesAsync(
+                messages.Where(x => x.Content.StartsWith($"#{token}\n") && x.Author.IsBot));
         }
     }
-    
 }
