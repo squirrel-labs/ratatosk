@@ -25,6 +25,7 @@
         public Character(string path) : this()
         {
             this.Load(path); // load
+            this.Post_process(); // calculate derived values
         }
 
         public Character(Character c, string name, int stDv = 2) : this()
@@ -236,7 +237,12 @@
             return output.ToString();
         }
 
-        private void Load(string path)
+        private void Post_process()
+        {
+       
+        }
+
+            private void Load(string path)
         {
             var reader = new XmlTextReader(path);
             while (reader.Read())

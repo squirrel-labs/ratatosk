@@ -33,7 +33,8 @@
                 case "stats":
                     res.Add(character.Name + ":");
                     res.AddRange(
-                        character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
+                        character.Eigenschaften.Select(s => s.Key + ":\t " + s.Value));
+                    //character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
                     break;
                 case "t":
                 case "ta":
