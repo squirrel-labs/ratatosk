@@ -1,71 +1,87 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
-using Discord;
-using Discord.WebSocket;
-using Discord.Commands;
-using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscoBot
 {
+    using DiscoBot.Commands;
+
     public class Program
     {
         private CommandService commands;
         private DiscordSocketClient client;
         private IServiceProvider services;
 
-        public Char a = new Char();
+        public static void Main(string[] args) => new Program().StartAsync().GetAwaiter().GetResult();
 
-
-        static void Main(string[] args) => new Program().Start().GetAwaiter().GetResult();
-
-        public async Task Start()
+        public async Task StartAsync()
         {
-            client = new DiscordSocketClient();
-            commands = new CommandService();
+            Dsa.Startup();
+            this.client = new DiscordSocketClient();
+            this.commands = new CommandService();
 
-            string token = "Mjk0NTU0MDU4Nzg4NzAwMTYx.C7XGwQ.VwCAM10lDmwUe01NhBvDKNbd17I";
+            string token = Properties.Settings.Default.Token;
 
-            services = new ServiceCollection()
+            this.services = new ServiceCollection()
                     .BuildServiceProvider();
+            AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 
-            await InstallCommands();
+            await this.InstallCommandsAsync();
 
-            await client.LoginAsync(TokenType.Bot, token);
-            await client.StartAsync();
-
+            await this.client.LoginAsync(TokenType.Bot, token);
+            await this.client.StartAsync();
+            
             await Task.Delay(-1);
         }
 
-        public async Task InstallCommands()
+        public Task InstallCommandsAsync()
         {
             // Hook the MessageReceived Event into our Command Handler
-            client.MessageReceived += HandleCommand;
+            this.client.MessageReceived += this.HandleCommandAsync;
+            
             // Discover all of the commands in this assembly and load them.
-            await commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            return this.commands.AddModulesAsync(Assembly.GetEntryAssembly());
         }
 
-        public async Task HandleCommand(SocketMessage messageParam)
+        public async Task HandleCommandAsync(SocketMessage messageParam)
         {
             // Don't process the command if it was a System Message
-            var message = messageParam as SocketUserMessage;
-            if (message == null) return;
+            if (!(messageParam is SocketUserMessage message))
+            {
+                return;
+            }
+
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
+
             // Determine if the message is a command, based on if it starts with '!' or a mention prefix
-            if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(client.CurrentUser, ref argPos))) return;
+            if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(this.client.CurrentUser, ref argPos)))
+            {
+                return;
+            }
+
             // Create a Command Context
-            var context = new CommandContext(client, message);
+            var context = new CommandContext(this.client, message);
+
             // Execute the command. (result does not indicate a return value, 
             // rather an object stating if the command executed successfully)
-            var result = await commands.ExecuteAsync(context, argPos, services);
+            var result = await this.commands.ExecuteAsync(context, argPos, this.services);
             if (!result.IsSuccess)
+            {
                 await context.Channel.SendMessageAsync(result.ErrorReason);
+            }
+        }
+
+        private static void OnProcessExit(object sender, EventArgs e)
+        {
+            Console.WriteLine("I'm out of here");
+            Voice.Client.StopAsync();
         }
     }
-
 }
