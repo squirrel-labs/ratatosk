@@ -63,6 +63,10 @@
 
         public double CompareExact(string s, string q)
         {
+
+            s = s.ToLower();
+            q = q.ToLower();
+
             int i, j;
             const double Match = 3.0;
             const double Gap = -2.0;
