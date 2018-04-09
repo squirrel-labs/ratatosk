@@ -30,16 +30,19 @@
         }
 
         [Command("leave", RunMode = RunMode.Async)]
-        public Task LeaveChannelAsync(IVoiceChannel channel = null)
+        public async Task LeaveChannelAsync(IVoiceChannel channel = null)
         {
-            // For the next step with transmitting audio, you would want to pass this Audio Client in to a service.
-            return Client.StopAsync();
+            if (Client != null)
+            {
+                await Client.StopAsync();
+                Client = null;
+            }
         }
 
         [Command("play")]
         public Task PlayAudioAsync(string path)
         {
-            return SendAsync(path);
+            return Client == null ? this.Context.Channel.SendMessageAsync("Erst Joinen!") : SendAsync(path);
         }
 
         private static Process CreateStream(string path)
