@@ -19,12 +19,19 @@
 
         public static async Task SendAsync(string path, int volume = 256)
         {
+            if (Client == null)
+            {
+                throw new NullReferenceException("Bot befindet sich nicht in einem Sprachchannel");
+            }
+
             // Create FFmpeg using the previous example
-            var ffmpeg = CreateStream(path, volume);
+                var ffmpeg = CreateStream(path, volume);
             var output = ffmpeg.StandardOutput.BaseStream;
+
             var discord = Client.CreatePCMStream(AudioApplication.Music);
             await output.CopyToAsync(discord);
             await discord.FlushAsync();
+
         }
 
         [Command("join", RunMode = RunMode.Async)]
@@ -51,6 +58,7 @@
         {
             if (Client != null)
             {
+                await SoundEffects.Play(Sound.Nooo);
                 await Client.StopAsync();
                 Client = null;
             }
@@ -71,7 +79,7 @@
                 soundList.Add((Sound)sound);
             }
 
-             var sc = new SpellCorrect();
+            var sc = new SpellCorrect();
 
             var tSound = soundList.OrderBy(x => sc.Compare(path, x.ToString())).First();
 
