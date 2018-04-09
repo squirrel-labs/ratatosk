@@ -44,8 +44,10 @@ namespace DiscoBot.Auxiliary
                     url = "https://www.myinstants.com/media/sounds/nooo.swf.mp3";
                     break;
                 case Sound.Wrong:
-                    url = "https://www.myinstants.com/media/sounds/stupid_dum_03.mp3";
-                    vol = 10;
+                    // url = "https://www.myinstants.com/media/sounds/stupid_dum_03.mp3";
+                    // vol = 10;
+                    url = "https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3";
+                    vol = 50;
                     break;
             }
 
