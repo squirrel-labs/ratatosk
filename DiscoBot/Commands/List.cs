@@ -33,8 +33,9 @@
                 case "stats":
                     res.Add(character.Name + ":");
                     res.AddRange(
-                        character.Eigenschaften.Select(s => s.Key + ":\t " + s.Value));
-                    //character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
+                    //character.Eigenschaften.Select(s => s.Key + ":\t " + s.Value));
+                    character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
+                    res.Add("LE:\t " + character.Lebenspunkte);
                     break;
                 case "t":
                 case "ta":

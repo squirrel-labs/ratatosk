@@ -241,7 +241,13 @@
 
         private void Post_process()
         {
-       
+            var LE_Wert = this.Eigenschaften.First(s => s.Key.Contains("Leben")).Value;
+            var KK_Wert = this.Eigenschaften.First(s => s.Key.Contains("Körper")).Value;
+            var KO__Wert = this.Eigenschaften.First(s => s.Key.Contains("Konst")).Value;
+
+            this.Lebenspunkte = LE_Wert + (int)(KO__Wert + (KK_Wert/2.0) + 0.5);
+
+
         }
 
             private void Load(string path)

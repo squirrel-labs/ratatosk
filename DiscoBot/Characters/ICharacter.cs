@@ -6,6 +6,12 @@
 
         int Lebenspunkte { get; set; }
 
+        //int Ausdauer { get; set; }
+
+        //int Astralpunkte { get; set; }
+
+        //int Karmalpunkte { get; set; }
+
         string TestTalent(string talent, int erschwernis = 0);
 
         string TestEigenschaft(string eigenschaft, int erschwernis = 0);
