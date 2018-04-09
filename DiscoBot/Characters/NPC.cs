@@ -36,6 +36,7 @@
                 return $"{this.Name} vollführt {talent} erfolgreich";
             }
 
+
             return $"{this.Name} scheitert an {talent}";
         }
 

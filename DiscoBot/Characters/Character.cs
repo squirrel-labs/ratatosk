@@ -78,7 +78,7 @@
                 }
 
                 var props = tTalent.Test(); // get the required properties
-                int tap = tTalent.Value; // get tap
+                int tap = tTalent.Value; // get taw
                 var werte = props.Select(p => this.Eigenschaften[this.PropTable[p]]).ToList();
 
                 output.AppendFormat(
@@ -102,9 +102,9 @@
                         int temp = Dice.Roll();
                         int eigenschaft = this.Eigenschaften[this.PropTable[props[i]]];
 
-                        if (eigenschaft - gesamtErschwernis < temp)
+                        if (eigenschaft + gesamtErschwernis < temp)
                         {
-                            tap -= temp - eigenschaft + gesamtErschwernis;
+                            tap -= temp - (eigenschaft + gesamtErschwernis);
                         }
 
                         output.Append($"[{temp}]"); // add to string
@@ -132,8 +132,12 @@
                     }
                 }
 
-                tap = tap == 0 ? 1 : tap;
+                tap = (tap == 0) ? 1 : tap;
 
+                if(tap < 0)
+                {
+                    SoundEffects.Play(Sound.Wrong);
+                }
                 output.AppendFormat(" tap: {0,2}", tap);
 
                 return output.ToString(); // return output
