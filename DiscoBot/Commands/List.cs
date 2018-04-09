@@ -17,40 +17,52 @@
         public async Task ListAsync([Summary("Aktion")] string prop)
         {
             var res = new List<string>();
+
+            var character = ((Character)Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])));
             switch (prop.ToLower())
             {
                 case "chars":
                 case "Chars":
                     res.AddRange(Dsa.Chars.Select(x => x.Name));
                     break;
+                case "e":
+                case "eig":
+                case "eigenschaft":
+                case "eigenschaften":
+                case "stat":
+                case "stats":
+                    res.Add(character.Name + ":");
+                    res.AddRange(
+                        character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
+                    break;
                 case "t":
                 case "ta":
                 case "talent":
                 case "zauber":
+                    res.Add(character.Name + ":");
                     res.AddRange(
-                        ((Character)Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])))
-                        .Talente.Select(s => s.Name + "\t " + s.Value + "\t " + s.Probe));
+                        character.Talente.Select(s => s.Name + "\t " + s.Value + "\t " + s.Probe));
                     break;
                 case "w":
                 case "waffe":
                 case "waffen":
+                    res.Add(character.Name + ":");
                     res.AddRange(
-                        ((Character)Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])))
-                        .Kampftalente.Select(s => s.Name));
+                        character.Kampftalente.Select(s => s.Name));
                     break;
                 case "fern":
+                    res.Add(character.Name + ":");
                     res.AddRange(
-                        ((Character)Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])))
-                        .Talente.Select(s => s.Name));
+                        character.Talente.Select(s => s.Name));
                     break;
                 case "v":
                 case "vt":
                 case "vor":
                 case "vorteil":
+                    res.Add(character.Name + ":");
                     res.AddRange(
-                        ((Character)Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])))
-                        .Vorteile
-                        .Select(s => s.Name + "\t " + (s.Value == 0 ? string.Empty : s.Value.ToString())));
+                        character.Vorteile
+                        .Select(s => s.Name + "\t " + s.Value));// (s.Value == 0 ? string.Empty : s.Value.ToString())));
                     break;
 
                 default:

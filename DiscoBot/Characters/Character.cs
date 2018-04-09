@@ -268,7 +268,8 @@
                             {
                                 this.Vorteile.Add(new Vorteil(
                                     reader.GetAttribute("name"),
-                                    Convert.ToInt32(reader.GetAttribute("value"))));
+                                  //  Convert.ToInt32(reader.GetAttribute("value"))));
+                                reader.GetAttribute("value")));
                             }
                             catch
                             {
