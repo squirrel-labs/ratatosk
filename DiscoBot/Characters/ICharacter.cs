@@ -4,6 +4,8 @@
     {
         string Name { get; set; }
 
+        int Lebenspunkte { get; set; }
+
         string TestTalent(string talent, int erschwernis = 0);
 
         string TestEigenschaft(string eigenschaft, int erschwernis = 0);

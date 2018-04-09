@@ -16,7 +16,9 @@
         }
 
         public string Name { get; set; }
-        
+
+        public int Lebenspunkte { get; set; }
+
         public string TestTalent(string talent, int tap = 3)
         {
             for (int i = 0; i <= 2; i++)
