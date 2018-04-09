@@ -53,7 +53,7 @@ namespace DiscoBot.Auxiliary
 
             if (url != string.Empty)
             {
-                await Task.Run(() => Voice.SendAsync(url, vol));
+                Task.Run(() => Voice.SendAsync(url, vol));
                 return;
             }
 

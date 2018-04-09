@@ -54,6 +54,8 @@
 
         public string Name { get; set; } // char name
 
+        public int Lebenspunkte { get; set; }
+
         public Dictionary<string, int> Eigenschaften { get; set; } = new Dictionary<string, int>();   // char properties
 
         public List<Talent> Talente { get; set; } = new List<Talent>();       // list of talent objects (talents and spells)
