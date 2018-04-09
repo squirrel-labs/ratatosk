@@ -6,6 +6,8 @@
 
     public class SpellCorrect : StringComparer
     {
+        public const int ErrorThreshold = 94100;
+
         public override int Compare(string x, string y)
         {
             if (string.IsNullOrEmpty(x))

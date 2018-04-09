@@ -142,6 +142,7 @@
   <ItemGroup>
     <Compile Include="Auxiliary\Dice.cs" />
     <Compile Include="Auxiliary\KampfTalent.cs" />
+    <Compile Include="Auxiliary\Soundeffects.cs" />
     <Compile Include="Auxiliary\SpellCorrect.cs" />
     <Compile Include="Auxiliary\Talent.cs" />
     <Compile Include="Auxiliary\Vorteil.cs" />

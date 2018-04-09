@@ -71,8 +71,9 @@
                 var sc = new SpellCorrect();
                 var tTalent = this.Talente.OrderBy(x => sc.Compare(talent, x.Name)).First();
 
-                if (sc.Compare(talent, tTalent.Name) > 94100)
+                if (sc.Compare(talent, tTalent.Name) > SpellCorrect.ErrorThreshold)
                 {
+                    SoundEffects.Play(Sound.Wrong);
                     return $"{this.Name} kann nicht {talent}...";
                 }
 
@@ -164,8 +165,9 @@
             var output = new StringBuilder();
             var sc = new SpellCorrect();
             var attack = this.Kampftalente.OrderBy(x => sc.Compare(talent, x.Name)).First();
-            if (sc.Compare(talent, attack.Name) > 94)
+            if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
             {
+                SoundEffects.Play(Sound.Wrong);
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";
             }
 
@@ -187,8 +189,9 @@
             var sc = new SpellCorrect();
             var attack = this.Kampftalente.OrderBy(x => sc.Compare(talent, x.Name)).First();
 
-            if (sc.Compare(talent, attack.Name) > 94)
+            if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
             {
+                SoundEffects.Play(Sound.Wrong);
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";
             }
 
@@ -210,8 +213,9 @@
             var sc = new SpellCorrect();
             int fk = this.Eigenschaften["fk"];
             var attack = this.Talente.OrderBy(x => sc.Compare(talent, x.Name)).First();
-            if (sc.Compare(talent, attack.Name) > 94)
+            if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
             {
+                SoundEffects.Play(Sound.Wrong);
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";
             }
 

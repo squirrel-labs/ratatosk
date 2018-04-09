@@ -1,7 +1,13 @@
 ﻿namespace DiscoBot.Commands
 {
+    using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
+    using System.Media;
     using System.Threading.Tasks;
+
+    using DiscoBot.Auxiliary;
 
     using Discord;
     using Discord.Audio;
@@ -10,6 +16,17 @@
     public class Voice : ModuleBase
     {
         public static IAudioClient Client { get; set; }
+
+        public static async Task SendAsync(string path, int volume = 256)
+        {
+            // Create FFmpeg using the previous example
+            var ffmpeg = CreateStream(path, volume);
+            var output = ffmpeg.StandardOutput.BaseStream;
+            var discord = Client.CreatePCMStream(AudioApplication.Music);
+            await output.CopyToAsync(discord);
+            await discord.FlushAsync();
+        }
+
         [Command("join", RunMode = RunMode.Async)]
         public async Task JoinChannelAsync(IVoiceChannel channel = null)
         {
@@ -42,29 +59,40 @@
         [Command("play")]
         public Task PlayAudioAsync(string path)
         {
-            return Client == null ? this.Context.Channel.SendMessageAsync("Erst Joinen!") : SendAsync(path);
+            if (Client == null)
+            {
+                return this.Context.Channel.SendMessageAsync("Erst Joinen!");
+            }
+
+            var sounds = Enum.GetValues(typeof(Sound));
+            var soundList = new List<Sound>();
+            foreach (var sound in sounds)
+            {
+                soundList.Add((Sound)sound);
+            }
+
+             var sc = new SpellCorrect();
+
+            var tSound = soundList.OrderBy(x => sc.Compare(path, x.ToString())).First();
+
+            if (sc.Compare(path, tSound.ToString()) > SpellCorrect.ErrorThreshold)
+            {
+                return SendAsync(path);
+            }
+
+            return SoundEffects.Play(tSound);
         }
 
-        private static Process CreateStream(string path)
+        private static Process CreateStream(string path, int vol = 256)
         {
             var ffmpeg = new ProcessStartInfo
             {
                 FileName = "ffmpeg",
-                Arguments = $"-i {path}  -ac 2 -f s16le -ar 48000 -ab 620000 pipe:1",
+                Arguments = $"-i {path}  -ac 2 -f s16le -ar 48000 -ab 620000 -vol {vol} pipe:1",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
             };
             return Process.Start(ffmpeg);
-        }
-
-        private static async Task SendAsync(string path)
-        {
-            // Create FFmpeg using the previous example
-            var ffmpeg = CreateStream(path);
-            var output = ffmpeg.StandardOutput.BaseStream;
-            var discord = Client.CreatePCMStream(AudioApplication.Music);
-            await output.CopyToAsync(discord);
-            await discord.FlushAsync();
         }
     }
 }
