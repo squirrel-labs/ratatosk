@@ -76,13 +76,15 @@
             
             for (i = 1; i < s.Length; i++)
             {
-                matrix[i, 0] = 0.0;
+               //  matrix[i, 0] = 0.0;
+                matrix[i, 0] = i * Gap;
             }
 
             for (i = 1; i < q.Length; i++)
             {
-                matrix[0, i] = 0.0;
+               matrix[0, i] = 0.0;
             }
+
 
             for (i = 1; i <= s.Length; i++)
             {
@@ -114,12 +116,12 @@
                         }
                     }
                 
-                    if (score < 0)
-                    {
-                        score = 0;
-                    }
+                  //  if (score < 0)
+                  //  {
+                  //      score = 0;
+                  // }
 
-                    if (max < score)
+                    if (max < score && i == s.Length)
                     {
                         max = score;
                     }
