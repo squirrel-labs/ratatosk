@@ -13,7 +13,8 @@
         public static string CheckCommand(string name, CommandTypes command, string waffe, int erschwernis = 0)
         {
             var comp = new SpellCorrect();
-            var chr = Dsa.Chars.OrderBy(x => comp.Compare(x.Name, name)).First();
+            var chr = Dsa.Chars.OrderBy(x => comp.Compare(name, x.Name)).First();
+
             switch (command)
             {
                 case CommandTypes.Talent:
