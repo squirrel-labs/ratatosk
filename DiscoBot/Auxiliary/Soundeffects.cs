@@ -10,11 +10,13 @@ namespace DiscoBot.Auxiliary
 
     public enum Sound
     {
+        Bell,
         Ding,
         Nooo,
         Monterkill,
         Finish,
-        Wrong
+        Wrong,
+        Magic
     }
 
     public static class SoundEffects
@@ -25,11 +27,15 @@ namespace DiscoBot.Auxiliary
             int vol = 256;
             switch (s)
             {
+                case Sound.Bell:
                 case Sound.Ding:
                     url = "https://www.myinstants.com/media/sounds/boxing-bell.mp3";
                     break;
                 case Sound.Finish:
                     url = "https://www.myinstants.com/media/sounds/finishhim.swf.mp3";
+                    break; 
+                case Sound.Magic:
+                    url = "https://www.myinstants.com/media/sounds/dream-harp-sound-effect.mp3";
                     break;
                 case Sound.Monterkill:
                     url = "https://www.myinstants.com/media/sounds/announcer_kill_monster_01.mp3";

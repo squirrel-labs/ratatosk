@@ -15,7 +15,7 @@
         public static async Task ReplyTimedAsync(this ModuleBase m, string message, TimeSpan time)
         {
             var token = message.GetHashCode();
-            var send = m.Context.Channel.SendMessageAsync($"#{token}\n```xl\n{message}```", true);
+            var send = m.Context.Channel.SendMessageAsync($"#{token}\n```xl\n{message}```", false);
 
             var barInvoker = new BackgroundWorker();
             barInvoker.DoWork += delegate
