@@ -21,7 +21,7 @@ namespace DiscoBot.Auxiliary
 
     public static class SoundEffects
     {
-        public static Task Play(Sound s)
+        public static async Task Play(Sound s)
         {
             string url = string.Empty;
             int vol = 256;
@@ -53,10 +53,11 @@ namespace DiscoBot.Auxiliary
 
             if (url != string.Empty)
             {
-                return Voice.SendAsync(url, vol);
+                await Task.Run(() => Voice.SendAsync(url, vol));
+                return;
             }
 
-            return Dsa.GeneralContext.Channel.SendMessageAsync("Ton Existiert nicht");
+            await Dsa.GeneralContext.Channel.SendMessageAsync("Ton Existiert nicht");
         }
     }
 }

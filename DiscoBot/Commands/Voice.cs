@@ -30,6 +30,7 @@
 
             var discord = Client.CreatePCMStream(AudioApplication.Music);
             await output.CopyToAsync(discord);
+
             await discord.FlushAsync();
 
         }
@@ -65,11 +66,11 @@
         }
 
         [Command("play")]
-        public Task PlayAudioAsync(string path)
+        public async Task PlayAudioAsync(string path)
         {
             if (Client == null)
             {
-                return this.Context.Channel.SendMessageAsync("Erst Joinen!");
+                await this.Context.Channel.SendMessageAsync("Erst Joinen!");
             }
 
             var sounds = Enum.GetValues(typeof(Sound));
@@ -85,10 +86,10 @@
 
             if (sc.Compare(path, tSound.ToString()) > SpellCorrect.ErrorThreshold)
             {
-                return SendAsync(path);
+                await Task.Run(() => Voice.SendAsync(path));
             }
 
-            return SoundEffects.Play(tSound);
+            await Task.Run(() => SoundEffects.Play(tSound));
         }
 
         private static Process CreateStream(string path, int vol = 256)
