@@ -39,10 +39,10 @@
         [Command("play")]
         public Task PlayAudioAsync(string path)
         {
-            return this.SendAsync(Client, path);
+            return SendAsync(path);
         }
 
-        private Process CreateStream(string path)
+        private static Process CreateStream(string path)
         {
             var ffmpeg = new ProcessStartInfo
             {
@@ -54,12 +54,12 @@
             return Process.Start(ffmpeg);
         }
 
-        private async Task SendAsync(IAudioClient client, string path)
+        private static async Task SendAsync(string path)
         {
             // Create FFmpeg using the previous example
-            var ffmpeg = this.CreateStream(path);
+            var ffmpeg = CreateStream(path);
             var output = ffmpeg.StandardOutput.BaseStream;
-            var discord = client.CreatePCMStream(AudioApplication.Music);
+            var discord = Client.CreatePCMStream(AudioApplication.Music);
             await output.CopyToAsync(discord);
             await discord.FlushAsync();
         }
