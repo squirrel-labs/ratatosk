@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace DiscoBot.Auxiliary
 {
+    using System.Runtime.CompilerServices;
+    using System.Threading;
+
     using DiscoBot.Commands;
 
     public enum Sound
@@ -53,11 +56,11 @@ namespace DiscoBot.Auxiliary
 
             if (url != string.Empty)
             {
-                Task.Run(() => Voice.SendAsync(url, vol));
-                return;
+                // await Dsa.Service.SendAudioAsync(url, vol);
+                await Voice.SendAsync(url, vol);
             }
 
-            await Dsa.GeneralContext.Channel.SendMessageAsync("Ton Existiert nicht");
+            throw new Exception("Ton Existiert nicht");
         }
     }
 }

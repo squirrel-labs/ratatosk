@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscoBot
 {
+    using DiscoBot.Audio;
     using DiscoBot.Commands;
 
     public class Program
@@ -28,7 +29,7 @@ namespace DiscoBot
 
             string token = Properties.Settings.Default.Token;
 
-            this.services = new ServiceCollection()
+            this.services = new ServiceCollection().AddSingleton(new AudioService())
                     .BuildServiceProvider();
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 

@@ -4,6 +4,7 @@
     using System.IO;
     using System.Linq;
 
+    using DiscoBot.Audio;
     using DiscoBot.Auxiliary;
     using DiscoBot.Characters;
 
@@ -12,6 +13,8 @@
     public static class Dsa
     {
         public static ICommandContext GeneralContext { get; set; }
+
+        public static AudioService Service { get; set; }
 
         public static Dictionary<string, string> Relation { get; set; } = new Dictionary<string, string>(); // dictionary to match the char
 

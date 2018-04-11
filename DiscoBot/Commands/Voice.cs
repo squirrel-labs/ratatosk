@@ -2,11 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Media;
+    using System.Threading;
     using System.Threading.Tasks;
 
+    using DiscoBot.Audio;
     using DiscoBot.Auxiliary;
 
     using Discord;
@@ -27,12 +30,16 @@
             // Create FFmpeg using the previous example
                 var ffmpeg = CreateStream(path, volume);
             var output = ffmpeg.StandardOutput.BaseStream;
+            var barInvoker = new BackgroundWorker();
+            barInvoker.DoWork += delegate
+                {
+                    var discord = Client.CreatePCMStream(AudioApplication.Music);
+                    output.CopyToAsync(discord);
 
-            var discord = Client.CreatePCMStream(AudioApplication.Music);
-            await output.CopyToAsync(discord);
-
-            await discord.FlushAsync();
-
+                    discord.FlushAsync();
+                };
+            
+            barInvoker.RunWorkerAsync();
         }
 
         [Command("join", RunMode = RunMode.Async)]
@@ -59,13 +66,14 @@
         {
             if (Client != null)
             {
-                await SoundEffects.Play(Sound.Nooo);
+                var wait = SoundEffects.Play(Sound.Nooo);
                 await Client.StopAsync();
                 Client = null;
+                wait.Wait();
             }
         }
 
-        [Command("play")]
+        [Command("play", RunMode = RunMode.Async)]
         public async Task PlayAudioAsync(string path)
         {
             if (Client == null)

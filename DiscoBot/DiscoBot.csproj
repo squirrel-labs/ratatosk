@@ -140,6 +140,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioModule.cs" />
+    <Compile Include="Audio\AudioService.cs" />
     <Compile Include="Auxiliary\Dice.cs" />
     <Compile Include="Auxiliary\KampfTalent.cs" />
     <Compile Include="Auxiliary\Soundeffects.cs" />
