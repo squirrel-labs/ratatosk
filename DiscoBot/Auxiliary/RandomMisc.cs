@@ -4,7 +4,7 @@
     using System.Linq;
     using System.Text;
 
-    public static class Misc
+    public static class RandomMisc
     {
         private static readonly Random Rand = new Random();
 

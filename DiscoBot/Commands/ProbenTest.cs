@@ -4,7 +4,7 @@
 
     using Discord.Commands;
 
-    public class Test : ModuleBase
+    public class ProbenTest : ModuleBase
     {
         [Command("t"), Summary("Würfelt ein Talent-/Zauberprobe")]
         [Alias("T", "Talent", "talent", "zauber", "z", "versuche")]

@@ -25,7 +25,7 @@
             {
                 // foreach property, dice and tap 
                 int temp = Dice.Roll();
-                int eigenschaft = (int)Math.Round(Misc.Random(this.stDv, this.mean));
+                int eigenschaft = (int)Math.Round(RandomMisc.Random(this.stDv, this.mean));
 
                 if (eigenschaft < temp)
                 {
@@ -45,7 +45,7 @@
         public string TestEigenschaft(string eigenschaft, int erschwernis = 0)
         {
             int temp = Dice.Roll();
-            int prop = (int)Math.Round(Misc.Random(this.stDv, this.stDv));
+            int prop = (int)Math.Round(RandomMisc.Random(this.stDv, this.stDv));
             
             if (temp + erschwernis < prop)
             {

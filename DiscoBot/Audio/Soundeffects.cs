@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DiscoBot.Auxiliary
+﻿namespace DiscoBot.Audio
 {
-    using System.Runtime.CompilerServices;
-    using System.Threading;
+    using System;
+    using System.Threading.Tasks;
 
     using DiscoBot.Commands;
 

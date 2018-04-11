@@ -144,7 +144,8 @@
     <Compile Include="Audio\AudioService.cs" />
     <Compile Include="Auxiliary\Dice.cs" />
     <Compile Include="Auxiliary\KampfTalent.cs" />
-    <Compile Include="Auxiliary\Soundeffects.cs" />
+    <Compile Include="Audio\Soundeffects.cs" />
+    <Compile Include="Commands\MiscCommands.cs" />
     <Compile Include="Auxiliary\SpellCorrect.cs" />
     <Compile Include="Auxiliary\Talent.cs" />
     <Compile Include="Auxiliary\Vorteil.cs" />
@@ -155,11 +156,10 @@
     <Compile Include="Commands\Gm.cs" />
     <Compile Include="Commands\List.cs" />
     <Compile Include="Commands\NpcCommands.cs" />
-    <Compile Include="Commands\Test.cs" />
-    <Compile Include="Commands\Utility.cs" />
-    <Compile Include="Commands\Voice.cs" />
+    <Compile Include="Commands\ProbenTest.cs" />
+    <Compile Include="Audio\Voice.cs" />
     <Compile Include="Characters\ICharacter.cs" />
-    <Compile Include="Auxiliary\Misc.cs" />
+    <Compile Include="Auxiliary\RandomMisc.cs" />
     <Compile Include="Characters\NPC.cs" />
     <Compile Include="Dsa.cs" />
     <Compile Include="Program.cs" />

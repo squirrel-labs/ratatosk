@@ -17,7 +17,7 @@
 
         public int Value { get; set; }
         
-        public string[] Test() // turn XX/XX/XX into string[]{XX,XX,XX}
+        public string[] GetEigenschaften() // turn XX/XX/XX into string[]{XX,XX,XX}
         {
             var temp = this.Probe.Split('/');
             for (var index = 0; index < temp.Length; index++)

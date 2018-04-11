@@ -6,6 +6,7 @@
     using System.Text;
     using System.Xml;
 
+    using DiscoBot.Audio;
     using DiscoBot.Auxiliary;
 
     public class Character : ICharacter
@@ -33,22 +34,22 @@
             this.Name = name;
             foreach (var i in c.Eigenschaften)
             {
-                this.Eigenschaften.Add(i.Key, i.Value + (int)Math.Round(Misc.Random(stDv)));
+                this.Eigenschaften.Add(i.Key, i.Value + (int)Math.Round(RandomMisc.Random(stDv)));
             }
 
             foreach (var i in c.Vorteile)
             {
-                this.Vorteile.Add(new Vorteil(i.Name, i.Value + (int)Math.Round(Misc.Random(stDv))));
+                this.Vorteile.Add(new Vorteil(i.Name, i.Value + (int)Math.Round(RandomMisc.Random(stDv))));
             }
 
             foreach (var i in c.Talente)
             {
-                this.Talente.Add(new Talent(i.Name, i.Probe, i.Value + (int)Math.Round(Misc.Random(stDv))));
+                this.Talente.Add(new Talent(i.Name, i.Probe, i.Value + (int)Math.Round(RandomMisc.Random(stDv))));
             }
 
             foreach (var i in c.Kampftalente)
             {
-                this.Kampftalente.Add(new KampfTalent(i.Name, i.At + (int)Math.Round(Misc.Random(stDv)), i.Pa + (int)Math.Round(Misc.Random(stDv))));
+                this.Kampftalente.Add(new KampfTalent(i.Name, i.At + (int)Math.Round(RandomMisc.Random(stDv)), i.Pa + (int)Math.Round(RandomMisc.Random(stDv))));
             }
         }
 
@@ -80,7 +81,7 @@
                     return $"{this.Name} kann nicht {talent}...";
                 }
 
-                var props = tTalent.Test(); // get the required properties
+                var props = tTalent.GetEigenschaften(); // get the required properties
                 int tap = tTalent.Value; // get taw
                 var werte = props.Select(p => this.Eigenschaften[this.PropTable[p]]).ToList();
 

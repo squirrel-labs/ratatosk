@@ -1,15 +1,12 @@
-﻿namespace DiscoBot.Commands
+﻿namespace DiscoBot.Audio
 {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
-    using System.Media;
-    using System.Threading;
     using System.Threading.Tasks;
 
-    using DiscoBot.Audio;
     using DiscoBot.Auxiliary;
 
     using Discord;

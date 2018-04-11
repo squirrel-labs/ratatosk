@@ -6,13 +6,13 @@
 
     using Discord.Commands;
 
-    public class Utility : ModuleBase
+    public class MiscCommands : ModuleBase
     {
         [Command("r"), Summary("Würfelt ")]
         [Alias("R", "Roll", "roll", "Würfle")]
         public Task RollAsync([Remainder, Summary("Weapon")] string roll)
         {
-            return this.ReplyAsync("```xl\n" + Misc.Roll(roll) + "\n```");
+            return this.ReplyAsync("```xl\n" + RandomMisc.Roll(roll) + "\n```");
         }
 
         [Command("general"), Summary("Set General ")]
