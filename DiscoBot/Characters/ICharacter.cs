@@ -10,7 +10,7 @@
 
         //int Astralpunkte { get; set; }
 
-        //int Karmalpunkte { get; set; }
+        //int Karmapunkte { get; set; }
 
         string TestTalent(string talent, int erschwernis = 0);
 

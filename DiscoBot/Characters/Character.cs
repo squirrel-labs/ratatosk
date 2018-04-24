@@ -21,12 +21,13 @@
             this.PropTable.Add("GE", "Gewandtheit");
             this.PropTable.Add("KO", "Konstitution");
             this.PropTable.Add("KK", "Körperkraft");
+
+            this.Post_process(); // calculate derived values
         }
 
         public Character(string path) : this()
         {
             this.Load(path); // load
-            this.Post_process(); // calculate derived values
         }
 
         public Character(Character c, string name, int stDv = 2) : this()
@@ -69,8 +70,6 @@
         
         public string TestTalent(string talent, int erschwernis = 0)     // Talentprobe
         {
-            try
-            {
                 var output = new StringBuilder();
                 var sc = new SpellCorrect();
                 var tTalent = this.Talente.OrderBy(x => sc.Compare(talent, x.Name)).First();
@@ -138,19 +137,15 @@
 
                 tap = (tap == 0) ? 1 : tap;
 
-                if(tap < 0)
+                if (tap < 0)
                 {
                     SoundEffects.Play(Sound.Wrong).Wait();
                 }
+
                 output.AppendFormat(" tap: {0,2}", tap);
 
                 return output.ToString(); // return output
-            }
-            catch (Exception)
-            {
-                throw new Exception(
-                    $"{talent} nicht vorhanden! Besitzt {this.Name} {talent} nicht? \n Oder ist {talent} falsch geschrieben?");
-            }
+            
         }
 
         public string TestEigenschaft(string eigenschaft, int erschwernis = 0)
@@ -247,8 +242,7 @@
             var KO__Wert = this.Eigenschaften.First(s => s.Key.Contains("Konst")).Value;
 
             this.Lebenspunkte = LE_Wert + (int)(KO__Wert + (KK_Wert/2.0) + 0.5);
-
-
+            
         }
 
             private void Load(string path)

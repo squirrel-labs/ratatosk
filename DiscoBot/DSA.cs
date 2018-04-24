@@ -29,6 +29,9 @@
             Relation.Add("DSA Bot", "Morla"); // "Felis Exodus Schattenwald");
             Relation.Add("Morla", "Morla");
             Relation.Add("Rhoktar", "Rhoktar4");
+            Relation.Add("MagicBro5", "Krenko");
+            Relation.Add("Nicolas", "Hartmut Reiher");
+            Relation.Add("TrueKuehli", "Ledur Torfinson");
 
             // relation.Add("Papo","Gwendelson");
             Relation.Add("Papo", "Pump aus der Gosse");

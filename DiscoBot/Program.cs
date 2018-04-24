@@ -24,6 +24,7 @@ namespace DiscoBot
         public async Task StartAsync()
         {
             Dsa.Startup();
+            
             this.client = new DiscordSocketClient();
             this.commands = new CommandService();
 

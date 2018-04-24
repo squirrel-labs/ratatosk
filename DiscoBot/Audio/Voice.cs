@@ -12,6 +12,7 @@
     using Discord;
     using Discord.Audio;
     using Discord.Commands;
+    using Discord.WebSocket;
 
     public class Voice : ModuleBase
     {
@@ -61,6 +62,11 @@
         [Command("leave", RunMode = RunMode.Async)]
         public async Task LeaveChannelAsync(IVoiceChannel channel = null)
         {
+            if (!((SocketGuildUser)this.Context.User).Roles.ToList().Exists(v => v.Name.Equals("Meister")))
+            {
+                await this.ReplyAsync("```xl\n Keine ausreichenden Berechtigunen\n```");
+                return;
+            }
             if (Client != null)
             {
                 var wait = SoundEffects.Play(Sound.Nooo);

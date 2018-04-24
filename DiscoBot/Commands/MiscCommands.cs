@@ -28,5 +28,13 @@
         {
             return this.ReplyAsync(echo);
         }
+
+        [Command("spot"), Summary("Echos a message.")]
+        [Alias("spotify")]
+        public Task SpotiAsync([Remainder, Summary("The text to echo")] string echo)
+        {
+            var test = new Spotify.WebClient();
+            return this.ReplyAsync(string.Join("\n", test.GetPlaylist("")));
+        }
     }
 }
