@@ -29,6 +29,10 @@
                 case "eig":
                 case "eigenschaft":
                 case "eigenschaften":
+                    res.Add(character.Name + ":");
+                    res.AddRange(
+                    character.Eigenschaften.Take(8).Select(s => s.Key + ":\t " + s.Value));
+                    break;
                 case "stat":
                 case "stats":
                     res.Add(character.Name + ":");
