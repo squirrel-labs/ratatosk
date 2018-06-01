@@ -25,7 +25,7 @@
         public static void Startup()
         {
             Relation.Add("The Doctor", "Numeri Illuminus"); // Relation
-            Relation.Add("Tardis", "Morla"); // "Numeri Illuminus");
+            Relation.Add("Tardis", "Helga von Drachenei, Tausendsasserin"); // "Numeri Illuminus");
             Relation.Add("DSA Bot", "Morla"); // "Felis Exodus Schattenwald");
             Relation.Add("Morla", "Morla");
             Relation.Add("Rhoktar", "Rhoktar4");

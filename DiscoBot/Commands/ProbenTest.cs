@@ -10,7 +10,24 @@
         [Alias("T", "Talent", "talent", "zauber", "z", "versuche")]
         public Task TalentAsync([Summary("Talent oder Zaubername")] string talent, int erschwernis = 0)
         {
-            string res = Gm.CheckCommand(Dsa.Relation[this.Context.User.Username], CommandTypes.Talent, talent, erschwernis);
+            string res;
+            try
+            {
+                res = Gm.CheckCommand(
+                    Dsa.Relation[this.Context.User.Username],
+                    CommandTypes.Talent,
+                    talent,
+                    erschwernis);
+            }
+            catch
+            {
+                res = Gm.CheckCommand(
+                    Dsa.Relation["Tardis"],
+                    CommandTypes.Talent,
+                    talent,
+                    erschwernis);
+            }
+
             return this.ReplyAsync("```xl\n" + res + "\n```");
         }
 

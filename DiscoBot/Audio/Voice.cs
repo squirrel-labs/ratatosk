@@ -62,17 +62,23 @@
         [Command("leave", RunMode = RunMode.Async)]
         public async Task LeaveChannelAsync(IVoiceChannel channel = null)
         {
-            if (!((SocketGuildUser)this.Context.User).Roles.ToList().Exists(v => v.Name.Equals("Meister")))
-            {
-                await this.ReplyAsync("```xl\n Keine ausreichenden Berechtigunen\n```");
-                return;
-            }
+//            Permissions.Test(this.Context, "Meister");
+
             if (Client != null)
             {
                 var wait = SoundEffects.Play(Sound.Nooo);
                 await Client.StopAsync();
                 Client = null;
                 wait.Wait();
+            }
+        }
+
+        [Command("volume")]
+        public async Task SetVolume(int volume)
+        {
+            if (volume <= 100 && volume >= 0)
+            {
+                SoundEffects.Volume = volume;
             }
         }
 
