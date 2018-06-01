@@ -6,6 +6,7 @@
     using System.Text;
     using System.Threading.Tasks;
 
+    using DiscoBot.Audio;
     using DiscoBot.Auxiliary;
     using DiscoBot.Characters;
 
@@ -56,6 +57,11 @@
                     res.Add(character.Name + ":");
                     res.AddRange(
                         character.Talente.Select(s => s.Name));
+                    break;
+                case "sound":
+                case "sounds":
+                    res.AddRange(
+                        Enum.GetNames(typeof(Sound)));
                     break;
                 case "v":
                 case "vt":

@@ -42,5 +42,7 @@
             m.Context.Channel.DeleteMessagesAsync(
                 messages.Where(x => x.Content.StartsWith($"#{token}\n") && x.Author.IsBot));
         }
+
+
     }
 }

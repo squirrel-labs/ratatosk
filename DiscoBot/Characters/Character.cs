@@ -22,12 +22,12 @@
             this.PropTable.Add("KO", "Konstitution");
             this.PropTable.Add("KK", "Körperkraft");
 
-            this.Post_process(); // calculate derived values
         }
 
         public Character(string path) : this()
         {
             this.Load(path); // load
+            this.Post_process(); // calculate derived values
         }
 
         public Character(Character c, string name, int stDv = 2) : this()
@@ -52,6 +52,8 @@
             {
                 this.Kampftalente.Add(new KampfTalent(i.Name, i.At + (int)Math.Round(RandomMisc.Random(stDv)), i.Pa + (int)Math.Round(RandomMisc.Random(stDv))));
             }
+
+            this.Post_process(); // calculate derived values
         }
 
         public string Name { get; set; } // char name
@@ -139,7 +141,7 @@
 
                 if (tap < 0)
                 {
-                    SoundEffects.Play(Sound.Wrong).Wait();
+                    //SoundEffects.Play(Sound.Wrong).Wait();
                 }
 
                 output.AppendFormat(" tap: {0,2}", tap);

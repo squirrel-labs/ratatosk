@@ -36,11 +36,7 @@
         [Alias("GM", "as", "As", "als")]
         public async Task ProbeAsync([Summary("Fernkampfwaffe")] string name, string command, string waffe, int erschwernis = 0)
         {
-            if (!((SocketGuildUser)this.Context.User).Roles.ToList().Exists(v => v.Name.Equals("Meister")))
-            {
-                await this.ReplyAsync("```xl\n Keine ausreichenden Berechtigunen\n```");
-                return;
-            }
+            Permissions.Test(this.Context, "Meister");
 
             command = command.ToLower();
             string res = this.Test(name, command, waffe, erschwernis);
