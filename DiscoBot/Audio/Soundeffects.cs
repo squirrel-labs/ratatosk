@@ -67,7 +67,7 @@
             if (url != string.Empty)
             {
                 // await Dsa.Service.SendAudioAsync(url, vol);
-                await Voice.SendAsync(url, volume);
+                Voice.SendAsync(url, volume);
                 return;
             }
 
