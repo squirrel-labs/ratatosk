@@ -1,4 +1,4 @@
-﻿namespace DiscoBot.Auxiliary
+﻿namespace DiscoBot.DSA_Game
 {
     public class KampfTalent
     {

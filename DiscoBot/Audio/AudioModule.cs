@@ -14,6 +14,8 @@ using Discord.Commands;
 
 namespace DiscoBot.Audio
 {
+    using DiscoBot.DSA_Game;
+
     public class AudioModule : ModuleBase
     {
         // Scroll down further for the AudioService.

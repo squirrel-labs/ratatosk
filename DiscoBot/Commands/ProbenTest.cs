@@ -2,6 +2,8 @@
 {
     using System.Threading.Tasks;
 
+    using DiscoBot.DSA_Game;
+
     using Discord.Commands;
 
     public class ProbenTest : ModuleBase
@@ -25,6 +27,31 @@
                     Dsa.Relation["Tardis"],
                     CommandTypes.Talent,
                     talent,
+                    erschwernis);
+            }
+
+            return this.ReplyAsync("```xl\n" + res + "\n```");
+        }
+
+        [Command("Zauber"), Summary("Würfelt ein Zauberprobe")]
+        [Alias("Z", "zauber", "z")]
+        public Task ZauberAsync([Summary("Zaubername")] string zauber, int erschwernis = 0)
+        {
+            string res;
+            try
+            {
+                res = Gm.CheckCommand(
+                    Dsa.Relation[this.Context.User.Username],
+                    CommandTypes.Zauber,
+                    zauber,
+                    erschwernis);
+            }
+            catch
+            {
+                res = Gm.CheckCommand(
+                    Dsa.Relation["Tardis"],
+                    CommandTypes.Zauber,
+                    zauber,
                     erschwernis);
             }
 

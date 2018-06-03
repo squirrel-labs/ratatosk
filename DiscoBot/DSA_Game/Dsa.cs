@@ -1,4 +1,4 @@
-﻿namespace DiscoBot
+﻿namespace DiscoBot.DSA_Game
 {
     using System.Collections.Generic;
     using System.IO;
@@ -6,7 +6,7 @@
 
     using DiscoBot.Audio;
     using DiscoBot.Auxiliary;
-    using DiscoBot.Characters;
+    using DiscoBot.DSA_Game.Characters;
 
     using Discord.Commands;
 

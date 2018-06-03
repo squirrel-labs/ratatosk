@@ -24,6 +24,7 @@ namespace DiscoBot.Commands
     using System.Windows.Forms;
 
     using DiscoBot.Auxiliary;
+    using DiscoBot.DSA_Game;
 
     using Discord;
     using Discord.Commands;
@@ -111,40 +112,7 @@ namespace DiscoBot.Commands
             var us = users.Result.Select(x => x.Username);
             
             var lines = test.Where(x => !x.Equals(string.Empty)).ToList();
-
-            string ls = string.Empty;
-            using (var client = new WebClient())
-            {
-                ls =client.DownloadString(@"https://discordapp.com/assets/8529401dde4ab112e81d.js");
-            }
-
-            /*using (ScriptEngine engine = new ScriptEngine("jscript"))
-            {
-                ParsedScript parsed = engine.Parse(ls);
-                Debug.WriteLine(parsed.CallMethod("t", 3));
-            }*/
-            /*var task = MessageLoopWorker.Run(WebCrawler.DoWorkAsync,
-                "https://discordapp.com/widget?id=361270203952136203&theme=dark");
-            task.Wait();
-            var kl =task.Result;
-            Console.WriteLine("DoWorkAsync completed.");
-
-
-            ls = WebCrawler.Crawl("https://discordapp.com/widget?id=361270203952136203&theme=dark");
-*/
-            /*    
-            ScrapingBrowser Browser = new ScrapingBrowser();
-            Browser.AllowAutoRedirect = true; // Browser has settings you can access in setup
-            Browser.AllowMetaRedirect = true;
-            Browser.UserAgent = new FakeUserAgent("The Doctor", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
-            Browser.Timeout = TimeSpan.FromMinutes(1);
-            WebPage PageResult = Browser.NavigateToPage(new Uri("https://discordapp.com/widget?id=361270203952136203&theme=dark"));
-            //await Task.Delay(TimeSpan.FromSeconds(10));
-
-            var dom = new ScrapySharp.Html.Parsing.HtmlDomBuilder(new HtmlDeclarationReader(new CodeReader(PageResult.Html.OuterHtml)));
-
-            HtmlNode TitleNode = PageResult.Html.CssSelect(".widget-header").First();
-            string PageTitle = TitleNode.InnerText;*/
+            
 
             var sc = new SpellCorrect();
 

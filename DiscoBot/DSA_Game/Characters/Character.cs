@@ -1,4 +1,4 @@
-﻿namespace DiscoBot.Characters
+﻿namespace DiscoBot.DSA_Game.Characters
 {
     using System;
     using System.Collections.Generic;
@@ -48,6 +48,11 @@
                 this.Talente.Add(new Talent(i.Name, i.Probe, i.Value + (int)Math.Round(RandomMisc.Random(stDv))));
             }
 
+            foreach (var i in c.Zauber)
+            {
+                this.Zauber.Add(new Zauber(i.Name, i.Probe, i.Value + (int)Math.Round(RandomMisc.Random(stDv)), i.Complexity, i.Representation));
+            }
+
             foreach (var i in c.Kampftalente)
             {
                 this.Kampftalente.Add(new KampfTalent(i.Name, i.At + (int)Math.Round(RandomMisc.Random(stDv)), i.Pa + (int)Math.Round(RandomMisc.Random(stDv))));
@@ -62,7 +67,9 @@
 
         public Dictionary<string, int> Eigenschaften { get; set; } = new Dictionary<string, int>();   // char properties
 
-        public List<Talent> Talente { get; set; } = new List<Talent>();       // list of talent objects (talents and spells)
+        public List<Talent> Talente { get; set; } = new List<Talent>();       // list of talent objects (talents)
+
+        public List<Zauber> Zauber { get; set; } = new List<Zauber>();       // list of spell objects 
 
         public List<KampfTalent> Kampftalente { get; set; } = new List<KampfTalent>();    // list of combat objects
 
@@ -72,82 +79,12 @@
         
         public string TestTalent(string talent, int erschwernis = 0)     // Talentprobe
         {
-                var output = new StringBuilder();
-                var sc = new SpellCorrect();
-                var tTalent = this.Talente.OrderBy(x => sc.Compare(talent, x.Name)).First();
+            return this.Talente.ProbenTest(this, talent, erschwernis);
+        }
 
-                if (sc.Compare(talent, tTalent.Name) > SpellCorrect.ErrorThreshold)
-                {
-                    SoundEffects.Play(Sound.Wrong).Wait();
-                    return $"{this.Name} kann nicht {talent}...";
-                }
-
-                var props = tTalent.GetEigenschaften(); // get the required properties
-                int tap = tTalent.Value; // get taw
-                var werte = props.Select(p => this.Eigenschaften[this.PropTable[p]]).ToList();
-
-                output.AppendFormat(
-                    "{0} würfelt: {1} \n{2} - {3}   taw:{4} {5} \n",
-                    this.Name,
-                    tTalent.Name,
-                    tTalent.Probe,
-                    string.Join("/", werte),
-                    tTalent.Value,
-                    erschwernis.Equals(0) ? string.Empty : "Erschwernis: " + erschwernis);
-
-                output.Append("         ");
-                tap -= erschwernis;
-                int gesamtErschwernis = tap;
-                if (gesamtErschwernis < 0)
-                {
-                    tap = 0;
-                    for (int i = 0; i <= 2; i++)
-                    {
-                        // foreach property, dice and tap 
-                        int temp = Dice.Roll();
-                        int eigenschaft = this.Eigenschaften[this.PropTable[props[i]]];
-
-                        if (eigenschaft + gesamtErschwernis < temp)
-                        {
-                            tap -= temp - (eigenschaft + gesamtErschwernis);
-                        }
-
-                        output.Append($"[{temp}]"); // add to string
-                    }
-
-                    if (tap >= 0)
-                    {
-                        tap = 1;
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i <= 2; i++)
-                    {
-                        // foreach property, dice and tap 
-                        int temp = Dice.Roll();
-                        int eigenschaft = this.Eigenschaften[this.PropTable[props[i]]];
-
-                        if (eigenschaft < temp)
-                        {
-                            tap -= temp - eigenschaft;
-                        }
-
-                        output.Append($"[{temp}]"); // add to string
-                    }
-                }
-
-                tap = (tap == 0) ? 1 : tap;
-
-                if (tap < 0)
-                {
-                    //SoundEffects.Play(Sound.Wrong).Wait();
-                }
-
-                output.AppendFormat(" tap: {0,2}", tap);
-
-                return output.ToString(); // return output
-            
+        public string TestZauber(string zauber, int erschwernis = 0)     // Talentprobe
+        {
+            return this.Zauber.ProbenTest(this, zauber, erschwernis);
         }
 
         public string TestEigenschaft(string eigenschaft, int erschwernis = 0)
@@ -308,11 +245,13 @@
                         reader.Read();
                         while (reader.Name.Equals("zauber"))
                         {
-                            this.Talente.Add(
-                                new Talent(
+                            this.Zauber.Add(
+                                new Zauber(
                                     reader.GetAttribute("name"),
                                     reader.GetAttribute("probe")?.Remove(0, 2).Trim(')'),
-                                    Convert.ToInt32(reader.GetAttribute("value"))));
+                                    Convert.ToInt32(reader.GetAttribute("value")),
+                                    reader.GetAttribute("k").ToCharArray()[0],
+                                    reader.GetAttribute("repraesentation")));
                             reader.Read();
                         }
 

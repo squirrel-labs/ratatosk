@@ -5,6 +5,8 @@
     using System.IO;
     using System.Threading.Tasks;
 
+    using DiscoBot.DSA_Game;
+
     using Discord;
     using Discord.Audio;
 
