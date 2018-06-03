@@ -51,14 +51,6 @@ namespace DiscoBot.Commands
             return this.ReplyAsync(echo);
         }
 
-        [Command("spot"), Summary("Echos a message.")]
-        [Alias("spotify")]
-        public Task SpotiAsync([Remainder, Summary("The text to echo")] string echo)
-        {
-            var test = new Spotify.WebClient();
-            return this.ReplyAsync(string.Join("\n", test.GetPlaylist("")));
-        }
-
         [Command("liebe"), Summary("Echos a message.")]
         [Alias("Liebe", "<3", "love")]
         public Task LoveAsync()
@@ -190,7 +182,7 @@ namespace DiscoBot.Commands
             }
 
             if(Permissions.Check(this.Context, new []{"Admin", "Mod"}))
-            this.ReplyTimedAsync(sb.ToString(), TimeSpan.FromSeconds(90));
+            await this.ReplyTimedAsync(sb.ToString(), TimeSpan.FromSeconds(90));
 
             //await this.ReplyAsync($"{count} Duplikate gefunden");
 
@@ -267,7 +259,7 @@ namespace DiscoBot.Commands
                 Antwort = Antwort + $"\nAuf unserem Server Kein Match gefunden: {quarry} \n```";
             }
 
-            ReplyAsync(Antwort);
+            await ReplyAsync(Antwort);
 
         }
     }

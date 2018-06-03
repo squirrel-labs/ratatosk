@@ -18,7 +18,7 @@
     {
         public static IAudioClient Client { get; set; }
 
-        public static async Task SendAsync(string path, int volume = 256)
+        public static void SendAsync(string path, int volume = 256)
         {
             if (Client == null)
             {
@@ -74,7 +74,7 @@
         }
 
         [Command("volume")]
-        public async Task SetVolume(int volume)
+        public void SetVolume(int volume)
         {
             if (volume <= 100 && volume >= 0)
             {
