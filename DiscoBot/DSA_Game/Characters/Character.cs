@@ -179,13 +179,23 @@
         private void Post_process()
         {
             var LE_Wert = this.Eigenschaften["Lebensenergie"];
+            var AE_Wert = this.Eigenschaften.First(s => s.Key.Contains("Astralenergie")).Value;
+
+            //var KL_Wert = this.Eigenschaften.First(s => s.Key.Contains("Klugheit")).Value;
+            var MU_Wert = this.Eigenschaften.First(s => s.Key.Contains("Mut")).Value;
+            var IN_Wert = this.Eigenschaften.First(s => s.Key.Contains("Intuition")).Value;
+            var CH_Wert = this.Eigenschaften.First(s => s.Key.Contains("Charisma")).Value;
             var KK_Wert = this.Eigenschaften["Körperkraft"];
             var KO__Wert = this.Eigenschaften["Konstitution"];
 
+            this.Astralpunkte = 0;
             this.Lebenspunkte = LE_Wert + (int)(KO__Wert + (KK_Wert/2.0) + 0.5);
 
-            // ToDo: Astralpunkte berrechnen
-            
+            if (this.Vorteile.Exists(x => x.Name.ToLower().Contains("zauberer")))
+            {
+                this.Astralpunkte = AE_Wert + (int)((MU_Wert + IN_Wert + CH_Wert) / 2.0 + 0.5);
+            }
+
         }
 
             private void Load(string path)

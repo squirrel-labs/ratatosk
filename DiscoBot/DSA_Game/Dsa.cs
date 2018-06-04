@@ -33,7 +33,7 @@
             Relation.Add("Nicolas", "Hartmut Reiher");
             Relation.Add("TrueKuehli", "Ledur Torfinson");
 
-             relation.Add("Papo","Gwendelson");
+             //Relation.Add("Papo","Gwendelson");
             //Relation.Add("Papo", "Pump aus der Gosse");
 
             //Nachteile für LE, AE, MR
@@ -41,7 +41,7 @@
 
             //Vorteile für LE, AE, MR
             //Relation.Add("Papo", "Beef");
-            //Relation.Add("Papo", "Astrallos");
+            Relation.Add("Papo", "Astrallos");
 
             Relation.Add("Potus", "Potus");
             
