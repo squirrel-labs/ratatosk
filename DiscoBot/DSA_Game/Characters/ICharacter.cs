@@ -1,4 +1,4 @@
-﻿namespace DiscoBot.Characters
+﻿namespace DiscoBot.DSA_Game.Characters
 {
     public interface ICharacter
     {
@@ -21,5 +21,7 @@
         string Parade(string talent, int erschwernis = 0);
 
         string Fernkampf(string talent, int erschwernis = 0);
+
+        string TestZauber(string waffe, int erschwernis);
     }
 }

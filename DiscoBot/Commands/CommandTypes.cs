@@ -7,6 +7,7 @@
         Angriff,
         Parade,
         Fernkampf,
-        KeinChar
+        KeinChar,
+        Zauber
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace DiscoBot.Auxiliary
+﻿namespace DiscoBot.DSA_Game
 {
     using System;
+
+    using DiscoBot.Auxiliary;
 
     public class Talent // talent objekt
     {

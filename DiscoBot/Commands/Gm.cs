@@ -4,9 +4,9 @@
     using System.Threading.Tasks;
 
     using DiscoBot.Auxiliary;
+    using DiscoBot.DSA_Game;
 
     using Discord.Commands;
-    using Discord.WebSocket;
 
     public class Gm : ModuleBase
     {
@@ -27,6 +27,8 @@
                     return chr.Parade(waffe, erschwernis);
                 case CommandTypes.Fernkampf:
                     return chr.Fernkampf(waffe, erschwernis);
+                case CommandTypes.Zauber:
+                    return chr.TestZauber(waffe, erschwernis);
             }
 
             return $"{name} verwendet {waffe}";

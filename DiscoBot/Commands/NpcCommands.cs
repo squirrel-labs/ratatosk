@@ -6,6 +6,8 @@
 
     using DiscoBot.Auxiliary;
     using DiscoBot.Characters;
+    using DiscoBot.DSA_Game;
+    using DiscoBot.DSA_Game.Characters;
 
     using Discord.Commands;
 

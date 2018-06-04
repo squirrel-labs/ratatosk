@@ -3,6 +3,7 @@
     using System;
 
     using DiscoBot.Auxiliary;
+    using DiscoBot.DSA_Game.Characters;
 
     public class Npc : ICharacter
     {
@@ -106,6 +107,11 @@
             }
 
             return $"{this.Name} schießt mit {waffe} daneben";
+        }
+
+        public string TestZauber(string zauber, int erschwernis)
+        {
+            return TestTalent(zauber, erschwernis);
         }
     }
 }
