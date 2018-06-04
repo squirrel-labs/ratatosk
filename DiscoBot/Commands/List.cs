@@ -41,6 +41,10 @@
                     //character.Eigenschaften.Select(s => s.Key + ":\t " + s.Value));
                     character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
                     res.Add("LE:\t " + character.Lebenspunkte);
+                    if (character.Astralpunkte > 0)
+                    {
+                        res.Add("AE:\t " + character.Astralpunkte);
+                    }
                     break;
                 case "t":
                 case "ta":

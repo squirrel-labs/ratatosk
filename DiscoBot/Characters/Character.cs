@@ -60,6 +60,8 @@
 
         public int Lebenspunkte { get; set; }
 
+        public int Astralpunkte { get; set; }
+
         public Dictionary<string, int> Eigenschaften { get; set; } = new Dictionary<string, int>();   // char properties
 
         public List<Talent> Talente { get; set; } = new List<Talent>();       // list of talent objects (talents and spells)
@@ -240,11 +242,34 @@
         private void Post_process()
         {
             var LE_Wert = this.Eigenschaften.First(s => s.Key.Contains("Leben")).Value;
+            var AE_Wert = this.Eigenschaften.First(s => s.Key.Contains("Astralenergie")).Value;
+
+            //var KL_Wert = this.Eigenschaften.First(s => s.Key.Contains("Klugheit")).Value;
+            var MU_Wert = this.Eigenschaften.First(s => s.Key.Contains("Mut")).Value;
+            var IN_Wert = this.Eigenschaften.First(s => s.Key.Contains("Intuition")).Value;
+            var CH_Wert = this.Eigenschaften.First(s => s.Key.Contains("Charisma")).Value;
             var KK_Wert = this.Eigenschaften.First(s => s.Key.Contains("Körper")).Value;
             var KO__Wert = this.Eigenschaften.First(s => s.Key.Contains("Konst")).Value;
 
+            this.Astralpunkte = 0;
             this.Lebenspunkte = LE_Wert + (int)(KO__Wert + (KK_Wert/2.0) + 0.5);
-            
+
+         if(this.Vorteile.Exists(x => x.Name.ToLower().Contains("zauberer")))
+            {
+                this.Astralpunkte = AE_Wert + (int)((MU_Wert + IN_Wert + CH_Wert)/2.0 + 0.5);
+            }
+
+ //            if (this.Vorteile.Exists(x => x.Name.Contains("Hohe Lebenskraft")))
+ //           {
+ //               var temp = this.Vorteile.Find(x => x.Name.Contains("Hohe Lebenskraft"));
+ //               this.Lebenspunkte += Convert.ToInt32(temp.Value) ;
+  //          }
+  //          if (this.Vorteile.Exists(x => x.Name.Contains("Niedrige Lebenskraft")))
+  //          {
+  //              var temp = this.Vorteile.Find(x => x.Name.Contains("Niedrige Lebenskraft"));
+  //              this.Lebenspunkte -= Convert.ToInt32(temp.Value);
+  //
+  //          }
         }
 
             private void Load(string path)

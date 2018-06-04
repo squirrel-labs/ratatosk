@@ -8,7 +8,7 @@
 
         //int Ausdauer { get; set; }
 
-        //int Astralpunkte { get; set; }
+        int Astralpunkte { get; set; }
 
         //int Karmapunkte { get; set; }
 
