@@ -65,6 +65,8 @@
 
         public int Lebenspunkte { get; set; }
 
+        public int Astralpunkte { get; set; }
+
         public Dictionary<string, int> Eigenschaften { get; set; } = new Dictionary<string, int>();   // char properties
 
         public List<Talent> Talente { get; set; } = new List<Talent>();       // list of talent objects (talents)
@@ -176,11 +178,13 @@
 
         private void Post_process()
         {
-            var LE_Wert = this.Eigenschaften.First(s => s.Key.Contains("Leben")).Value;
-            var KK_Wert = this.Eigenschaften.First(s => s.Key.Contains("Körper")).Value;
-            var KO__Wert = this.Eigenschaften.First(s => s.Key.Contains("Konst")).Value;
+            var LE_Wert = this.Eigenschaften["Lebensenergie"];
+            var KK_Wert = this.Eigenschaften["Körperkraft"];
+            var KO__Wert = this.Eigenschaften["Konstitution"];
 
             this.Lebenspunkte = LE_Wert + (int)(KO__Wert + (KK_Wert/2.0) + 0.5);
+
+            // ToDo: Astralpunkte berrechnen
             
         }
 

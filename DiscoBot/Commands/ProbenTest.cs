@@ -9,7 +9,7 @@
     public class ProbenTest : ModuleBase
     {
         [Command("t"), Summary("Würfelt ein Talent-/Zauberprobe")]
-        [Alias("T", "Talent", "talent", "zauber", "z", "versuche")]
+        [Alias("T", "Talent", "talent", "versuche")]
         public Task TalentAsync([Summary("Talent oder Zaubername")] string talent, int erschwernis = 0)
         {
             string res;

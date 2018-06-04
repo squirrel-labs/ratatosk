@@ -7,7 +7,6 @@
     using DiscoBot.DSA_Game;
 
     using Discord.Commands;
-    using Discord.WebSocket;
 
     public class Gm : ModuleBase
     {
