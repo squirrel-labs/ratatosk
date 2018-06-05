@@ -40,8 +40,8 @@
             // Relation.Add("Papo", "Angilbert Arres");
 
             //Vorteile für LE, AE, MR
-            //Relation.Add("Papo", "Beef");
-            Relation.Add("Papo", "Astrallos");
+            Relation.Add("Papo", "Beef");
+            //Relation.Add("Papo", "Astrallos");
 
             Relation.Add("Potus", "Potus");
             
