@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 namespace DiscoBot
 {
     using DiscoBot.Audio;
-    using DiscoBot.Commands;
     using DiscoBot.DSA_Game;
 
     public class Program

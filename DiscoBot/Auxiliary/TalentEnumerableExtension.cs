@@ -21,7 +21,7 @@ namespace DiscoBot.Auxiliary
 
             if (sc.Compare(talent, tTalent.Name) > SpellCorrect.ErrorThreshold)
             {
-                SoundEffects.Play(Sound.Wrong).Wait();
+                SoundEffects.Play(Sound.Wrong);
                 return $"{c.Name} kann nicht {talent}...";
             }
 

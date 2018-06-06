@@ -21,6 +21,8 @@
             var res = new List<string>();
 
             var character = ((Character)Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])));
+
+
             switch (prop.ToLower())
             {
                 case "chars":

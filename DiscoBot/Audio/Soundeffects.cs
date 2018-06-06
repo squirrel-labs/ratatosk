@@ -23,10 +23,10 @@
     {
         public static int Volume { get; set; } = 50;
 
-        public static async Task Play(Sound s)
+        public static void Play(Sound s)
         {
             string url = string.Empty;
-            int volume = 256;
+            int volume = 255;
             switch (s)
             {
                 case Sound.Bell:
@@ -35,7 +35,7 @@
                     break;
                 case Sound.Finish:
                     url = "https://www.myinstants.com/media/sounds/finishhim.swf.mp3";
-                    break; 
+                    break;
                 case Sound.Magic:
                     url = "https://www.myinstants.com/media/sounds/dream-harp-sound-effect.mp3";
                     break;
@@ -58,7 +58,7 @@
                 case Sound.Wrong:
                     url = "https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3";
                     volume = 50;
-                    break; 
+                    break;
             }
 
             volume = (int)(volume * (Volume / 100.0));
@@ -67,7 +67,7 @@
             if (url != string.Empty)
             {
                 // await Dsa.Service.SendAudioAsync(url, vol);
-                Voice.SendAsync(url, volume);
+                Voice.Send(url, volume);
                 return;
             }
 

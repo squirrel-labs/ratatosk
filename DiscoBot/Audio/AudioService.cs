@@ -16,8 +16,7 @@
 
         public async Task JoinAudio(IGuild guild, IVoiceChannel target)
         {
-            IAudioClient client;
-            if (this.connectedChannels.TryGetValue(guild.Id, out client))
+            if (this.connectedChannels.TryGetValue(guild.Id, out var client))
             {
                 return;
             }
@@ -39,8 +38,7 @@
 
         public async Task LeaveAudio(IGuild guild)
         {
-            IAudioClient client;
-            if (this.connectedChannels.TryRemove(guild.Id, out client))
+            if (this.connectedChannels.TryRemove(guild.Id, out var client))
             {
                 await client.StopAsync();
                 //await Log(LogSeverity.Info, $"Disconnected from voice on {guild.Name}.");
@@ -55,8 +53,8 @@
                 await channel.SendMessageAsync("File does not exist.");
                 return;
             }
-            IAudioClient client;
-            if (this.connectedChannels.TryGetValue(guild.Id, out client))
+
+            if (this.connectedChannels.TryGetValue(guild.Id, out var client))
             {
                 //await Log(LogSeverity.Debug, $"Starting playback of {path} in {guild.Name}");
                 using (var ffmpeg = this.CreateStream(path))

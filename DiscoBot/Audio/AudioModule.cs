@@ -71,7 +71,7 @@ namespace DiscoBot.Audio
                 await _service.SendAudioAsync(Context.Guild, Context.Channel, song);
             }
 
-            await SoundEffects.Play(tSound);
+            SoundEffects.Play(tSound);
         }
     }
 }

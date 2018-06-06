@@ -180,10 +180,7 @@ namespace DiscoBot.Commands
         [Alias("Check")]
         public async Task CheckAsync(string quarry)
         {
-            var perm = new List<string>();
-            perm.Add("Admin");
-            perm.Add("Mod");
-            perm.Add("Privatpolizei");
+            var perm = new List<string> { "Admin", "Mod", "Privatpolizei" };
 
             Permissions.Test(this.Context, perm.ToArray());
 

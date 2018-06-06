@@ -18,7 +18,7 @@
     {
         public static IAudioClient Client { get; set; }
 
-        public static void SendAsync(string path, int volume = 256)
+        public static void Send(string path, int volume = 256)
         {
             if (Client == null)
             {
@@ -26,7 +26,7 @@
             }
 
             // Create FFmpeg using the previous example
-                var ffmpeg = CreateStream(path, volume);
+            var ffmpeg = CreateStream(path, volume);
             var output = ffmpeg.StandardOutput.BaseStream;
             var barInvoker = new BackgroundWorker();
             barInvoker.DoWork += delegate
@@ -36,7 +36,7 @@
 
                     discord.FlushAsync();
                 };
-            
+
             barInvoker.RunWorkerAsync();
         }
 
@@ -66,10 +66,9 @@
 
             if (Client != null)
             {
-                var wait = SoundEffects.Play(Sound.Nooo);
+                SoundEffects.Play(Sound.Nooo);
                 await Client.StopAsync();
                 Client = null;
-                wait.Wait();
             }
         }
 
@@ -103,7 +102,7 @@
 
             if (sc.Compare(path, tSound.ToString()) > SpellCorrect.ErrorThreshold)
             {
-                await Task.Run(() => Voice.SendAsync(path));
+                await Task.Run(() => Voice.Send(path));
             }
 
             await Task.Run(() => SoundEffects.Play(tSound));
