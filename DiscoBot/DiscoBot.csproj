@@ -151,6 +151,7 @@
     <Compile Include="Audio\AudioService.cs" />
     <Compile Include="Auxiliary\Dice.cs" />
     <Compile Include="Auxiliary\TalentEnumerableExtension.cs" />
+    <Compile Include="Commands\LebenUndAstral.cs" />
     <Compile Include="DSA_Game\KampfTalent.cs" />
     <Compile Include="Audio\Soundeffects.cs" />
     <Compile Include="Auxiliary\Permissions.cs" />
