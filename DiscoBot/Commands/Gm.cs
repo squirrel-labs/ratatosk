@@ -8,7 +8,36 @@
 
     using Discord.Commands;
 
-    public class Gm : ModuleBase
+    public class Iam : ModuleBase
+    {
+
+        [Command("Iam"), Summary("Wechselt den Character")]
+        [Alias("iam", "I_am", "i_am", "IchBin", "ichbin", "Ichbin", "Ich_bin", "ich_bin", "Ich", "ich", "I", "i" )]
+        public async Task Change_Character(string given_name, string ups ="", string ups2 = "", string ups3 = "", string ups4 = "")
+        {
+            string res = "";
+            string name ="Nobody";
+            if ( ( given_name.ToLower().Equals("bin") || given_name.ToLower().Equals("am") ) && ups.Length > 0)
+            {
+                name = ups + ups2 + ups3 + ups4;
+            }
+            else{
+                name = given_name+ups + ups2 + ups3 + ups4;
+            }
+
+            var comp = new SpellCorrect();
+            var character = Dsa.Chars.OrderBy(x => comp.Compare(name, x.Name)).First();
+
+            Dsa.Relation[this.Context.User.Username] = character.Name;
+            res += (" \nWillkommen " + character.Name + "!\n \n");
+
+            await this.ReplyAsync("```xl\n" + res + "\n```");
+        }
+
+    }
+
+
+        public class Gm : ModuleBase
     {
         public static string CheckCommand(string name, CommandTypes command, string waffe, int erschwernis = 0)
         {
