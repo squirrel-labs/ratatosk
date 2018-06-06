@@ -118,7 +118,7 @@
             var attack = this.Kampftalente.OrderBy(x => sc.Compare(talent, x.Name)).First();
             if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
             {
-                SoundEffects.Play(Sound.Wrong).Wait();
+                SoundEffects.Play(Sound.Wrong);
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";
             }
 
@@ -142,7 +142,7 @@
 
             if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
             {
-                SoundEffects.Play(Sound.Wrong).Wait();
+                SoundEffects.Play(Sound.Wrong);
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";
             }
 
@@ -166,7 +166,7 @@
             var attack = this.Talente.OrderBy(x => sc.Compare(talent, x.Name)).First();
             if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
             {
-                SoundEffects.Play(Sound.Wrong).Wait();
+                SoundEffects.Play(Sound.Wrong);
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";
             }
 
