@@ -33,13 +33,21 @@
                 case "eig":
                 case "eigenschaft":
                 case "eigenschaften":
+                    res.Add(character.Name + ":");
+                    res.AddRange(
+                    character.Eigenschaften.Take(8).Select(s => s.Key + ":\t " + s.Value));
+                    break;
                 case "stat":
                 case "stats":
                     res.Add(character.Name + ":");
                     res.AddRange(
                     //character.Eigenschaften.Select(s => s.Key + ":\t " + s.Value));
                     character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
-                    res.Add("LE:\t " + character.Lebenspunkte);
+                    res.Add("LE:\t " + character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis);
+                    if (character.Astralpunkte_Basis > 0)
+                    {
+                        res.Add("AE:\t " + character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis);
+                    }
                     break;
                 case "t":
                 case "ta":

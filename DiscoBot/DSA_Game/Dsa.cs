@@ -33,10 +33,18 @@
             Relation.Add("Nicolas", "Hartmut Reiher");
             Relation.Add("TrueKuehli", "Ledur Torfinson");
 
-            // relation.Add("Papo","Gwendelson");
-            Relation.Add("Papo", "Pump aus der Gosse");
-            Relation.Add("Potus", "Potus");
+             //Relation.Add("Papo","Gwendelson");
+            //Relation.Add("Papo", "Pump aus der Gosse");
 
+            //Nachteile für LE, AE, MR
+            // Relation.Add("Papo", "Angilbert Arres");
+
+            //Vorteile für LE, AE, MR
+            Relation.Add("Papo", "Beef");
+            //Relation.Add("Papo", "Astrallos");
+
+            Relation.Add("Potus", "Potus");
+            
             // relation.Add("Papo", "Pump aus der Gosse");
             foreach (var filename in Directory.GetFiles("helden", "*.xml"))
             {

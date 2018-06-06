@@ -63,9 +63,16 @@
 
         public string Name { get; set; } // char name
 
-        public int Lebenspunkte { get; set; }
+        public int Lebenspunkte_Basis { get; set; }
+        public int Lebenspunkte_Aktuell { get; set; }
 
-        public int Astralpunkte { get; set; }
+        public int Astralpunkte_Basis { get; set; }
+        public int Astralpunkte_Aktuell { get; set; }
+
+        public int Ausdauer_Basis { get; set; }
+        public int Ausdauer_Aktuell { get; set; }
+
+        
 
         public Dictionary<string, int> Eigenschaften { get; set; } = new Dictionary<string, int>();   // char properties
 
@@ -179,13 +186,31 @@
         private void Post_process()
         {
             var LE_Wert = this.Eigenschaften["Lebensenergie"];
+            var AE_Wert = this.Eigenschaften.First(s => s.Key.Contains("Astralenergie")).Value;
+
+            //var KL_Wert = this.Eigenschaften.First(s => s.Key.Contains("Klugheit")).Value;
+            var MU_Wert = this.Eigenschaften.First(s => s.Key.Contains("Mut")).Value;
+            var IN_Wert = this.Eigenschaften.First(s => s.Key.Contains("Intuition")).Value;
+            var CH_Wert = this.Eigenschaften.First(s => s.Key.Contains("Charisma")).Value;
             var KK_Wert = this.Eigenschaften["Körperkraft"];
             var KO__Wert = this.Eigenschaften["Konstitution"];
 
-            this.Lebenspunkte = LE_Wert + (int)(KO__Wert + (KK_Wert/2.0) + 0.5);
+            this.Astralpunkte_Basis = 0;
 
-            // ToDo: Astralpunkte berrechnen
-            
+            this.Ausdauer_Basis = 0;
+
+            this.Lebenspunkte_Basis = LE_Wert + (int)(KO__Wert + (KK_Wert/2.0) + 0.5);
+
+            if (this.Vorteile.Exists(x => x.Name.ToLower().Contains("zauberer")))
+            {
+                this.Astralpunkte_Basis = AE_Wert + (int)((MU_Wert + IN_Wert + CH_Wert) / 2.0 + 0.5);
+            }
+
+            this.Lebenspunkte_Aktuell = this.Lebenspunkte_Basis;
+            this.Astralpunkte_Aktuell = this.Astralpunkte_Basis;
+            this.Ausdauer_Aktuell = this.Ausdauer_Basis;
+
+
         }
 
             private void Load(string path)

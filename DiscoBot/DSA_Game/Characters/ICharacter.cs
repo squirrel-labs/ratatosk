@@ -4,11 +4,14 @@
     {
         string Name { get; set; }
 
-        int Lebenspunkte { get; set; }
+        int Lebenspunkte_Basis { get; set; }
+        int Lebenspunkte_Aktuell { get; set; }
 
-        //int Ausdauer { get; set; }
+        int Ausdauer_Basis { get; set; }
+        int Ausdauer_Aktuell { get; set; }
 
-        int Astralpunkte { get; set; }
+        int Astralpunkte_Basis { get; set; }
+        int Astralpunkte_Aktuell { get; set; }
 
         //int Karmapunkte { get; set; }
 
