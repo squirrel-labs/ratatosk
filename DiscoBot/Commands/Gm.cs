@@ -36,12 +36,49 @@
 
         [Command("gm"), Summary("Führt eine probe aus")]
         [Alias("GM", "as", "As", "als")]
-        public async Task ProbeAsync([Summary("Fernkampfwaffe")] string name, string command, string waffe, int erschwernis = 0)
+        public async Task ProbeAsync([Summary("Fernkampfwaffe")] string name, string command, string waffe = "", int erschwernis = 0)
         {
             Permissions.Test(this.Context, "Meister");
 
             command = command.ToLower();
-            string res = this.Test(name, command, waffe, erschwernis);
+
+            string res;
+            string temp = "";
+            switch (command)
+            {
+                case "le":
+                case "leben":
+                case "lp":
+                    LE le = new LE();
+                    temp = "";
+
+                    if (erschwernis != 0)
+                    {
+                        temp = erschwernis.ToString();
+                    }
+
+                    res = le.get_LE_Text(name, waffe.Trim() + temp);
+
+                    break;
+                case "ae":
+                case "asp":
+                case "astral":
+                    AE ae = new AE();
+                    temp = "";
+
+                    if (erschwernis != 0)
+                    {
+                        temp = erschwernis.ToString();
+                    }
+
+                    res = ae.get_AE_Text(name, waffe.Trim() + temp);
+
+                    break;
+                default:
+                    res = this.Test(name, command, waffe, erschwernis);
+                    break;
+            }
+
 
             if (Dsa.GeneralContext != null && Dsa.GeneralContext.Channel.Id != this.Context.Channel.Id)
             {

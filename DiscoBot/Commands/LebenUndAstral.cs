@@ -12,40 +12,12 @@
 
     public class LE : ModuleBase
     {
-        
-
-        [Command("LE"), Summary("Ändert aktuellen Lebenspunktestand")]
-        [Alias("le", "leben", "LP", "lp", "Le", "Lp")]
-
-        public async Task LEAsync([Summary("LE Modifier")] string prop = "", string s = "")
+        public string get_LE_Text(string name, string prop)
         {
-            //This is the string that will be printed
-            string res ="";
-
-            if(prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
-            {
-
-                Man man = new Man();
-                await this.ReplyAsync("```xl\n" + man.Man_LE() + "\n```"); 
-                return;
-
-                //res += "Use !LE to display, set, or change LE value\n\n";
-                //res += " !LE      Display values\n";
-                //res += " !LE 30   Set LE to 30\n";
-                //res += " !LE +5   Increment LE by 5 (up to the maximum)\n";
-                //res += " !LE ++5  Increment LE by 5 (ignoring the maximum)\n";
-                //res += " !LE -5   Decrease LE by 5\n";
-
-                //await this.ReplyAsync("```xl\n" + res + "\n```");
-
-                //return;
-            }
-
-                //Incase the input is badly formated
-                prop = prop.Trim() + s.Trim();
-
-            //Find the corresponding character
-            var character = ((Character)Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])));
+            string res = "";
+            var comp = new SpellCorrect();
+            var character = Dsa.Chars.OrderBy(x => comp.Compare(name, x.Name)).First();
+            
             res += (character.Name + ":\n");
 
             //If there is actual input we process it
@@ -61,11 +33,11 @@
                     //Allow overflowing the max
                     if (prop.StartsWith("++"))
                     {
-                        character.Lebenspunkte_Aktuell = character.Lebenspunkte_Aktuell + Convert.ToInt32(prop.Substring(1,prop.Length-1));
+                        character.Lebenspunkte_Aktuell = character.Lebenspunkte_Aktuell + Convert.ToInt32(prop.Substring(1, prop.Length - 1));
                     }
                     else
                     {
-                    int temp = character.Lebenspunkte_Aktuell + Convert.ToInt32(prop) - character.Lebenspunkte_Basis;
+                        int temp = character.Lebenspunkte_Aktuell + Convert.ToInt32(prop) - character.Lebenspunkte_Basis;
                         //Stop from overflow overflow
                         if (temp > 0 && prop.StartsWith("+"))
                         {
@@ -95,6 +67,35 @@
                 res += ("LE: " + character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis);
             }
 
+            return res;
+        }
+
+
+        [Command("LE"), Summary("Ändert aktuellen Lebenspunktestand")]
+        [Alias("le", "leben", "LP", "lp", "Le", "Lp")]
+
+        public async Task LEAsync([Summary("LE Modifier")] string prop = "", string s = "")
+        {
+            //This is the string that will be printed
+            string res ="";
+
+            if(prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
+            {
+
+                Man man = new Man();
+                await this.ReplyAsync("```xl\n" + man.Man_LE() + "\n```"); 
+                return;
+
+
+            }
+
+                //In case the input is badly formated
+                prop = prop.Trim() + s.Trim();
+
+
+            //Get the actual text
+            res += get_LE_Text(Dsa.Relation[this.Context.User.Username], prop);
+                
 
             await this.ReplyAsync("```xl\n" + res + "\n```");
         }
@@ -111,7 +112,71 @@
 public class AE : ModuleBase
 {
 
+        public string get_AE_Text(string name, string prop)
+        {
+            string res = "";
+            var comp = new SpellCorrect();
+            var character = Dsa.Chars.OrderBy(x => comp.Compare(name, x.Name)).First();
 
+            res += (character.Name + ":\n");
+
+            //If there is actual input we process it
+            if (prop.Length > 0)
+            {
+
+                res += "AE: ";
+                res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis + " -> ";
+
+                // Apply a change to current value
+                if (prop.StartsWith("+") || prop.StartsWith("-"))
+                {
+                    //Allow overflowing the max
+                    if (prop.StartsWith("++"))
+                    {
+                        character.Astralpunkte_Aktuell = character.Astralpunkte_Aktuell + Convert.ToInt32(prop.Substring(1, prop.Length - 1));
+                    }
+                    else
+                    {
+                        int temp = character.Astralpunkte_Aktuell + Convert.ToInt32(prop) - character.Astralpunkte_Basis;
+                        //Stop from overflow overflow
+                        if (temp > 0 && prop.StartsWith("+"))
+                        {
+                            character.Astralpunkte_Aktuell = (character.Astralpunkte_Basis > character.Astralpunkte_Aktuell) ? character.Astralpunkte_Basis : character.Astralpunkte_Aktuell;
+                            res += " Maximale Astralpunkte sind erreicht ";
+                        }
+                        //Simply apply change
+                        else
+                        {
+                            character.Astralpunkte_Aktuell = character.Astralpunkte_Aktuell + Convert.ToInt32(prop);
+                        }
+                    }
+
+                    if (character.Astralpunkte_Aktuell < 0)
+                    {
+                        res += "Nicht genügend Astralpunkte! ";
+                        character.Astralpunkte_Aktuell = 0;
+                    }
+
+                    res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis;
+
+                }
+                //Set to new value regardless of original
+                else
+                {
+                    character.Astralpunkte_Aktuell = Convert.ToInt32(prop);
+
+                    res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis;
+                }
+            }
+            //If no value is passed, the curent value is displayed
+            else
+            {
+                res += ("AE: " + character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis);
+            }
+
+
+            return res;
+        }
     [Command("AE"), Summary("Ändert aktuellen Astralpunktestand")]
     [Alias("ae", "astral", "ASP", "Asp", "asp", "Astral")]
 
@@ -127,79 +192,16 @@ public class AE : ModuleBase
                 await this.ReplyAsync("```xl\n" + man.Man_AE() + "\n```");
                 return;
 
-            //    res += "Use !AE to display, set, or change AE/Asp value\n\n";
-            //res += " !AE      Display values\n";
-            //res += " !AE 30   Set Asp to 30\n";
-            //res += " !AE +5   Increment Asp by 5 (up to the maximum)\n";
-            //res += " !AE ++5  Increment Asp by 5 (ignoring the maximum)\n";
-            //res += " !AE -5   Decrease Asp by 5 (down to 0)\n";
-
-            //await this.ReplyAsync("```xl\n" + res + "\n```");
-
-            //return;
         }
 
         //Incase the input is badly formated
         prop = prop.Trim() + s.Trim();
 
-        //Find the corresponding character
-        var character = ((Character)Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])));
-        res += (character.Name + ":\n");
 
-        //If there is actual input we process it
-        if (prop.Length > 0)
-        {
+            //Get the actual text
+            res += get_AE_Text(Dsa.Relation[this.Context.User.Username], prop);
 
-            res += "AE: ";
-            res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis + " -> ";
-
-            // Apply a change to current value
-            if (prop.StartsWith("+") || prop.StartsWith("-"))
-            {
-                //Allow overflowing the max
-                if (prop.StartsWith("++"))
-                {
-                    character.Astralpunkte_Aktuell = character.Astralpunkte_Aktuell + Convert.ToInt32(prop.Substring(1, prop.Length - 1));
-                }
-                else
-                {
-                    int temp = character.Astralpunkte_Aktuell + Convert.ToInt32(prop) - character.Astralpunkte_Basis;
-                    //Stop from overflow overflow
-                    if (temp > 0 && prop.StartsWith("+"))
-                    {
-                        character.Astralpunkte_Aktuell = (character.Astralpunkte_Basis > character.Astralpunkte_Aktuell) ? character.Astralpunkte_Basis : character.Astralpunkte_Aktuell;
-                        res += " Maximale Astralpunkte sind erreicht ";
-                    }
-                    //Simply apply change
-                    else
-                    {
-                        character.Astralpunkte_Aktuell = character.Astralpunkte_Aktuell + Convert.ToInt32(prop);
-                    }
-                }
-
-                    if (character.Astralpunkte_Aktuell < 0)
-                    {
-                        res += "Nicht genügend Astralpunkte! ";
-                        character.Astralpunkte_Aktuell = 0;
-                    }
-
-                res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis;
-
-            }
-            //Set to new value regardless of original
-            else
-            {
-                character.Astralpunkte_Aktuell = Convert.ToInt32(prop);
-
-                res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis;
-            }
-        }
-        //If no value is passed, the curent value is displayed
-        else
-        {
-            res += ("AE: " + character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis);
-        }
-
+         
 
         await this.ReplyAsync("```xl\n" + res + "\n```");
     }
