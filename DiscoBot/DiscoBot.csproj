@@ -149,6 +149,7 @@
   <ItemGroup>
     <Compile Include="Audio\AudioModule.cs" />
     <Compile Include="Audio\AudioService.cs" />
+    <Compile Include="Commands\Man.cs" />
     <Compile Include="Auxiliary\Dice.cs" />
     <Compile Include="Auxiliary\TalentEnumerableExtension.cs" />
     <Compile Include="Commands\LebenUndAstral.cs" />

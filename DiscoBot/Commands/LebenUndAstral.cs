@@ -12,7 +12,7 @@
 
     public class LE : ModuleBase
     {
-
+        
 
         [Command("LE"), Summary("Ändert aktuellen Lebenspunktestand")]
         [Alias("le", "leben", "LP", "lp", "Le", "Lp")]
@@ -24,16 +24,21 @@
 
             if(prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
             {
-                res += "Use !LE to display, set, or change LE value\n\n";
-                res += " !LE      Display values\n";
-                res += " !LE 30   Set LE to 30\n";
-                res += " !LE +5   Increment LE by 5 (up to the maximum)\n";
-                res += " !LE ++5  Increment LE by 5 (ignoring the maximum)\n";
-                res += " !LE -5   Decrease LE by 5\n";
 
-                await this.ReplyAsync("```xl\n" + res + "\n```");
-
+                Man man = new Man();
+                await this.ReplyAsync("```xl\n" + man.Man_LE() + "\n```"); 
                 return;
+
+                //res += "Use !LE to display, set, or change LE value\n\n";
+                //res += " !LE      Display values\n";
+                //res += " !LE 30   Set LE to 30\n";
+                //res += " !LE +5   Increment LE by 5 (up to the maximum)\n";
+                //res += " !LE ++5  Increment LE by 5 (ignoring the maximum)\n";
+                //res += " !LE -5   Decrease LE by 5\n";
+
+                //await this.ReplyAsync("```xl\n" + res + "\n```");
+
+                //return;
             }
 
                 //Incase the input is badly formated
@@ -117,16 +122,21 @@ public class AE : ModuleBase
 
         if (prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
         {
-            res += "Use !AE to display, set, or change AE/Asp value\n\n";
-            res += " !AE      Display values\n";
-            res += " !AE 30   Set Asp to 30\n";
-            res += " !AE +5   Increment Asp by 5 (up to the maximum)\n";
-            res += " !AE ++5  Increment Asp by 5 (ignoring the maximum)\n";
-            res += " !AE -5   Decrease Asp by 5 (down to 0)\n";
 
-            await this.ReplyAsync("```xl\n" + res + "\n```");
+                Man man = new Man();
+                await this.ReplyAsync("```xl\n" + man.Man_AE() + "\n```");
+                return;
 
-            return;
+            //    res += "Use !AE to display, set, or change AE/Asp value\n\n";
+            //res += " !AE      Display values\n";
+            //res += " !AE 30   Set Asp to 30\n";
+            //res += " !AE +5   Increment Asp by 5 (up to the maximum)\n";
+            //res += " !AE ++5  Increment Asp by 5 (ignoring the maximum)\n";
+            //res += " !AE -5   Decrease Asp by 5 (down to 0)\n";
+
+            //await this.ReplyAsync("```xl\n" + res + "\n```");
+
+            //return;
         }
 
         //Incase the input is badly formated
