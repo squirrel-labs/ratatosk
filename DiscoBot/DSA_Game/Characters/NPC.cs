@@ -18,9 +18,14 @@
 
         public string Name { get; set; }
 
-        public int Lebenspunkte { get; set; }
+        public int Lebenspunkte_Basis { get; set; }
+        public int Lebenspunkte_Aktuell { get; set; }
 
-        public int Astralpunkte { get; set; }
+        public int Astralpunkte_Basis { get; set; }
+        public int Astralpunkte_Aktuell { get; set; }
+
+        public int Ausdauer_Basis { get; set; }
+        public int Ausdauer_Aktuell { get; set; }
 
         public string TestTalent(string talent, int tap = 3)
         {
