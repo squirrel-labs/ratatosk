@@ -8,16 +8,19 @@ namespace DiscoBot.Auxiliary
 {
     public struct CommandInfo
     {
-        public CommandInfo(string name, string[] description, string scope)
+        public CommandInfo(string name, string brief, string[] description, string scope)
         {
             this.Name = name;
             this.Scope = scope;
+            this.Brief = brief;
             this.Description = description;
         }
 
         public string Name { get; }
 
         public string Scope { get; }
+
+        public string Brief { get; }
 
         public string[] Description { get; }
 
