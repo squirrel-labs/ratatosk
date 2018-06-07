@@ -28,11 +28,12 @@
                 sum += roll;
                 output.Append("[" + roll + "] ");
             }
-
-            if (count > 1)
-            {
-                output.Append("sum: " + sum);
-            }
+            
+                if (strings.Count > 1)
+                {
+                    sum += Convert.ToInt32(strings[1]);
+                    output.Append("sum: " + sum);
+                }
 
             return output.ToString();
         }
