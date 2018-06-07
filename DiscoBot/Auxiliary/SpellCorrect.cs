@@ -10,6 +10,11 @@
 
         public override int Compare(string x, string y)
         {
+            return CompareEasy(x, y);
+        }
+
+        public static int CompareEasy(string x, string y)
+        {
             if (string.IsNullOrEmpty(x))
             {
                 throw new ArgumentException("message", nameof(x));
@@ -47,7 +52,7 @@
                 return score + 1;
             }
 
-            return 100000 - (int)(this.CompareExact(x, y) * 1000.0);
+            return 100000 - (int)(CompareExact(x, y) * 1000.0);
             /*if (y.Contains(x))
                 return 6;*/
         }
@@ -63,7 +68,7 @@
             throw new NotImplementedException();
         }
 
-        public double CompareExact(string s, string q)
+        public static double CompareExact(string s, string q)
         {
 
             s = s.ToLower();

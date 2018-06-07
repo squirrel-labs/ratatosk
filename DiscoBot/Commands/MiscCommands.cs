@@ -88,7 +88,7 @@ namespace DiscoBot.Commands
             var sc = new SpellCorrect();
             var rand = new System.Random((s1+s2).GetHashCode());
 
-            var wert = Math.Log10(Math.Floor(1000.0 * (sc.CompareExact(s1, s2) + rand.NextDouble() * 10.0)) / 1000.0);
+            var wert = Math.Log10(Math.Floor(1000.0 * (SpellCorrect.CompareExact(s1, s2) + rand.NextDouble() * 10.0)) / 1000.0);
             wert = ((wert * 100.0) < 100.0 ? wert * 100.0 : 100.0 - wert);
             wert = wert < 0 ? -wert : wert;
             return this.ReplyAsync($"Ihr passt zu {Math.Floor(100.0 * wert )/ 100.0}% zusammen");

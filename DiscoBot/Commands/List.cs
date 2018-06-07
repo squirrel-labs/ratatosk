@@ -29,6 +29,9 @@
                 case "Chars":
                     res.AddRange(Dsa.Chars.Select(x => x.Name));
                     break;
+                case "commands":
+                    res.AddRange(Help.Commands.Select(x => x.Name));
+                    break;
                 case "e":
                 case "eig":
                 case "eigenschaft":

@@ -1,0 +1,24 @@
+﻿{
+  "CommandInfos": [
+    {
+      "Name": "List",
+      "Scope": "All",
+      "Description": "Testbeschreibung"
+    },
+    {
+      "Name": "LE",
+      "Scope": "All",
+      "Description": "Verändert Leben - im wahrsten Sinne des Wortes"
+    },
+    {
+      "Name": "AE",
+      "Scope": "All",
+      "Description": "Verändert ASTRALPUNKTE"
+    },
+    {
+      "Name": "Gm",
+      "Scope": "Meister",
+      "Description": "Gm Aktionen"
+    }
+  ]
+}

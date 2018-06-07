@@ -149,6 +149,8 @@
   <ItemGroup>
     <Compile Include="Audio\AudioModule.cs" />
     <Compile Include="Audio\AudioService.cs" />
+    <Compile Include="Auxiliary\CommandInfo.cs" />
+    <Compile Include="Commands\Help.cs" />
     <Compile Include="Commands\Man.cs" />
     <Compile Include="Auxiliary\Dice.cs" />
     <Compile Include="Auxiliary\TalentEnumerableExtension.cs" />
@@ -184,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Help.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
