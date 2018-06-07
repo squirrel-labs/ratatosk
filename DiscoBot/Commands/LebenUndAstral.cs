@@ -12,12 +12,88 @@
 
     public class LE : ModuleBase
     {
-        public string get_LE_Text(string name, string prop)
+
+
+        [Command("LE"), Summary("Ändert aktuellen Lebenspunktestand")]
+        [Alias("le", "leben", "LP", "lp", "Le", "Lp")]
+
+        public async Task LEAsync([Summary("LE Modifier")] string prop = "", string s = "")
+        {
+            //This is the string that will be printed
+            string res = "";
+
+            if (prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
+            {
+
+                Man man = new Man();
+                await this.ReplyAsync("```xl\n" + man.Man_LE() + "\n```");
+                return;
+
+
+            }
+
+            //In case the input is badly formated
+            prop = prop.Trim() + s.Trim();
+
+
+            //Get the actual text
+            res += Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Relation[this.Context.User.Username], x.Name)).First().get_LE_Text(prop);
+
+
+            await this.ReplyAsync("```xl\n" + res + "\n```");
+        }
+    }
+
+
+
+
+
+
+    public class AE : ModuleBase
+    {
+
+        
+        [Command("AE"), Summary("Ändert aktuellen Astralpunktestand")]
+        [Alias("ae", "astral", "ASP", "Asp", "asp", "Astral")]
+
+        public async Task AEAsync([Summary("AE Modifier")] string prop = "", string s = "")
+        {
+            //This is the string that will be printed
+            string res = "";
+
+            if (prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
+            {
+
+                Man man = new Man();
+                await this.ReplyAsync("```xl\n" + man.Man_AE() + "\n```");
+                return;
+
+            }
+
+            //Incase the input is badly formated
+            prop = prop.Trim() + s.Trim();
+
+
+            //Get the actual text
+            res += Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Relation[this.Context.User.Username], x.Name)).First().get_AE_Text(prop);
+
+
+
+            await this.ReplyAsync("```xl\n" + res + "\n```");
+        }
+
+
+
+    }
+
+    public static class StatExtension
+    {
+        public static string get_LE_Text(this ICharacter c, string prop)
         {
             string res = "";
             var comp = new SpellCorrect();
-            var character = Dsa.Chars.OrderBy(x => comp.Compare(name, x.Name)).First();
-            
+            var character = c;
+
             res += (character.Name + ":\n");
 
             //If there is actual input we process it
@@ -69,54 +145,11 @@
 
             return res;
         }
-
-
-        [Command("LE"), Summary("Ändert aktuellen Lebenspunktestand")]
-        [Alias("le", "leben", "LP", "lp", "Le", "Lp")]
-
-        public async Task LEAsync([Summary("LE Modifier")] string prop = "", string s = "")
-        {
-            //This is the string that will be printed
-            string res ="";
-
-            if(prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
-            {
-
-                Man man = new Man();
-                await this.ReplyAsync("```xl\n" + man.Man_LE() + "\n```"); 
-                return;
-
-
-            }
-
-                //In case the input is badly formated
-                prop = prop.Trim() + s.Trim();
-
-
-            //Get the actual text
-            res += get_LE_Text(Dsa.Relation[this.Context.User.Username], prop);
-                
-
-            await this.ReplyAsync("```xl\n" + res + "\n```");
-        }
-
-
-
-    }
-
-
-
-
-
-
-public class AE : ModuleBase
-{
-
-        public string get_AE_Text(string name, string prop)
+        public static string get_AE_Text(this ICharacter c, string prop)
         {
             string res = "";
             var comp = new SpellCorrect();
-            var character = Dsa.Chars.OrderBy(x => comp.Compare(name, x.Name)).First();
+            var character = c;
 
             res += (character.Name + ":\n");
 
@@ -177,40 +210,8 @@ public class AE : ModuleBase
 
             return res;
         }
-    [Command("AE"), Summary("Ändert aktuellen Astralpunktestand")]
-    [Alias("ae", "astral", "ASP", "Asp", "asp", "Astral")]
-
-    public async Task AEAsync([Summary("AE Modifier")] string prop = "", string s = "")
-    {
-        //This is the string that will be printed
-        string res = "";
-
-        if (prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
-        {
-
-                Man man = new Man();
-                await this.ReplyAsync("```xl\n" + man.Man_AE() + "\n```");
-                return;
-
-        }
-
-        //Incase the input is badly formated
-        prop = prop.Trim() + s.Trim();
-
-
-            //Get the actual text
-            res += get_AE_Text(Dsa.Relation[this.Context.User.Username], prop);
-
-         
-
-        await this.ReplyAsync("```xl\n" + res + "\n```");
     }
-
-
-
 }
-}
-
 
 
 

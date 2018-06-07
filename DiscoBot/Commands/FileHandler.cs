@@ -3,7 +3,9 @@
     using System;
     using System.Linq;
     using System.Net;
-    
+
+    using DiscoBot.Auxiliary;
+    using DiscoBot.Characters;
     using DiscoBot.DSA_Game;
     using DiscoBot.DSA_Game.Characters;
 
@@ -11,7 +13,7 @@
 
     public class FileHandler : ModuleBase
     {
-        [Command("add"), Summary("fügt Helden hinzu")]
+        [Command("send"), Summary("fügt Helden hinzu")]
         public void AddChar()
         {
             var msg = this.Context.Message;

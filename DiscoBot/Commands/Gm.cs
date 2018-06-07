@@ -97,7 +97,7 @@
                         temp = erschwernis.ToString();
                     }
 
-                    res = le.get_LE_Text(name, waffe.Trim() + temp);
+                    res = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Relation[this.Context.User.Username], x.Name)).First().get_LE_Text(waffe.Trim() + temp);
 
                     break;
                 case "ae":
@@ -111,7 +111,7 @@
                         temp = erschwernis.ToString();
                     }
 
-                    res = ae.get_AE_Text(name, waffe.Trim() + temp);
+                    res = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Relation[this.Context.User.Username], x.Name)).First().get_AE_Text(waffe.Trim() + temp);
 
                     break;
                 default:

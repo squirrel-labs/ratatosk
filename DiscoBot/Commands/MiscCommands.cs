@@ -157,8 +157,8 @@ namespace DiscoBot.Commands
         }
 
 
-        [Command("clear"), Summary("Echos a message.")]
-        public async Task DeletekAsync(int count)
+        [Command("clear"), Summary("Cleans up messages.")]
+        public async Task DeleteAsync(int count)
         {
             var messagesAsync = Context.Channel.GetMessagesAsync(count);
             Task.WaitAll(messagesAsync.ToArray());
@@ -169,7 +169,7 @@ namespace DiscoBot.Commands
                 messages.AddRange(task.ToList());
             }
 
-            if (Permissions.Check(Context, new[] { "Admin", "Mod" }))
+            if (Permissions.Check(Context, new[] { "Admin", "Mod", "Meister" }))
             {
                 await Context.Channel.DeleteMessagesAsync(messages);
             }
