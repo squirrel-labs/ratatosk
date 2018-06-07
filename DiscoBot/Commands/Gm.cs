@@ -17,7 +17,15 @@
         {
             string res;
             string name;
-            if ((givenName[0].ToLower().Equals("bin") || givenName[0].ToLower().Equals("am")) && givenName.Length > 1)
+
+            if (givenName.Length == 0)
+            {
+                res = " \nDu bist " + Dsa.Relation[this.Context.User.Username] + "!\n \n";
+
+                return this.ReplyAsync("```xl\n" + res + "\n```");
+            }
+
+            if (givenName.Length > 1 && (givenName[0].ToLower().Equals("bin") || givenName[0].ToLower().Equals("am")) )
             {
                 name = givenName.Skip(1).Aggregate((s, c) => s + c); // (Skip(1)) don't use the first element; Aggregate: take source s and do operation s = s+c for all elements
             }
@@ -28,8 +36,12 @@
 
             var character = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(name, x.Name)).First(); // usage of compareEasy
 
-            Dsa.Relation[this.Context.User.Username] = character.Name;
-            res = " \nWillkommen " + character.Name + "!\n \n";
+
+            
+ 
+                Dsa.Relation[this.Context.User.Username] = character.Name;
+                res = " \nWillkommen " + character.Name + "!\n \n";
+            
 
             return this.ReplyAsync("```xl\n" + res + "\n```");
         }

@@ -3,22 +3,35 @@
     {
       "Name": "List",
       "Scope": "All",
-      "Description": "Testbeschreibung"
+      "Description": [ "Testbeschreibung" ]
     },
     {
       "Name": "LE",
       "Scope": "All",
-      "Description": "Verändert Leben - im wahrsten Sinne des Wortes"
+      "Description": [
+        "Use !LE to display, set, or change LE value\n\n",
+        " !LE      Display values\n",
+        " !LE 30   Set LE to 30\n",
+        " !LE 30   Set LE to 30\n",
+        " !LE +5   Increment LE by 5 (up to the maximum)\n",
+        " !LE ++5  Increment LE by 5 (ignoring the maximum)\n",
+        " !LE -5   Decrease LE by 5\n \n"
+      ],
     },
     {
       "Name": "AE",
       "Scope": "All",
-      "Description": "Verändert ASTRALPUNKTE"
+      "Description": ["Use !AE (or !Asp) to display, set, or change AE/Asp value\n\n",
+            " !AE      Display values\n",
+            " !AE 30   Set Asp to 30\n",
+            " !AE +5   Increment Asp by 5 (up to the maximum)\n",
+            " !AE ++5  Increment Asp by 5 (ignoring the maximum)\n",
+            " !AE -5   Decrease Asp by 5 (down to 0)\n"],
     },
     {
       "Name": "Gm",
       "Scope": "Meister",
-      "Description": "Gm Aktionen"
+      "Description": ["Gm Aktionen"]
     }
   ]
 }
