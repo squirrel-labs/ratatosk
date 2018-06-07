@@ -81,9 +81,10 @@
 
             if(prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
             {
+                
+                await this.ReplyAsync("```xl\n" + Help.Get_Specific_Help("LE") + "\n```"); 
 
-                Man man = new Man();
-                await this.ReplyAsync("```xl\n" + man.Man_LE() + "\n```"); 
+
                 return;
 
 
@@ -187,11 +188,8 @@ public class AE : ModuleBase
 
         if (prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
         {
-
-                Man man = new Man();
-                await this.ReplyAsync("```xl\n" + man.Man_AE() + "\n```");
+                await this.ReplyAsync("```xl\n" + Help.Get_Specific_Help("AE") + "\n```");
                 return;
-
         }
 
         //Incase the input is badly formated

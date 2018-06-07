@@ -40,6 +40,14 @@ namespace DiscoBot.Commands
 
         public static List<CommandInfo> Commands { get; } = new List<CommandInfo>();
 
+
+        public static string Get_Specific_Help(string command)
+        {
+            // return command specific help
+            var com = Commands.OrderBy(x => SpellCorrect.CompareEasy(x.Name, command.ToLower())).First(); // get best fit command
+            return com.GetDescription();
+        }
+
         [Command("help"), Summary("prints the help menu.")]
         [Alias("Help", "man", "Man")]
         public async Task ShowHelpAsync(string command = "")
@@ -53,9 +61,10 @@ namespace DiscoBot.Commands
 
 
             // return command specific help
-            var com = Commands.OrderBy(x => SpellCorrect.CompareEasy(x.Name, command.ToLower())).First(); // get best fit command
+            //var com = Commands.OrderBy(x => SpellCorrect.CompareEasy(x.Name, command.ToLower())).First(); // get best fit command
 
-            await this.ReplyAsync("```xl\n" + com.GetDescription() + "\n```");
+            //await this.ReplyAsync("```xl\n" + com.GetDescription() + "\n```");
+            await this.ReplyAsync("```xl\n" + Get_Specific_Help(command) + "\n```");
         }
     }
 }

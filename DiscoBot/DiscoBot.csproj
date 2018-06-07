@@ -151,7 +151,6 @@
     <Compile Include="Audio\AudioService.cs" />
     <Compile Include="Auxiliary\CommandInfo.cs" />
     <Compile Include="Commands\Help.cs" />
-    <Compile Include="Commands\Man.cs" />
     <Compile Include="Auxiliary\Dice.cs" />
     <Compile Include="Auxiliary\TalentEnumerableExtension.cs" />
     <Compile Include="Commands\LebenUndAstral.cs" />
