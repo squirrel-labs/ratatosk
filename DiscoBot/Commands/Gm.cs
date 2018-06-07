@@ -12,32 +12,31 @@
     {
 
         [Command("Iam"), Summary("Wechselt den Character")]
-        [Alias("iam", "I_am", "i_am", "IchBin", "ichbin", "Ichbin", "Ich_bin", "ich_bin", "Ich", "ich", "I", "i" )]
-        public async Task Change_Character(string given_name, string ups ="", string ups2 = "", string ups3 = "", string ups4 = "")
+        [Alias("iam", "I_am", "i_am", "IchBin", "ichbin", "Ichbin", "Ich_bin", "ich_bin", "Ich", "ich", "I", "i")]
+        public Task Change_Character(params string[] givenName) // use fancy parameters
         {
-            string res = "";
-            string name ="Nobody";
-            if ( ( given_name.ToLower().Equals("bin") || given_name.ToLower().Equals("am") ) && ups.Length > 0)
+            string res;
+            string name;
+            if ((givenName[0].ToLower().Equals("bin") || givenName[0].ToLower().Equals("am")) && givenName.Length > 1)
             {
-                name = ups + ups2 + ups3 + ups4;
+                name = givenName.Skip(1).Aggregate((s, c) => s + c); // (Skip(1)) don't use the first element; Aggregate: take source s and do operation s = s+c for all elements
             }
-            else{
-                name = given_name+ups + ups2 + ups3 + ups4;
+            else
+            {
+                name = givenName.Aggregate((s, c) => s + c);
             }
 
-            var comp = new SpellCorrect();
-            var character = Dsa.Chars.OrderBy(x => comp.Compare(name, x.Name)).First();
+            var character = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(name, x.Name)).First(); // usage of compareEasy
 
             Dsa.Relation[this.Context.User.Username] = character.Name;
-            res += (" \nWillkommen " + character.Name + "!\n \n");
+            res = " \nWillkommen " + character.Name + "!\n \n";
 
-            await this.ReplyAsync("```xl\n" + res + "\n```");
+            return this.ReplyAsync("```xl\n" + res + "\n```");
         }
-
     }
 
 
-        public class Gm : ModuleBase
+    public class Gm : ModuleBase
     {
         public static string CheckCommand(string name, CommandTypes command, string waffe, int erschwernis = 0)
         {
@@ -72,14 +71,14 @@
             command = command.ToLower();
 
             string res;
-            string temp = "";
+            string temp = string.Empty;
             switch (command)
             {
                 case "le":
                 case "leben":
                 case "lp":
                     LE le = new LE();
-                    temp = "";
+                    temp = string.Empty;
 
                     if (erschwernis != 0)
                     {
@@ -93,7 +92,7 @@
                 case "asp":
                 case "astral":
                     AE ae = new AE();
-                    temp = "";
+                    temp = string.Empty;
 
                     if (erschwernis != 0)
                     {
@@ -111,7 +110,7 @@
 
             if (Dsa.GeneralContext != null && Dsa.GeneralContext.Channel.Id != this.Context.Channel.Id)
             {
-                    await Dsa.GeneralContext.Channel.SendMessageAsync("```xl\n" + res + "\n```");
+                await Dsa.GeneralContext.Channel.SendMessageAsync("```xl\n" + res + "\n```");
             }
 
             await this.ReplyAsync("```xl\n" + res + "\n```");
