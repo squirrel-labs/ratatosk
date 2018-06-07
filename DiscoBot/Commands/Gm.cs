@@ -34,6 +34,12 @@
                 name = givenName.Aggregate((s, c) => s + c);
             }
 
+            if (name.ToLower().Equals("man") || name.ToLower().Equals("help"))
+            {
+                return this.ReplyAsync("```xl\n" + Help.Get_Specific_Help("ich bin") + "\n```");
+                
+            }
+
             var character = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(name, x.Name)).First(); // usage of compareEasy
 
 

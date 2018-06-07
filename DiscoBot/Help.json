@@ -1,6 +1,21 @@
 ﻿{
   "CommandInfos": [
     {
+      "Name": "ich bin",
+      "Scope": "All",
+      "Brief": "Setzt den gespielten Charakter fest",
+      "Description": [
+        "Mit \"!Ich bin\" kann der gespielte Charakter definiert, bzw. gewechselt werden.\n",
+        " Die Charaktere müssen als *.xml Dateien hinterlegt sein.\n\n",
+        " !ich                 Zeigt an welcher Charakter zur Zeit gespielt wird\n",
+        " !ich bin Zalibius    Wechsel zum Helden Zalibius\n",
+        " !ich Rhoktar         Orkische Variante von !ich bin.\n",
+        "                      Wechselt zu Rhoktar.\n\n",
+        " !list chars          Zeigt die Liste verfügbarer Charaktere.\n",
+        " \n"
+      ]
+    },
+    {
       "Name": "List",
       "Scope": "All",
       "Brief": "Testbeschreibung",

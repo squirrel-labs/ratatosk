@@ -50,8 +50,13 @@ namespace DiscoBot.Commands
 
         [Command("help"), Summary("prints the help menu.")]
         [Alias("Help", "man", "Man")]
-        public async Task ShowHelpAsync(string command = "")
+        public async Task ShowHelpAsync(params string[] command_list)
         {
+            var command = "";
+            if (command_list.Length > 0) {
+                command = command_list.Aggregate((s, c) => s + " " + c);
+            }
+
             if (command.Equals(string.Empty)) // return generic Help
             {
                 string res = "";
@@ -62,10 +67,10 @@ namespace DiscoBot.Commands
 
                     if (com.Description.Length > 1)
                     {
-                        res += "\n\t(!man " + com.Name + " gibt genauere Informationen)";
+                        res += "\n\t(\"!man " + com.Name + "\" gibt genauere Informationen)";
                     }
 
-                    res += "\n";
+                    res += "\n\n";
                 }
                 //await this.ReplyAsync("```\n[hilfreiche Erklärungen]\nAuflistung aller Commands mit !list commands\n```");
                 await this.ReplyAsync("```xl\n" + res +"\n```");
