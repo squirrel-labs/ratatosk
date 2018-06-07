@@ -21,7 +21,11 @@ namespace DiscoBot.Auxiliary
 
             if (sc.Compare(talent, tTalent.Name) > SpellCorrect.ErrorThreshold)
             {
-                SoundEffects.Play(Sound.Wrong);
+                try
+                {
+                    SoundEffects.Play(Sound.Stupid);
+                }
+                catch { }
                 return $"{c.Name} kann nicht {talent}...";
             }
 
@@ -84,7 +88,11 @@ namespace DiscoBot.Auxiliary
 
             if (tap < 0)
             {
-                //SoundEffects.Play(Sound.Wrong).Wait();
+                try
+                {
+                    SoundEffects.Play(Sound.Wrong);
+                }
+                catch { }
             }
 
             output.AppendFormat(" tap: {0,2}", tap);
