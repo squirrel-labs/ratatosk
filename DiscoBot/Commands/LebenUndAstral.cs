@@ -12,8 +12,6 @@
 
     public class LE : ModuleBase
     {
-
-
         [Command("LE"), Summary("Ändert aktuellen Lebenspunktestand")]
         [Alias("le", "leben", "LP", "lp", "Le", "Lp")]
 
@@ -25,8 +23,7 @@
             if (prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
             {
 
-                Man man = new Man();
-                await this.ReplyAsync("```xl\n" + man.Man_LE() + "\n```");
+                await this.ReplyAsync("```xl\n" + Help.Get_Specific_Help("LE") + "\n```");
                 return;
 
 
@@ -44,15 +41,8 @@
         }
     }
 
-
-
-
-
-
     public class AE : ModuleBase
     {
-
-        
         [Command("AE"), Summary("Ändert aktuellen Astralpunktestand")]
         [Alias("ae", "astral", "ASP", "Asp", "asp", "Astral")]
 
@@ -64,10 +54,8 @@
             if (prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
             {
 
-                Man man = new Man();
-                await this.ReplyAsync("```xl\n" + man.Man_AE() + "\n```");
+                await this.ReplyAsync("```xl\n" + Help.Get_Specific_Help("AE") + "\n```");
                 return;
-
             }
 
             //Incase the input is badly formated
@@ -81,9 +69,6 @@
 
             await this.ReplyAsync("```xl\n" + res + "\n```");
         }
-
-
-
     }
 
     public static class StatExtension
