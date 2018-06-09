@@ -22,6 +22,7 @@
 
             var character = ((Character)Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])));
 
+            int first_column_width = 18;
 
             switch (prop.ToLower())
             {
@@ -55,10 +56,15 @@
                 case "t":
                 case "ta":
                 case "talent":
-                case "zauber":
                     res.Add(character.Name + ":");
                     res.AddRange(
-                        character.Talente.Select(s => s.Name + "\t " + s.Value + "\t " + s.Probe));
+                        character.Talente.Select(s => (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(first_column_width + 5) + " " + s.Probe));
+                    break;
+                case "zauber":
+                case "z":
+                    res.Add(character.Name + ":");
+                    res.AddRange(
+                        character.Zauber.Select(s => (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(first_column_width + 5) + " " + s.Probe));
                     break;
                 case "w":
                 case "waffe":

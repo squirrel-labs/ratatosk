@@ -63,11 +63,12 @@ namespace DiscoBot.Commands
 
                 foreach (var com in Commands)
                 {
-                    res += "!" + com.Name + ": " + com.Brief;
+                    int first_column_width = 8;
+                    res += ("!" + com.Name + ": ").AddSpaces(first_column_width) + com.Brief;
 
                     if (com.Description.Length > 1)
                     {
-                        res += "\n\t(\"!man " + com.Name + "\" gibt genauere Informationen)";
+                        res += "\n" + "".AddSpaces(first_column_width) + "(\"!man " + com.Name + "\" gibt genauere Informationen)";
                     }
 
                     res += "\n\n";
