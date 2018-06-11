@@ -20,31 +20,38 @@
       "Scope": "All",
       "Brief": "Anzeige von Heldenwerten und Spielrelevanten Listen",
       "Description": [
-        "Mit \"!list\" lassen sich Heldenwerte sowie andere relevante Listen ausgeben. Bis auf wenige Ausnahmen wird die Angezeigte Liste nach einiger Zeit wieder gelöscht.\n",
+        "Mit \"!list\" lassen sich spielrelevante Listen ausgeben. Die Angezeigte Liste wird nach einiger Zeit wieder gelöscht.\n",
         "\n",
-        " !list Held           Zeigt den Heldenbrief an.\n",
-        "                      (Diese Liste wird nicht automatisch gelöscht)\n",
-        " !list Eigenschaften  Zeigt die Eigenschaften MU/KL/CH/IN/KK/GE/FF/KO.\n",
-        " !list e              Kurzform von \"!list Eigenschaften\".\n",
-        " !list stats          Zeigt Eigenschaften und zusätzlich SO/LE/AE.\n",
-        " !list Kampfwerte     Zeigt AT/PA für aktivierte Waffentalente.\n",
-        " !list Waffe/!list w  Kurzformen von \"!list Kampfwerte\".\n",
-        " !list Vorteile       Zeigt Vor- und Nachteile an.\n",
-        " !list v              Kurzform von \"!list Vorteile\".\n",
-        " !list Talente        Zeigt die Liste aller aktivierten Talente, deren TaW,\n",
-        "                      sowie die Probe.\n",
-        " !list t              Kurzform von \"!list Talente\".\n",
-        " !list Zauber         Zeigt die Liste aller aktivierten Zauber, deren ZaW,\n",
-        "                      sowie die Probe.\n",
-        " !list z              Kurzform von \"!list Zauber\".\n",
-        " \n",
         " !list chars          Liste aller verfügbaren Helden (eingelesen per *.xml)\n",
         "                      und NSCs.\n",
         "                      (Mit \"!ich bin\" kann der Held ausgewählt werden.)\n",
         " !list commands       Liste aller verwendbaren Bot-Kommandos.\n",
-        " !list play           Liste der Soundeffekte."
-
-
+        " !list sounds           Liste der Soundeffekte." ]
+    },
+    {
+      "Name": "Held",
+      "Scope": "All",
+      "Brief": "Anzeige von Heldenwerten",
+      "Description": [
+        "Mit \"!Held\" lassen sich Heldenwerte ausgeben. Mehrere Werte können gleichzeitig angefordert werde. \"!Held LE Waffen\" liefert so z.B. Informationen zur Lebensenergie und den Kampfwerten.\n Bis auf wenige Ausnahmen wird die Angezeigte Liste nach einiger Zeit wieder gelöscht.\n",
+        "\n",
+        " !Held                Zeigt den Heldenbrief an.\n",
+        "                      (Diese Liste wird nicht automatisch gelöscht)\n",
+        " !Held Eigenschaften  Zeigt die Eigenschaften MU/KL/CH/IN/KK/GE/FF/KO.\n",
+        " !Held e              Kurzform von \"!Held Eigenschaften\".\n",
+        " !Held LE             Zeigt LE an.\n",
+        " !Held AE             Zeigt AE an.\n",
+        " !Held stats          Zeigt Eigenschaften und zusätzlich SO/LE/AE.\n",
+        " !Held Kampfwerte     Zeigt AT/PA für aktivierte Waffentalente.\n",
+        " !Held Waffe/!list w  Kurzformen von \"!Held Kampfwerte\".\n",
+        " !Held Vorteile       Zeigt Vor- und Nachteile an.\n",
+        " !Held v              Kurzform von \"!Held Vorteile\".\n",
+        " !Held Talente        Zeigt die Liste aller aktivierten Talente, deren TaW,\n",
+        "                      sowie die Probe.\n",
+        " !Held t              Kurzform von \"!Held Talente\".\n",
+        " !Held Zauber         Zeigt die Liste aller aktivierten Zauber, deren ZaW,\n",
+        "                      sowie die Probe.\n",
+        " !Held z              Kurzform von \"!Held Zauber\".\n"
       ]
     },
     {
