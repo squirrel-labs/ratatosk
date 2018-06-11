@@ -69,7 +69,6 @@
                     }
                     break;
                 case "chars":
-                case "Chars":
                     res.AddRange(Dsa.Chars.Select(x => x.Name));
                     break;
                 case "commands":
@@ -89,6 +88,7 @@
                     res.AddRange(
                     //character.Eigenschaften.Select(s => s.Key + ":\t " + s.Value));
                     character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
+                    res.Add("");
                     res.Add("LE:\t " + character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis);
                     if (character.Astralpunkte_Basis > 0)
                     {
@@ -98,6 +98,7 @@
                 case "t":
                 case "ta":
                 case "talent":
+                case "talente":
                     res.Add(character.Name + ":\n");
                     res.AddRange(
                         character.Talente.Select(s => (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(first_column_width + 5) + " " + s.Probe));
@@ -111,6 +112,9 @@
                 case "w":
                 case "waffe":
                 case "waffen":
+                case "kampf":
+                case "kampfwert":
+                case "kampfwerte":
                     res.Add(character.Name + ":");
                     res.Add("".AddSpaces(first_column_width) + " AT/PA");
                     res.AddRange(
@@ -130,6 +134,9 @@
                 case "vt":
                 case "vor":
                 case "vorteil":
+                case "vorteile":
+                case "nachteil":
+                case "nachteile":
                     res.Add(character.Name + ":\n");
                     res.AddRange(
                         character.Vorteile
