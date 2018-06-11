@@ -97,6 +97,7 @@
     <Compile Include="Audio\AudioModule.cs" />
     <Compile Include="Audio\AudioService.cs" />
     <Compile Include="Auxiliary\CommandInfo.cs" />
+    <Compile Include="Auxiliary\Extensions.cs" />
     <Compile Include="Commands\Help.cs" />
     <Compile Include="Auxiliary\Dice.cs" />
     <Compile Include="Auxiliary\TalentEnumerableExtension.cs" />

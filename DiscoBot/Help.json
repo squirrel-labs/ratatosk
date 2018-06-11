@@ -1,37 +1,57 @@
 ﻿{
   "CommandInfos": [
     {
+      "Name": "ich bin",
+      "Scope": "All",
+      "Brief": "Setzt den gespielten Charakter fest",
+      "Description": [
+        "Mit \"!Ich bin\" kann der gespielte Charakter definiert, bzw. gewechselt werden.\n",
+        " Die Charaktere müssen als *.xml Dateien hinterlegt sein.\n\n",
+        " !ich                 Zeigt an welcher Charakter zur Zeit gespielt wird\n",
+        " !ich bin Zalibius    Wechsel zum Helden Zalibius\n",
+        " !ich Rhoktar         Orkische Variante von !ich bin.\n",
+        "                      Wechselt zu Rhoktar.\n\n",
+        " !list chars          Zeigt die Liste verfügbarer Charaktere.\n",
+        " \n"
+      ]
+    },
+    {
       "Name": "List",
       "Scope": "All",
+      "Brief": "Testbeschreibung",
       "Description": [ "Testbeschreibung" ]
     },
     {
       "Name": "LE",
       "Scope": "All",
+      "Brief": "Ändert dein Leben - im wahrsten Sinne des Wortes",
       "Description": [
-        "Use !LE to display, set, or change LE value\n\n",
-        " !LE      Display values\n",
-        " !LE 30   Set LE to 30\n",
-        " !LE 30   Set LE to 30\n",
-        " !LE +5   Increment LE by 5 (up to the maximum)\n",
-        " !LE ++5  Increment LE by 5 (ignoring the maximum)\n",
-        " !LE -5   Decrease LE by 5\n \n"
-      ],
+        "Mit !LE zeigt man die Lebensenergie an, ändert sie, oder setzt sie auf einen neuen Wert\n\n",
+        " !LE      Zeigt Lebensenergie an\n",
+        " !LE 30   Setzt LE auf 30\n",
+        " !LE +5   Erhöht LE um 5 (bis zum Maximum)\n",
+        " !LE ++5  Erhöht LE um 5 (ignoriert Maximum)\n",
+        " !LE -5   Verringert LE um 5\n \n"
+      ]
     },
     {
       "Name": "AE",
       "Scope": "All",
-      "Description": ["Use !AE (or !Asp) to display, set, or change AE/Asp value\n\n",
-            " !AE      Display values\n",
-            " !AE 30   Set Asp to 30\n",
-            " !AE +5   Increment Asp by 5 (up to the maximum)\n",
-            " !AE ++5  Increment Asp by 5 (ignoring the maximum)\n",
-            " !AE -5   Decrease Asp by 5 (down to 0)\n"],
+      "Brief": "Ändert Astralenergie",
+      "Description": [
+        "Mit !AE (oder !Asp) zeigt man die Astralenergie an, ändert sie, oder setzt sie auf einen neuen Wert\n\n",
+        " !AE      Zeigt Astralenergie an\n",
+        " !AE 30   Setzt Asp auf 30\n",
+        " !AE +5   Erhöht Asp um 5 (bis zum Maximum)\n",
+        " !AE ++5  Erhöht Asp um 5 (ignoriert Maximum)\n",
+        " !AE -5   Verringert Asp um 5 (Minimum 0)\n"
+      ]
     },
     {
       "Name": "Gm",
       "Scope": "Meister",
-      "Description": ["Gm Aktionen"]
+      "Brief": "Testbeschreibung",
+      "Description": [ "Gm Aktionen" ]
     }
   ]
 }
