@@ -44,14 +44,21 @@
                 messages.Where(x => x.Content.StartsWith($"#{token}\n") && x.Author.IsBot));
         }
 
-        public static async Task ReplyAsync(this ModuleBase m, IEnumerable<string> message)
+        public static async Task ReplyAsync(this ModuleBase m, IEnumerable<string> message, bool directMessage = false)
         {
             var sb = new StringBuilder();
             foreach (string re in message)
             {
                 if (sb.Length + re.Length > 1798)
                 {
-                    await m.Context.Channel.SendMessageAsync("```xl\n" + sb + "\n```");
+                    if (directMessage)
+                    {
+                        await m.Context.User.SendMessageAsync("```xl\n" + sb + "\n```");
+                    }
+                    else
+                    {
+                        await m.Context.Channel.SendMessageAsync("```xl\n" + sb + "\n```");
+                    }
 
                     sb.Clear();
                 }
@@ -59,7 +66,14 @@
                 sb.AppendLine(re);
             }
 
-            await m.Context.Channel.SendMessageAsync("```xl\n" + sb + "\n```");
+            if (directMessage)
+            {
+                await m.Context.User.SendMessageAsync("```xl\n" + sb + "\n```");
+            }
+            else
+            {
+                await m.Context.Channel.SendMessageAsync("```xl\n" + sb + "\n```");
+            }
         }
 
         public static async Task ReplyAsync(this ModuleBase m, IEnumerable<string> message, TimeSpan time)
