@@ -22,11 +22,8 @@
 
             if (prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
             {
-
                 await this.ReplyAsync("```xl\n" + Help.Get_Specific_Help("LE") + "\n```");
                 return;
-
-
             }
 
             //In case the input is badly formated
@@ -53,7 +50,6 @@
 
             if (prop.ToLower().Equals("help") || prop.ToLower().Equals("man"))
             {
-
                 await this.ReplyAsync("```xl\n" + Help.Get_Specific_Help("AE") + "\n```");
                 return;
             }
@@ -84,7 +80,6 @@
             //If there is actual input we process it
             if (prop.Length > 0)
             {
-
                 res += "LE: ";
                 res += character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis + " -> ";
 
@@ -111,12 +106,12 @@
                             character.Lebenspunkte_Aktuell = character.Lebenspunkte_Aktuell + Convert.ToInt32(prop);
                         }
                     }
-                    res += character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis;
 
+                    res += character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis;
                 }
-                //Set to new value regardless of original
                 else
                 {
+                    // Set to new value regardless of original
                     character.Lebenspunkte_Aktuell = Convert.ToInt32(prop);
 
                     res += character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis;
