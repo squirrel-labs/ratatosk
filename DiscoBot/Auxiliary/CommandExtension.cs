@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -43,6 +44,42 @@
                 messages.Where(x => x.Content.StartsWith($"#{token}\n") && x.Author.IsBot));
         }
 
+        public static async Task ReplyAsync(this ModuleBase m, IEnumerable<string> message)
+        {
+            var sb = new StringBuilder();
+            foreach (string re in message)
+            {
+                if (sb.Length + re.Length > 1798)
+                {
+                    await m.Context.Channel.SendMessageAsync("```xl\n" + sb + "\n```");
 
+                    sb.Clear();
+                }
+
+                sb.AppendLine(re);
+            }
+
+            await m.Context.Channel.SendMessageAsync("```xl\n" + sb + "\n```");
+        }
+
+        public static async Task ReplyAsync(this ModuleBase m, IEnumerable<string> message, TimeSpan time)
+        {
+            var sb = new StringBuilder();
+            foreach (string re in message)
+            {
+                if (sb.Length + re.Length > 1798)
+                {
+
+                    await m.ReplyTimedAsync(sb.ToString(), time);
+
+
+                    sb.Clear();
+                }
+
+                sb.AppendLine(re);
+            }
+
+            await m.ReplyTimedAsync(sb.ToString(), TimeSpan.FromSeconds(90));
+        }
     }
 }
