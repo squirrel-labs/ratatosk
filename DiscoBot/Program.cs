@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscoBot
 {
+    using System.IO;
+
     using DiscoBot.Audio;
     using DiscoBot.DSA_Game;
 
@@ -28,7 +30,10 @@ namespace DiscoBot
             this.client = new DiscordSocketClient();
             this.commands = new CommandService();
 
-            string token = Properties.Settings.Default.Token;
+
+
+            string token = File.ReadAllText("Token");
+            //Properties.Settings.Default.Token;
 
             this.services = new ServiceCollection().AddSingleton(new AudioService())
                     .BuildServiceProvider();
