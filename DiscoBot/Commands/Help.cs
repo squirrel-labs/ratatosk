@@ -48,8 +48,26 @@ namespace DiscoBot.Commands
             return com.GetDescription();
         }
 
+        public static string Get_Generic_Help()
+        {
+            string res = "";
+            foreach (var com in Commands)
+            {
+                int first_column_width = 8;
+                res += ("!" + com.Name + ": ").AddSpaces(first_column_width) + com.Brief;
+
+                if (com.Description.Length > 1)
+                {
+                    res += "\n" + "".AddSpaces(first_column_width) + "(\"!man " + com.Name + "\" gibt genauere Informationen)";
+                }
+
+                res += "\n\n";
+            }
+            return res;
+        }
+
         [Command("help"), Summary("prints the help menu.")]
-        [Alias("Help", "man", "Man")]
+        [Alias("Help", "man", "Man", "Hilfe", "hilfe", "h")]
         public async Task ShowHelpAsync(params string[] command_list)
         {
             var command = "";
@@ -59,20 +77,8 @@ namespace DiscoBot.Commands
 
             if (command.Equals(string.Empty)) // return generic Help
             {
-                string res = "";
+                string res = Get_Generic_Help();
 
-                foreach (var com in Commands)
-                {
-                    int first_column_width = 8;
-                    res += ("!" + com.Name + ": ").AddSpaces(first_column_width) + com.Brief;
-
-                    if (com.Description.Length > 1)
-                    {
-                        res += "\n" + "".AddSpaces(first_column_width) + "(\"!man " + com.Name + "\" gibt genauere Informationen)";
-                    }
-
-                    res += "\n\n";
-                }
                 //await this.ReplyAsync("```\n[hilfreiche Erklärungen]\nAuflistung aller Commands mit !list commands\n```");
                 await this.ReplyAsync("```xl\n" + res +"\n```");
                 return;

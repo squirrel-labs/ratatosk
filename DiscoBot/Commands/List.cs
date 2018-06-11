@@ -28,6 +28,11 @@
 
             switch (prop.ToLower())
             {
+                case "man":
+                case "help":
+                    await this.ReplyAsync("```xl\n" + Help.Get_Specific_Help("List") + "\n```");
+                    return;
+                   // break;
                 case "all":
                 case "held":
                 case "char":
@@ -72,7 +77,8 @@
                     res.AddRange(Dsa.Chars.Select(x => x.Name));
                     break;
                 case "commands":
-                    res.AddRange(Help.Commands.Select(x => x.Name));
+                    // res.AddRange(Help.Commands.Select(x => x.Name));
+                    res.Add(Help.Get_Generic_Help());
                     break;
                 case "e":
                 case "eig":
@@ -125,6 +131,7 @@
                     res.AddRange(
                         character.Talente.Select(s => s.Name));
                     break;
+                case "play":
                 case "sound":
                 case "sounds":
                     res.AddRange(
