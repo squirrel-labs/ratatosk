@@ -18,7 +18,7 @@
     {
       "Name": "List",
       "Scope": "All",
-      "Brief": "Anzeige von Heldenwerten und Spielrelevanten Listen",
+      "Brief": "Anzeige vonSpielrelevanten Listen",
       "Description": [
         "Mit \"!list\" lassen sich spielrelevante Listen ausgeben. Die Angezeigte Liste wird nach einiger Zeit wieder gelöscht.\n",
         "\n",
