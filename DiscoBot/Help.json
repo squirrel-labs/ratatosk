@@ -21,6 +21,7 @@
       "Brief": "Anzeige von Heldenwerten und Spielrelevanten Listen",
       "Description": [
         "Mit \"!list\" lassen sich Heldenwerte sowie andere relevante Listen ausgeben. Bis auf wenige Ausnahmen wird die Angezeigte Liste nach einiger Zeit wieder gelöscht.\n",
+        "\n",
         " !list Held           Zeigt den Heldenbrief an.\n",
         "                      (Diese Liste wird nicht automatisch gelöscht)\n",
         " !list Eigenschaften  Zeigt die Eigenschaften MU/KL/CH/IN/KK/GE/FF/KO.\n",
@@ -30,13 +31,16 @@
         " !list Waffe/!list w  Kurzformen von \"!list Kampfwerte\".\n",
         " !list Vorteile       Zeigt Vor- und Nachteile an.\n",
         " !list v              Kurzform von \"!list Vorteile\".\n",
-        " !list Talente        Zeigt die Liste aller aktivierten Talente, deren TaW, sowie die Probe.\n",
+        " !list Talente        Zeigt die Liste aller aktivierten Talente, deren TaW,\n",
+        "                      sowie die Probe.\n",
         " !list t              Kurzform von \"!list Talente\".\n",
-        " !list Zauber         Zeigt die Liste aller aktivierten Zauber, deren ZaW, sowie die Probe.\n",
+        " !list Zauber         Zeigt die Liste aller aktivierten Zauber, deren ZaW,\n",
+        "                      sowie die Probe.\n",
         " !list z              Kurzform von \"!list Zauber\".\n",
         " \n",
-        " !list chars          Liste aller verfügbaren Helden (eingelesen per *.xml) und NSCs.\n",
-        "                      (Mit \"!ich bin\" kann der Held ausgewählt werden.)",
+        " !list chars          Liste aller verfügbaren Helden (eingelesen per *.xml)\n",
+        "                      und NSCs.\n",
+        "                      (Mit \"!ich bin\" kann der Held ausgewählt werden.)\n",
         " !list commands       Liste aller verwendbaren Bot-Kommandos.\n",
         " !list play           Liste der Soundeffekte."
 
