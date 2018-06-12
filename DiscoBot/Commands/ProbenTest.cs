@@ -68,7 +68,7 @@
         }
 
         [Command("a"), Summary("Würfelt ein Angriff")]
-        [Alias("At", "at", "Angriff", "angriff", "attackiere_mit", "attacke", "Attacke")]
+        [Alias("A", "At", "at", "Angriff", "angriff", "attackiere_mit", "attacke", "Attacke")]
         public Task AngriffAsync([Summary("Weapon")] string weapon, int erschwernis = 0)
         {
             return this.ReplyAsync("```xl\n" + Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])).Angriff(weapon, erschwernis) + "\n```");
@@ -82,7 +82,7 @@
         }
 
         [Command("f"), Summary("Führt eine Fernkampfprobe aus")]
-        [Alias("F", "fernkampf", "Fernkampf", "schieße", "schieße_mit")]
+        [Alias("F", "fern", "Fern", "Schuss", "schuss", "fernkampf", "Fernkampf", "schieße", "schieße_mit")]
         public Task FernkampfAsync([Summary("Fernkampfwaffe")] string waffe, int erschwernis = 0)
         {
             return this.ReplyAsync("```xl\n" + Dsa.Chars.Find(x => x.Name.Equals(Dsa.Relation[this.Context.User.Username])).Fernkampf(waffe, erschwernis) + "\n```");
