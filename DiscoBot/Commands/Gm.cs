@@ -18,7 +18,7 @@
             string res;
             string name;
 
-            if (givenName.Length == 0)
+            if (givenName.Length == 0 || (givenName.Length == 1 && (givenName[0].ToLower().Equals("bin") || givenName[0].ToLower().Equals("am"))))
             {
                 res = " \nDu bist " + Dsa.Relation[this.Context.User.Username] + "!\n \n";
 
