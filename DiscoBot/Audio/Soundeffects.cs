@@ -1,9 +1,12 @@
 ﻿namespace DiscoBot.Audio
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
 
+    using DiscoBot.Auxiliary;
     using DiscoBot.Commands;
+    using DiscoBot.DSA_Game;
 
     /*public enum Sound
     {
@@ -27,7 +30,7 @@
         {
             string url = string.Empty;
             int volume = 255;
-            switch (s)
+            /*switch (s)
             {
                 case "Bell":
                 case "Ding":
@@ -59,6 +62,15 @@
                     url = "https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3";
                     volume = 50;
                     break;
+            }*/
+
+            var tSound = Dsa.Properties.Sounds.OrderBy(x => SpellCorrect.CompareEasy(s, x.Name)).First();
+
+            url = s;
+
+            if (SpellCorrect.CompareEasy(s, tSound.Name) > SpellCorrect.ErrorThreshold)
+            {
+                url = tSound.Url;
             }
 
             volume = (int)(volume * (Volume / 100.0));

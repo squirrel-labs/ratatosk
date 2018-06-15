@@ -8,14 +8,17 @@ namespace DiscoBot.Audio
 {
     public class Sound
     {
-        public Sound(string name, string url)
+        public Sound(string name, string url, int volume)
         {
-            Name = name;
-            Url = url;
+            this.Name = name;
+            this.Url = url;
+            this.Volume = volume;
         }
 
         public string Name { get; }
 
         public string Url { get; }
+
+        public int Volume { get; }
     }
 }

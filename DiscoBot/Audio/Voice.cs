@@ -8,6 +8,7 @@
     using System.Threading.Tasks;
 
     using DiscoBot.Auxiliary;
+    using DiscoBot.DSA_Game;
 
     using Discord;
     using Discord.Audio;
@@ -98,14 +99,7 @@
 
             var sc = new SpellCorrect();
 
-            var tSound = soundList.OrderBy(x => sc.Compare(path, x.ToString())).First();
-
-            if (sc.Compare(path, tSound.ToString()) > SpellCorrect.ErrorThreshold)
-            {
-                await Task.Run(() => Voice.Send(path));
-            }
-
-            await Task.Run(() => SoundEffects.Play(path));
+            
         }
 
         private static Process CreateStream(string path, int vol = 256)
