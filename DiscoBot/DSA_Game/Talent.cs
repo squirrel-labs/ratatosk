@@ -35,5 +35,24 @@
             var sc = (StringComparer)new SpellCorrect();
             return sc.Compare(quarry, this.Name);
         }
+
+        public bool IstFernkampftalent()
+        {
+            switch (Name)
+            {
+                case "Armbrust":
+                case "Belagerungswaffen":
+                case "Blasrohr":
+                case "Bogen":
+                case "Diskus":
+                case "Schleuder":
+                case "Wurfbeile":
+                case "Wurfmesser":
+                case "Wurfspeere":
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 }

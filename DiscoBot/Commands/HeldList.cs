@@ -48,6 +48,11 @@
                 res.AddRange(
                     character.Kampftalente.Select(s => s.Name.AddSpaces(first_column_width) + " " + s.At.ToString().AddSpacesAtHead(2) + "/" + s.Pa.ToString().AddSpacesAtHead(2)));
                 res.Add("");
+                //Fernkampf
+                res.Add("".AddSpaces(first_column_width) + " FK");
+                res.AddRange(
+                    character.Talente.Where(x => x.IstFernkampftalent()).Select(s => s.Name.AddSpaces(first_column_width) + " " + (character.Eigenschaften["fk"] + s.Value).ToString().AddSpacesAtHead(2)));
+                res.Add("");
                 //Vorteile
                 res.AddRange(
                     character.Vorteile
@@ -126,9 +131,11 @@
                             res.AddRange(
                                 character.Kampftalente.Select(s => s.Name.AddSpaces(first_column_width) + " " + s.At.ToString().AddSpacesAtHead(2) + "/" + s.Pa.ToString().AddSpacesAtHead(2)));
                             break;
+                        case "f":
                         case "fern":
+                            res.Add("".AddSpaces(first_column_width) + " FK");
                             res.AddRange(
-                                character.Talente.Select(s => s.Name));
+                                character.Talente.Where(x => x.IstFernkampftalent()).Select(s => s.Name.AddSpaces(first_column_width) + " " + (character.Eigenschaften["fk"] + s.Value).ToString().AddSpacesAtHead(2)));
                             break;
                         case "v":
                         case "vt":
@@ -173,7 +180,7 @@
             //}
             if (persist == 1)
             {
-                await this.ReplyAsync(res);
+                await this.ReplyAsync(res, true);
             }
             else
             {
