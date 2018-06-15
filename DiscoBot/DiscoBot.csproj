@@ -104,12 +104,14 @@
     <Compile Include="Auxiliary\TalentEnumerableExtension.cs" />
     <Compile Include="Commands\LebenUndAstral.cs" />
     <Compile Include="Commands\HeldList.cs" />
+    <Compile Include="DSA_Game\Characters\SaveChar.cs" />
     <Compile Include="DSA_Game\KampfTalent.cs" />
     <Compile Include="Audio\Soundeffects.cs" />
     <Compile Include="Auxiliary\Permissions.cs" />
     <Compile Include="Commands\MiscCommands.cs" />
     <Compile Include="Auxiliary\SpellCorrect.cs" />
     <Compile Include="DSA_Game\Save\Properties.cs" />
+    <Compile Include="DSA_Game\Save\Session.cs" />
     <Compile Include="DSA_Game\Talent.cs" />
     <Compile Include="DSA_Game\Vorteil.cs" />
     <Compile Include="DSA_Game\Characters\Character.cs" />

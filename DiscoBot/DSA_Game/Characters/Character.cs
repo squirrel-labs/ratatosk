@@ -222,9 +222,9 @@
             this.Lebenspunkte_Aktuell = this.Lebenspunkte_Basis;
             this.Astralpunkte_Aktuell = this.Astralpunkte_Basis;
             this.Ausdauer_Aktuell = this.Ausdauer_Basis;
-
-
+            
         }
+        
 
             private void Load(string path)
         {

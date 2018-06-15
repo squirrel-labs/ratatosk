@@ -1,0 +1,125 @@
+{
+  "GeneralContext": null,
+  "Relation": {
+    "The Doctor": "Numeri Illuminus",
+    "Tardis": "Helga von Drachenei, Tausendsasserin",
+    "DSA Bot": "Morla",
+    "Morla": "Morla",
+    "Rhoktar": "Rhoktar4",
+    "MagicBro5": "Krenko",
+    "Nicolas": "Hartmut Reiher",
+    "TrueKuehli": "Ledur Torfinson",
+    "Papo": "Beef",
+    "Potus": "Potus"
+  },
+  "Chars": [
+    {
+      "Name": "Felis Exodus Schattenwald",
+      "Lebenspunkte_Basis": 30,
+      "Lebenspunkte_Aktuell": 30,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 20,
+      "Astralpunkte_Aktuell": 20
+    },
+    {
+      "Name": "Gardist",
+      "Lebenspunkte_Basis": 29,
+      "Lebenspunkte_Aktuell": 29,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 0,
+      "Astralpunkte_Aktuell": 0
+    },
+    {
+      "Name": "Hartmut Reiher",
+      "Lebenspunkte_Basis": 31,
+      "Lebenspunkte_Aktuell": 31,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 0,
+      "Astralpunkte_Aktuell": 0
+    },
+    {
+      "Name": "Helga vom Drachenei, Tausendsasserin",
+      "Lebenspunkte_Basis": 21,
+      "Lebenspunkte_Aktuell": 21,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 35,
+      "Astralpunkte_Aktuell": 35
+    },
+    {
+      "Name": "Krenko",
+      "Lebenspunkte_Basis": 25,
+      "Lebenspunkte_Aktuell": 25,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 0,
+      "Astralpunkte_Aktuell": 0
+    },
+    {
+      "Name": "Ledur Torfinson",
+      "Lebenspunkte_Basis": 39,
+      "Lebenspunkte_Aktuell": 39,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 0,
+      "Astralpunkte_Aktuell": 0
+    },
+    {
+      "Name": "Morla",
+      "Lebenspunkte_Basis": 26,
+      "Lebenspunkte_Aktuell": 26,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 13,
+      "Astralpunkte_Aktuell": 13
+    },
+    {
+      "Name": "Numeri Illuminus",
+      "Lebenspunkte_Basis": 28,
+      "Lebenspunkte_Aktuell": 28,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 40,
+      "Astralpunkte_Aktuell": 40
+    },
+    {
+      "Name": "Potus",
+      "Lebenspunkte_Basis": 39,
+      "Lebenspunkte_Aktuell": 39,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 16,
+      "Astralpunkte_Aktuell": 16
+    },
+    {
+      "Name": "Pump aus der Gosse",
+      "Lebenspunkte_Basis": 18,
+      "Lebenspunkte_Aktuell": 18,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 13,
+      "Astralpunkte_Aktuell": 13
+    },
+    {
+      "Name": "Rhoktar4",
+      "Lebenspunkte_Basis": 34,
+      "Lebenspunkte_Aktuell": 34,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 17,
+      "Astralpunkte_Aktuell": 17
+    },
+    {
+      "Name": "Volant",
+      "Lebenspunkte_Basis": 28,
+      "Lebenspunkte_Aktuell": 28,
+      "Ausdauer_Basis": 0,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Basis": 43,
+      "Astralpunkte_Aktuell": 43
+    }
+  ]
+}

@@ -34,10 +34,7 @@ namespace DiscoBot.DSA_Game.Save
         }
 
         public void Serialize(string path = @"..\..\Properties.json")
-        {/*
-            var stream = new StreamWriter(path); // Load properties file
-            var reader = new JsonTextWriter(stream); // create stream reader*/
-
+        {
             try
             {
                  File.WriteAllText(path, JsonConvert.SerializeObject(this, Formatting.Indented)); // Deserialize Data and create CommandInfo Struct

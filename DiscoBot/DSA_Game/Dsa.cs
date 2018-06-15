@@ -1,11 +1,11 @@
 ﻿namespace DiscoBot.DSA_Game
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
 
     using DiscoBot.Audio;
-    using DiscoBot.Auxiliary;
     using DiscoBot.Commands;
     using DiscoBot.DSA_Game.Characters;
     using DiscoBot.DSA_Game.Save;
@@ -25,7 +25,9 @@
         public static List<Talent> Talente { get; set; } = new List<Talent>();
 
         public static Properties Properties { get; set; }
-        
+
+        public static Session Session { get; set; }
+
         public static void Startup()
         {
             Relation.Add("The Doctor", "Numeri Illuminus"); // Relation
@@ -37,18 +39,18 @@
             Relation.Add("Nicolas", "Hartmut Reiher");
             Relation.Add("TrueKuehli", "Ledur Torfinson");
 
-             //Relation.Add("Papo","Gwendelson");
-            //Relation.Add("Papo", "Pump aus der Gosse");
+            // Relation.Add("Papo","Gwendelson");
+            // Relation.Add("Papo", "Pump aus der Gosse");
 
-            //Nachteile für LE, AE, MR
+            // Nachteile für LE, AE, MR
             // Relation.Add("Papo", "Angilbert Arres");
 
-            //Vorteile für LE, AE, MR
+            // Vorteile für LE, AE, MR
             Relation.Add("Papo", "Beef");
-            //Relation.Add("Papo", "Astrallos");
 
+            // Relation.Add("Papo", "Astrallos");
             Relation.Add("Potus", "Potus");
-            
+
             // relation.Add("Papo", "Pump aus der Gosse");
             foreach (var filename in Directory.GetFiles("helden", "*.xml"))
             {
@@ -57,10 +59,17 @@
                     .Where(c => !Talente.Exists(v => v.Name.Equals(c.Name))).ToList().ForEach(v => Talente.Add(v));
             }
 
-            Properties = Save.Properties.Deserialize();
+            Properties = Properties.Deserialize();
             Properties.Serialize();
 
             Talente = Talente.OrderBy(x => x.Name).ToList();
+
+            Session = new Session();
+            List<SaveChar> save = Chars.Select(SaveChar.FromICharacter).ToList();
+            Session.Chars = save.Select(x=>x as ICharacter).ToList();
+            Session.GeneralContext = GeneralContext;
+            Session.Relation = Relation;
+            Session.Save();
         }
     }
 }
