@@ -66,7 +66,7 @@
 
             if (Client != null)
             {
-                SoundEffects.Play(Sound.Nooo);
+                SoundEffects.Play("Nooo");
                 await Client.StopAsync();
                 Client = null;
             }
@@ -105,7 +105,7 @@
                 await Task.Run(() => Voice.Send(path));
             }
 
-            await Task.Run(() => SoundEffects.Play(tSound));
+            await Task.Run(() => SoundEffects.Play(path));
         }
 
         private static Process CreateStream(string path, int vol = 256)

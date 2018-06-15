@@ -5,9 +5,11 @@ namespace DiscoBot.Commands
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Security.Cryptography;
     using System.Threading.Tasks;
 
     using DiscoBot.Auxiliary;
+    using DiscoBot.DSA_Game;
 
     using Discord.Commands;
 
@@ -19,7 +21,7 @@ namespace DiscoBot.Commands
     {
         static Help()
         {
-            TextReader stream = new StreamReader(@"..\..\Help.json"); // Load command-description file
+            /*TextReader stream = new StreamReader(@"..\..\Help.json"); // Load command-description file
             var reader = new JsonTextReader(stream); // create stream reader
 
             reader.Read(); // step into structure, until the array starts
@@ -35,23 +37,23 @@ namespace DiscoBot.Commands
             catch (Exception e)
             {
                 // ignored
-            }
+            }*/
         }
 
-        public static List<CommandInfo> Commands { get; } = new List<CommandInfo>();
+        //public static List<CommandInfo> Commands { get; } = new List<CommandInfo>();
 
 
         public static string Get_Specific_Help(string command)
         {
             // return command specific help
-            var com = Commands.OrderBy(x => SpellCorrect.CompareEasy(x.Name, command.ToLower())).First(); // get best fit command
+            var com = Dsa.Properties.CommandInfos.OrderBy(x => SpellCorrect.CompareEasy(x.Name, command.ToLower())).First(); // get best fit command
             return com.GetDescription();
         }
 
         public static string Get_Generic_Help()
         {
             string res = "";
-            foreach (var com in Commands)
+            foreach (var com in Dsa.Properties.CommandInfos)
             {
                 int first_column_width = 8;
                 res += ("!" + com.Name + ": ").AddSpaces(first_column_width) + com.Brief;

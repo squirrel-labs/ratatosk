@@ -5,7 +5,7 @@
 
     using DiscoBot.Commands;
 
-    public enum Sound
+    /*public enum Sound
     {
         Bell,
         Ding,
@@ -17,45 +17,45 @@
         Stupid,
         Police,
         Roblox
-    }
+    }*/
 
     public static class SoundEffects
     {
         public static int Volume { get; set; } = 50;
 
-        public static void Play(Sound s)
+        public static void Play(string s)
         {
             string url = string.Empty;
             int volume = 255;
             switch (s)
             {
-                case Sound.Bell:
-                case Sound.Ding:
+                case "Bell":
+                case "Ding":
                     url = "https://www.myinstants.com/media/sounds/boxing-bell.mp3";
                     break;
-                case Sound.Finish:
+                case "Finish":
                     url = "https://www.myinstants.com/media/sounds/finishhim.swf.mp3";
                     break;
-                case Sound.Magic:
+                case "Magic":
                     url = "https://www.myinstants.com/media/sounds/dream-harp-sound-effect.mp3";
                     break;
-                case Sound.Monsterkill:
+                case "Monsterkill":
                     url = "https://www.myinstants.com/media/sounds/announcer_kill_monster_01.mp3";
                     break;
-                case Sound.Nooo:
+                case "Nooo":
                     url = "https://www.myinstants.com/media/sounds/nooo.swf.mp3";
                     break;
-                case Sound.Roblox:
+                case "Roblox":
                     url = "https://www.myinstants.com/media/sounds/roblox-death-sound_ytkBL7X.mp3";
                     break;
-                case Sound.Stupid:
+                case "Stupid":
                     url = "https://www.myinstants.com/media/sounds/stupid_dum_03.mp3";
                     volume = 10;
                     break;
-                case Sound.Police:
+                case "Police":
                     url = "https://www.myinstants.com/media/sounds/sound-of-the-police.mp3";
                     break;
-                case Sound.Wrong:
+                case "Wrong":
                     url = "https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3";
                     volume = 50;
                     break;

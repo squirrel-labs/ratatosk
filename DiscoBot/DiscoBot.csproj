@@ -96,6 +96,7 @@
   <ItemGroup>
     <Compile Include="Audio\AudioModule.cs" />
     <Compile Include="Audio\AudioService.cs" />
+    <Compile Include="Audio\Sound.cs" />
     <Compile Include="Auxiliary\CommandInfo.cs" />
     <Compile Include="Auxiliary\Extensions.cs" />
     <Compile Include="Commands\Help.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Auxiliary\Permissions.cs" />
     <Compile Include="Commands\MiscCommands.cs" />
     <Compile Include="Auxiliary\SpellCorrect.cs" />
+    <Compile Include="DSA_Game\Save\Properties.cs" />
     <Compile Include="DSA_Game\Talent.cs" />
     <Compile Include="DSA_Game\Vorteil.cs" />
     <Compile Include="DSA_Game\Characters\Character.cs" />

@@ -120,7 +120,7 @@
             {
                 try
                 {
-                    SoundEffects.Play(Sound.Wrong);
+                    SoundEffects.Play("Wrong");
                 }
                 catch { }
 
@@ -149,7 +149,7 @@
             {
                 try
                 {
-                    SoundEffects.Play(Sound.Wrong);
+                    SoundEffects.Play("Wrong");
                 }
                 catch { }
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";
@@ -177,7 +177,7 @@
             {
                 try
                 {
-                    SoundEffects.Play(Sound.Wrong);
+                    SoundEffects.Play("Wrong");
                 }
                 catch { }
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";

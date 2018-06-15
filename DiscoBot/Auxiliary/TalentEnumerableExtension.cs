@@ -23,7 +23,7 @@ namespace DiscoBot.Auxiliary
             {
                 try
                 {
-                    SoundEffects.Play(Sound.Stupid);
+                    SoundEffects.Play("Stupid");
                 }
                 catch { }
                 return $"{c.Name} kann nicht {talent}...";
@@ -90,7 +90,7 @@ namespace DiscoBot.Auxiliary
             {
                 try
                 {
-                    SoundEffects.Play(Sound.Wrong);
+                    SoundEffects.Play("Wrong");
                 }
                 catch { }
             }

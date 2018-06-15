@@ -6,7 +6,9 @@
 
     using DiscoBot.Audio;
     using DiscoBot.Auxiliary;
+    using DiscoBot.Commands;
     using DiscoBot.DSA_Game.Characters;
+    using DiscoBot.DSA_Game.Save;
 
     using Discord.Commands;
 
@@ -21,6 +23,8 @@
         public static List<ICharacter> Chars { get; set; } = new List<ICharacter>();  // list of all characters
 
         public static List<Talent> Talente { get; set; } = new List<Talent>();
+
+        public static Properties Properties { get; set; }
         
         public static void Startup()
         {
@@ -52,6 +56,9 @@
                 (Chars.Last() as Character)?.Talente.Select(x => new Talent(x.Name, x.Probe, 0))
                     .Where(c => !Talente.Exists(v => v.Name.Equals(c.Name))).ToList().ForEach(v => Talente.Add(v));
             }
+
+            Properties = Save.Properties.Deserialize();
+            Properties.Serialize();
 
             Talente = Talente.OrderBy(x => x.Name).ToList();
         }
