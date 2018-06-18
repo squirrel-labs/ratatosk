@@ -42,7 +42,7 @@
 
             Session = new Session
                           {
-                              Chars = Chars.Select(x => SaveChar.FromICharacter(x) as ICharacter).ToList(),
+                              Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList(),
                               GeneralContext = GeneralContext
                           };
             Session.Save();

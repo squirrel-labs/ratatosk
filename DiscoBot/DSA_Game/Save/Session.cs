@@ -20,7 +20,7 @@ namespace DiscoBot.DSA_Game.Save
 
         public Dictionary<string, string> Relation { get; set; } = new Dictionary<string, string>(); // dictionary to match the char
 
-        public List<ICharacter> Chars { get; set; } = new List<ICharacter>();  // list of all characters
+        public List<SaveChar> Chars { get; set; } = new List<SaveChar>();  // list of all characters
 
         public string SessionName { get; set; }
 
