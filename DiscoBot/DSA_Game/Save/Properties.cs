@@ -6,38 +6,76 @@ using System.Threading.Tasks;
 
 namespace DiscoBot.DSA_Game.Save
 {
+    using System.Collections;
     using System.IO;
+    using System.Reflection;
+    using System.Runtime.CompilerServices;
 
     using DiscoBot.Audio;
     using DiscoBot.Auxiliary;
     using DiscoBot.Commands;
 
+    using Discord;
+
     using Newtonsoft.Json;
 
-    public class Properties
+    public static class Properties
     {
-        public List<CommandInfo> CommandInfos { get; set; }
+        private static Dictionary<string, object> objects;
 
-        public List<Sound> Sounds { get; set; }
-
-        public static Properties Deserialize(string path = @"..\..\Properties.json")
-        {   
-            try
-            {
-                return JsonConvert.DeserializeObject<Properties>(File.ReadAllText(path)); // Deserialize Data and create CommandInfo Struct
-            }
-            catch (Exception e)
-            {
-                // ignored
-                return null;
-            }
+        static Properties()
+        {
+            objects = new Dictionary<string, object>();
+            /*this.objects.Add("Sounds", new List<Sound>());
+            this.objects.Add("CommandInfos", new List<CommandInfo>());*/
         }
 
-        public void Serialize(string path = @"..\..\Properties.json")
+        public static List<CommandInfo> CommandInfos { get => objects["CommandInfo"] as List<CommandInfo>; set => objects["CommandInfo"] = value; } // use Properties.Commandinfos to access the abstract Object array
+
+        public static List<Sound> Sounds { get => objects["Sound"] as List<Sound>; set => objects["Sound"] = value; }
+
+        public static void Deserialize(string path = @"..\..\sessions")
+        {
+            
+                var files = Directory.GetFiles(path, "*.json");
+
+                foreach (string file in files)
+                {
+                    try
+                    {
+                        string name = file.Split('\\').Last().Split('.')[0].Replace('-', '.');
+                        string data = File.ReadAllText(file);
+                        Type type = Type.GetType(name);
+                        if (data.StartsWith("["))
+                        {
+                            type = typeof(List<>).MakeGenericType(type);
+                        }
+
+                        var o = JsonConvert.DeserializeObject(data, type);
+                        objects.Add(name.Split('.').Last(), o);
+                    }
+                    catch (Exception e)
+                    {
+                        // ignored
+                        var log = new LogMessage(LogSeverity.Warning, "Properties", $"Laden von Save-File {file} fehlgeschlagen.", e);
+                        Console.WriteLine(log);
+                    }
+
+                }
+            
+        }
+
+        public static void Serialize(string path = @"..\..\sessions\")
         {
             try
             {
-                 File.WriteAllText(path, JsonConvert.SerializeObject(this, Formatting.Indented)); // Deserialize Data and create CommandInfo Struct
+                foreach (var o in objects)
+                {
+                    string assembly = o.Value is IList list ? ((IList)list)[0]?.GetType().FullName : o.Value.GetType().FullName;
+
+                    var name = path + assembly.Replace('.', '-') + ".json";
+                    File.WriteAllText(name, JsonConvert.SerializeObject(o.Value, Formatting.Indented)); // Deserialize Data and create CommandInfo Struct
+                }
             }
             catch (Exception e)
             {

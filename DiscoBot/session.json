@@ -1,17 +1,6 @@
 {
   "GeneralContext": null,
-  "Relation": {
-    "The Doctor": "Numeri Illuminus",
-    "Tardis": "Helga von Drachenei, Tausendsasserin",
-    "DSA Bot": "Morla",
-    "Morla": "Morla",
-    "Rhoktar": "Rhoktar4",
-    "MagicBro5": "Krenko",
-    "Nicolas": "Hartmut Reiher",
-    "TrueKuehli": "Ledur Torfinson",
-    "Papo": "Beef",
-    "Potus": "Potus"
-  },
+  "Relation": {},
   "Chars": [
     {
       "Name": "Felis Exodus Schattenwald",
@@ -121,5 +110,6 @@
       "Astralpunkte_Basis": 43,
       "Astralpunkte_Aktuell": 43
     }
-  ]
+  ],
+  "SessionName": null
 }

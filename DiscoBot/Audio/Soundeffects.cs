@@ -64,7 +64,7 @@
                     break;
             }*/
 
-            var tSound = Dsa.Properties.Sounds.OrderBy(x => SpellCorrect.CompareEasy(s, x.Name)).First();
+            var tSound = DSA_Game.Save.Properties.Sounds.OrderBy(x => SpellCorrect.CompareEasy(s, x.Name)).First();
 
             url = s;
 

@@ -46,14 +46,14 @@ namespace DiscoBot.Commands
         public static string Get_Specific_Help(string command)
         {
             // return command specific help
-            var com = Dsa.Properties.CommandInfos.OrderBy(x => SpellCorrect.CompareEasy(x.Name, command.ToLower())).First(); // get best fit command
+            var com = DSA_Game.Save.Properties.CommandInfos.OrderBy(x => SpellCorrect.CompareEasy(x.Name, command.ToLower())).First(); // get best fit command
             return com.GetDescription();
         }
 
         public static string Get_Generic_Help()
         {
             string res = "";
-            foreach (var com in Dsa.Properties.CommandInfos)
+            foreach (var com in DSA_Game.Save.Properties.CommandInfos)
             {
                 int first_column_width = 8;
                 res += ("!" + com.Name + ": ").AddSpaces(first_column_width) + com.Brief;

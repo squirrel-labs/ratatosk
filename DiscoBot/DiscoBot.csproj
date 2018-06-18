@@ -111,6 +111,7 @@
     <Compile Include="Commands\MiscCommands.cs" />
     <Compile Include="Auxiliary\SpellCorrect.cs" />
     <Compile Include="DSA_Game\Save\Properties.cs" />
+    <Compile Include="DSA_Game\Save\SaveCommand.cs" />
     <Compile Include="DSA_Game\Save\Session.cs" />
     <Compile Include="DSA_Game\Talent.cs" />
     <Compile Include="DSA_Game\Vorteil.cs" />

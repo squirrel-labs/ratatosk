@@ -22,6 +22,8 @@ namespace DiscoBot.DSA_Game.Save
 
         public List<ICharacter> Chars { get; set; } = new List<ICharacter>();  // list of all characters
 
+        public string SessionName { get; set; }
+
         public static Session Load(string path = @"..\..\session.json")
         {
             try

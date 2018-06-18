@@ -20,7 +20,7 @@
 
             if (givenName.Length == 0 || (givenName.Length == 1 && (givenName[0].ToLower().Equals("bin") || givenName[0].ToLower().Equals("am"))))
             {
-                res = " \nDu bist " + Dsa.Relation[this.Context.User.Username] + "!\n \n";
+                res = " \nDu bist " + Dsa.Session.Relation[this.Context.User.Username] + "!\n \n";
 
                 return this.ReplyAsync("```xl\n" + res + "\n```");
             }
@@ -41,11 +41,8 @@
             }
 
             var character = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(name, x.Name)).First(); // usage of compareEasy
-
-
             
- 
-                Dsa.Relation[this.Context.User.Username] = character.Name;
+                Dsa.Session.Relation[this.Context.User.Username] = character.Name;
                 res = " \nWillkommen " + character.Name + "!\n \n";
             
 
@@ -103,7 +100,7 @@
                         temp = erschwernis.ToString();
                     }
 
-                    res = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Relation[this.Context.User.Username], x.Name)).First().get_LE_Text(waffe.Trim() + temp);
+                    res = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Session.Relation[this.Context.User.Username], x.Name)).First().get_LE_Text(waffe.Trim() + temp);
 
                     break;
                 case "ae":
@@ -117,7 +114,7 @@
                         temp = erschwernis.ToString();
                     }
 
-                    res = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Relation[this.Context.User.Username], x.Name)).First().get_AE_Text(waffe.Trim() + temp);
+                    res = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Session.Relation[this.Context.User.Username], x.Name)).First().get_AE_Text(waffe.Trim() + temp);
 
                     break;
                 default:

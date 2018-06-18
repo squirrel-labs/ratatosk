@@ -31,7 +31,7 @@
 
 
             //Get the actual text
-            res += Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Relation[this.Context.User.Username], x.Name)).First().get_LE_Text(prop);
+            res += Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Session.Relation[this.Context.User.Username], x.Name)).First().get_LE_Text(prop);
 
 
             await this.ReplyAsync("```xl\n" + res + "\n```");
@@ -59,7 +59,7 @@
 
 
             //Get the actual text
-            res += Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Relation[this.Context.User.Username], x.Name)).First().get_AE_Text(prop);
+            res += Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Session.Relation[this.Context.User.Username], x.Name)).First().get_AE_Text(prop);
 
 
 

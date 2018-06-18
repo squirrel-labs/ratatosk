@@ -18,38 +18,14 @@
 
         public static AudioService Service { get; set; }
 
-        public static Dictionary<string, string> Relation { get; set; } = new Dictionary<string, string>(); // dictionary to match the char
-
         public static List<ICharacter> Chars { get; set; } = new List<ICharacter>();  // list of all characters
 
         public static List<Talent> Talente { get; set; } = new List<Talent>();
-
-        public static Properties Properties { get; set; }
 
         public static Session Session { get; set; }
 
         public static void Startup()
         {
-            Relation.Add("The Doctor", "Numeri Illuminus"); // Relation
-            Relation.Add("Tardis", "Helga von Drachenei, Tausendsasserin"); // "Numeri Illuminus");
-            Relation.Add("DSA Bot", "Morla"); // "Felis Exodus Schattenwald");
-            Relation.Add("Morla", "Morla");
-            Relation.Add("Rhoktar", "Rhoktar4");
-            Relation.Add("MagicBro5", "Krenko");
-            Relation.Add("Nicolas", "Hartmut Reiher");
-            Relation.Add("TrueKuehli", "Ledur Torfinson");
-
-            // Relation.Add("Papo","Gwendelson");
-            // Relation.Add("Papo", "Pump aus der Gosse");
-
-            // Nachteile für LE, AE, MR
-            // Relation.Add("Papo", "Angilbert Arres");
-
-            // Vorteile für LE, AE, MR
-            Relation.Add("Papo", "Beef");
-
-            // Relation.Add("Papo", "Astrallos");
-            Relation.Add("Potus", "Potus");
 
             // relation.Add("Papo", "Pump aus der Gosse");
             foreach (var filename in Directory.GetFiles("helden", "*.xml"))
@@ -59,16 +35,16 @@
                     .Where(c => !Talente.Exists(v => v.Name.Equals(c.Name))).ToList().ForEach(v => Talente.Add(v));
             }
 
-            Properties = Properties.Deserialize();
+            Properties.Deserialize();
             Properties.Serialize();
 
             Talente = Talente.OrderBy(x => x.Name).ToList();
 
-            Session = new Session();
-            List<SaveChar> save = Chars.Select(SaveChar.FromICharacter).ToList();
-            Session.Chars = save.Select(x=>x as ICharacter).ToList();
-            Session.GeneralContext = GeneralContext;
-            Session.Relation = Relation;
+            Session = new Session
+                          {
+                              Chars = Chars.Select(x => SaveChar.FromICharacter(x) as ICharacter).ToList(),
+                              GeneralContext = GeneralContext
+                          };
             Session.Save();
         }
     }
