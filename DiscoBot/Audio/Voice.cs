@@ -98,8 +98,6 @@
             }
 
             var sc = new SpellCorrect();
-
-            
         }
 
         private static Process CreateStream(string path, int vol = 256)
