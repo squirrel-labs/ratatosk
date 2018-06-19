@@ -15,27 +15,54 @@ namespace DiscoBot.DSA_Game.Save
 
     public class SaveCommand : ModuleBase
     {
-        [Command("save"), Summary("Save Session")]
-        public async Task ReportAsync()
+        [Command("load"), Summary("Load Session")]
+        public async Task LoadSessionAsync([Remainder, Summary("Session Name")] string name = "")
         {
-            
-
-            await this.ReplyAsync($"Dein report wurde hinzugefügt");
-        }
-
-        [Command("save"), Summary("Save Session")]
-        public async Task ReportAsync([Remainder, Summary("Session Name")] string name)
-        {
-            if (name.Equals("?"))
+            if (name.Equals("?") || name.Equals(string.Empty))
             {
                 await this.ReplyAsync($"Gespeicherte Sessions:");
                 await this.ReplyAsync(this.ListSessions());
+                return;
             }
+
+            var path = DSA_Game.Save.Session.DirectoryPath + @"\" + name;
+
+            var files = Directory.GetFiles(path);
+            var session = files.OrderByDescending(x => Convert.ToInt32(x.Split('-').Last().Split('.').First())).First();
+            Dsa.Session = Session.Load(session);
+
+            await this.ReplyAsync($"{name} wurde geladen");
+        }
+
+        [Command("save"), Summary("Save Session")]
+        public async Task SessionSaveAsync([Remainder, Summary("Session Name")] string name = "")
+        {
+            if (name.Equals("?") || name.Equals(string.Empty))
+            {
+                await this.ReplyAsync($"Gespeicherte Sessions:");
+                await this.ReplyAsync(this.ListSessions());
+                return;
+            }
+
+            var path = DSA_Game.Save.Session.DirectoryPath + @"\" + name;
+            if (Directory.Exists(path))
+            {
+                var files = Directory.GetFiles(path);
+                int current = files.Max(x => Convert.ToInt32(x.Split('-').Last().Split('.').First()));
+                Dsa.Session.Save(path + "\\" + name + $"-{++current}.json");
+            }
+            else
+            {
+                Directory.CreateDirectory(path);
+                Dsa.Session.Save(path + "\\" + name + $"-0.json");
+            }
+
+            await this.ReplyAsync($"{name} wurde gespeichert");
         }
 
         private string[] ListSessions()
         {
-            return Directory.GetDirectories(@"..\..\sessions");
+            return Directory.GetDirectories(Session.DirectoryPath);
         }
 
 

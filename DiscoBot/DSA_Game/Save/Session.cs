@@ -10,12 +10,15 @@ namespace DiscoBot.DSA_Game.Save
 
     using DiscoBot.DSA_Game.Characters;
 
+    using Discord;
     using Discord.Commands;
 
     using Newtonsoft.Json;
 
     public class Session
     {
+        public static string DirectoryPath { get; set; } = @"..\..\sessions";
+
         public ICommandContext GeneralContext { get; set; }
 
         public Dictionary<string, string> Relation { get; set; } = new Dictionary<string, string>(); // dictionary to match the char
@@ -23,7 +26,7 @@ namespace DiscoBot.DSA_Game.Save
         public List<SaveChar> Chars { get; set; } = new List<SaveChar>();  // list of all characters
 
         public string SessionName { get; set; }
-
+        
         public static Session Load(string path = @"..\..\session.json")
         {
             try
@@ -33,6 +36,8 @@ namespace DiscoBot.DSA_Game.Save
             catch (Exception e)
             {
                 // ignored
+                var log = new LogMessage(LogSeverity.Warning, "Properties", $"Laden von Save-File {path} fehlgeschlagen.", e);
+                Console.WriteLine(log);
                 return null;
             }
         }
@@ -45,6 +50,8 @@ namespace DiscoBot.DSA_Game.Save
             }
             catch (Exception e)
             {
+                var log = new LogMessage(LogSeverity.Warning, "Properties", $"Speichern von Save-File {path} fehlgeschlagen.", e);
+                Console.WriteLine(log);
                 // ignored
             }
         }

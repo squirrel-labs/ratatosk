@@ -22,7 +22,7 @@
 
         public static List<Talent> Talente { get; set; } = new List<Talent>();
 
-        public static Session Session { get; set; }
+        public static Session Session { get; set; } = new Session();
 
         public static void Startup()
         {

@@ -34,7 +34,7 @@ namespace DiscoBot.DSA_Game.Save
 
         public static List<Sound> Sounds { get => objects["Sound"] as List<Sound>; set => objects["Sound"] = value; }
 
-        public static void Deserialize(string path = @"..\..\sessions")
+        public static void Deserialize(string path = @"..\..\Properties")
         {
             
                 var files = Directory.GetFiles(path, "*.json");
@@ -65,7 +65,7 @@ namespace DiscoBot.DSA_Game.Save
             
         }
 
-        public static void Serialize(string path = @"..\..\sessions\")
+        public static void Serialize(string path = @"..\..\Properties\")
         {
             try
             {
@@ -80,6 +80,8 @@ namespace DiscoBot.DSA_Game.Save
             catch (Exception e)
             {
                 // ignored
+                var log = new LogMessage(LogSeverity.Warning, "Properties", $"Speichern von Save-File fehlgeschlagen.", e);
+                Console.WriteLine(log);
             }
         }
     }
