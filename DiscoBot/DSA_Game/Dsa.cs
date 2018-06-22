@@ -14,6 +14,8 @@
 
     public static class Dsa
     {
+        private static Session s_session;
+
         public static ICommandContext GeneralContext { get; set; }
 
         public static AudioService Service { get; set; }
@@ -22,11 +24,27 @@
 
         public static List<Talent> Talente { get; set; } = new List<Talent>();
 
-        public static Session Session { get; set; } = new Session();
+        public static Session Session
+        {
+            get
+            {
+                s_session.Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList();
+                return s_session;
+            }
+
+            set
+            {
+                s_session = value;
+                foreach (var x in value.Chars)
+                {
+                    Chars.Find(c => c.Name.Equals(x.Name)).Update(x);
+                }
+            }
+        }
 
         public static void Startup()
         {
-
+            /*Session = new Session();*/
             // relation.Add("Papo", "Pump aus der Gosse");
             foreach (var filename in Directory.GetFiles("helden", "*.xml"))
             {
@@ -39,12 +57,11 @@
             Properties.Serialize();
 
             Talente = Talente.OrderBy(x => x.Name).ToList();
-
             Session = new Session
-                          {
-                              Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList(),
-                              GeneralContext = GeneralContext
-                          };
+            {
+                Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList(),
+                GeneralContext = GeneralContext
+            };
             Session.Save();
         }
     }

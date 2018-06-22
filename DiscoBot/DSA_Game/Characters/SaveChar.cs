@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace DiscoBot.DSA_Game.Characters
 {
+    using Discord;
+
     public class SaveChar
     {
         public string Name { get; set; }
@@ -25,6 +27,18 @@ namespace DiscoBot.DSA_Game.Characters
                 Lebenspunkte_Aktuell = c.Lebenspunkte_Aktuell,
                 Name = c.Name
             };
+        }
+    }
+
+
+    public static class ICharExtension
+    {
+        public static void Update(this ICharacter c, SaveChar s)
+        {
+            c.Astralpunkte_Aktuell = s.Astralpunkte_Aktuell;
+            c.Ausdauer_Aktuell = s.Ausdauer_Aktuell;
+            c.Lebenspunkte_Aktuell = s.Lebenspunkte_Aktuell;
+            c.Name = s.Name;
         }
     }
 }
