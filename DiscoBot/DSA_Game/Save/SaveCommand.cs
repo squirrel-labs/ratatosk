@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace DiscoBot.DSA_Game.Save
 {
     using System.IO;
+    using System.Net;
     using System.Net.Http;
 
     using DiscoBot.Auxiliary;
@@ -34,9 +35,11 @@ namespace DiscoBot.DSA_Game.Save
             await this.ReplyAsync($"{name} wurde geladen");
         }
 
-        [Command("save"), Summary("Save Session")]
+        [Command("save", RunMode = RunMode.Async), Summary("Save Session")]
         public async Task SessionSaveAsync([Remainder, Summary("Session Name")] string name = "")
         {
+            var sendFile = this.Context.Channel.SendWebFile("https://cdn.discordapp.com/attachments/377123019673567232/465615882048110603/giphy.gif");
+
             if (name.Equals("?") || name.Equals(string.Empty))
             {
                 await this.ReplyAsync($"Gespeicherte Sessions:");
@@ -58,6 +61,7 @@ namespace DiscoBot.DSA_Game.Save
             }
 
             await this.ReplyAsync($"{name} wurde gespeichert");
+            await sendFile;
         }
 
         private string[] ListSessions()

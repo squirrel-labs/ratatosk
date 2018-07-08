@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace DiscoBot.DSA_Game.Save
 {
     using System.IO;
+    using System.Runtime.CompilerServices;
 
     using DiscoBot.DSA_Game.Characters;
 
@@ -37,7 +38,7 @@ namespace DiscoBot.DSA_Game.Save
             {
                 // ignored
                 var log = new LogMessage(LogSeverity.Warning, "Properties", $"Laden von Save-File {path} fehlgeschlagen.", e);
-                Console.WriteLine(log);
+                Console.WriteLine(log); 
                 return null;
             }
         }

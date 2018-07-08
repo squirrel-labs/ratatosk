@@ -3,7 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -13,6 +15,8 @@
 
     public static class CommandExtension
     {
+        private static WebClient client;
+
         public static async Task ReplyTimedAsync(this ModuleBase m, string message, TimeSpan time)
         {
             var token = message.GetHashCode();
@@ -94,6 +98,17 @@
             }
 
             await m.ReplyTimedAsync(sb.ToString(), TimeSpan.FromSeconds(90));
+        }
+
+        public static async Task SendWebFile(this IMessageChannel channel, string url = "https://i.imgur.com/0iHEycJ.png")
+        {
+            if (client == null)
+            {
+                client = new WebClient();
+            }
+
+            Stream stream = client.OpenRead(url);
+            await channel.SendFileAsync(stream, url.Split('/').Last());
         }
     }
 }
