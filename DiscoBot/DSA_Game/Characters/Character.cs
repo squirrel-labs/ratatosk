@@ -9,7 +9,7 @@
     using DiscoBot.Audio;
     using DiscoBot.Auxiliary;
 
-    public class Character : Being, ICharacter
+    public class Character : ICharacter
     {
         public Character()
         {
@@ -60,6 +60,19 @@
 
             this.Post_process(); // calculate derived values
         }
+
+        public string Name { get; set; } // char name
+
+        public int Lebenspunkte_Basis { get; set; }
+        public int Lebenspunkte_Aktuell { get; set; }
+
+        public int Astralpunkte_Basis { get; set; }
+        public int Astralpunkte_Aktuell { get; set; }
+
+        public int Ausdauer_Basis { get; set; }
+        public int Ausdauer_Aktuell { get; set; }
+
+        
 
         public Dictionary<string, int> Eigenschaften { get; set; } = new Dictionary<string, int>();   // char properties
 

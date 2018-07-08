@@ -5,7 +5,7 @@
     using DiscoBot.Auxiliary;
     using DiscoBot.DSA_Game.Characters;
 
-    public class Npc : Being, ICharacter
+    public class Npc : ICharacter
     {
         private readonly int mean, stDv;
 
@@ -15,6 +15,17 @@
             this.stDv = stDv;
             this.Name = name;
         }
+
+        public string Name { get; set; }
+
+        public int Lebenspunkte_Basis { get; set; }
+        public int Lebenspunkte_Aktuell { get; set; }
+
+        public int Astralpunkte_Basis { get; set; }
+        public int Astralpunkte_Aktuell { get; set; }
+
+        public int Ausdauer_Basis { get; set; }
+        public int Ausdauer_Aktuell { get; set; }
 
         public string TestTalent(string talent, int tap = 3)
         {
