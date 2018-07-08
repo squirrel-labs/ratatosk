@@ -104,7 +104,10 @@
     <Compile Include="Auxiliary\TalentEnumerableExtension.cs" />
     <Compile Include="Commands\LebenUndAstral.cs" />
     <Compile Include="Commands\HeldList.cs" />
+    <Compile Include="DSA_Game\Characters\Being.cs" />
+    <Compile Include="DSA_Game\Characters\Combatant.cs" />
     <Compile Include="DSA_Game\Characters\SaveChar.cs" />
+    <Compile Include="DSA_Game\Characters\Entity.cs" />
     <Compile Include="DSA_Game\KampfTalent.cs" />
     <Compile Include="Audio\Soundeffects.cs" />
     <Compile Include="Auxiliary\Permissions.cs" />
