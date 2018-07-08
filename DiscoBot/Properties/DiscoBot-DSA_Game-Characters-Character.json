@@ -1,12 +1,29 @@
 [
   {
-    "Name": "Felis Exodus Schattenwald",
+    "Eigenschaften": {},
+    "Talente": [],
+    "Zauber": [],
+    "Kampftalente": [],
+    "Vorteile": [],
+    "PropTable": {
+      "MU": "Mut",
+      "KL": "Klugheit",
+      "IN": "Intuition",
+      "CH": "Charisma",
+      "FF": "Fingerfertigkeit",
+      "GE": "Gewandtheit",
+      "KO": "Konstitution",
+      "KK": "Körperkraft"
+    },
     "Lebenspunkte_Basis": 30,
     "Lebenspunkte_Aktuell": 30,
+    "Ausdauer_Basis": 0,
+    "Ausdauer_Aktuell": 0,
     "Astralpunkte_Basis": 20,
     "Astralpunkte_Aktuell": 20,
-    "Ausdauer_Basis": 0,
-    "Ausdauer_Aktuell": 0,
+    "Name": "Felis Exodus Schattenwald"
+  },
+  {
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -21,16 +38,16 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
-  },
-  {
-    "Name": "Gardist",
+    },
     "Lebenspunkte_Basis": 29,
     "Lebenspunkte_Aktuell": 29,
-    "Astralpunkte_Basis": 0,
-    "Astralpunkte_Aktuell": 0,
     "Ausdauer_Basis": 0,
     "Ausdauer_Aktuell": 0,
+    "Astralpunkte_Basis": 0,
+    "Astralpunkte_Aktuell": 0,
+    "Name": "Gardist"
+  },
+  {
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -45,16 +62,16 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
-  },
-  {
-    "Name": "Hartmut Reiher",
+    },
     "Lebenspunkte_Basis": 31,
     "Lebenspunkte_Aktuell": 31,
-    "Astralpunkte_Basis": 0,
-    "Astralpunkte_Aktuell": 0,
     "Ausdauer_Basis": 0,
     "Ausdauer_Aktuell": 0,
+    "Astralpunkte_Basis": 0,
+    "Astralpunkte_Aktuell": 0,
+    "Name": "Hartmut Reiher"
+  },
+  {
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -69,16 +86,16 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
-  },
-  {
-    "Name": "Helga vom Drachenei, Tausendsasserin",
+    },
     "Lebenspunkte_Basis": 21,
     "Lebenspunkte_Aktuell": 21,
+    "Ausdauer_Basis": 0,
+    "Ausdauer_Aktuell": 0,
     "Astralpunkte_Basis": 35,
     "Astralpunkte_Aktuell": 35,
-    "Ausdauer_Basis": 0,
-    "Ausdauer_Aktuell": 0,
+    "Name": "Helga vom Drachenei, Tausendsasserin"
+  },
+  {
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -93,16 +110,16 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
-  },
-  {
-    "Name": "Krenko",
+    },
     "Lebenspunkte_Basis": 25,
     "Lebenspunkte_Aktuell": 25,
-    "Astralpunkte_Basis": 0,
-    "Astralpunkte_Aktuell": 0,
     "Ausdauer_Basis": 0,
     "Ausdauer_Aktuell": 0,
+    "Astralpunkte_Basis": 0,
+    "Astralpunkte_Aktuell": 0,
+    "Name": "Krenko"
+  },
+  {
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -117,16 +134,16 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
-  },
-  {
-    "Name": "Ledur Torfinson",
+    },
     "Lebenspunkte_Basis": 39,
     "Lebenspunkte_Aktuell": 39,
-    "Astralpunkte_Basis": 0,
-    "Astralpunkte_Aktuell": 0,
     "Ausdauer_Basis": 0,
     "Ausdauer_Aktuell": 0,
+    "Astralpunkte_Basis": 0,
+    "Astralpunkte_Aktuell": 0,
+    "Name": "Ledur Torfinson"
+  },
+  {
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -141,16 +158,16 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
-  },
-  {
-    "Name": "Morla",
+    },
     "Lebenspunkte_Basis": 26,
     "Lebenspunkte_Aktuell": 26,
-    "Astralpunkte_Basis": 13,
-    "Astralpunkte_Aktuell": 13,
     "Ausdauer_Basis": 0,
     "Ausdauer_Aktuell": 0,
+    "Astralpunkte_Basis": 13,
+    "Astralpunkte_Aktuell": 13,
+    "Name": "Morla"
+  },
+  {
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -165,16 +182,16 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
-  },
-  {
-    "Name": "Numeri Illuminus",
+    },
     "Lebenspunkte_Basis": 28,
     "Lebenspunkte_Aktuell": 28,
+    "Ausdauer_Basis": 0,
+    "Ausdauer_Aktuell": 0,
     "Astralpunkte_Basis": 40,
     "Astralpunkte_Aktuell": 40,
-    "Ausdauer_Basis": 0,
-    "Ausdauer_Aktuell": 0,
+    "Name": "Numeri Illuminus"
+  },
+  {
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -189,16 +206,16 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
-  },
-  {
-    "Name": "Potus",
+    },
     "Lebenspunkte_Basis": 39,
     "Lebenspunkte_Aktuell": 39,
+    "Ausdauer_Basis": 0,
+    "Ausdauer_Aktuell": 0,
     "Astralpunkte_Basis": 16,
     "Astralpunkte_Aktuell": 16,
-    "Ausdauer_Basis": 0,
-    "Ausdauer_Aktuell": 0,
+    "Name": "Potus"
+  },
+  {
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -213,16 +230,16 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
-  },
-  {
-    "Name": "Pump aus der Gosse",
+    },
     "Lebenspunkte_Basis": 18,
     "Lebenspunkte_Aktuell": 18,
+    "Ausdauer_Basis": 0,
+    "Ausdauer_Aktuell": 0,
     "Astralpunkte_Basis": 13,
     "Astralpunkte_Aktuell": 13,
-    "Ausdauer_Basis": 0,
-    "Ausdauer_Aktuell": 0,
+    "Name": "Pump aus der Gosse"
+  },
+  {
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -237,40 +254,16 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
-  },
-  {
-    "Name": "Rhoktar4",
+    },
     "Lebenspunkte_Basis": 34,
     "Lebenspunkte_Aktuell": 34,
+    "Ausdauer_Basis": 0,
+    "Ausdauer_Aktuell": 0,
     "Astralpunkte_Basis": 17,
     "Astralpunkte_Aktuell": 17,
-    "Ausdauer_Basis": 0,
-    "Ausdauer_Aktuell": 0,
-    "Eigenschaften": {},
-    "Talente": [],
-    "Zauber": [],
-    "Kampftalente": [],
-    "Vorteile": [],
-    "PropTable": {
-      "MU": "Mut",
-      "KL": "Klugheit",
-      "IN": "Intuition",
-      "CH": "Charisma",
-      "FF": "Fingerfertigkeit",
-      "GE": "Gewandtheit",
-      "KO": "Konstitution",
-      "KK": "Körperkraft"
-    }
+    "Name": "Rhoktar4"
   },
   {
-    "Name": "Volant",
-    "Lebenspunkte_Basis": 28,
-    "Lebenspunkte_Aktuell": 28,
-    "Astralpunkte_Basis": 43,
-    "Astralpunkte_Aktuell": 43,
-    "Ausdauer_Basis": 0,
-    "Ausdauer_Aktuell": 0,
     "Eigenschaften": {},
     "Talente": [],
     "Zauber": [],
@@ -285,6 +278,13 @@
       "GE": "Gewandtheit",
       "KO": "Konstitution",
       "KK": "Körperkraft"
-    }
+    },
+    "Lebenspunkte_Basis": 28,
+    "Lebenspunkte_Aktuell": 28,
+    "Ausdauer_Basis": 0,
+    "Ausdauer_Aktuell": 0,
+    "Astralpunkte_Basis": 43,
+    "Astralpunkte_Aktuell": 43,
+    "Name": "Volant"
   }
 ]

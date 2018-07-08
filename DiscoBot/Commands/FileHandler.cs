@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using System.Net;
+    using System.Threading.Tasks;
 
     using DiscoBot.Auxiliary;
     using DiscoBot.Characters;
@@ -14,7 +15,7 @@
     public class FileHandler : ModuleBase
     {
         [Command("send"), Summary("fügt Helden hinzu")]
-        public void AddChar()
+        public async Task AddChar()
         {
             var msg = this.Context.Message;
             if (msg.Attachments == null)
