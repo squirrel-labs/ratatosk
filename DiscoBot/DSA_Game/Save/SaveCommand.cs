@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DiscoBot.DSA_Game.Save
 {
+    using System.Diagnostics;
     using System.IO;
     using System.Net;
     using System.Net.Http;
@@ -66,9 +67,13 @@ namespace DiscoBot.DSA_Game.Save
 
         private string[] ListSessions()
         {
-            return Directory.GetDirectories(Session.DirectoryPath);
+            string[] dirs = Directory.GetDirectories(Session.DirectoryPath).OrderByDescending(x => new DirectoryInfo(x).LastAccessTime.Ticks).ToArray();
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                dirs[i] += "; " + new DirectoryInfo(dirs[i]).LastAccessTime;
+            }
+
+            return dirs;
         }
-
-
     }
 }
