@@ -4,9 +4,7 @@
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
-
-    using DiscoBot.Auxiliary;
-    using DiscoBot.Characters;
+    
     using DiscoBot.DSA_Game;
     using DiscoBot.DSA_Game.Characters;
 

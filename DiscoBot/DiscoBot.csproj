@@ -99,16 +99,14 @@
     <Compile Include="Audio\Sound.cs" />
     <Compile Include="Auxiliary\CommandInfo.cs" />
     <Compile Include="Auxiliary\Extensions.cs" />
+    <Compile Include="DSA_Game\Characters\Character.cs" />
+    <Compile Include="DSA_Game\Characters\NPC.cs" />
+    <Compile Include="DSA_Game\Characters\SaveChar.cs" />
     <Compile Include="Commands\Help.cs" />
     <Compile Include="Auxiliary\Dice.cs" />
     <Compile Include="Auxiliary\TalentEnumerableExtension.cs" />
     <Compile Include="Commands\LebenUndAstral.cs" />
     <Compile Include="Commands\HeldList.cs" />
-    <Compile Include="DSA_Game\Characters\Being.cs" />
-    <Compile Include="DSA_Game\Characters\Combatant.cs" />
-    <Compile Include="DSA_Game\Characters\SaveChar.cs" />
-    <Compile Include="DSA_Game\Characters\Entity.cs" />
-    <Compile Include="DSA_Game\KampfTalent.cs" />
     <Compile Include="Audio\Soundeffects.cs" />
     <Compile Include="Auxiliary\Permissions.cs" />
     <Compile Include="Commands\MiscCommands.cs" />
@@ -116,9 +114,6 @@
     <Compile Include="DSA_Game\Save\Properties.cs" />
     <Compile Include="DSA_Game\Save\SaveCommand.cs" />
     <Compile Include="DSA_Game\Save\Session.cs" />
-    <Compile Include="DSA_Game\Talent.cs" />
-    <Compile Include="DSA_Game\Vorteil.cs" />
-    <Compile Include="DSA_Game\Characters\Character.cs" />
     <Compile Include="Auxiliary\CommandExtension.cs" />
     <Compile Include="Commands\CommandTypes.cs" />
     <Compile Include="Commands\FileHandler.cs" />
@@ -127,11 +122,8 @@
     <Compile Include="Commands\NpcCommands.cs" />
     <Compile Include="Commands\ProbenTest.cs" />
     <Compile Include="Audio\Voice.cs" />
-    <Compile Include="DSA_Game\Characters\ICharacter.cs" />
     <Compile Include="Auxiliary\RandomMisc.cs" />
-    <Compile Include="DSA_Game\Characters\NPC.cs" />
     <Compile Include="DSA_Game\Dsa.cs" />
-    <Compile Include="DSA_Game\Zauber.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -148,6 +140,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DSALib\DSALib.csproj">
+      <Project>{33281e45-1d5c-4645-8d2b-dd05b40fdfd5}</Project>
+      <Name>DSALib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

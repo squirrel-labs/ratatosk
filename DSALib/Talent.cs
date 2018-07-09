@@ -1,8 +1,7 @@
 ﻿namespace DiscoBot.DSA_Game
 {
     using System;
-
-    using DiscoBot.Auxiliary;
+    
 
     public class Talent // talent objekt
     {
@@ -29,13 +28,7 @@
 
             return temp;
         }
-
-        public int CheckName(string quarry)
-        {
-            var sc = (StringComparer)new SpellCorrect();
-            return sc.Compare(quarry, this.Name);
-        }
-
+        
         public bool IstFernkampftalent()
         {
             switch (Name)

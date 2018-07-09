@@ -10,6 +10,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscoBot", "DiscoBot\DiscoBot.csproj", "{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSALib", "DSALib\DSALib.csproj", "{33281E45-1D5C-4645-8D2B-DD05B40FDFD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZooBOTanica", "ZooBOTanica\ZooBOTanica.csproj", "{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +24,14 @@ Global
 		{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33281E45-1D5C-4645-8D2B-DD05B40FDFD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33281E45-1D5C-4645-8D2B-DD05B40FDFD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33281E45-1D5C-4645-8D2B-DD05B40FDFD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33281E45-1D5C-4645-8D2B-DD05B40FDFD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

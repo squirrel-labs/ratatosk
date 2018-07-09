@@ -72,7 +72,7 @@
         public List<Vorteil> Vorteile { get; set; } = new List<Vorteil>();
 
         public Dictionary<string, string> PropTable { get; set; } = new Dictionary<string, string>(); // -> Körperkraft
-        
+
         public string TestTalent(string talent, int erschwernis = 0)     // Talentprobe
         {
             return this.Talente.ProbenTest(this, talent, erschwernis);
@@ -89,8 +89,8 @@
             var prop = this.PropTable[eigenschaft.ToUpper()];
             int tap = this.Eigenschaften[prop];
             output.AppendFormat(
-                "{0}-Eigenschaftsprobe ew:{1} {2} \n", 
-                prop, 
+                "{0}-Eigenschaftsprobe ew:{1} {2} \n",
+                prop,
                 tap,
                 erschwernis.Equals(0) ? string.Empty : "Erschwernis: " + erschwernis);
             int roll = Dice.Roll();
@@ -144,9 +144,9 @@
 
             int tap = attack.Pa;
             output.AppendFormat(
-                "{0}-Parade taw:{1} {2}\n", 
-                attack.Name, 
-                tap, 
+                "{0}-Parade taw:{1} {2}\n",
+                attack.Name,
+                tap,
                 erschwernis.Equals(0) ? string.Empty : "Erschwernis: " + erschwernis);
 
             int temp = Dice.Roll();
@@ -172,8 +172,8 @@
 
             int tap = attack.Value;
             output.AppendFormat(
-                "{0} taw:{1} {2} \n", 
-                attack.Name, 
+                "{0} taw:{1} {2} \n",
+                attack.Name,
                 tap,
                 erschwernis.Equals(0) ? string.Empty : "Erschwernis: " + erschwernis);
             tap -= erschwernis;
@@ -199,7 +199,7 @@
 
             this.Ausdauer_Basis = 0;
 
-            this.Lebenspunkte_Basis = LE_Wert + (int)(KO__Wert + (KK_Wert/2.0) + 0.5);
+            this.Lebenspunkte_Basis = LE_Wert + (int)(KO__Wert + (KK_Wert / 2.0) + 0.5);
 
             if (this.Vorteile.Exists(x => x.Name.ToLower().Contains("zauberer")))
             {
@@ -209,11 +209,11 @@
             this.Lebenspunkte_Aktuell = this.Lebenspunkte_Basis;
             this.Astralpunkte_Aktuell = this.Astralpunkte_Basis;
             this.Ausdauer_Aktuell = this.Ausdauer_Basis;
-            
-        }
-        
 
-            private void Load(string path)
+        }
+
+
+        private void Load(string path)
         {
             var reader = new XmlTextReader(path);
             while (reader.Read())
@@ -245,7 +245,7 @@
                             {
                                 this.Vorteile.Add(new Vorteil(
                                     reader.GetAttribute("name"),
-                                  //  Convert.ToInt32(reader.GetAttribute("value"))));
+                                //  Convert.ToInt32(reader.GetAttribute("value"))));
                                 reader.GetAttribute("value")));
                             }
                             catch
