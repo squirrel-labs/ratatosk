@@ -1,0 +1,37 @@
+{
+  "Rs": 1,
+  "Mr": 3,
+  "Ko": 8,
+  "Pa": 0,
+  "Gs": 8,
+  "Gw": 3,
+  "Ini": "2w6+5",
+  "Comment": "",
+  "CritterAttacks": [
+    {
+      "Name": "Biss",
+      "At": 10,
+      "Tp": "1W+1",
+      "Comment": ""
+    },
+    {
+      "Name": "Schwert",
+      "At": 10,
+      "Tp": "1W+4",
+      "Comment": ""
+    },
+    {
+      "Name": "Schleuder",
+      "At": 6,
+      "Tp": "1W+2",
+      "Comment": ""
+    }
+  ],
+  "Lebenspunkte_Basis": 22,
+  "Lebenspunkte_Aktuell": 30,
+  "Ausdauer_Basis": 30,
+  "Ausdauer_Aktuell": 30,
+  "Astralpunkte_Basis": 0,
+  "Astralpunkte_Aktuell": 0,
+  "Name": "Goblin"
+}

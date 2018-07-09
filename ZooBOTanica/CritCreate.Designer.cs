@@ -34,21 +34,21 @@
             this.LeLabel = new System.Windows.Forms.Label();
             this.LeEdit = new System.Windows.Forms.NumericUpDown();
             this.GrundwerteGroup = new System.Windows.Forms.GroupBox();
+            this.KoLabel = new System.Windows.Forms.Label();
+            this.KoEdit = new System.Windows.Forms.NumericUpDown();
             this.AeLabel = new System.Windows.Forms.Label();
             this.AeEdit = new System.Windows.Forms.NumericUpDown();
             this.AuLabel = new System.Windows.Forms.Label();
             this.AuEdit = new System.Windows.Forms.NumericUpDown();
             this.VerteidugungGroup = new System.Windows.Forms.GroupBox();
-            this.KoLabel = new System.Windows.Forms.Label();
-            this.KoEdit = new System.Windows.Forms.NumericUpDown();
+            this.PaEdit = new System.Windows.Forms.NumericUpDown();
+            this.PaLabel = new System.Windows.Forms.Label();
             this.MRLabel = new System.Windows.Forms.Label();
             this.MREdit = new System.Windows.Forms.NumericUpDown();
             this.RSLAbel = new System.Windows.Forms.Label();
             this.RSEdit = new System.Windows.Forms.NumericUpDown();
-            this.PALabel = new System.Windows.Forms.Label();
-            this.PAEdit = new System.Windows.Forms.NumericUpDown();
             this.SecondGroup = new System.Windows.Forms.GroupBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.INIEdit = new System.Windows.Forms.TextBox();
             this.GWLabel = new System.Windows.Forms.Label();
             this.GWEdit = new System.Windows.Forms.NumericUpDown();
             this.INILabel = new System.Windows.Forms.Label();
@@ -60,15 +60,19 @@
             this.ATCollum = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TPCollum = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.KommentarCollum = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.MeisterkommentarEdit = new System.Windows.Forms.TextBox();
+            this.MeisterkommentarLabel = new System.Windows.Forms.Label();
+            this.SaveButton = new System.Windows.Forms.Button();
+            this.LoadButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.LeEdit)).BeginInit();
             this.GrundwerteGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.KoEdit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.AeEdit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.AuEdit)).BeginInit();
             this.VerteidugungGroup.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.KoEdit)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PaEdit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MREdit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSEdit)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PAEdit)).BeginInit();
             this.SecondGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GWEdit)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.GsEdit)).BeginInit();
@@ -83,8 +87,8 @@
             // 
             // NameEdit
             // 
-            resources.ApplyResources(this.NameEdit, "NameEdit");
             this.NameEdit.ForeColor = System.Drawing.SystemColors.WindowText;
+            resources.ApplyResources(this.NameEdit, "NameEdit");
             this.NameEdit.Name = "NameEdit";
             // 
             // LeLabel
@@ -104,15 +108,30 @@
             // 
             // GrundwerteGroup
             // 
-            resources.ApplyResources(this.GrundwerteGroup, "GrundwerteGroup");
+            this.GrundwerteGroup.Controls.Add(this.KoLabel);
+            this.GrundwerteGroup.Controls.Add(this.KoEdit);
             this.GrundwerteGroup.Controls.Add(this.AeLabel);
             this.GrundwerteGroup.Controls.Add(this.AeEdit);
             this.GrundwerteGroup.Controls.Add(this.AuLabel);
             this.GrundwerteGroup.Controls.Add(this.AuEdit);
-            this.GrundwerteGroup.Controls.Add(this.LeLabel);
-            this.GrundwerteGroup.Controls.Add(this.LeEdit);
+            resources.ApplyResources(this.GrundwerteGroup, "GrundwerteGroup");
             this.GrundwerteGroup.Name = "GrundwerteGroup";
             this.GrundwerteGroup.TabStop = false;
+            // 
+            // KoLabel
+            // 
+            resources.ApplyResources(this.KoLabel, "KoLabel");
+            this.KoLabel.Name = "KoLabel";
+            // 
+            // KoEdit
+            // 
+            resources.ApplyResources(this.KoEdit, "KoEdit");
+            this.KoEdit.Name = "KoEdit";
+            this.KoEdit.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
             // 
             // AeLabel
             // 
@@ -141,30 +160,25 @@
             // 
             // VerteidugungGroup
             // 
-            resources.ApplyResources(this.VerteidugungGroup, "VerteidugungGroup");
-            this.VerteidugungGroup.Controls.Add(this.KoLabel);
-            this.VerteidugungGroup.Controls.Add(this.KoEdit);
+            this.VerteidugungGroup.Controls.Add(this.PaEdit);
+            this.VerteidugungGroup.Controls.Add(this.PaLabel);
             this.VerteidugungGroup.Controls.Add(this.MRLabel);
             this.VerteidugungGroup.Controls.Add(this.MREdit);
             this.VerteidugungGroup.Controls.Add(this.RSLAbel);
             this.VerteidugungGroup.Controls.Add(this.RSEdit);
+            resources.ApplyResources(this.VerteidugungGroup, "VerteidugungGroup");
             this.VerteidugungGroup.Name = "VerteidugungGroup";
             this.VerteidugungGroup.TabStop = false;
             // 
-            // KoLabel
+            // PaEdit
             // 
-            resources.ApplyResources(this.KoLabel, "KoLabel");
-            this.KoLabel.Name = "KoLabel";
+            resources.ApplyResources(this.PaEdit, "PaEdit");
+            this.PaEdit.Name = "PaEdit";
             // 
-            // KoEdit
+            // PaLabel
             // 
-            resources.ApplyResources(this.KoEdit, "KoEdit");
-            this.KoEdit.Name = "KoEdit";
-            this.KoEdit.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
+            resources.ApplyResources(this.PaLabel, "PaLabel");
+            this.PaLabel.Name = "PaLabel";
             // 
             // MRLabel
             // 
@@ -191,37 +205,23 @@
             resources.ApplyResources(this.RSEdit, "RSEdit");
             this.RSEdit.Name = "RSEdit";
             // 
-            // PALabel
-            // 
-            resources.ApplyResources(this.PALabel, "PALabel");
-            this.PALabel.Name = "PALabel";
-            // 
-            // PAEdit
-            // 
-            resources.ApplyResources(this.PAEdit, "PAEdit");
-            this.PAEdit.Name = "PAEdit";
-            this.PAEdit.Value = new decimal(new int[] {
-            6,
-            0,
-            0,
-            0});
-            // 
             // SecondGroup
             // 
-            resources.ApplyResources(this.SecondGroup, "SecondGroup");
-            this.SecondGroup.Controls.Add(this.textBox1);
+            this.SecondGroup.Controls.Add(this.INIEdit);
             this.SecondGroup.Controls.Add(this.GWLabel);
             this.SecondGroup.Controls.Add(this.GWEdit);
             this.SecondGroup.Controls.Add(this.INILabel);
             this.SecondGroup.Controls.Add(this.GsLabel);
             this.SecondGroup.Controls.Add(this.GsEdit);
+            resources.ApplyResources(this.SecondGroup, "SecondGroup");
             this.SecondGroup.Name = "SecondGroup";
             this.SecondGroup.TabStop = false;
             // 
-            // textBox1
+            // INIEdit
             // 
-            resources.ApplyResources(this.textBox1, "textBox1");
-            this.textBox1.Name = "textBox1";
+            this.INIEdit.CharacterCasing = System.Windows.Forms.CharacterCasing.Lower;
+            resources.ApplyResources(this.INIEdit, "INIEdit");
+            this.INIEdit.Name = "INIEdit";
             // 
             // GWLabel
             // 
@@ -260,16 +260,14 @@
             // 
             // AttackGroup
             // 
-            resources.ApplyResources(this.AttackGroup, "AttackGroup");
             this.AttackGroup.Controls.Add(this.AttackList);
-            this.AttackGroup.Controls.Add(this.PALabel);
-            this.AttackGroup.Controls.Add(this.PAEdit);
+            resources.ApplyResources(this.AttackGroup, "AttackGroup");
             this.AttackGroup.Name = "AttackGroup";
             this.AttackGroup.TabStop = false;
             // 
             // AttackList
             // 
-            resources.ApplyResources(this.AttackList, "AttackList");
+            this.AttackList.AllowDrop = true;
             this.AttackList.AllowUserToResizeRows = false;
             this.AttackList.BackgroundColor = System.Drawing.Color.PeachPuff;
             this.AttackList.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -278,6 +276,7 @@
             this.ATCollum,
             this.TPCollum,
             this.KommentarCollum});
+            resources.ApplyResources(this.AttackList, "AttackList");
             this.AttackList.Name = "AttackList";
             // 
             // NameCollum
@@ -302,40 +301,69 @@
             resources.ApplyResources(this.KommentarCollum, "KommentarCollum");
             this.KommentarCollum.Name = "KommentarCollum";
             // 
+            // MeisterkommentarEdit
+            // 
+            resources.ApplyResources(this.MeisterkommentarEdit, "MeisterkommentarEdit");
+            this.MeisterkommentarEdit.Name = "MeisterkommentarEdit";
+            // 
+            // MeisterkommentarLabel
+            // 
+            resources.ApplyResources(this.MeisterkommentarLabel, "MeisterkommentarLabel");
+            this.MeisterkommentarLabel.Name = "MeisterkommentarLabel";
+            // 
+            // SaveButton
+            // 
+            resources.ApplyResources(this.SaveButton, "SaveButton");
+            this.SaveButton.Name = "SaveButton";
+            this.SaveButton.UseVisualStyleBackColor = true;
+            this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
+            // 
+            // LoadButton
+            // 
+            resources.ApplyResources(this.LoadButton, "LoadButton");
+            this.LoadButton.Name = "LoadButton";
+            this.LoadButton.UseVisualStyleBackColor = true;
+            this.LoadButton.Click += new System.EventHandler(this.LoadButton_Click);
+            // 
             // CritCreateForm
             // 
-            resources.ApplyResources(this, "$this");
             this.AllowDrop = true;
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.SandyBrown;
+            this.Controls.Add(this.LoadButton);
+            this.Controls.Add(this.SaveButton);
+            this.Controls.Add(this.MeisterkommentarLabel);
+            this.Controls.Add(this.MeisterkommentarEdit);
             this.Controls.Add(this.AttackGroup);
+            this.Controls.Add(this.LeLabel);
+            this.Controls.Add(this.LeEdit);
             this.Controls.Add(this.SecondGroup);
             this.Controls.Add(this.VerteidugungGroup);
             this.Controls.Add(this.GrundwerteGroup);
             this.Controls.Add(this.NameEdit);
             this.Controls.Add(this.NameLabel);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.MaximizeBox = false;
             this.Name = "CritCreateForm";
             this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.CritCreateForm_DragDrop);
             ((System.ComponentModel.ISupportInitialize)(this.LeEdit)).EndInit();
             this.GrundwerteGroup.ResumeLayout(false);
             this.GrundwerteGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.KoEdit)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.AeEdit)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.AuEdit)).EndInit();
             this.VerteidugungGroup.ResumeLayout(false);
             this.VerteidugungGroup.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.KoEdit)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PaEdit)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MREdit)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.RSEdit)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PAEdit)).EndInit();
             this.SecondGroup.ResumeLayout(false);
             this.SecondGroup.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GWEdit)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.GsEdit)).EndInit();
             this.AttackGroup.ResumeLayout(false);
-            this.AttackGroup.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.AttackList)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -358,8 +386,6 @@
         private System.Windows.Forms.NumericUpDown MREdit;
         private System.Windows.Forms.Label RSLAbel;
         private System.Windows.Forms.NumericUpDown RSEdit;
-        private System.Windows.Forms.Label PALabel;
-        private System.Windows.Forms.NumericUpDown PAEdit;
         private System.Windows.Forms.Label KoLabel;
         private System.Windows.Forms.NumericUpDown KoEdit;
         private System.Windows.Forms.GroupBox SecondGroup;
@@ -368,13 +394,19 @@
         private System.Windows.Forms.Label INILabel;
         private System.Windows.Forms.Label GsLabel;
         private System.Windows.Forms.NumericUpDown GsEdit;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox INIEdit;
         private System.Windows.Forms.GroupBox AttackGroup;
         private System.Windows.Forms.DataGridView AttackList;
         private System.Windows.Forms.DataGridViewTextBoxColumn NameCollum;
         private System.Windows.Forms.DataGridViewTextBoxColumn ATCollum;
         private System.Windows.Forms.DataGridViewTextBoxColumn TPCollum;
         private System.Windows.Forms.DataGridViewTextBoxColumn KommentarCollum;
+        private System.Windows.Forms.TextBox MeisterkommentarEdit;
+        private System.Windows.Forms.Label MeisterkommentarLabel;
+        private System.Windows.Forms.Button SaveButton;
+        private System.Windows.Forms.Button LoadButton;
+        private System.Windows.Forms.Label PaLabel;
+        private System.Windows.Forms.NumericUpDown PaEdit;
     }
 }
 

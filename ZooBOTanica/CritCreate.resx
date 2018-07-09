@@ -117,789 +117,838 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="KoEdit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 20</value>
-  </data>
-  <data name="&gt;&gt;KoLabel.Parent" xml:space="preserve">
-    <value>VerteidugungGroup</value>
-  </data>
-  <data name="AttackList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>279, 150</value>
-  </data>
-  <data name="&gt;&gt;VerteidugungGroup.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="LeLabel.Text" xml:space="preserve">
-    <value>Le:</value>
-  </data>
-  <data name="&gt;&gt;GsLabel.Parent" xml:space="preserve">
-    <value>SecondGroup</value>
-  </data>
-  <data name="&gt;&gt;ATCollum.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;LeLabel.Parent" xml:space="preserve">
-    <value>GrundwerteGroup</value>
-  </data>
-  <data name="&gt;&gt;INILabel.Parent" xml:space="preserve">
-    <value>SecondGroup</value>
-  </data>
-  <data name="&gt;&gt;PAEdit.Parent" xml:space="preserve">
-    <value>AttackGroup</value>
-  </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="RSLAbel.AutoSize" type="System.Boolean, mscorlib">
+  <data name="NameLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="AuLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;MRLabel.Name" xml:space="preserve">
-    <value>MRLabel</value>
-  </data>
-  <data name="SecondGroup.Text" xml:space="preserve">
-    <value>Sekundäre Werte</value>
-  </data>
-  <data name="GWLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>185, 21</value>
-  </data>
-  <data name="&gt;&gt;GWLabel.Name" xml:space="preserve">
-    <value>GWLabel</value>
-  </data>
-  <data name="MRLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>27, 13</value>
-  </data>
-  <data name="AttackList.TabIndex" type="System.Int32, mscorlib">
-    <value>14</value>
-  </data>
-  <data name="Kommentar.HeaderText" xml:space="preserve">
-    <value>Kommentar</value>
-  </data>
-  <data name="AeLabel.Text" xml:space="preserve">
-    <value>Ae:</value>
-  </data>
-  <data name="&gt;&gt;MREdit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;GWEdit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;RSEdit.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="NameLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>22, 32</value>
-  </data>
-  <data name="&gt;&gt;INILabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="PALabel.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="SecondGroup.Location" type="System.Drawing.Point, System.Drawing">
-    <value>314, 173</value>
-  </data>
-  <data name="&gt;&gt;AttackList.Name" xml:space="preserve">
-    <value>AttackList</value>
-  </data>
-  <data name="GWLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>8</value>
-  </data>
-  <data name="&gt;&gt;LeEdit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="ATCollum.HeaderText" xml:space="preserve">
-    <value>At</value>
-  </data>
-  <data name="&gt;&gt;KoLabel.Name" xml:space="preserve">
-    <value>KoLabel</value>
-  </data>
-  <data name="&gt;&gt;NameLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="AuEdit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>121, 19</value>
-  </data>
-  <data name="VerteidugungGroup.TabIndex" type="System.Int32, mscorlib">
-    <value>10</value>
-  </data>
-  <data name="AeLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;GWLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;GrundwerteGroup.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;INILabel.Name" xml:space="preserve">
-    <value>INILabel</value>
-  </data>
-  <data name="AttackGroup.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 55</value>
-  </data>
-  <data name="&gt;&gt;NameEdit.Name" xml:space="preserve">
-    <value>NameEdit</value>
-  </data>
-  <data name="PALabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="GsEdit.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;MRLabel.Parent" xml:space="preserve">
-    <value>VerteidugungGroup</value>
-  </data>
-  <data name="&gt;&gt;Kommentar.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="AeLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>8</value>
-  </data>
-  <data name="&gt;&gt;GWEdit.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;AeLabel.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;GWEdit.Parent" xml:space="preserve">
-    <value>SecondGroup</value>
-  </data>
-  <data name="&gt;&gt;KommentarCollum.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="GsLabel.Text" xml:space="preserve">
-    <value>GS:</value>
-  </data>
-  <data name="&gt;&gt;NameEdit.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="GrundwerteGroup.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
-  </data>
-  <data name="GrundwerteGroup.Size" type="System.Drawing.Size, System.Drawing">
-    <value>277, 53</value>
-  </data>
-  <data name="NameEdit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>80, 29</value>
-  </data>
-  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>6, 13</value>
-  </data>
-  <data name="&gt;&gt;AttackGroup.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="NameLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;AeEdit.Parent" xml:space="preserve">
-    <value>GrundwerteGroup</value>
-  </data>
-  <data name="&gt;&gt;GrundwerteGroup.Parent" xml:space="preserve">
-    <value>$this</value>
+    <value>333, 31</value>
   </data>
   <data name="NameLabel.Size" type="System.Drawing.Size, System.Drawing">
     <value>38, 13</value>
   </data>
-  <data name="MREdit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>131, 23</value>
-  </data>
-  <data name="AuLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="KoEdit.TabIndex" type="System.Int32, mscorlib">
-    <value>11</value>
-  </data>
-  <data name="&gt;&gt;AuEdit.Name" xml:space="preserve">
-    <value>AuEdit</value>
-  </data>
-  <data name="&gt;&gt;AttackList.ZOrder" xml:space="preserve">
+  <data name="NameLabel.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
-  </data>
-  <data name="&gt;&gt;NameLabel.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="textBox1.Text" xml:space="preserve">
-    <value>2w6+5</value>
-  </data>
-  <data name="&gt;&gt;MREdit.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;AttackGroup.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="LeLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 21</value>
-  </data>
-  <data name="&gt;&gt;AttackGroup.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="GrundwerteGroup.Text" xml:space="preserve">
-    <value>Grundwerte</value>
-  </data>
-  <data name="&gt;&gt;VerteidugungGroup.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;LeEdit.Parent" xml:space="preserve">
-    <value>GrundwerteGroup</value>
-  </data>
-  <data name="AT.Width" type="System.Int32, mscorlib">
-    <value>42</value>
-  </data>
-  <data name="&gt;&gt;GsLabel.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="&gt;&gt;PALabel.Parent" xml:space="preserve">
-    <value>AttackGroup</value>
-  </data>
-  <data name="&gt;&gt;LeLabel.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="&gt;&gt;GsLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="INILabel.Text" xml:space="preserve">
-    <value>INI:</value>
-  </data>
-  <data name="&gt;&gt;NameEdit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;RSLAbel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="AttackGroup.Size" type="System.Drawing.Size, System.Drawing">
-    <value>296, 218</value>
-  </data>
-  <data name="GsLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;LeLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;VerteidugungGroup.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="PAEdit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 20</value>
-  </data>
-  <data name="textBox1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>121, 18</value>
-  </data>
-  <data name="NameEdit.Text" xml:space="preserve">
-    <value>Gegner</value>
-  </data>
-  <data name="RSLAbel.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="&gt;&gt;LeEdit.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="&gt;&gt;$this.Name" xml:space="preserve">
-    <value>CritCreateForm</value>
-  </data>
-  <data name="&gt;&gt;VerteidugungGroup.Name" xml:space="preserve">
-    <value>VerteidugungGroup</value>
-  </data>
-  <data name="&gt;&gt;GrundwerteGroup.Name" xml:space="preserve">
-    <value>GrundwerteGroup</value>
-  </data>
-  <data name="&gt;&gt;AuLabel.Parent" xml:space="preserve">
-    <value>GrundwerteGroup</value>
-  </data>
-  <data name="TP.HeaderText" xml:space="preserve">
-    <value>TP</value>
-  </data>
-  <data name="KoLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>10</value>
-  </data>
-  <data name="GrundwerteGroup.Location" type="System.Drawing.Point, System.Drawing">
-    <value>314, 55</value>
-  </data>
-  <data name="GsEdit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 20</value>
-  </data>
-  <data name="&gt;&gt;GsEdit.Parent" xml:space="preserve">
-    <value>SecondGroup</value>
-  </data>
-  <data name="KoLabel.Text" xml:space="preserve">
-    <value>KO:</value>
-  </data>
-  <data name="&gt;&gt;AuEdit.Parent" xml:space="preserve">
-    <value>GrundwerteGroup</value>
-  </data>
-  <data name="Name.HeaderText" xml:space="preserve">
-    <value>Name</value>
-  </data>
-  <data name="PALabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 189</value>
-  </data>
-  <data name="LeEdit.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="AeEdit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>213, 19</value>
-  </data>
-  <data name="AuEdit.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
-  </data>
-  <data name="&gt;&gt;PALabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="textBox1.TabIndex" type="System.Int32, mscorlib">
-    <value>10</value>
-  </data>
-  <data name="&gt;&gt;NameLabel.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="&gt;&gt;GrundwerteGroup.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="RSLAbel.Text" xml:space="preserve">
-    <value>RS:</value>
-  </data>
-  <data name="&gt;&gt;NameEdit.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="AeEdit.TabIndex" type="System.Int32, mscorlib">
-    <value>9</value>
-  </data>
-  <data name="PALabel.Text" xml:space="preserve">
-    <value>PA:</value>
-  </data>
-  <data name="&gt;&gt;RSEdit.Parent" xml:space="preserve">
-    <value>VerteidugungGroup</value>
-  </data>
-  <data name="RSEdit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 20</value>
-  </data>
-  <data name="AeEdit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 20</value>
-  </data>
-  <data name="&gt;&gt;PAEdit.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;AT.Name" xml:space="preserve">
-    <value>AT</value>
-  </data>
-  <data name="&gt;&gt;RSLAbel.Parent" xml:space="preserve">
-    <value>VerteidugungGroup</value>
-  </data>
-  <data name="AuLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>93, 21</value>
-  </data>
-  <data name="NameEdit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>100, 20</value>
-  </data>
-  <data name="GWLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="AttackGroup.Text" xml:space="preserve">
-    <value>Attacke(n)</value>
-  </data>
-  <data name="&gt;&gt;NameCollum.Name" xml:space="preserve">
-    <value>NameCollum</value>
-  </data>
-  <data name="&gt;&gt;GsEdit.Name" xml:space="preserve">
-    <value>GsEdit</value>
-  </data>
-  <data name="VerteidugungGroup.Text" xml:space="preserve">
-    <value>Verteidigung</value>
-  </data>
-  <data name="GWEdit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>213, 19</value>
-  </data>
-  <data name="KoLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>25, 13</value>
-  </data>
-  <data name="MREdit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 20</value>
-  </data>
-  <data name="PAEdit.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;AuLabel.Name" xml:space="preserve">
-    <value>AuLabel</value>
-  </data>
-  <data name="AuLabel.Text" xml:space="preserve">
-    <value>Au:</value>
-  </data>
-  <data name="&gt;&gt;AeLabel.Name" xml:space="preserve">
-    <value>AeLabel</value>
-  </data>
-  <data name="$this.Text" xml:space="preserve">
-    <value>CritCreate</value>
-  </data>
-  <data name="&gt;&gt;AeLabel.Parent" xml:space="preserve">
-    <value>GrundwerteGroup</value>
-  </data>
-  <data name="RSEdit.TabIndex" type="System.Int32, mscorlib">
-    <value>7</value>
-  </data>
-  <data name="&gt;&gt;KommentarCollum.Name" xml:space="preserve">
-    <value>KommentarCollum</value>
-  </data>
-  <data name="INILabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;RSLAbel.Name" xml:space="preserve">
-    <value>RSLAbel</value>
-  </data>
-  <data name="&gt;&gt;ATCollum.Name" xml:space="preserve">
-    <value>ATCollum</value>
-  </data>
-  <data name="&gt;&gt;LeEdit.Name" xml:space="preserve">
-    <value>LeEdit</value>
-  </data>
-  <data name="&gt;&gt;INILabel.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;AuEdit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="GsLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>25, 13</value>
-  </data>
-  <data name="RSEdit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>39, 23</value>
-  </data>
-  <data name="&gt;&gt;AeEdit.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;AuEdit.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="&gt;&gt;PAEdit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;AT.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="SecondGroup.Size" type="System.Drawing.Size, System.Drawing">
-    <value>277, 53</value>
-  </data>
-  <data name="LeLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>22, 13</value>
-  </data>
-  <data name="&gt;&gt;RSEdit.Name" xml:space="preserve">
-    <value>RSEdit</value>
-  </data>
-  <data name="LeLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="AuLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>23, 13</value>
-  </data>
-  <data name="&gt;&gt;KoLabel.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;SecondGroup.Type" xml:space="preserve">
-    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;GWLabel.Parent" xml:space="preserve">
-    <value>SecondGroup</value>
-  </data>
-  <data name="KoEdit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>221, 23</value>
-  </data>
-  <data name="GsEdit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>36, 19</value>
-  </data>
-  <data name="&gt;&gt;textBox1.Name" xml:space="preserve">
-    <value>textBox1</value>
-  </data>
-  <data name="SecondGroup.TabIndex" type="System.Int32, mscorlib">
-    <value>10</value>
-  </data>
-  <data name="MRLabel.Text" xml:space="preserve">
-    <value>MR:</value>
-  </data>
-  <data name="&gt;&gt;RSLAbel.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="LeLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="TP.Width" type="System.Int32, mscorlib">
-    <value>46</value>
-  </data>
-  <data name="&gt;&gt;GWEdit.Name" xml:space="preserve">
-    <value>GWEdit</value>
-  </data>
-  <data name="&gt;&gt;SecondGroup.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;Name.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;textBox1.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="ATCollum.Width" type="System.Int32, mscorlib">
-    <value>42</value>
-  </data>
-  <data name="&gt;&gt;MREdit.Name" xml:space="preserve">
-    <value>MREdit</value>
-  </data>
-  <data name="&gt;&gt;AuLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="AttackList.Location" type="System.Drawing.Point, System.Drawing">
-    <value>11, 19</value>
-  </data>
-  <data name="LeEdit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>36, 19</value>
-  </data>
-  <data name="&gt;&gt;KoEdit.Name" xml:space="preserve">
-    <value>KoEdit</value>
-  </data>
-  <data name="LeEdit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 20</value>
-  </data>
-  <data name="&gt;&gt;Kommentar.Name" xml:space="preserve">
-    <value>Kommentar</value>
-  </data>
-  <data name="INILabel.TabIndex" type="System.Int32, mscorlib">
-    <value>6</value>
-  </data>
-  <data name="&gt;&gt;AttackList.Parent" xml:space="preserve">
-    <value>AttackGroup</value>
-  </data>
-  <data name="PALabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>24, 13</value>
-  </data>
-  <data name="GsLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="GWEdit.TabIndex" type="System.Int32, mscorlib">
-    <value>9</value>
-  </data>
-  <data name="&gt;&gt;GWLabel.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="MRLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>103, 25</value>
-  </data>
-  <data name="KoLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="GWLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>29, 13</value>
-  </data>
-  <data name="TPCollum.HeaderText" xml:space="preserve">
-    <value>TP</value>
-  </data>
-  <data name="&gt;&gt;KoEdit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;GsEdit.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="&gt;&gt;KoEdit.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="AeLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>185, 21</value>
-  </data>
-  <data name="GWLabel.Text" xml:space="preserve">
-    <value>GW:</value>
-  </data>
-  <data name="&gt;&gt;NameLabel.Name" xml:space="preserve">
-    <value>NameLabel</value>
-  </data>
-  <data name="&gt;&gt;KoLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;NameCollum.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="KommentarCollum.HeaderText" xml:space="preserve">
-    <value>Kommentar</value>
-  </data>
-  <data name="&gt;&gt;AeEdit.Name" xml:space="preserve">
-    <value>AeEdit</value>
-  </data>
-  <data name="&gt;&gt;TPCollum.Name" xml:space="preserve">
-    <value>TPCollum</value>
-  </data>
-  <data name="&gt;&gt;AttackGroup.Name" xml:space="preserve">
-    <value>AttackGroup</value>
-  </data>
-  <data name="&gt;&gt;PALabel.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="GWEdit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 20</value>
-  </data>
-  <data name="&gt;&gt;PALabel.Name" xml:space="preserve">
-    <value>PALabel</value>
-  </data>
-  <data name="&gt;&gt;textBox1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="AT.HeaderText" xml:space="preserve">
-    <value>At</value>
-  </data>
-  <data name="&gt;&gt;Name.Name" xml:space="preserve">
-    <value>Name</value>
-  </data>
-  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>600, 284</value>
-  </data>
-  <data name="AttackGroup.TabIndex" type="System.Int32, mscorlib">
-    <value>12</value>
-  </data>
-  <data name="&gt;&gt;TPCollum.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;RSEdit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;SecondGroup.Name" xml:space="preserve">
-    <value>SecondGroup</value>
-  </data>
-  <data name="&gt;&gt;AeEdit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="RSLAbel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>11, 25</value>
-  </data>
-  <data name="RSLAbel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>25, 13</value>
-  </data>
-  <data name="INILabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>93, 21</value>
-  </data>
-  <data name="&gt;&gt;PAEdit.Name" xml:space="preserve">
-    <value>PAEdit</value>
-  </data>
-  <data name="&gt;&gt;GsEdit.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="TPCollum.Width" type="System.Int32, mscorlib">
-    <value>46</value>
-  </data>
-  <data name="MRLabel.TabIndex" type="System.Int32, mscorlib">
-    <value>8</value>
-  </data>
-  <data name="NameCollum.HeaderText" xml:space="preserve">
-    <value>Name</value>
-  </data>
-  <data name="&gt;&gt;AeLabel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="MRLabel.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="&gt;&gt;AuLabel.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="&gt;&gt;SecondGroup.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="VerteidugungGroup.Location" type="System.Drawing.Point, System.Drawing">
-    <value>314, 114</value>
   </data>
   <data name="NameLabel.Text" xml:space="preserve">
     <value>Name:</value>
   </data>
-  <data name="&gt;&gt;MRLabel.ZOrder" xml:space="preserve">
-    <value>2</value>
+  <data name="&gt;&gt;NameLabel.Name" xml:space="preserve">
+    <value>NameLabel</value>
   </data>
-  <data name="GsLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>8, 21</value>
+  <data name="&gt;&gt;NameLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="VerteidugungGroup.Size" type="System.Drawing.Size, System.Drawing">
-    <value>277, 53</value>
+  <data name="&gt;&gt;NameLabel.Parent" xml:space="preserve">
+    <value>$this</value>
   </data>
-  <data name="&gt;&gt;TP.Name" xml:space="preserve">
-    <value>TP</value>
+  <data name="&gt;&gt;NameLabel.ZOrder" xml:space="preserve">
+    <value>11</value>
   </data>
-  <data name="&gt;&gt;AttackList.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="NameEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>391, 28</value>
   </data>
-  <data name="AuEdit.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 20</value>
-  </data>
-  <data name="MREdit.TabIndex" type="System.Int32, mscorlib">
-    <value>9</value>
-  </data>
-  <data name="INILabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>24, 13</value>
-  </data>
-  <data name="&gt;&gt;textBox1.Parent" xml:space="preserve">
-    <value>SecondGroup</value>
-  </data>
-  <data name="AeLabel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>23, 13</value>
-  </data>
-  <data name="&gt;&gt;LeLabel.Name" xml:space="preserve">
-    <value>LeLabel</value>
-  </data>
-  <data name="&gt;&gt;TP.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="KoLabel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>193, 25</value>
-  </data>
-  <data name="&gt;&gt;KoEdit.Parent" xml:space="preserve">
-    <value>VerteidugungGroup</value>
+  <data name="NameEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>100, 20</value>
   </data>
   <data name="NameEdit.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
-  <data name="NameLabel.AutoSize" type="System.Boolean, mscorlib">
+  <data name="NameEdit.Text" xml:space="preserve">
+    <value>Gegner</value>
+  </data>
+  <data name="&gt;&gt;NameEdit.Name" xml:space="preserve">
+    <value>NameEdit</value>
+  </data>
+  <data name="&gt;&gt;NameEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;NameEdit.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;NameEdit.ZOrder" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="LeLabel.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="&gt;&gt;MREdit.Parent" xml:space="preserve">
+  <data name="LeLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>510, 31</value>
+  </data>
+  <data name="LeLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>22, 13</value>
+  </data>
+  <data name="LeLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="LeLabel.Text" xml:space="preserve">
+    <value>Le:</value>
+  </data>
+  <data name="&gt;&gt;LeLabel.Name" xml:space="preserve">
+    <value>LeLabel</value>
+  </data>
+  <data name="&gt;&gt;LeLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;LeLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;LeLabel.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="LeEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>538, 29</value>
+  </data>
+  <data name="LeEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 20</value>
+  </data>
+  <data name="LeEdit.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;LeEdit.Name" xml:space="preserve">
+    <value>LeEdit</value>
+  </data>
+  <data name="&gt;&gt;LeEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;LeEdit.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;LeEdit.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="KoLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="KoLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>189, 26</value>
+  </data>
+  <data name="KoLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>25, 13</value>
+  </data>
+  <data name="KoLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="KoLabel.Text" xml:space="preserve">
+    <value>KO:</value>
+  </data>
+  <data name="&gt;&gt;KoLabel.Name" xml:space="preserve">
+    <value>KoLabel</value>
+  </data>
+  <data name="&gt;&gt;KoLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;KoLabel.Parent" xml:space="preserve">
+    <value>GrundwerteGroup</value>
+  </data>
+  <data name="&gt;&gt;KoLabel.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="KoEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>217, 24</value>
+  </data>
+  <data name="KoEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 20</value>
+  </data>
+  <data name="KoEdit.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
+  </data>
+  <data name="&gt;&gt;KoEdit.Name" xml:space="preserve">
+    <value>KoEdit</value>
+  </data>
+  <data name="&gt;&gt;KoEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;KoEdit.Parent" xml:space="preserve">
+    <value>GrundwerteGroup</value>
+  </data>
+  <data name="&gt;&gt;KoEdit.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="AeLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="AeLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>93, 26</value>
+  </data>
+  <data name="AeLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>23, 13</value>
+  </data>
+  <data name="AeLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="AeLabel.Text" xml:space="preserve">
+    <value>Ae:</value>
+  </data>
+  <data name="&gt;&gt;AeLabel.Name" xml:space="preserve">
+    <value>AeLabel</value>
+  </data>
+  <data name="&gt;&gt;AeLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;AeLabel.Parent" xml:space="preserve">
+    <value>GrundwerteGroup</value>
+  </data>
+  <data name="&gt;&gt;AeLabel.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="AeEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>121, 24</value>
+  </data>
+  <data name="AeEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 20</value>
+  </data>
+  <data name="AeEdit.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="&gt;&gt;AeEdit.Name" xml:space="preserve">
+    <value>AeEdit</value>
+  </data>
+  <data name="&gt;&gt;AeEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;AeEdit.Parent" xml:space="preserve">
+    <value>GrundwerteGroup</value>
+  </data>
+  <data name="&gt;&gt;AeEdit.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="AuLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="AuLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>13, 26</value>
+  </data>
+  <data name="AuLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>23, 13</value>
+  </data>
+  <data name="AuLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="AuLabel.Text" xml:space="preserve">
+    <value>Au:</value>
+  </data>
+  <data name="&gt;&gt;AuLabel.Name" xml:space="preserve">
+    <value>AuLabel</value>
+  </data>
+  <data name="&gt;&gt;AuLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;AuLabel.Parent" xml:space="preserve">
+    <value>GrundwerteGroup</value>
+  </data>
+  <data name="&gt;&gt;AuLabel.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="AuEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>36, 24</value>
+  </data>
+  <data name="AuEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 20</value>
+  </data>
+  <data name="AuEdit.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;AuEdit.Name" xml:space="preserve">
+    <value>AuEdit</value>
+  </data>
+  <data name="&gt;&gt;AuEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;AuEdit.Parent" xml:space="preserve">
+    <value>GrundwerteGroup</value>
+  </data>
+  <data name="&gt;&gt;AuEdit.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="GrundwerteGroup.Location" type="System.Drawing.Point, System.Drawing">
+    <value>325, 117</value>
+  </data>
+  <data name="GrundwerteGroup.Size" type="System.Drawing.Size, System.Drawing">
+    <value>277, 53</value>
+  </data>
+  <data name="GrundwerteGroup.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="GrundwerteGroup.Text" xml:space="preserve">
+    <value>Grundwerte</value>
+  </data>
+  <data name="&gt;&gt;GrundwerteGroup.Name" xml:space="preserve">
+    <value>GrundwerteGroup</value>
+  </data>
+  <data name="&gt;&gt;GrundwerteGroup.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;GrundwerteGroup.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;GrundwerteGroup.ZOrder" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <data name="PaEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>36, 23</value>
+  </data>
+  <data name="PaEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 20</value>
+  </data>
+  <data name="PaEdit.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;PaEdit.Name" xml:space="preserve">
+    <value>PaEdit</value>
+  </data>
+  <data name="&gt;&gt;PaEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;PaEdit.Parent" xml:space="preserve">
     <value>VerteidugungGroup</value>
+  </data>
+  <data name="&gt;&gt;PaEdit.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="PaLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="PaLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="PaLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>11, 29</value>
+  </data>
+  <data name="PaLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>24, 13</value>
+  </data>
+  <data name="PaLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="PaLabel.Text" xml:space="preserve">
+    <value>PA:</value>
+  </data>
+  <data name="&gt;&gt;PaLabel.Name" xml:space="preserve">
+    <value>PaLabel</value>
+  </data>
+  <data name="&gt;&gt;PaLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;PaLabel.Parent" xml:space="preserve">
+    <value>VerteidugungGroup</value>
+  </data>
+  <data name="&gt;&gt;PaLabel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="MRLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="MRLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>185, 25</value>
+  </data>
+  <data name="MRLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>27, 13</value>
+  </data>
+  <data name="MRLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="MRLabel.Text" xml:space="preserve">
+    <value>MR:</value>
+  </data>
+  <data name="&gt;&gt;MRLabel.Name" xml:space="preserve">
+    <value>MRLabel</value>
   </data>
   <data name="&gt;&gt;MRLabel.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="PAEdit.Location" type="System.Drawing.Point, System.Drawing">
-    <value>36, 187</value>
+  <data name="&gt;&gt;MRLabel.Parent" xml:space="preserve">
+    <value>VerteidugungGroup</value>
+  </data>
+  <data name="&gt;&gt;MRLabel.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="MREdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>213, 23</value>
+  </data>
+  <data name="MREdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 20</value>
+  </data>
+  <data name="MREdit.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;MREdit.Name" xml:space="preserve">
+    <value>MREdit</value>
+  </data>
+  <data name="&gt;&gt;MREdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;MREdit.Parent" xml:space="preserve">
+    <value>VerteidugungGroup</value>
+  </data>
+  <data name="&gt;&gt;MREdit.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="RSLAbel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="RSLAbel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>93, 25</value>
+  </data>
+  <data name="RSLAbel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>25, 13</value>
+  </data>
+  <data name="RSLAbel.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="RSLAbel.Text" xml:space="preserve">
+    <value>RS:</value>
+  </data>
+  <data name="&gt;&gt;RSLAbel.Name" xml:space="preserve">
+    <value>RSLAbel</value>
+  </data>
+  <data name="&gt;&gt;RSLAbel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;RSLAbel.Parent" xml:space="preserve">
+    <value>VerteidugungGroup</value>
+  </data>
+  <data name="&gt;&gt;RSLAbel.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="RSEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>121, 23</value>
+  </data>
+  <data name="RSEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 20</value>
+  </data>
+  <data name="RSEdit.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;RSEdit.Name" xml:space="preserve">
+    <value>RSEdit</value>
+  </data>
+  <data name="&gt;&gt;RSEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;RSEdit.Parent" xml:space="preserve">
+    <value>VerteidugungGroup</value>
+  </data>
+  <data name="&gt;&gt;RSEdit.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="VerteidugungGroup.Location" type="System.Drawing.Point, System.Drawing">
+    <value>325, 58</value>
+  </data>
+  <data name="VerteidugungGroup.Size" type="System.Drawing.Size, System.Drawing">
+    <value>277, 53</value>
+  </data>
+  <data name="VerteidugungGroup.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="VerteidugungGroup.Text" xml:space="preserve">
+    <value>Verteidigung</value>
+  </data>
+  <data name="&gt;&gt;VerteidugungGroup.Name" xml:space="preserve">
+    <value>VerteidugungGroup</value>
+  </data>
+  <data name="&gt;&gt;VerteidugungGroup.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;VerteidugungGroup.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;VerteidugungGroup.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="INIEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>121, 18</value>
+  </data>
+  <data name="INIEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>55, 20</value>
+  </data>
+  <data name="INIEdit.TabIndex" type="System.Int32, mscorlib">
+    <value>11</value>
+  </data>
+  <data name="INIEdit.Text" xml:space="preserve">
+    <value>1w6</value>
+  </data>
+  <data name="&gt;&gt;INIEdit.Name" xml:space="preserve">
+    <value>INIEdit</value>
+  </data>
+  <data name="&gt;&gt;INIEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;INIEdit.Parent" xml:space="preserve">
+    <value>SecondGroup</value>
+  </data>
+  <data name="&gt;&gt;INIEdit.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="GWLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="GWLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>185, 21</value>
+  </data>
+  <data name="GWLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>29, 13</value>
+  </data>
+  <data name="GWLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="GWLabel.Text" xml:space="preserve">
+    <value>GW:</value>
+  </data>
+  <data name="&gt;&gt;GWLabel.Name" xml:space="preserve">
+    <value>GWLabel</value>
+  </data>
+  <data name="&gt;&gt;GWLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;GWLabel.Parent" xml:space="preserve">
+    <value>SecondGroup</value>
+  </data>
+  <data name="&gt;&gt;GWLabel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="GWEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>213, 19</value>
+  </data>
+  <data name="GWEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 20</value>
+  </data>
+  <data name="GWEdit.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="&gt;&gt;GWEdit.Name" xml:space="preserve">
+    <value>GWEdit</value>
+  </data>
+  <data name="&gt;&gt;GWEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;GWEdit.Parent" xml:space="preserve">
+    <value>SecondGroup</value>
+  </data>
+  <data name="&gt;&gt;GWEdit.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="INILabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="INILabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>93, 21</value>
+  </data>
+  <data name="INILabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>24, 13</value>
+  </data>
+  <data name="INILabel.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="INILabel.Text" xml:space="preserve">
+    <value>INI:</value>
+  </data>
+  <data name="&gt;&gt;INILabel.Name" xml:space="preserve">
+    <value>INILabel</value>
+  </data>
+  <data name="&gt;&gt;INILabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;INILabel.Parent" xml:space="preserve">
+    <value>SecondGroup</value>
+  </data>
+  <data name="&gt;&gt;INILabel.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="GsLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="GsLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>8, 21</value>
+  </data>
+  <data name="GsLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>25, 13</value>
+  </data>
+  <data name="GsLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="GsLabel.Text" xml:space="preserve">
+    <value>GS:</value>
   </data>
   <data name="&gt;&gt;GsLabel.Name" xml:space="preserve">
     <value>GsLabel</value>
   </data>
-  <data name="textBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>58, 20</value>
+  <data name="&gt;&gt;GsLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <metadata name="$this.Language" type="System.Globalization.CultureInfo, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>de-DE</value>
-  </metadata>
-  <metadata name="Name.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="&gt;&gt;GsLabel.Parent" xml:space="preserve">
+    <value>SecondGroup</value>
+  </data>
+  <data name="&gt;&gt;GsLabel.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="GsEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>36, 19</value>
+  </data>
+  <data name="GsEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 20</value>
+  </data>
+  <data name="GsEdit.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="&gt;&gt;GsEdit.Name" xml:space="preserve">
+    <value>GsEdit</value>
+  </data>
+  <data name="&gt;&gt;GsEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;GsEdit.Parent" xml:space="preserve">
+    <value>SecondGroup</value>
+  </data>
+  <data name="&gt;&gt;GsEdit.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="SecondGroup.Location" type="System.Drawing.Point, System.Drawing">
+    <value>325, 182</value>
+  </data>
+  <data name="SecondGroup.Size" type="System.Drawing.Size, System.Drawing">
+    <value>277, 53</value>
+  </data>
+  <data name="SecondGroup.TabIndex" type="System.Int32, mscorlib">
+    <value>10</value>
+  </data>
+  <data name="SecondGroup.Text" xml:space="preserve">
+    <value>Sekundäre Werte</value>
+  </data>
+  <data name="&gt;&gt;SecondGroup.Name" xml:space="preserve">
+    <value>SecondGroup</value>
+  </data>
+  <data name="&gt;&gt;SecondGroup.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;SecondGroup.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;SecondGroup.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <metadata name="NameCollum.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="TP.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="NameCollum.HeaderText" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <metadata name="ATCollum.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
+  <data name="ATCollum.HeaderText" xml:space="preserve">
+    <value>At</value>
+  </data>
+  <data name="ATCollum.Width" type="System.Int32, mscorlib">
+    <value>42</value>
+  </data>
   <metadata name="TPCollum.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="Kommentar.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="TPCollum.HeaderText" xml:space="preserve">
+    <value>TP</value>
+  </data>
+  <data name="TPCollum.Width" type="System.Int32, mscorlib">
+    <value>46</value>
+  </data>
+  <metadata name="KommentarCollum.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="KommentarCollum.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="KommentarCollum.HeaderText" xml:space="preserve">
+    <value>Kommentar</value>
+  </data>
+  <data name="AttackList.Location" type="System.Drawing.Point, System.Drawing">
+    <value>11, 19</value>
+  </data>
+  <data name="AttackList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>279, 150</value>
+  </data>
+  <data name="AttackList.TabIndex" type="System.Int32, mscorlib">
+    <value>13</value>
+  </data>
+  <data name="&gt;&gt;AttackList.Name" xml:space="preserve">
+    <value>AttackList</value>
+  </data>
+  <data name="&gt;&gt;AttackList.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;AttackList.Parent" xml:space="preserve">
+    <value>AttackGroup</value>
+  </data>
+  <data name="&gt;&gt;AttackList.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="AttackGroup.Location" type="System.Drawing.Point, System.Drawing">
+    <value>11, 21</value>
+  </data>
+  <data name="AttackGroup.Size" type="System.Drawing.Size, System.Drawing">
+    <value>296, 181</value>
+  </data>
+  <data name="AttackGroup.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="AttackGroup.Text" xml:space="preserve">
+    <value>Attacke(n)</value>
+  </data>
+  <data name="&gt;&gt;AttackGroup.Name" xml:space="preserve">
+    <value>AttackGroup</value>
+  </data>
+  <data name="&gt;&gt;AttackGroup.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;AttackGroup.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;AttackGroup.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="MeisterkommentarEdit.Location" type="System.Drawing.Point, System.Drawing">
+    <value>22, 227</value>
+  </data>
+  <data name="MeisterkommentarEdit.Multiline" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="MeisterkommentarEdit.Size" type="System.Drawing.Size, System.Drawing">
+    <value>279, 60</value>
+  </data>
+  <data name="MeisterkommentarEdit.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
+  </data>
+  <data name="&gt;&gt;MeisterkommentarEdit.Name" xml:space="preserve">
+    <value>MeisterkommentarEdit</value>
+  </data>
+  <data name="&gt;&gt;MeisterkommentarEdit.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;MeisterkommentarEdit.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;MeisterkommentarEdit.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="MeisterkommentarLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="MeisterkommentarLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>22, 205</value>
+  </data>
+  <data name="MeisterkommentarLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>96, 13</value>
+  </data>
+  <data name="MeisterkommentarLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>16</value>
+  </data>
+  <data name="MeisterkommentarLabel.Text" xml:space="preserve">
+    <value>Meisterkommentar:</value>
+  </data>
+  <data name="&gt;&gt;MeisterkommentarLabel.Name" xml:space="preserve">
+    <value>MeisterkommentarLabel</value>
+  </data>
+  <data name="&gt;&gt;MeisterkommentarLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;MeisterkommentarLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;MeisterkommentarLabel.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="SaveButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>468, 251</value>
+  </data>
+  <data name="SaveButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>119, 36</value>
+  </data>
+  <data name="SaveButton.TabIndex" type="System.Int32, mscorlib">
+    <value>15</value>
+  </data>
+  <data name="SaveButton.Text" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="&gt;&gt;SaveButton.Name" xml:space="preserve">
+    <value>SaveButton</value>
+  </data>
+  <data name="&gt;&gt;SaveButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;SaveButton.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;SaveButton.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="LoadButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="LoadButton.Location" type="System.Drawing.Point, System.Drawing">
+    <value>336, 251</value>
+  </data>
+  <data name="LoadButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>119, 36</value>
+  </data>
+  <data name="LoadButton.TabIndex" type="System.Int32, mscorlib">
+    <value>18</value>
+  </data>
+  <data name="LoadButton.Text" xml:space="preserve">
+    <value>Laden</value>
+  </data>
+  <data name="&gt;&gt;LoadButton.Name" xml:space="preserve">
+    <value>LoadButton</value>
+  </data>
+  <data name="&gt;&gt;LoadButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;LoadButton.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;LoadButton.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="$this.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="NameCollum.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="AT.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="ATCollum.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>6, 13</value>
+  </data>
+  <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
+    <value>646, 304</value>
+  </data>
+  <data name="$this.Text" xml:space="preserve">
+    <value>CritCreate</value>
+  </data>
+  <data name="&gt;&gt;NameCollum.Name" xml:space="preserve">
+    <value>NameCollum</value>
+  </data>
+  <data name="&gt;&gt;NameCollum.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ATCollum.Name" xml:space="preserve">
+    <value>ATCollum</value>
+  </data>
+  <data name="&gt;&gt;ATCollum.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;TPCollum.Name" xml:space="preserve">
+    <value>TPCollum</value>
+  </data>
+  <data name="&gt;&gt;TPCollum.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;KommentarCollum.Name" xml:space="preserve">
+    <value>KommentarCollum</value>
+  </data>
+  <data name="&gt;&gt;KommentarCollum.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridViewTextBoxColumn, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>CritCreateForm</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>
