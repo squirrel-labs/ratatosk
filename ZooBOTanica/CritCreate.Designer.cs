@@ -99,6 +99,11 @@
             // LeEdit
             // 
             resources.ApplyResources(this.LeEdit, "LeEdit");
+            this.LeEdit.Maximum = new decimal(new int[] {
+            999,
+            0,
+            0,
+            0});
             this.LeEdit.Name = "LeEdit";
             this.LeEdit.Value = new decimal(new int[] {
             30,
@@ -174,6 +179,11 @@
             // 
             resources.ApplyResources(this.PaEdit, "PaEdit");
             this.PaEdit.Name = "PaEdit";
+            this.PaEdit.Value = new decimal(new int[] {
+            6,
+            0,
+            0,
+            0});
             // 
             // PaLabel
             // 
@@ -188,6 +198,11 @@
             // MREdit
             // 
             resources.ApplyResources(this.MREdit, "MREdit");
+            this.MREdit.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
             this.MREdit.Name = "MREdit";
             this.MREdit.Value = new decimal(new int[] {
             5,
@@ -322,6 +337,7 @@
             // 
             resources.ApplyResources(this.LoadButton, "LoadButton");
             this.LoadButton.Name = "LoadButton";
+            this.LoadButton.TabStop = false;
             this.LoadButton.UseVisualStyleBackColor = true;
             this.LoadButton.Click += new System.EventHandler(this.LoadButton_Click);
             // 

@@ -44,6 +44,7 @@
 
         public static void Startup()
         {
+            //new DiscoBot.Auxiliary.Calculator.StringSolver("1d100 - (1d200 + 1) * -50000").Solve();
             /*Session = new Session();*/
             // relation.Add("Papo", "Pump aus der Gosse");
             foreach (var filename in Directory.GetFiles("helden", "*.xml"))

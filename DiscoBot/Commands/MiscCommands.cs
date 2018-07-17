@@ -37,6 +37,12 @@ namespace DiscoBot.Commands
             return this.ReplyAsync("```xl\n" + RandomMisc.Roll(roll) + "\n```");
         }
 
+        [Command("rd"), Summary("Würfel Dennis ")]
+        public Task RollDennisAsync([Remainder, Summary("Weapon")] string roll)
+        {
+            return this.ReplyAsync("```xl\n" + new Auxiliary.Calculator.StringSolver(roll).Solve() + "\n```");
+        }
+
         [Command("general"), Summary("Set General ")]
         public Task SetGeneralAsync([Remainder, Summary("Set General")] int i = 0)
         {
