@@ -7,6 +7,7 @@ using DiscoBot.Auxiliary;
 
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 
 namespace DiscoBot.Commands
 {
@@ -59,10 +60,12 @@ namespace DiscoBot.Commands
 
         [Command("liebe"), Summary("Echos a message.")]
         [Alias("Liebe", "<3", "love")]
-        public Task LoveAsync()
+        public async Task LoveAsync()
         {
-            return this.ReplyAsync(":heart: :heart: :heart: Verteilt die Liebe!");
-            //return this.ReplyAsync("!say !liebe");
+            Random rand = new Random();
+            var user = Context.Channel.GetUsersAsync().ToList().Result.ToList().First().Where(x=>x.Status!= UserStatus.Offline).OrderBy(x => rand.Next()).First();
+            await this.ReplyAsync(":heart: :heart: :heart: Verteilt die Liebe! :heart: :heart: :heart: \n Besondere Liebe geht an " + user.Username);
+            await this.ReplyAsync("!liebe");
         }
 
         [Command("maul"), Summary("Echos a message.")]

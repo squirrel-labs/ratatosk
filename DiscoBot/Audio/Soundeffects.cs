@@ -30,7 +30,7 @@
         {
             string url = string.Empty;
             int volume = 255;
-            /*switch (s)
+            switch (s)
             {
                 case "Bell":
                 case "Ding":
@@ -62,7 +62,7 @@
                     url = "https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3";
                     volume = 50;
                     break;
-            }*/
+            }
 
             var tSound = DSA_Game.Save.Properties.Sounds.OrderBy(x => SpellCorrect.CompareEasy(s, x.Name)).First();
 
