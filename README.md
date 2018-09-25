@@ -1,5 +1,5 @@
 # DiscoBot
-A sipmle Discord Bot, interfacing to  the DSA "Heldensoftware", for a minimalistic and low labor aproach to digitalize p&amp;p rpg's
+A sipmle Discord Bot, interfacing with  the DSA "Heldensoftware", for a minimalistic and low-labor aproach to digitalize P&amp;P RPG's
 
 
 This software takes helden.zip.hld files and loads them into the Bot.
