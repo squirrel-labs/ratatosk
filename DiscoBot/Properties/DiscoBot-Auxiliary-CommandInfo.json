@@ -83,9 +83,19 @@
   {
     "Name": "Gm",
     "Scope": "Meister",
-    "Brief": "Testbeschreibung",
+    "Brief": "Kontrolliere andere Charaktere",
     "Description": [
-      "Gm Aktionen"
+      "Mit !GM fürhrt man commands als eine andere Person aus.",
+      " !GM [charaktername] [command] [commandattribut] [mofifier]",
+      " Unterstützte [commands]'s:",
+      " !GM [name] LE",
+      " !GM [name] AE",
+      " !GM [name] Talent",
+      " !GM [name] Fernkampf",
+      " !GM [name] Eigenschaft",
+      " !GM [name] Zauber",
+      " !GM [name] Angriff",
+      " !GM [name] Parade"
     ]
   }
 ]

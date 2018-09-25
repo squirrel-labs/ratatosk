@@ -78,7 +78,7 @@
         {
             if (volume <= 100 && volume >= 0)
             {
-                SoundEffects.Volume = volume;
+                SoundEffects.MaxVolume = volume;
             }
         }
 
@@ -89,6 +89,8 @@
             {
                 await this.Context.Channel.SendMessageAsync("Erst Joinen!");
             }
+
+            SoundEffects.Play(path);
 
             var sounds = Enum.GetValues(typeof(Sound));
             var soundList = new List<Sound>();

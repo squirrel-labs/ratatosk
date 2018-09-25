@@ -35,6 +35,7 @@ namespace DiscoBot.Commands
         [Alias("R", "Roll", "roll", "Würfle")]
         public Task RollAsync([Remainder, Summary("Weapon")] string roll)
         {
+            //return this.ReplyAsync("```xl\n" + new Auxiliary.Calculator.StringSolver(roll).Solve() + "\n```");
             return this.ReplyAsync("```xl\n" + RandomMisc.Roll(roll) + "\n```");
         }
 
@@ -65,7 +66,7 @@ namespace DiscoBot.Commands
             Random rand = new Random();
             var user = Context.Channel.GetUsersAsync().ToList().Result.ToList().First().Where(x=>x.Status!= UserStatus.Offline).OrderBy(x => rand.Next()).First();
             await this.ReplyAsync(":heart: :heart: :heart: Verteilt die Liebe! :heart: :heart: :heart: \n Besondere Liebe geht an " + user.Username);
-            await this.ReplyAsync("!liebe");
+            //await this.ReplyAsync("!liebe");
         }
 
         [Command("maul"), Summary("Echos a message.")]

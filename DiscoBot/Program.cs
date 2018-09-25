@@ -75,7 +75,7 @@ namespace DiscoBot
 
             // Create a Command Context
             var context = new CommandContext(this.client, message);
-
+            
             // Execute the command. (result does not indicate a return value, 
             // rather an object stating if the command executed successfully)
             var result = await this.commands.ExecuteAsync(context, argPos, this.services);

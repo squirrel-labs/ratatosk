@@ -1,4 +1,6 @@
-﻿namespace DiscoBot.Commands
+﻿using DiscoBot.DSA_Game.Characters;
+
+namespace DiscoBot.Commands
 {
     using System.Linq;
     using System.Threading.Tasks;
@@ -79,14 +81,16 @@
 
         [Command("gm"), Summary("Führt eine probe aus")]
         [Alias("GM", "as", "As", "als")]
-        public async Task ProbeAsync([Summary("Fernkampfwaffe")] string name, string command, string waffe = "", int erschwernis = 0)
+        public async Task ProbeAsync([Summary("Fernkampfwaffe")] string name, string command, string cmdText = "", int modifier = 0)
         {
-            Permissions.Test(this.Context, "Meister");
+            if (!Permissions.Test(this.Context, "Meister")) return;
 
             command = command.ToLower();
 
             string res;
             string temp = string.Empty;
+            ICharacter cha = Dsa.Chars.OrderBy(x =>
+                SpellCorrect.CompareEasy(name, x.Name)).First();
             switch (command)
             {
                 case "le":
@@ -95,12 +99,12 @@
                     LE le = new LE();
                     temp = string.Empty;
 
-                    if (erschwernis != 0)
+                    if (modifier != 0)
                     {
-                        temp = erschwernis.ToString();
+                        temp = modifier.ToString();
                     }
 
-                    res = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Session.Relation[this.Context.User.Username], x.Name)).First().get_LE_Text(waffe.Trim() + temp);
+                    res = cha.get_LE_Text(cmdText.Trim() + temp);
 
                     break;
                 case "ae":
@@ -109,16 +113,16 @@
                     AE ae = new AE();
                     temp = string.Empty;
 
-                    if (erschwernis != 0)
+                    if (modifier != 0)
                     {
-                        temp = erschwernis.ToString();
+                        temp = modifier.ToString();
                     }
 
-                    res = Dsa.Chars.OrderBy(x => SpellCorrect.CompareEasy(Dsa.Session.Relation[this.Context.User.Username], x.Name)).First().get_AE_Text(waffe.Trim() + temp);
+                    res = cha.get_AE_Text(cmdText.Trim() + temp);
 
                     break;
                 default:
-                    res = this.Test(name, command, waffe, erschwernis);
+                    res = this.Test(name, command, cmdText, modifier);
                     break;
             }
 
@@ -134,7 +138,7 @@
         private string Test(string name, string command, string waffe, int erschwernis = 0)
         {
             string res;
-            switch (command)
+            switch (command.ToLower())
             {
                 case "f":
                 case "fern":

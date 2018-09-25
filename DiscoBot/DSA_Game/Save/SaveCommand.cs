@@ -18,6 +18,7 @@ namespace DiscoBot.DSA_Game.Save
     public class SaveCommand : ModuleBase
     {
         [Command("load"), Summary("Load Session")]
+        [Alias("session")]
         public async Task LoadSessionAsync([Remainder, Summary("Session Name")] string name = "")
         {
             if (name.Equals("?") || name.Equals(string.Empty))
@@ -39,7 +40,7 @@ namespace DiscoBot.DSA_Game.Save
         [Command("save", RunMode = RunMode.Async), Summary("Save Session")]
         public async Task SessionSaveAsync([Remainder, Summary("Session Name")] string name = "")
         {
-            var sendFile = this.Context.Channel.SendWebFile("https://cdn.discordapp.com/attachments/377123019673567232/465615882048110603/giphy.gif");
+            //var sendFile = this.Context.Channel.SendWebFile("https://cdn.discordapp.com/attachments/377123019673567232/465615882048110603/giphy.gif");
 
             if (name.Equals("?") || name.Equals(string.Empty))
             {
@@ -53,16 +54,18 @@ namespace DiscoBot.DSA_Game.Save
             {
                 var files = Directory.GetFiles(path);
                 int current = files.Max(x => Convert.ToInt32(x.Split('-').Last().Split('.').First()));
+                Dsa.Session.SessionName = name;
                 Dsa.Session.Save(path + "\\" + name + $"-{++current}.json");
             }
             else
             {
                 Directory.CreateDirectory(path);
+                Dsa.Session.SessionName = name;
                 Dsa.Session.Save(path + "\\" + name + $"-0.json");
             }
 
             await this.ReplyAsync($"{name} wurde gespeichert");
-            await sendFile;
+            //await sendFile;
         }
 
         private string[] ListSessions()

@@ -24,12 +24,17 @@
 
     public static class SoundEffects
     {
-        public static int Volume { get; set; } = 50;
+        public static int MaxVolume { get; set; } = 50;
 
         public static void Play(string s)
         {
             string url = string.Empty;
             int volume = 255;
+
+            var tSound = DSA_Game.Save.Properties.Sounds.OrderBy(x => SpellCorrect.CompareEasy(s, x.Name)).First();
+
+            url = s;
+
             switch (s)
             {
                 case "Bell":
@@ -64,16 +69,15 @@
                     break;
             }
 
-            var tSound = DSA_Game.Save.Properties.Sounds.OrderBy(x => SpellCorrect.CompareEasy(s, x.Name)).First();
+            
 
-            url = s;
-
-            if (SpellCorrect.CompareEasy(s, tSound.Name) > SpellCorrect.ErrorThreshold)
+            if (SpellCorrect.CompareEasy(s, tSound.Name) < SpellCorrect.ErrorThreshold)
             {
                 url = tSound.Url;
+                volume = tSound.Volume;
             }
 
-            volume = (int)(volume * (Volume / 100.0));
+            volume = (int)(volume * (MaxVolume / 100.0));
 
 
             if (url != string.Empty)

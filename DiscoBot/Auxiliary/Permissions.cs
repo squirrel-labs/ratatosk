@@ -21,12 +21,15 @@ namespace DiscoBot.Auxiliary
             return roles.Any(role => ((SocketGuildUser)c.User).Roles.ToList().Exists(v => v.Name.Equals(role)));
         }
 
-        public static void Test(ICommandContext c, string role)
+        public static bool Test(ICommandContext c, string role)
         {
             if (!Check(c, role))
             {
                 c.Channel.SendMessageAsync("```xl\n Keine ausreichenden Berechtigungen\n```").Wait();
+                return false;
             }
+
+            return true;
         }
 
         public static void Test(ICommandContext c, string[] roles)

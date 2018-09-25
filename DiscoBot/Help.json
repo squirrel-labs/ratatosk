@@ -83,8 +83,38 @@
     {
       "Name": "Gm",
       "Scope": "Meister",
-      "Brief": "Testbeschreibung",
-      "Description": [ "Gm Aktionen" ]
+      "Brief": "Kontrolliere andere Charaktere",
+      "Description": [ 
+		"Mit !GM fürhrt man commands als eine andere Person aus.",
+		" !GM [charaktername] [command] [commandattribut] [mofifier]",
+		" Unterstützte [commands]'s:",
+		" !GM [name] LE",
+		" !GM [name] AE",
+		" !GM [name] Talent",
+		" !GM [name] Fernkampf",
+		" !GM [name] Eigenschaft",
+		" !GM [name] Zauber",
+		" !GM [name] Angriff",
+		" !GM [name] Parade"
+	  ]
+    },
+	{
+      "Name": "ich bin",
+      "Scope": "All",
+      "Brief": "Kontrolliere andere Charaktere",
+      "Description": [ 
+		"Mit !GM fürhrt man commands als eine andere Person aus.",
+		" !GM [charaktername] [command] [commandattribut] [mofifier]",
+		" Unterstützte [commands]'s:",
+		" !GM [name] LE",
+		" !GM [name] AE",
+		" !GM [name] Talent",
+		" !GM [name] Fernkampf",
+		" !GM [name] Eigenschaft",
+		" !GM [name] Zauber",
+		" !GM [name] Angriff",
+		" !GM [name] Parade"
+	  ]
     }
   ]
 }

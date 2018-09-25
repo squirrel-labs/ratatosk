@@ -1,0 +1,83 @@
+{
+  "GeneralContext": null,
+  "Relation": {
+    "Nicolas": "Hartmut Reiher",
+    "MagicBro5": "Krenko",
+    "TrueKuehli": "Ledur Torfinson"
+  },
+  "Chars": [
+    {
+      "Name": "Felis Exodus Schattenwald",
+      "Lebenspunkte_Aktuell": 30,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 20
+    },
+    {
+      "Name": "Gardist",
+      "Lebenspunkte_Aktuell": 29,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 0
+    },
+    {
+      "Name": "Hartmut Reiher",
+      "Lebenspunkte_Aktuell": 29,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 0
+    },
+    {
+      "Name": "Helga vom Drachenei, Tausendsasserin",
+      "Lebenspunkte_Aktuell": 21,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 35
+    },
+    {
+      "Name": "Krenko",
+      "Lebenspunkte_Aktuell": 22,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 0
+    },
+    {
+      "Name": "Ledur Torfinson",
+      "Lebenspunkte_Aktuell": 39,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 0
+    },
+    {
+      "Name": "Morla",
+      "Lebenspunkte_Aktuell": 26,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 13
+    },
+    {
+      "Name": "Numeri Illuminus",
+      "Lebenspunkte_Aktuell": 28,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 40
+    },
+    {
+      "Name": "Potus",
+      "Lebenspunkte_Aktuell": 39,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 16
+    },
+    {
+      "Name": "Pump aus der Gosse",
+      "Lebenspunkte_Aktuell": 18,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 13
+    },
+    {
+      "Name": "Rhoktar4",
+      "Lebenspunkte_Aktuell": 34,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 17
+    },
+    {
+      "Name": "Volant",
+      "Lebenspunkte_Aktuell": 28,
+      "Ausdauer_Aktuell": 0,
+      "Astralpunkte_Aktuell": 43
+    }
+  ],
+  "SessionName": "TheCrew"
+}
