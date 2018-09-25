@@ -43,9 +43,14 @@
             {
                 messages.AddRange(task.ToList());
             }
-
-            m.Context.Channel.DeleteMessagesAsync(
-                messages.Where(x => x.Content.StartsWith($"#{token}\n") && x.Author.IsBot));
+            
+            var test = messages.Where(x => x.Content.StartsWith($"#{token}\n") && x.Author.IsBot).Select(c=>c );
+            var waiters = new List<Task>();
+            foreach (var message in test)
+            {
+                waiters.Add((message as IUserMessage).DeleteAsync());
+            }
+            Task.WaitAll(waiters.ToArray());
         }
 
         public static async Task ReplyAsync(this ModuleBase m, IEnumerable<string> message, bool directMessage = false)
