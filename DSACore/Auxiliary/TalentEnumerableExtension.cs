@@ -1,15 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DiscoBot.DSA_Game.Characters;
 using DSALib;
 
-
-namespace DiscoBot.Auxiliary
+namespace DSACore.Auxiliary
 {
-    using DiscoBot.Audio;
-    using DiscoBot.DSA_Game.Characters;
-
-
     public static class TalentEnumerableExtension
     {
         public static string ProbenTest(this IEnumerable<Talent> List, Character c, string talent, int erschwernis = 0)
@@ -20,11 +16,6 @@ namespace DiscoBot.Auxiliary
 
             if (sc.Compare(talent, tTalent.Name) > SpellCorrect.ErrorThreshold)
             {
-                try
-                {
-                    SoundEffects.Play("Stupid");
-                }
-                catch { }
                 return $"{c.Name} kann nicht {talent}...";
             }
 
@@ -84,16 +75,7 @@ namespace DiscoBot.Auxiliary
             }
 
             tap = (tap == 0) ? 1 : tap;
-
-            if (tap < 0)
-            {
-                try
-                {
-                    SoundEffects.Play("Wrong");
-                }
-                catch { }
-            }
-
+            
             output.AppendFormat(" tap: {0,2}", tap);
 
             return output.ToString(); // return output

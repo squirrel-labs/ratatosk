@@ -9,6 +9,7 @@
     using DiscoBot.DSA_Game.Characters;
 
     using Discord.Commands;
+    using DSALib;
 
     public class FileHandler : ModuleBase
     {

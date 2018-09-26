@@ -1,4 +1,5 @@
-﻿using DSALib;
+﻿using DSACore.Auxiliary;
+using DSALib;
 using DSALib.Characters;
 
 namespace DiscoBot.DSA_Game.Characters
@@ -8,9 +9,7 @@ namespace DiscoBot.DSA_Game.Characters
     using System.Linq;
     using System.Text;
     using System.Xml;
-
-    using DiscoBot.Audio;
-    using DiscoBot.Auxiliary;
+    
 
     public class Character : Being, ICharacter
     {
@@ -108,12 +107,6 @@ namespace DiscoBot.DSA_Game.Characters
             var attack = this.Kampftalente.OrderBy(x => sc.Compare(talent, x.Name)).First();
             if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
             {
-                try
-                {
-                    SoundEffects.Play("Wrong");
-                }
-                catch { }
-
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";
             }
 
@@ -137,11 +130,6 @@ namespace DiscoBot.DSA_Game.Characters
 
             if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
             {
-                try
-                {
-                    SoundEffects.Play("Wrong");
-                }
-                catch { }
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";
             }
 
@@ -165,11 +153,6 @@ namespace DiscoBot.DSA_Game.Characters
             var attack = this.Talente.OrderBy(x => sc.Compare(talent, x.Name)).First();
             if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
             {
-                try
-                {
-                    SoundEffects.Play("Wrong");
-                }
-                catch { }
                 return $"{this.Name} kann nicht mit der Waffenart {talent} umgehen...";
             }
 

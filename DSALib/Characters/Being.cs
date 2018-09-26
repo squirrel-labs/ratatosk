@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DiscoBot.DSA_Game.Characters;
 
-namespace DiscoBot.DSA_Game.Characters
+namespace DSALib.Characters
 {
     public class Being : Entity
     {

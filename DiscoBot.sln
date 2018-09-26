@@ -5,13 +5,13 @@ VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscoBot", "DiscoBot\DiscoBot.csproj", "{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSALib", "DSALib\DSALib.csproj", "{33281E45-1D5C-4645-8D2B-DD05B40FDFD5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZooBOTanica", "ZooBOTanica\ZooBOTanica.csproj", "{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}"
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "NodeJSServer", "NodeJSServer\NodeJSServer.njsproj", "{57064377-C08C-4218-9C55-0552D40F3877}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSACore", "DSACore\DSACore.csproj", "{89343249-016C-47C0-AED6-C99165DE8B66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSACore", "DSACore\DSACore.csproj", "{89343249-016C-47C0-AED6-C99165DE8B66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSALib", "DSALib\DSALib.csproj", "{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,6 @@ Global
 		{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{33281E45-1D5C-4645-8D2B-DD05B40FDFD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{33281E45-1D5C-4645-8D2B-DD05B40FDFD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{33281E45-1D5C-4645-8D2B-DD05B40FDFD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{33281E45-1D5C-4645-8D2B-DD05B40FDFD5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +35,10 @@ Global
 		{89343249-016C-47C0-AED6-C99165DE8B66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89343249-016C-47C0-AED6-C99165DE8B66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89343249-016C-47C0-AED6-C99165DE8B66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

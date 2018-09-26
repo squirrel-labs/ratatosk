@@ -1,8 +1,5 @@
-﻿namespace DiscoBot.DSA_Game
+﻿namespace DSALib
 {
-    using System;
-    
-
     public class Talent // talent objekt
     {
         public Talent(string name, string probe, int value)

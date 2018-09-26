@@ -1,4 +1,6 @@
-﻿namespace DiscoBot.DSA_Game.Characters
+﻿using DiscoBot.DSA_Game.Characters;
+
+namespace DSALib.Characters
 {
     public interface ICharacter : ICombatant
     {

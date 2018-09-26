@@ -9,6 +9,7 @@ namespace DiscoBot.Commands
     using DiscoBot.DSA_Game;
 
     using Discord.Commands;
+    using DSALib.Characters;
 
     public class Iam : ModuleBase
     {

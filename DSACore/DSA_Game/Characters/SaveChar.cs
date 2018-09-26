@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DSALib.Characters;
 
 namespace DiscoBot.DSA_Game.Characters
 {
-    using Discord;
-    using DSALib.Characters;
 
     public class SaveChar
     {

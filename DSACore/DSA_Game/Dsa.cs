@@ -3,25 +3,15 @@ using DSALib.Characters;
 
 namespace DiscoBot.DSA_Game
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-
-    using DiscoBot.Audio;
-    using DiscoBot.Commands;
     using DiscoBot.DSA_Game.Characters;
     using DiscoBot.DSA_Game.Save;
-
-    using Discord.Commands;
 
     public static class Dsa
     {
         private static Session s_session;
-
-        public static ICommandContext GeneralContext { get; set; }
-
-        public static AudioService Service { get; set; }
 
         public static List<ICharacter> Chars { get; set; } = new List<ICharacter>();  // list of all characters
 
@@ -63,8 +53,7 @@ namespace DiscoBot.DSA_Game
             Talente = Talente.OrderBy(x => x.Name).ToList();
             Session = new Session
             {
-                Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList(),
-                GeneralContext = GeneralContext
+                Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList()
             };
             Session.Save();
         }
