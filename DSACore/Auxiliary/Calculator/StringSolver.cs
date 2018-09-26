@@ -1,4 +1,9 @@
-﻿namespace DiscoBot.Auxiliary.Calculator
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using DSACorev.Auxiliary.Calculator;
+
+namespace DSACore.Auxiliary.Calculator
 {
     using System;
     using System.Collections.Generic;

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DiscoBot.DSA_Game.Save
+namespace DSACore.DSA_Game.Save
 {
     using System.IO;
 
@@ -17,7 +17,7 @@ namespace DiscoBot.DSA_Game.Save
                 return;
             }
 
-            var path = DSA_Game.Save.Session.DirectoryPath + @"\" + name;
+            var path = Save.Session.DirectoryPath + @"\" + name;
 
             var files = Directory.GetFiles(path);
             var session = files.OrderByDescending(x => Convert.ToInt32(x.Split('-').Last().Split('.').First())).First();

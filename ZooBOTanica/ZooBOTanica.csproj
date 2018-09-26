@@ -79,5 +79,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DSALib\DSALib.csproj">
+      <Project>{388dd4ed-29c4-4127-ac8f-34dd3fe9f9b0}</Project>
+      <Name>DSALib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

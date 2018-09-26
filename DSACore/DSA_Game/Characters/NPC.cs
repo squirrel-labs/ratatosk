@@ -1,12 +1,13 @@
-﻿using DSACore.Auxiliary;
+﻿using System;
+using DSACore.Auxiliary;
 using DSALib.Characters;
 
-namespace DiscoBot.Characters
+namespace DSACore.Characters
 {
     using System;
 
-    using DiscoBot.Auxiliary;
-    using DiscoBot.DSA_Game.Characters;
+    using DSACore.Auxiliary;
+    using DSACore.DSA_Game.Characters;
 
     public class Npc : Being, ICharacter
     {

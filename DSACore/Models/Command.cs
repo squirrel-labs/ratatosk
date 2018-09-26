@@ -7,7 +7,13 @@ namespace DSACore.Models
 {
     public class Command
     {
+        public ulong GroupId { get; set; } = 0;
+        public ulong CharId { get; set; } 
         public string Name { get; set; }
-        public string CmdText { get; set; }
+        public string CmdIdentifier { get; set; }
+        public List<string> CmdTexts { get; set; }
+        public string CmdText => CmdTexts.First();
+        public int Cmdmodifier { get; set; } = 0;
+        public bool IsDm { get; set; } = false;
     }
 }

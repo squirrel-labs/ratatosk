@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DiscoBot.DSA_Game.Save
+namespace DSACore.DSA_Game.Save
 {
     using System.IO;
-    using DiscoBot.DSA_Game.Characters;
+    using Characters;
     using Newtonsoft.Json;
 
     public class Session

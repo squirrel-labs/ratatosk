@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using DSACore.DSA_Game.Characters;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DiscoBot.DSA_Game.Characters;
 using DSALib;
 
 namespace DSACore.Auxiliary

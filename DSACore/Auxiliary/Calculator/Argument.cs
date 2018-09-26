@@ -1,4 +1,4 @@
-﻿namespace DiscoBot.Auxiliary.Calculator
+﻿namespace DSACore.Auxiliary.Calculator
 {
     using System;
     

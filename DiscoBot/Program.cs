@@ -34,9 +34,7 @@ namespace DiscoBot
 
             string token = File.ReadAllText("Token");
             //Properties.Settings.Default.Token;
-
-            this.services = new ServiceCollection().AddSingleton(new AudioService())
-                    .BuildServiceProvider();
+            
             AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
 
             await this.InstallCommandsAsync();
@@ -73,6 +71,7 @@ namespace DiscoBot
                 return;
             }
 
+            
             // Create a Command Context
             var context = new CommandContext(this.client, message);
             

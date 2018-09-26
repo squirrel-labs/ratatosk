@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DSALib.Characters;
+﻿using DSALib.Characters;
 
-namespace DiscoBot.DSA_Game.Characters
+namespace DSACore.DSA_Game.Characters
 {
 
     public class SaveChar

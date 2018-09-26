@@ -113,13 +113,13 @@
     <Compile Include="Commands\LebenUndAstral.cs" />
     <Compile Include="Commands\HeldList.cs" />
     <Compile Include="Audio\Soundeffects.cs" />
-    <Compile Include="Auxiliary\Permissions.cs" />
+    <Compile Include="ToRework\Permissions.cs" />
     <Compile Include="Commands\MiscCommands.cs" />
     <Compile Include="Auxiliary\SpellCorrect.cs" />
     <Compile Include="DSA_Game\Save\Properties.cs" />
     <Compile Include="DSA_Game\Save\SaveCommand.cs" />
     <Compile Include="DSA_Game\Save\Session.cs" />
-    <Compile Include="Auxiliary\CommandExtension.cs" />
+    <Compile Include="ToRework\CommandExtension.cs" />
     <Compile Include="Commands\CommandTypes.cs" />
     <Compile Include="Commands\FileHandler.cs" />
     <Compile Include="Commands\Gm.cs" />

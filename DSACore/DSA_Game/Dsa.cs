@@ -1,13 +1,15 @@
-﻿using DSALib;
+﻿using System;
+using DSALib;
 using DSALib.Characters;
+using Microsoft.EntityFrameworkCore.Design;
 
-namespace DiscoBot.DSA_Game
+namespace DSACore.DSA_Game
 {
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using DiscoBot.DSA_Game.Characters;
-    using DiscoBot.DSA_Game.Save;
+    using DSACore.DSA_Game.Characters;
+    using DSACore.DSA_Game.Save;
 
     public static class Dsa
     {
@@ -37,7 +39,7 @@ namespace DiscoBot.DSA_Game
 
         public static void Startup()
         {
-            //new DiscoBot.Auxiliary.Calculator.StringSolver("1d100 - (1d200 + 1) * -50000").Solve();
+            //new .Auxiliary.Calculator.StringSolver("1d100 - (1d200 + 1) * -50000").Solve();
             /*Session = new Session();*/
             // relation.Add("Papo", "Pump aus der Gosse");
             foreach (var filename in Directory.GetFiles("helden", "*.xml"))
@@ -56,6 +58,16 @@ namespace DiscoBot.DSA_Game
                 Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList()
             };
             Session.Save();
+        }
+
+        public static ICharacter GetCharacter(ulong id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static ICharacter GetCharacter(string name, ulong groupId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

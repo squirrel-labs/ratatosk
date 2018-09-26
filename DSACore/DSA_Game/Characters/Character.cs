@@ -2,7 +2,7 @@
 using DSALib;
 using DSALib.Characters;
 
-namespace DiscoBot.DSA_Game.Characters
+namespace DSACore.DSA_Game.Characters
 {
     using System;
     using System.Collections.Generic;

@@ -1,7 +1,7 @@
 ﻿using System;
-using DSACore.Auxiliary;
+using DSACorev.Auxiliary.Calculator;
 
-namespace DiscoBot.Auxiliary.Calculator
+namespace DSACore.Auxiliary.Calculator
 {
     /// <summary>
     /// The Operator Class represents a binary operator with tow Arguments and an Operation type
