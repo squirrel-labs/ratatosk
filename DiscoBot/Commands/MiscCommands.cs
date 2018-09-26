@@ -180,7 +180,14 @@ namespace DiscoBot.Commands
 
             if (Permissions.Check(Context, new[] { "Admin", "Mod", "Meister" }))
             {
-                await Context.Channel.DeleteMessagesAsync(messages);
+                
+                var waiters = new List<Task>();
+                foreach (var message in messages)
+                {
+                    waiters.Add((message as IUserMessage).DeleteAsync());
+                }
+
+                Task.WaitAll(waiters.ToArray());
             }
             
         }
