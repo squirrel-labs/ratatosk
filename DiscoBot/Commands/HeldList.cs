@@ -15,7 +15,7 @@
 
     public class Held : ModuleBase
     {
-        [Command("held"), Summary("gibt Heldenwerte  aus")]
+        //[Command("held"), Summary("gibt Heldenwerte  aus")]
         [Alias("Held", "Wert", "Werte", "werte", "char", "Char")]
         public async Task ListAsync([Summary("Werte")] params string[] prop_list)
         {

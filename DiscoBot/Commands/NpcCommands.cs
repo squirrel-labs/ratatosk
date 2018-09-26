@@ -13,7 +13,7 @@
 
     public class NpcCommands : ModuleBase
     {
-        [Command("npc"), Summary("Erstellt ein NPC")]
+        //[Command("npc"), Summary("Erstellt ein NPC")]
         [Alias("Npc", "NPc", "NPC", "nPC")]
         public Task RandomAsync([Summary("Create Random")] string npcName, int mean = 9, int stDv = 1)
         {
@@ -21,7 +21,7 @@
             return this.ReplyAsync($"{npcName} wurde zufällig generiert");
         }
 
-        [Command("npc"), Summary("Erstellt ein NPC")]
+        //[Command("npc"), Summary("Erstellt ein NPC")]
         [Alias("Npc", "NPc", "NPC", "nPC")]
         public Task CopyAsync([Summary("Create Copy")] string npcName, string source, int stDv = 1)
         {

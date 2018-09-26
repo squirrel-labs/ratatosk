@@ -13,7 +13,7 @@
 
     public class LE : ModuleBase
     {
-        [Command("LE"), Summary("Ändert aktuellen Lebenspunktestand")]
+        //[Command("LE"), Summary("Ändert aktuellen Lebenspunktestand")]
         [Alias("le", "leben", "LP", "lp", "Le", "Lp")]
 
         public async Task LEAsync([Summary("LE Modifier")] string prop = "", string s = "")
@@ -41,7 +41,7 @@
 
     public class AE : ModuleBase
     {
-        [Command("AE"), Summary("Ändert aktuellen Astralpunktestand")]
+        //[Command("AE"), Summary("Ändert aktuellen Astralpunktestand")]
         [Alias("ae", "astral", "ASP", "Asp", "asp", "Astral")]
 
         public async Task AEAsync([Summary("AE Modifier")] string prop = "", string s = "")

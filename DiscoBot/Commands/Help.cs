@@ -67,8 +67,9 @@ namespace DiscoBot.Commands
             }
             return res;
         }
+/*
 
-        [Command("help"), Summary("prints the help menu.")]
+        //[Command("help"), Summary("prints the help menu.")]
         [Alias("Help", "man", "Man", "Hilfe", "hilfe", "h")]
         public async Task ShowHelpAsync(params string[] command_list)
         {
@@ -93,6 +94,6 @@ namespace DiscoBot.Commands
 
             //await this.ReplyAsync("```xl\n" + com.GetDescription() + "\n```");
             await this.ReplyAsync("```xl\n" + Get_Specific_Help(command) + "\n```");
-        }
+        }*/
     }
 }

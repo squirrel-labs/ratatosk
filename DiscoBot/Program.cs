@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -68,7 +70,7 @@ namespace DiscoBot
             // Determine if the message is a command, based on if it starts with '!' or a mention prefix
             if (!(message.HasCharPrefix('!', ref argPos) || message.HasMentionPrefix(this.client.CurrentUser, ref argPos)))
             {
-                return;
+                return; 
             }
 
             
@@ -78,9 +80,47 @@ namespace DiscoBot
             // Execute the command. (result does not indicate a return value, 
             // rather an object stating if the command executed successfully)
             var result = await this.commands.ExecuteAsync(context, argPos, this.services);
-            if (!result.IsSuccess)
+            if (result.Error == CommandError.UnknownCommand)
+            {
+                await context.Channel.SendMessageAsync(SendCommand(message.Author.Username, message.Content, "https://localhost:44365/api/Commands"));
+            }
+            else if (!result.IsSuccess)
             {
                 await context.Channel.SendMessageAsync(result.ErrorReason);
+            }
+        }
+
+        private string SendCommand(string name, string command, string url)
+        {
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+            httpWebRequest.ContentType = "application/json";
+            httpWebRequest.Method = "POST";
+
+            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            {
+                command = command.Remove(0,1); 
+                var args = command.Split(new []{' '}, StringSplitOptions.RemoveEmptyEntries);
+
+                string content = string.Empty;
+                if (args.Length > 1)
+                {
+                    content = "\"" + args.Skip(1).Aggregate((s, n) => ( s + "\", \"" + n)) + "\"";
+                }
+
+                string json = "{\"Name\":\"" + name + "\"," +
+                              "\"CmdIdentifier\":\"" + args.First() + "\"," +
+                              "\"CmdTexts\": ["+ content+"] }";
+            
+
+                streamWriter.Write(json);
+                streamWriter.Flush();
+                streamWriter.Close();
+            }
+
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+            {
+                return streamReader.ReadToEnd();
             }
         }
 

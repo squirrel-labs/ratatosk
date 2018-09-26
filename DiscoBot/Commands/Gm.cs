@@ -14,7 +14,7 @@ namespace DiscoBot.Commands
     public class Iam : ModuleBase
     {
 
-        [Command("Iam"), Summary("Wechselt den Character")]
+        //[Command("Iam"), Summary("Wechselt den Character")]
         [Alias("iam", "I_am", "i_am", "IchBin", "ichbin", "Ichbin", "Ich_bin", "ich_bin", "Ich", "ich", "I", "i")]
         public Task Change_Character(params string[] givenName) // use fancy parameters
         {
@@ -80,7 +80,7 @@ namespace DiscoBot.Commands
             return $"{name} verwendet {waffe}";
         }
 
-        [Command("gm"), Summary("Führt eine probe aus")]
+        //[Command("gm"), Summary("Führt eine probe aus")]
         [Alias("GM", "as", "As", "als")]
         public async Task ProbeAsync([Summary("Fernkampfwaffe")] string name, string command, string cmdText = "", int modifier = 0)
         {

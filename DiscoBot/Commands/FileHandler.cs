@@ -13,7 +13,7 @@
 
     public class FileHandler : ModuleBase
     {
-        [Command("send"), Summary("fügt Helden hinzu")]
+        //[Command("send"), Summary("fügt Helden hinzu")]
         public async Task AddChar()
         {
             var msg = this.Context.Message;

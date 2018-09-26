@@ -15,7 +15,7 @@
 
     public class List : ModuleBase
     {
-        [Command("list"), Summary("gibt eine Auflistung  aus")]
+        //[Command("list"), Summary("gibt eine Auflistung  aus")]
         public async Task ListAsync([Summary("Aktion")] string prop)
         {
             var res = new List<string>();
