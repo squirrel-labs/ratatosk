@@ -22,7 +22,7 @@ namespace DSACore.Commands
                 case "man":
                 case "hilfe":
                 case "h":
-                    return Help.ShowHelp(cmd.CmdText);
+                    return Help.ShowHelp(cmd.CmdTexts.ToArray());
                 case "le":
                 case "leben":
                 case "lp":
@@ -94,7 +94,7 @@ namespace DSACore.Commands
             return res;
         }
 
-        public static string CheckCommand(string name, CommandTypes command, string waffe, int erschwernis = 0)
+        private static string CheckCommand(string name, CommandTypes command, string waffe, int erschwernis = 0)
         {
             var chr = Dsa.GetCharacter(0);
             throw new NotImplementedException("access char by id ore name and group id");

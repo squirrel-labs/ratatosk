@@ -35,7 +35,7 @@ namespace DSACore.DSA_Game.Save
             set => objects["Sound"] = value;
         }
 
-        public static void Deserialize(string path = @"..\..\Properties")
+        public static void Deserialize(string path = /*@"..\.."*/@"Properties")
         {
             var files = Directory.GetFiles(path, "*.json");
 

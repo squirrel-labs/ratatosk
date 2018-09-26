@@ -14,25 +14,34 @@ namespace DSACore.Controllers
     {
         // GET: api/<controller>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public string Get()
         {
-            return new string[] { "value1", "value2" };
+            return "Dies ist die supa dolle Web Api";
         }
 
         // GET api/<controller>/5
-        [HttpGet("{id}")]
+        /*[HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
-        }
+        }*/
 
         // POST api/<controller>/Felis
         [HttpPost]
         public string Post([FromBody]Command cmd)
         {
-            return cmd.Name + " strichelt erfolgreich das Einhorn" + cmd.CmdText;
+            try
+            {
+                return Commands.CommandHandler.ExecuteCommand(cmd);
+            }
+            catch (Exception e)
+            {
+                return $"Ein Fehler ist aufgetreten: \n {e.Message}";
+            }
+            
         }
 
+/*
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
@@ -44,6 +53,6 @@ namespace DSACore.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-        }
+        }*/
     }
 }

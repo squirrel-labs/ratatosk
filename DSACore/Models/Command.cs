@@ -12,7 +12,8 @@ namespace DSACore.Models
         public string Name { get; set; }
         public string CmdIdentifier { get; set; }
         public List<string> CmdTexts { get; set; }
-        public string CmdText => CmdTexts.First();
+        public string CmdText => CmdTexts != null ? CmdTexts.First() : "";
+
         public int Cmdmodifier { get; set; } = 0;
         public bool IsDm { get; set; } = false;
     }

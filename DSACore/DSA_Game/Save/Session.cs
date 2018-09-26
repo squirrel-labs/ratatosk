@@ -9,7 +9,7 @@ namespace DSACore.DSA_Game.Save
 
     public class Session
     {
-        public static string DirectoryPath { get; set; } = @"..\..\sessions";
+        public static string DirectoryPath { get; set; } = @"sessions";
 
         public Dictionary<string, string> Relation { get; set; } = new Dictionary<string, string>(); // dictionary to match the char
 
@@ -17,7 +17,7 @@ namespace DSACore.DSA_Game.Save
 
         public string SessionName { get; set; }
         
-        public static Session Load(string path = @"..\..\session.json")
+        public static Session Load(string path)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace DSACore.DSA_Game.Save
             }
         }
 
-        public void Save(string path = @"..\..\session.json")
+        public void Save(string path)
         {
             try
             {

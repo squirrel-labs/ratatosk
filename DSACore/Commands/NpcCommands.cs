@@ -24,14 +24,14 @@ namespace DSACore.Commands
 
         }
 
-        public static string Random(ulong id, string npcName, int mean = 9, int stDv = 1)
+        private static string Random(ulong id, string npcName, int mean = 9, int stDv = 1)
         {
             throw new NotImplementedException();
             Dsa.Chars.Add(new Npc(npcName, mean, stDv));
             return $"{npcName} wurde zufällig generiert";
         }
         
-        public static string Copy(ulong id, string npcName, string source, int stDv = 1)
+        private static string Copy(ulong id, string npcName, string source, int stDv = 1)
         {
             if (Dsa.Chars.Exists(x => x.Name.Equals(npcName)))
             {

@@ -57,7 +57,7 @@ namespace DSACore.DSA_Game
             {
                 Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList()
             };
-            Session.Save();
+            //Session.Save();
         }
 
         public static ICharacter GetCharacter(ulong id)
