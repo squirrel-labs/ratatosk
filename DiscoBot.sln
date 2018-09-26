@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZooBOTanica", "ZooBOTanica\
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "NodeJSServer", "NodeJSServer\NodeJSServer.njsproj", "{57064377-C08C-4218-9C55-0552D40F3877}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSACore", "DSACore\DSACore.csproj", "{89343249-016C-47C0-AED6-C99165DE8B66}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{57064377-C08C-4218-9C55-0552D40F3877}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57064377-C08C-4218-9C55-0552D40F3877}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57064377-C08C-4218-9C55-0552D40F3877}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89343249-016C-47C0-AED6-C99165DE8B66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89343249-016C-47C0-AED6-C99165DE8B66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89343249-016C-47C0-AED6-C99165DE8B66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89343249-016C-47C0-AED6-C99165DE8B66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
