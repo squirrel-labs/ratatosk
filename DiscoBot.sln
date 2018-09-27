@@ -11,7 +11,7 @@ Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "NodeJSServer", "NodeJSServe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSACore", "DSACore\DSACore.csproj", "{89343249-016C-47C0-AED6-C99165DE8B66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DSALib", "DSALib\DSALib.csproj", "{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSALib", "DSALib\DSALib.csproj", "{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

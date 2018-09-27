@@ -11,6 +11,7 @@
   "author": "Timon Scholz",
   "license": "MIT",
   "dependencies": {
+    "@aspnet/signalr": "^1.0.3",
     "engine.io": "^3.2.0",
     "express": "^4.16.3",
     "socket.io": "^2.1.1",
