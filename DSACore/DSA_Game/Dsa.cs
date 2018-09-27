@@ -13,6 +13,8 @@ namespace DSACore.DSA_Game
 
     public static class Dsa
     {
+        public const string rootPath = "DiscoBot\\DSACore\\";
+
         private static Session s_session;
 
         public static List<ICharacter> Chars { get; set; } = new List<ICharacter>();  // list of all characters
@@ -37,6 +39,8 @@ namespace DSACore.DSA_Game
             }
         }
 
+        public static void start(){}
+
         public static void Startup()
         {
             //new .Auxiliary.Calculator.StringSolver("1d100 - (1d200 + 1) * -50000").Solve();
@@ -49,8 +53,8 @@ namespace DSACore.DSA_Game
                     .Where(c => !Talente.Exists(v => v.Name.Equals(c.Name))).ToList().ForEach(v => Talente.Add(v));
             }
 
-            Properties.Deserialize();
-            Properties.Serialize();
+            Properties.Deserialize(rootPath+"Properties");
+            Properties.Serialize(rootPath + "Properties");
 
             Talente = Talente.OrderBy(x => x.Name).ToList();
             Session = new Session
