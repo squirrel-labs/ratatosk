@@ -141,12 +141,14 @@ body {
     flex-wrap: wrap;
     transform-origin: top;
     transition: max-height 200ms ease, transform 200ms ease, visibility 200ms step-start;
+    min-height: 3.5rem;
 
     &.hidden {
       transform: scaleY(0);
       visibility: hidden;
       max-height: 0;
       transition: max-height 200ms ease, transform 200ms ease, visibility 200ms step-end;
+      min-height: 0;
     }
 
     .banner-text {
