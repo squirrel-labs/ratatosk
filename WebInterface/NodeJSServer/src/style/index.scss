@@ -5,6 +5,7 @@ html,body {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
+  font-display: swap;
   overflow: hidden;
   background-color: $primary;
   color: $primary-text;
@@ -113,6 +114,7 @@ body {
   border: none;
   border-radius: 16px 16px 0 0;
   min-height: 0;
+  height: 100%;
 
   box-sizing: border-box;
   background-color: white;
