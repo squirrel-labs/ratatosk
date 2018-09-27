@@ -14,9 +14,10 @@ namespace DSACore
     {
         public static void Main(string[] args)
         {
+            DSA_Game.Dsa.Startup();
             CreateWebHostBuilder(args).Build().Run();
         }
-
+        
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();

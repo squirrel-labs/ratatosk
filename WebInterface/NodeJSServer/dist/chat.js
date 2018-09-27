@@ -1,6 +1,6 @@
 "use strict";
 
-var connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:44365/chatHub").build();
+var connection = new signalR.HubConnectionBuilder().withUrl("https://192.168.2.58:5001/chatHub").build();
 
 connection.on("ReceiveMessage", function (user, message) {
     var msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
