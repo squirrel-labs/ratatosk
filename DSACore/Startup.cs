@@ -26,12 +26,23 @@ namespace DSACore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => options.AddPolicy("CorsPolicy",
+                builder =>
+                {
+                    builder.WithOrigins("https://dsa.truekuehli.de")
+                        .WithHeaders("Access-Control-Allow-Origin")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                }));
+            /*
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.WithOrigins("https://console.firebase.google.com/project/heldenonline-4d828"));
+                    builder => builder.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin().AllowCredentials()/*WithOrigins("https://dsa.truekuehli.de")#1#);
             });
 
+*/
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSignalR();
@@ -49,9 +60,13 @@ namespace DSACore
                 app.UseHsts();
             }
 
+            app.UseCors("CorsPolicy");
+
             app.UseSignalR(routes => { routes.MapHub<ChatHub>("/chatHub"); });
-            app.UseCors("AllowSpecificOrigin");
-            app.UseHttpsRedirection();
+
+            
+            //app.UseCors("AllowSpecificOrigin");
+            //app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
