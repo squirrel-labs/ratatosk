@@ -14,7 +14,7 @@ namespace DSACore.Models
         public List<string> CmdTexts { get; set; }
         public string CmdText => CmdTexts.Count != 0 ? CmdTexts.First() : "";
 
-        public int Cmdmodifier { get; set; } = 0;
+        public int Cmdmodifier => CmdTexts.Count!=0&&int.TryParse(CmdTexts.Last(),out int mod)?mod:0;
         public bool IsDm { get; set; } = false;
     }
 }
