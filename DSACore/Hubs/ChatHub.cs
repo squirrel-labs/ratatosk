@@ -24,6 +24,11 @@ namespace DSACore.Hubs
             return Clients.Group(group).SendCoreAsync("ReceiveMessage", new object[] { user, message });
         }
 
+        public async Task GetGroups()
+        {
+            await  Clients.Caller.SendCoreAsync("ListGroups", new object[] { "TheCrew", "Testdata" });
+        }
+
         public async Task Login(string group, string password)
         {
             if (password == "valid")
