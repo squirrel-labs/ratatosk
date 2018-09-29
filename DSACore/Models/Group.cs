@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace DSACore.Models
 {
-    public class User
+    public class Group
     {
         public string Name { get; set; }
-        public string ConnectionId { get; set; }
+        public List<User> Users { get; set; }= new List<User>();
     }
 }
