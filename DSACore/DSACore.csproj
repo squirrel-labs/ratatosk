@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <StartupObject>DSACore.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,13 +10,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FirebaseDatabase.net" Version="3.3.3" />
-    <PackageReference Include="FirebaseStorage.net" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DSALib\DSALib.csproj" />
+    <ProjectReference Include="..\FireBase\FireBase.csproj" />
   </ItemGroup>
 
 </Project>
