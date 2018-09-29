@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <StartupObject>DSACore.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DSALib\DSALib.csproj" />
+    <ProjectReference Include="..\FireBase\FireBase.csproj" />
   </ItemGroup>
 
 </Project>

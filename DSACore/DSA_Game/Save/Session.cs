@@ -9,7 +9,7 @@ namespace DSACore.DSA_Game.Save
 
     public class Session
     {
-        public static string DirectoryPath { get; set; } = @"sessions";
+        public static string DirectoryPath { get; set; } = Dsa.rootPath + @"sessions";
 
         public Dictionary<string, string> Relation { get; set; } = new Dictionary<string, string>(); // dictionary to match the char
 

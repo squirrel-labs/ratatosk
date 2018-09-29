@@ -23,7 +23,7 @@ namespace ZooBOTanica
             this.AllowDrop = true;
         }
 
-        private void Load(string path)
+        private new void Load(string path)
         {
             this.critter = Critter.Load(path);
 

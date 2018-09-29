@@ -97,7 +97,6 @@ namespace DSACore.Commands
         private static string CheckCommand(string name, CommandTypes command, string waffe, int erschwernis = 0)
         {
             var chr = Dsa.GetCharacter(0);
-            throw new NotImplementedException("access char by id ore name and group id");
 
             switch (command)
             {
@@ -116,6 +115,8 @@ namespace DSACore.Commands
             }
 
             return $"{name} verwendet {waffe}";
+
+            throw new NotImplementedException("access char by id ore name and group id");
         }
     }
 }

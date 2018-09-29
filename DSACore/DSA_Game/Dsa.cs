@@ -13,7 +13,7 @@ namespace DSACore.DSA_Game
 
     public static class Dsa
     {
-        public const string rootPath = "DiscoBot\\DSACore\\";
+        public const string rootPath = "";//"DiscoBot\\DSACore\\";
 
         private static Session s_session;
 
@@ -46,7 +46,7 @@ namespace DSACore.DSA_Game
             //new .Auxiliary.Calculator.StringSolver("1d100 - (1d200 + 1) * -50000").Solve();
             /*Session = new Session();*/
             // relation.Add("Papo", "Pump aus der Gosse");
-            foreach (var filename in Directory.GetFiles("helden", "*.xml"))
+            foreach (var filename in Directory.GetFiles(rootPath + "helden", "*.xml"))
             {
                 Chars.Add(new Character(filename));
                 (Chars.Last() as Character)?.Talente.Select(x => new Talent(x.Name, x.Probe, 0))
