@@ -8,6 +8,7 @@ namespace DSACore.Models.Network
     public class Group
     {
         public string Name { get; set; }
-        public List<User> Users { get; set; }= new List<User>();
+        public string Password { get; set; }
+        public List<User> Users { get; set; } = new List<User>();
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DSACore.Models;
+using DSACore.Models.Network;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DSACore.Hubs
@@ -18,8 +19,18 @@ namespace DSACore.Hubs
             var args = message.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
             var ident = args.First().Replace("!", ""); 
             if(args.Count>0){args.RemoveAt(0);}
+
+            string group;
+            try
+            {
+                group = getGroup(Context.ConnectionId).Name;
+                await SendToGroup(group, user, Commands.CommandHandler.ExecuteCommand(new Command { CharId = 0, CmdIdentifier = ident, CmdTexts = args, Name = user }));
+            }
+            catch(InvalidOperationException e)
+            {
+                await Clients.Caller.SendCoreAsync("ReceiveMessage", new[] {"Nutzer ist in keiner Gruppe. Erst joinen!"});
+            }
             
-            await SendToGroup(getGroup(Context.ConnectionId).Name, user, Commands.CommandHandler.ExecuteCommand(new Command{CharId = 0,CmdIdentifier = ident, CmdTexts = args, Name = user}));
         }
 
         private Task SendToGroup(string group, string user, string message)
@@ -34,19 +45,20 @@ namespace DSACore.Hubs
 
         public async Task GetGroups()
         {
-            await  Clients.Caller.SendCoreAsync("ListGroups", new object[] { Groups });
-            throw new NotImplementedException("add database call to get groups");
+            await  Clients.Caller.SendCoreAsync("ListGroups", new object[] { DSAGroups });
+            //throw new NotImplementedException("add database call to get groups");
         }
 
         public async Task AddGroup(string group, string password)
         {
-            await Clients.Caller.SendCoreAsync("ListGroups", new object[] { Groups });
-            throw new NotImplementedException("add database call to add groups");
+            DSAGroups.Add(new Group{Name = group, Password = password});
+            Clients.Caller.SendCoreAsync("ReceiveMessage", new[] {$"group {group} sucessfully added"});
+            //throw new NotImplementedException("add database call to add groups");
         }
 
         public async Task Login(string group, string user, string password)
         {
-            if (password == "valid")
+            if (password == DSAGroups.First(x=>x.Name == group).Password)
             {
                 DSAGroups.First(x=>x.Name.Equals(group)).Users.Add(new User{ConnectionId = Context.ConnectionId, Name = user});
                 await Groups.AddToGroupAsync(Context.ConnectionId, group);

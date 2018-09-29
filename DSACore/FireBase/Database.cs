@@ -13,7 +13,7 @@ namespace DSACore.FireBase
     {
         static Database()
         {
-            var auth = File.ReadAllText("Token"); ; // your app secret
+            var auth = File.ReadAllText(DSACore.DSA_Game.Dsa.rootPath+"Token"); ; // your app secret
             var firebaseClient = new FirebaseClient(
                 "https://heldenonline-4d828.firebaseio.com/",
                 new FirebaseOptions

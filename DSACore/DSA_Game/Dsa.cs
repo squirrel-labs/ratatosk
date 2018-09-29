@@ -13,7 +13,7 @@ namespace DSACore.DSA_Game
 
     public static class Dsa
     {
-        public const string rootPath = "";//"DiscoBot\\DSACore\\";
+        public const string rootPath = "C:\\Users\\Dennis\\Source\\Repos\\DiscoBot\\DSACore\\";//"DiscoBot\\DSACore\\";
 
         private static Session s_session;
 

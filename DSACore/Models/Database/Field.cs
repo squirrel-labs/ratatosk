@@ -5,11 +5,9 @@ using System.Threading.Tasks;
 
 namespace DSACore.Models.Database
 {
-    public class Group
+    public class Field
     {
         private string Name { get; set; }
-        private string Discord { get; set; }
-        private int Id { get; set; }
-        private List<GroupChar> Chars { get; set; }= new List<GroupChar>();
+        private int value { get; set; }
     }
 }
