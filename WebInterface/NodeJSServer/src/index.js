@@ -9,6 +9,8 @@ const connection = new signalR.HubConnectionBuilder()
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
+connection.on('')
+
 connection.on('ReceiveMessage', (user, message) => {
   let msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   let encodedMsg = user + " says " + msg;
