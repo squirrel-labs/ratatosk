@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 
 namespace DSACore.Models.Database
 {
-    public class Group
+    public class GroupChar
     {
         private string Name { get; set; }
-        private string Discord { get; set; }
         private int Id { get; set; }
-        private List<GroupChar> Chars { get; set; }= new List<GroupChar>();
+        private int Lp { get; set; }
+        private int LpMax { get; set; }
+        private int As { get; set; }
+        private int AsMax { get; set; }
+        private Weapon Weapon { get; set; }
     }
 }

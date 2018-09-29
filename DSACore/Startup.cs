@@ -29,7 +29,7 @@ namespace DSACore
             services.AddCors(options => options.AddPolicy("CorsPolicy",
                 builder =>
                 {
-                    builder.WithOrigins("https://dsa.truekuehli.de")
+                    builder.AllowAnyOrigin()//.WithOrigins("https://dsa.truekuehli.de", "127.0.0.1")
                         .WithHeaders("Access-Control-Allow-Origin")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
@@ -51,7 +51,7 @@ namespace DSACore
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsDevelopment()||true)
             {
                 app.UseDeveloperExceptionPage();
             }
