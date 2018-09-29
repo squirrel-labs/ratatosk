@@ -137,7 +137,6 @@ body {
       margin: 0;
       padding: 16px;
       text-align: center;
-      z-index: 2;
       flex-grow: 1;
 
       @media (min-width: 450px) {
@@ -390,5 +389,37 @@ body {
     margin: 4px;
     bottom: 0;
     text-align: center;
+  }
+}
+
+.modal-container {
+  position:absolute;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000AA;
+  display: flex;
+  opacity: 1;
+  transition: opacity 200ms ease;
+
+  &.hidden {
+    opacity: 0;
+  }
+
+  .modal {
+    background-color: #546e7a;
+    margin: auto;
+    padding: 1rem;
+    border-style: none;
+    border-radius: 8px;
+    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+  }
+
+  .modal-title {
+    margin: 1rem;
+  }
+
+  .modal-body {
+    margin: 0.25rem;
   }
 }
