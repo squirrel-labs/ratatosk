@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DSACore.FireBase;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,7 @@ namespace DSACore
     {
         public static void Main(string[] args)
         {
+            Database.DoStuff();
             DSA_Game.Dsa.Startup();
             CreateWebHostBuilder(args).Build().Run();
         }

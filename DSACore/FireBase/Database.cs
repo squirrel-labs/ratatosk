@@ -21,5 +21,7 @@ namespace DSACore.FireBase
                     AuthTokenAsyncFactory = () => Task.FromResult(auth)
                 });
         }
+
+        public static void DoStuff(){}
     }
 }
