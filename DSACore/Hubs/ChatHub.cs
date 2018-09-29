@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DSACore.Models;
+using DSACore.Models.Network;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DSACore.Hubs
