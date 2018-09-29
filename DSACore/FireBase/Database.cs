@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Database;
@@ -12,9 +13,9 @@ namespace DSACore.FireBase
     {
         static Database()
         {
-            var auth = "ABCDE"; // your app secret
+            var auth = File.ReadAllText("Token"); ; // your app secret
             var firebaseClient = new FirebaseClient(
-                "<URL>",
+                "https://heldenonline-4d828.firebaseio.com/",
                 new FirebaseOptions
                 {
                     AuthTokenAsyncFactory = () => Task.FromResult(auth)
