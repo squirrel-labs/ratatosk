@@ -7,8 +7,8 @@ namespace DSACore.Models.Database
 {
     public class Talent
     {
-        private string Name { get; set; }
+        public string Name { get; set; }
 
-        private Roll Roll { get; set; } = new Roll();
+        public Roll Roll { get; set; } = new Roll();
     }
 }

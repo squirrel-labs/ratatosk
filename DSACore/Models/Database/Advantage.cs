@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace DSACore.Models.Database
 {
-    public class Field
+    public class Advantage
     {
-        public Field(string name, int value = 0)
+        public Advantage(string name, string value = "")
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            this.Value = value;
+            Value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public string Name { get; set; }
-        public int Value { get; set; }
+        public string Value { get; set; }
     }
 }

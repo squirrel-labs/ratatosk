@@ -7,6 +7,6 @@ namespace DSACore.Models.Database
 {
     public class GeneralSpell : Talent
     {
-        private string Comlexity = "A";
+        public string Comlexity = "A";
     }
 }

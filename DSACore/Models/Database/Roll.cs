@@ -7,6 +7,6 @@ namespace DSACore.Models.Database
 {
     public class Roll
     {
-        private string[] Skills { get; set; } = new string[3];
+        public string[] Skills { get; set; } = new string[3];
     }
 }

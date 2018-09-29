@@ -7,9 +7,9 @@ namespace DSACore.Models.Database
 {
     public class Weapon
     {
-        private string Name { get; set; }
-        private string Damage { get; set; }
-        private string WeaponTalent { get; set; }
-        private string Modifier { get; set; }
+        public string Name { get; set; }
+        public string Damage { get; set; }
+        public string WeaponTalent { get; set; }
+        public string Modifier { get; set; }
     }
 }

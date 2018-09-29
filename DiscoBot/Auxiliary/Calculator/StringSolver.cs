@@ -9,8 +9,8 @@
     /// </summary>
     public class StringSolver : ISolvable
     {
-        private readonly string input;
-        private readonly List<object> arguments = new List<object>();
+        public readonly string input;
+        public readonly List<object> arguments = new List<object>();
 
         public StringSolver(string input)
         {
@@ -37,7 +37,7 @@
             return ((ISolvable)this.arguments.First()).Solve();
         }
 
-        private static string GetInner(ref string input) // extract the inner bracket an remove the section from the input string
+        public static string GetInner(ref string input) // extract the inner bracket an remove the section from the input string
         {
             int depth = 0;
             for (var index = 1; index < input.Length; index++)
@@ -67,7 +67,7 @@
             return string.Empty;
         }
 
-        private static Ops GetOps(char c)
+        public static Ops GetOps(char c)
         {
             switch (c)
             {
@@ -85,7 +85,7 @@
             }
         }
 
-        private static string ExpandParentheses(string input) // insert * between Parentheses and digits
+        public static string ExpandParentheses(string input) // insert * between Parentheses and digits
         {
             for (int i = 0; i < input.Length - 1; i++)
             {
@@ -106,7 +106,7 @@
             return input;
         }
 
-        private void AtomizeOperations(string workInput)
+        public void AtomizeOperations(string workInput)
         {
             for (var index = 0; index < workInput.Length; index++)
             {
@@ -146,7 +146,7 @@
             }
         }
 
-        private void NestOperations()
+        public void NestOperations()
         {
             foreach (Ops currentOp in Enum.GetValues(typeof(Ops)))
             {
@@ -180,7 +180,7 @@
             }
         }
 
-        private void HandleSpecialFormatting(ref int index, Ops op)
+        public void HandleSpecialFormatting(ref int index, Ops op)
         {
             var arg1 = this.arguments[index - 1];
             if (arg1.GetType() == typeof(Ops))

@@ -1,9 +1,18 @@
-﻿namespace DSACore.Models.Database
+﻿using System;
+
+namespace DSACore.Models.Database
 {
-    class WeaponTalent
+  public class WeaponTalent
     {
-        private string Name { get; set; }
-        private int At { get; set; }
-        private int Pa { get; set; }
+        public WeaponTalent(string name, int at, int pa)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            At = at;
+            Pa = pa;
+        }
+
+        public string Name { get; set; }
+        public int At { get; set; }
+        public int Pa { get; set; }
     }
 }

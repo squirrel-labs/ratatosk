@@ -14,7 +14,7 @@ namespace DSACore.DSA_Game.Save
 
     public static class Properties
     {
-        private static Dictionary<string, object> objects;
+        public static Dictionary<string, object> objects;
 
         static Properties()
         {

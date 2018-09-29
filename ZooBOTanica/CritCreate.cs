@@ -15,7 +15,7 @@ namespace ZooBOTanica
 
     public partial class CritCreateForm : Form
     {
-        private DSALib.Characters.Critter critter;
+        public DSALib.Characters.Critter critter;
 
         public CritCreateForm()
         {
@@ -23,7 +23,7 @@ namespace ZooBOTanica
             this.AllowDrop = true;
         }
 
-        private new void Load(string path)
+        public new void Load(string path)
         {
             this.critter = Critter.Load(path);
 
@@ -48,12 +48,12 @@ namespace ZooBOTanica
             }
         }
         
-        private void CritCreateForm_DragDrop(object sender, DragEventArgs e)
+        public void CritCreateForm_DragDrop(object sender, DragEventArgs e)
         {
             this.Load(e.Data.GetData(DataFormats.Text).ToString());
         }
 
-        private void LoadButton_Click(object sender, EventArgs e)
+        public void LoadButton_Click(object sender, EventArgs e)
         {
             var dig = new OpenFileDialog();
             dig.CheckFileExists = true;
@@ -67,7 +67,7 @@ namespace ZooBOTanica
             }
         }
 
-        private void SaveButton_Click(object sender, EventArgs e)
+        public void SaveButton_Click(object sender, EventArgs e)
         {
             this.critter = new Critter();
             this.critter.Astralpunkte_Basis = (int)this.AeEdit.Value;
