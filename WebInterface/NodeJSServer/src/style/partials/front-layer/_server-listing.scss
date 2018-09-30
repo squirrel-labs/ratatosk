@@ -1,0 +1,113 @@
+.front-layer {
+  .server-listing {
+    box-sizing: border-box;
+    background-color: $primary;
+    color: $primary-text;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border-style: none;
+    border-radius: 8px;
+    margin: 1rem;
+    margin-bottom: 2rem;
+    padding: 0.5rem;
+    padding-top: 0.25rem;
+    box-shadow: 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12), 0 5px 5px -3px rgba(0, 0, 0, .2);
+    h1 {
+      text-align: center;
+      @media (max-height: 550px) {
+        display: none;
+      }
+    }
+    hr {
+      width: 100%;
+      @media (max-height: 550px) {
+        display: none;
+      }
+    }
+
+    @media (max-height: 450px) {
+      padding-bottom: 0.125rem
+    }
+
+    .server-entries {
+      overflow-y: auto;
+      min-height: 0;
+
+      .server {
+        font-size: 1.25rem;
+        display: flex;
+        flex-direction: row;
+
+        @media (max-width: 1000px) {
+          flex-wrap: wrap;
+        }
+
+        align-items: center;
+        background-color: $primary-light;
+        padding: 0.5rem;
+        margin-bottom: 0.25rem;
+        border-style: none;
+        border-radius: 8px;
+
+        .server-name {
+          font-weight: bold;
+          letter-spacing: 0.125rem;
+          white-space: nowrap;
+          overflow: hidden;
+          margin: 0.5rem 0;
+        }
+
+        .player-count {
+          font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        .player-count-static {
+          @media (max-width: 1000px) {
+            display: none;
+          }
+
+          white-space: nowrap;
+          margin-left: 0.25rem;
+          letter-spacing: 0;
+          font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        .player-count-dot {
+          background-color: $online-green;
+          border-radius: 50%;
+          min-width: 1rem;
+          min-height: 1rem;
+          width: 1rem;
+          height: 1rem;
+          margin-left: auto;
+          margin-right: 0.25rem;
+        }
+
+        .join-btn {
+          margin-left: 0.5rem;
+          min-width: 12rem;
+        }
+      }
+    }
+
+    .button-container {
+      display: flex;
+      flex-direction: row-reverse;
+      margin-top: 1rem;
+      margin-right: 0.25rem;
+      min-height: 2.5rem;
+
+      @media (max-height: 450px) {
+        margin-top: 0.125rem;
+        min-height: 2rem;
+      }
+
+      .btn {
+        @media (max-width: 450px) {
+          letter-spacing: 0;
+        }
+      }
+    }
+  }
+}
