@@ -7,8 +7,14 @@ namespace DSACore.Models.Database
 {
     public class Talent
     {
+        public Talent(string name, String roll)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Roll = roll.Split('/');
+        }
+
         public string Name { get; set; }
 
-        public Roll Roll { get; set; } = new Roll();
+        public string[] Roll { get; set; } = new string[3];
     }
 }

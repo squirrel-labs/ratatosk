@@ -1,4 +1,5 @@
 ﻿using System;
+using DSACore.FireBase;
 using DSALib;
 using DSALib.Characters;
 using Microsoft.EntityFrameworkCore.Design;
@@ -20,6 +21,8 @@ namespace DSACore.DSA_Game
         public static List<ICharacter> Chars { get; set; } = new List<ICharacter>();  // list of all characters
 
         public static List<Talent> Talente { get; set; } = new List<Talent>();
+
+        public static List<Zauber> Zauber { get; set; } = new List<Zauber>();
 
         public static Session Session
         {
@@ -51,12 +54,27 @@ namespace DSACore.DSA_Game
                 Chars.Add(new Character(filename));
                 (Chars.Last() as Character)?.Talente.Select(x => new Talent(x.Name, x.Probe, 0))
                     .Where(c => !Talente.Exists(v => v.Name.Equals(c.Name))).ToList().ForEach(v => Talente.Add(v));
+                (Chars.Last() as Character)?.Zauber.Select(x => new Zauber(x.Name, x.Probe, 0, x.Complexity))
+                    .Where(c => !Zauber.Exists(v => v.Name.Equals(c.Name))).ToList().ForEach(v => Zauber.Add(v));
             }
 
             Properties.Deserialize(rootPath+"Properties");
             Properties.Serialize(rootPath + "Properties");
 
             Talente = Talente.OrderBy(x => x.Name).ToList();
+            Zauber = Zauber.OrderBy(x => x.Name).ToList();
+
+            /*foreach (var talent in Talente)
+            {
+                Database.AddTalent(new Models.Database.Talent(talent.Name, talent.Probe));
+            }
+
+            foreach (var talent in Zauber)
+            {
+                Database.AddSpell(new Models.Database.GeneralSpell(talent.Name, talent.Probe, talent.Complexity));
+            }*/
+
+
             Session = new Session
             {
                 Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList()

@@ -1,4 +1,5 @@
-﻿using DSACore.Auxiliary;
+﻿using System.IO;
+using DSACore.Auxiliary;
 using DSALib;
 using DSALib.Characters;
 
@@ -28,7 +29,12 @@ namespace DSACore.DSA_Game.Characters
 
         public Character(string path) : this()
         {
-            this.Load(path); // load
+            this.Load(new MemoryStream(File.ReadAllBytes(path))); // load
+            this.Post_process(); // calculate derived values
+        }
+        public Character(MemoryStream stream) : this()
+        {
+            this.Load(stream); // load
             this.Post_process(); // calculate derived values
         }
 
@@ -198,10 +204,11 @@ namespace DSACore.DSA_Game.Characters
 
         }
 
+        
 
-        private void Load(string path)
+        private void Load(MemoryStream stream)
         {
-            var reader = new XmlTextReader(path);
+            var reader = new XmlTextReader(stream);
             while (reader.Read())
             {
                 // read until he hits keywords

@@ -7,6 +7,15 @@ namespace DSACore.Models.Database
 {
     public class GeneralSpell : Talent
     {
-        public string Comlexity = "A";
+        public char Comlexity = 'A';
+
+        public GeneralSpell(string name, string roll, char comlexity = 'A') :base(name, roll)
+        {
+            Comlexity = comlexity;
+        }
+
+        public GeneralSpell(string name, string roll) : base(name, roll)
+        {
+        }
     }
 }

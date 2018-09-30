@@ -34,10 +34,10 @@ namespace DSACore.FireBase
             
             var lastChar = await firebase
                 .Child("Chars")
-                .OrderBy("id")
+                .OrderByKey()
                 .LimitToLast(1)
-                .OnceSingleAsync<DatabaseChar>();
-            int id = groupChar.Id = data.Id = lastChar.Id + 1;
+                .OnceAsync<DatabaseChar>();
+            int id = groupChar.Id = data.Id = lastChar.First().Object.Id + 1;
             
             await firebase
                 .Child("Groups")
@@ -180,7 +180,7 @@ namespace DSACore.FireBase
         {
             var groups = await firebase
                 .Child("Groups")
-                .OrderBy("id")
+                .OrderByKey()
                 .OnceAsync<Group>();
             var ret = new List<Models.Network.Group>();
 
@@ -201,14 +201,14 @@ namespace DSACore.FireBase
             return group;
         }
 
-        public static async void AddGroup(Group group)
+        public static async Task AddGroup(Group group)
         {
             var lastChar = await firebase
                 .Child("Groups")
-                .OrderBy("id")
+                .OrderByKey()
                 .LimitToLast(1)
-                .OnceSingleAsync<DatabaseChar>();
-            int id = group.Id = lastChar.Id + 1;
+                .OnceAsync<Group>();
+            int id = group.Id = lastChar.First().Object.Id + 1;
 
             await firebase
                 .Child("Groups")
