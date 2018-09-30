@@ -20,6 +20,8 @@ export default class ServerClient {
     this.refreshing = false;
 
     this.serverListing = new ServerListing(serverListingId);
+
+    this.messageHandling(); //TODO: REMOVE, JUST FOR DEBUGGING
   }
 
   loadServers() {
@@ -55,6 +57,7 @@ export default class ServerClient {
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
       let encodedMsg = user + " sagt:  " + msg;
+      console.log(encodedMsg); //TODO: REMOVE, JUST FOR DEBUGGING
     });
   }
 }

@@ -15,3 +15,5 @@ document.getElementById('refresh-button')
     .addEventListener('click', client.loadServers.bind(client));
 
 new LoginModal('The Crew', client);
+
+window.client = client;  //TODO: REMOVE, JUST FOR DEBUGGING
