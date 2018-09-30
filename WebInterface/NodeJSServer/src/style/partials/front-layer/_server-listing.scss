@@ -60,35 +60,41 @@
           margin: 0.5rem 0;
         }
 
-        .player-count {
-          font-family: 'Roboto Condensed', sans-serif;
-        }
+        .right-aligned-items {
+          margin-left: auto;
+          white-space: nowrap;
+          display: flex;
+          align-items: center;
 
-        .player-count-static {
-          @media (max-width: 1000px) {
-            display: none;
+          .player-count-dot {
+            background-color: $online-green;
+            border-radius: 50%;
+            min-width: 1rem;
+            min-height: 1rem;
+            width: 1rem;
+            height: 1rem;
+            margin-right: 0.25rem;
           }
 
-          white-space: nowrap;
-          margin-left: 0.25rem;
-          letter-spacing: 0;
-          font-family: 'Roboto Condensed', sans-serif;
-        }
+          .player-count {
+            font-family: 'Roboto Condensed', sans-serif;
+          }
 
-        .player-count-dot {
-          background-color: $online-green;
-          border-radius: 50%;
-          min-width: 1rem;
-          min-height: 1rem;
-          width: 1rem;
-          height: 1rem;
-          margin-left: auto;
-          margin-right: 0.25rem;
-        }
+          .player-count-static {
+            @media (max-width: 1000px) {
+              display: none;
+            }
 
-        .join-btn {
-          margin-left: 0.5rem;
-          min-width: 12rem;
+            white-space: nowrap;
+            margin-left: 0.25rem;
+            letter-spacing: 0;
+            font-family: 'Roboto Condensed', sans-serif;
+          }
+
+          .join-btn {
+            margin-left: 0.5rem;
+            min-width: 12rem;
+          }
         }
       }
     }
