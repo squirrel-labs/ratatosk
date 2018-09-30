@@ -13,6 +13,7 @@ export default class Modal {
     title.textContent = titleString;
 
     modal.appendChild(title);
+    modal.appendChild(body);
     modalBackground.appendChild(modal);
     document.body.appendChild(modalBackground);
 
@@ -25,6 +26,10 @@ export default class Modal {
   }
 
   registerEvents() {
+    this.modal.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
     this.bg.addEventListener('click', () => {
       this.bg.classList.add('hidden');
       this.bg.addEventListener('transitionend', () => {
