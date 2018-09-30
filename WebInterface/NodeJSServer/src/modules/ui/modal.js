@@ -31,10 +31,14 @@ export default class Modal {
     });
 
     this.bg.addEventListener('click', () => {
-      this.bg.classList.add('hidden');
-      this.bg.addEventListener('transitionend', () => {
-        document.body.removeChild(this.bg);
-      });
+      this.close();
+    });
+  }
+
+  close() {
+    this.bg.classList.add('hidden');
+    this.bg.addEventListener('transitionend', () => {
+      document.body.removeChild(this.bg);
     });
   }
 

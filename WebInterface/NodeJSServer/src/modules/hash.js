@@ -5,5 +5,13 @@ String.prototype.getHash = async function() {
     bufferView[i] = this.charCodeAt(i);
   }
 
-  return await crypto.subtle.digest('SHA-256', bufferView);
+  let encrypted = await crypto.subtle.digest('SHA-256', bufferView);
+  let byteArray = new Uint8Array(encrypted);
+  let base64String = '';
+
+  for (let byte of byteArray) {
+    base64String += String.fromCharCode(byte);
+  }
+
+  return btoa(base64String);
 }

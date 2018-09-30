@@ -2,7 +2,6 @@ import Backdrop from './modules/ui/backdrop.js';
 import BannerController from './modules/ui/notification-banner.js';
 import ServerClient from './modules/server-client.js'
 import LoginModal from './modules/ui/login-modal.js'; // TODO: JUST FOR DEBUGGING
-import './modules/hash.js';
 
 let backdrop = new Backdrop('menu', 'front-layer', 'show-menu');
 backdrop.register();
@@ -15,4 +14,4 @@ let client = new ServerClient('http://89.183.8.51:5000/chatHub', 'server-list', 
 document.getElementById('refresh-button')
     .addEventListener('click', client.loadServers.bind(client));
 
-// new LoginModal('The Crew');
+new LoginModal('The Crew', client);

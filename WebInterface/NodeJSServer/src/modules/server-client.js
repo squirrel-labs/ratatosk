@@ -45,6 +45,10 @@ export default class ServerClient {
     // TODO: Create
   }
 
+  sendLogin(group, password, username){
+    this.connection.invoke('Login', group, username, password);
+  }
+
   messageHandling(){
     this.connection.on('ReceiveMessage', (user, message) => {
       let msg = message.replace(/&/g, "&amp;")
