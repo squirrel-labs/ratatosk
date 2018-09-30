@@ -7,12 +7,12 @@ namespace DSACore.Models.Database
 {
     public class GroupChar
     {
-        private string Name { get; set; }
-        private int Id { get; set; }
-        private int Lp { get; set; }
-        private int LpMax { get; set; }
-        private int As { get; set; }
-        private int AsMax { get; set; }
-        private Weapon Weapon { get; set; }
+        public string Name { get; set; }
+        public int Id { get; set; }
+        public int Lp { get; set; }
+        public int LpMax { get; set; }
+        public int As { get; set; }
+        public int AsMax { get; set; }
+        public Weapon Weapon { get; set; }
     }
 }

@@ -7,7 +7,13 @@ namespace DSACore.Models.Database
 {
     public class Field
     {
-        private string Name { get; set; }
-        private int value { get; set; }
+        public Field(string name, int value = 0)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            this.Value = value;
+        }
+
+        public string Name { get; set; }
+        public int Value { get; set; }
     }
 }

@@ -7,9 +7,10 @@ namespace DSACore.Models.Database
 {
     public class Group
     {
-        private string Name { get; set; }
-        private string Discord { get; set; }
-        private int Id { get; set; }
-        private List<GroupChar> Chars { get; set; }= new List<GroupChar>();
+        public string Name { get; set; }
+        public string Discord { get; set; }
+        public string Password { get; set; }
+        public int Id { get; set; }
+        public List<GroupChar> Chars { get; set; }= new List<GroupChar>();
     }
 }

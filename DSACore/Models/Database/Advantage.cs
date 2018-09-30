@@ -5,16 +5,15 @@ using System.Threading.Tasks;
 
 namespace DSACore.Models.Database
 {
-    public class Talent
+    public class Advantage
     {
-        public Talent(string name, String roll)
+        public Advantage(string name, string value = "")
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            Roll = roll.Split('/');
+            Value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public string Name { get; set; }
-
-        public string[] Roll { get; set; } = new string[3];
+        public string Value { get; set; }
     }
 }

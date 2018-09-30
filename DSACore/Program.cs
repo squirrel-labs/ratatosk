@@ -15,7 +15,7 @@ namespace DSACore
     {
         public static void Main(string[] args)
         {
-            Database.DoStuff();
+            Database.GetGroup(0);
             DSA_Game.Dsa.Startup();
             CreateWebHostBuilder(args).Build().Run();
         }

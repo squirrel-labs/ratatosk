@@ -29,7 +29,7 @@ namespace DSALib.Characters
 
         public List<CritterAttack> CritterAttacks { get; set; }
 
-        private CritterAttack lastAttack;
+        public CritterAttack lastAttack;
 
         public Critter(int gw, int gs, int rs, int mr, int ko, int pa, string ini, List<CritterAttack> critterAttacks)
         {
