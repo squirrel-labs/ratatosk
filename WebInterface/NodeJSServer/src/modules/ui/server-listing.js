@@ -1,12 +1,26 @@
+/**
+ * Class for handling the server list
+ */
 export default class ServerListing {
+  /**
+   * Creates reference to container
+   * @param {string} serverListId ID of the server list div
+   */
   constructor(serverListId) {
     this.serverListing = document.getElementById(serverListId);
   }
 
+  /**
+   * Removes all elements currently in the server listing
+   */
   flushElements() {
     this.serverListing.innerHTML = '';
   }
 
+  /**
+   * Populates servers from a given array of games
+   * @param {array} array Array of available games
+   */
   addElements(array) {
     for (let server of array) {
       const name = server['name'];

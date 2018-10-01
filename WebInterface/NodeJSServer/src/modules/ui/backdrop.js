@@ -1,18 +1,32 @@
 // Showing / Hiding the backdrop menu
 
+/**
+ * Class for adding functionality to backdrop elements
+ */
 export default class Backdrop {
+  /**
+   * Registers all important elements in the backdrop
+   * @param {string} backdropMenu ID of Backdrop Menu
+   * @param {string} frontLayer ID of Front Layer
+   * @param {string} menuButton ID of Show / Hide Menu Button
+   */
   constructor(backdropMenu, frontLayer, menuButton) {
     this.backdrop = document.getElementById(backdropMenu);
     this.frontLayer = document.getElementById(frontLayer);
     this.menuButton = document.getElementById(menuButton);
   }
 
-
+  /**
+   * Registers all neccessary events
+   */
   register() {
     this.registerButtonEvent();
     this.registerFrontLayerEvent();
   }
 
+  /**
+   * Registers showing / hiding through menu button
+   */
   registerButtonEvent() {
     this.menuButton.addEventListener('click', () => {
       // Hide / Unhide Backdrop Menu
@@ -31,6 +45,9 @@ export default class Backdrop {
     });
   }
 
+  /**
+   * Registers hiding, when clicking on the front layer
+   */
   registerFrontLayerEvent() {
     // Hide menu when interacting with front layer
     this.frontLayer.addEventListener('click', () => {
