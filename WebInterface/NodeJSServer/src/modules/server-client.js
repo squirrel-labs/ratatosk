@@ -34,8 +34,6 @@ export default class ServerClient {
     this.refreshing = false;
 
     this.serverListing = new ServerListing(serverListingId, notifications);
-
-    this.messageHandling();
   }
 
   /**
@@ -79,23 +77,10 @@ export default class ServerClient {
    */
   sendLogin(group, password, username, callback) {
     this.connection.on('LoginResponse', (result) => {
-      callback(result, this);
+      callback(result, this.connection);
       this.connection.off('LoginResponse');
     });
     this.connection.invoke('Login', group, username, password);
-  }
-
-  /**
-   * Registers message handling
-   */
-  messageHandling() {
-    this.connection.on('ReceiveMessage', (user, message) => {
-      let msg = message.replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
-      let encodedMsg = user + ' sagt:  ' + msg;
-      console.log(encodedMsg); // TODO: REMOVE, JUST FOR DEBUGGING
-    });
   }
 }
 
@@ -104,5 +89,5 @@ export default class ServerClient {
  * @callback ServerClient~loginCallback
  * @param {number} result 0: Success, 1: PasswordError, 2:UsernameTaken,
  *  3:Unknown Error
- * @param {ServerClient} client ServerClient object, that handled the login
+ * @param {ConnectionHub} connection Connection to the server
  */

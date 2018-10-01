@@ -86,10 +86,10 @@ export default class LoginModal extends Modal {
    */
   registerLoginBtn() {
     let eventListener;
-    let loginCallBack = (result, client) => {
+    let loginCallBack = (result, connection) => {
       console.log(result);
       if (result == 0) {
-        this.redirectToPlay(client);
+        this.redirectToPlay(connection);
         this.close();
       } else if (result == 1) {
         this.invalid('Name');
@@ -107,11 +107,11 @@ export default class LoginModal extends Modal {
     eventListener = () => {
       this.invalid(); // Remove 'invalid' messages
       this.loginButton.removeEventListener('click', eventListener);
-      let userName = this.nameInput.value;
+      this.userName = this.nameInput.value;
       this.passwordInput.value.getHash()
           .then((result) => {
             this.serverClient.sendLogin(this.serverName, result,
-                userName, loginCallBack);
+                this.userName, loginCallBack);
           });
     };
     this.loginButton.addEventListener('click', eventListener);
@@ -145,17 +145,18 @@ export default class LoginModal extends Modal {
 
   /**
    * Loads play site
-   * @param {ServerClient} serverClient Main server client
+   * @param {HubConnection} connection Connection to the server
    */
-  redirectToPlay(serverClient) {
+  redirectToPlay(connection) {
     window.history.pushState('object or string', 'Game Page',
         'play#game=' + this.serverName);
     fetch('play').then((response) => {
       response.text().then((htmlString) => {
         htmlString = htmlString.replace(/\.\.\//g, './');
         htmlString = htmlString.replace(/<script src=".*"><\/script>/, '');
+        console.log(htmlString);
         htmlString = htmlString.replace(
-            /<remove_if_redirected>.*?<\/remove_if_redirected>/g, '');
+            /<remove_if_redirected>((.)|\n)*?<\/remove_if_redirected>/g, '');
         document.open();
         document.write(htmlString);
         document.close();
@@ -164,7 +165,11 @@ export default class LoginModal extends Modal {
           ui.refresh();
         }
 
-        // import()
+        import(/* webpackChunkName: "/playModule" */ '../playModule')
+            .then(({default: GameClient}) => {
+              let gameClient = new GameClient(this.userName, connection);
+              gameClient.registerChat('chat');
+            });
       });
     });
   }

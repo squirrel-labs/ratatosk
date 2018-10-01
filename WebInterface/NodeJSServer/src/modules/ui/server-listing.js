@@ -30,8 +30,7 @@ export default class ServerListing {
   addElements(array, serverClient, ui) {
     for (let server of array) {
       const name = server['name'];
-      const playerList = server['users'];
-      const playerAmount = playerList.length;
+      const playerAmount = server['userCount'];
 
       let serverDiv = document.createElement('div');
       let nameSpan = document.createElement('span');

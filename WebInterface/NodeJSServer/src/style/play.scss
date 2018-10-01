@@ -7,6 +7,8 @@
 @import 'partials/front-layer/copyright';
 @import 'partials/modal/base';
 @import 'partials/modal/login';
+@import 'partials/game';
+@import 'partials/game/chat';
 
 remove_if_redirected {
   width: 100vw;
