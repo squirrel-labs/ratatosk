@@ -7,11 +7,13 @@ export default class BannerController {
    * @param {string} bannerId ID of Notification Banner
    * @param {string} textP ID of Notification Banner text field
    * @param {string} dismissBtn ID of dismiss button
+   * @param {string} notificationBadge ID of badge (# of notifications)
    */
-  constructor(bannerId, textP, dismissBtn) {
+  constructor(bannerId, textP, dismissBtn, notificationBadge) {
     this.banner = document.getElementById(bannerId);
     this.bannerText = document.getElementById(textP);
     this.dismissBtn = document.getElementById(dismissBtn);
+    this.notificationBadge = document.getElementById(notificationBadge);
     this.bannerMsgs = [];
 
     // Hide Banner after JS loading finished
@@ -69,7 +71,6 @@ export default class BannerController {
    * Updates the notification banner with the most recent message
    */
   update() {
-    // TODO: Show if multiple messages are there
     if (this.bannerMsgs.length === 0) {
       this.banner.classList.add('hidden');
       return;
@@ -85,5 +86,16 @@ export default class BannerController {
     else this.bannerText.innerText = text;
 
     this.current = name;
+
+    // Update notification badge
+    if (this.bannerMsgs.length < 2) {
+      this.notificationBadge.classList.add('hidden');
+    } else if (this.bannerMsgs.length > 9) {
+      this.notificationBadge.classList.remove('hidden');
+      this.notificationBadge.textContent = '∞';
+    } else {
+      this.notificationBadge.classList.remove('hidden');
+      this.notificationBadge.textContent = this.bannerMsgs.length.toString();
+    }
   }
 }

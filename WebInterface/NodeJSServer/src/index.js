@@ -7,7 +7,7 @@ let backdrop = new Backdrop('menu', 'front-layer', 'show-menu');
 backdrop.register();
 
 let notifications = new BannerController('notifications',
-    'banner-info', 'dismiss-banner');
+    'banner-info', 'dismiss-banner', 'notification-amount');
 notifications.register();
 
 let client = new ServerClient('http://89.183.8.51:5000/chatHub', 'server-list', true);
