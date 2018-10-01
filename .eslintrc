@@ -1,0 +1,11 @@
+{
+  "extends": "google",
+  "parserOptions": {
+    "ecmaVersion": 2017,
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-unused-vars": "off",
+    "no-extend-native": "off"
+  }
+}
