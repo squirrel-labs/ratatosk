@@ -21,6 +21,8 @@ namespace DSACore.Hubs
         static ChatHub()
         {
             DSAGroups = Database.GetGroups().Result;
+            DSAGroups.Add(new Group("login", ""));
+            DSAGroups.Add(new Group("online", ""));
             //AddGroups();
         }
 
@@ -40,7 +42,7 @@ namespace DSACore.Hubs
             }
             catch (InvalidOperationException e)
             {
-                //await Clients.Caller.SendCoreAsync("ReceiveMessage",
+                //await Clients.Caller.SendCoreAsync("RecieveMessage",
                    // new object[] { "Nutzer ist in keiner Gruppe. Erst joinen!" });
             }
 
@@ -67,7 +69,7 @@ namespace DSACore.Hubs
                 {
                     case ResponseType.Caller:
                     case ResponseType.Error:
-                        await Clients.Caller.SendAsync("ReceiveMessage", ret.message);
+                        await Clients.Caller.SendAsync("RecieveMessage", ret.message);
                         break;
                     case ResponseType.Broadcast:
                         await SendToGroup(ret.message);
@@ -88,12 +90,12 @@ namespace DSACore.Hubs
             try
             {
                 string group = getGroup(Context.ConnectionId).Name;
-                return Clients.Group(group).SendCoreAsync("ReceiveMessage",
+                return Clients.Group(group).SendCoreAsync("RecieveMessage",
                     new object[] {getUser(Context.ConnectionId).Name, message});
             }
             catch (InvalidOperationException e)
             {
-                return Clients.Caller.SendCoreAsync("ReceiveMessage",
+                return Clients.Caller.SendCoreAsync("RecieveMessage",
                     new object[] { "Nutzer ist in keiner Gruppe. Erst joinen!" });
             }
         }
@@ -129,7 +131,7 @@ namespace DSACore.Hubs
             DSAGroups.Add(new Group(group, password));
             var Dgroup = new DSACore.Models.Database.Group { Name = group, Id = DSAGroups.Count - 1 };
             //Database.AddGroup(Dgroup);
-            await Clients.Caller.SendCoreAsync("ReceiveMessage", new[] { $"group {@group} sucessfully added" });
+            await Clients.Caller.SendCoreAsync("RecieveMessage", new[] { $"group {@group} sucessfully added" });
             //throw new NotImplementedException("add database call to add groups");
         }
 
@@ -149,10 +151,12 @@ namespace DSACore.Hubs
                 var gGroup = DSAGroups.First(x => x.Name.Equals(group));
                 if (!gGroup.Users.Exists(x => x.Name.Equals(user)))
                 {
+                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, "login");
                     await Groups.AddToGroupAsync(Context.ConnectionId, group);
                     gGroup.Users.Add(new User { ConnectionId = Context.ConnectionId, Name = user });
                     await SendToGroup("Ein neuer Nutzer hat die Gruppe betreten");
                     await Clients.Caller.SendAsync("LoginResponse", 0);
+                    await Clients.Caller.SendAsync("PlayerStatusChanged", new[] {user, "online"});
                 }
                 else
                 {
@@ -162,7 +166,7 @@ namespace DSACore.Hubs
             else
             {
                 await Clients.Caller.SendAsync("LoginResponse", 2);
-                //await Clients.Caller.SendAsync("ReceiveMessage", "Falsches Passwort!");
+                //await Clients.Caller.SendAsync("RecieveMessage", "Falsches Passwort!");
             }
         }
 
@@ -172,8 +176,16 @@ namespace DSACore.Hubs
             return base.OnDisconnectedAsync(exception);
         }
 
+        public override Task OnConnectedAsync()
+        {
+            Groups.AddToGroupAsync(Context.ConnectionId, "login").Wait();
+            Groups.AddToGroupAsync(Context.ConnectionId, "online").Wait();
+            return base.OnConnectedAsync();
+        }
+
         public async Task Disconnect()
         {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "online");
             if (DSAGroups.Exists(x => x.Users.Exists(y => y.ConnectionId == Context.ConnectionId)))
             {
                 try
@@ -182,7 +194,9 @@ namespace DSACore.Hubs
 
 
                     var user = getUser(Context.ConnectionId);
-                    await SendToGroup(user.Name + " disconnected from the Server");
+
+                    await Clients.Caller.SendAsync("PlayerStatusChanged", new[] { user.Name, "offline" });
+                    //await SendToGroup(user.Name + " disconnected from the Server");
                     group.Users.Remove(user);
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, group.Name);
                 }

@@ -33,7 +33,7 @@ namespace DSACore.Controllers
         {
             try
             {
-                return Commands.CommandHandler.ExecuteCommand(cmd);
+                return Commands.CommandHandler.ExecuteCommand(cmd).message;
             }
             catch (Exception e)
             {
