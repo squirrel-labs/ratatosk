@@ -25,7 +25,7 @@
         <Content Include="dist\chat.js" />
         <Content Include="dist\index.js" />
         <Content Include="src\index.js" />
-        <Content Include="dist\ressources\Logo768.png" />
+        <Content Include="dist\ressources\DSALogo.png" />
         <Content Include="dist\ressources\menu.png" />
         <Content Include="dist\ressources\menu_close.png" />
         <Content Include="src\modules\ui\backdrop.js" />
