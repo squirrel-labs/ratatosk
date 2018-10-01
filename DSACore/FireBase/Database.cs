@@ -154,24 +154,27 @@ namespace DSACore.FireBase
 
         public static async Task AddWeapon(Weapon wep)
         {
+            string collection = wep.GetType() == typeof(MeleeWeapon) ? "MeleeWeapons" : "RangedWeapons";
             await firebase
-                .Child("Weapons")
+                .Child(collection)
                 .Child(wep.Name)
                 .PutAsync(wep);
         }
 
-        public static async Task RemoveWeapon(string weapon)
+        public static async Task RemoveWeapon(string weapon, bool ranged = false)
         {
+            string collection = ranged ? "RangedWeapons" : "MeleeWeapons";
             await firebase
-                .Child("Weapons")
+                .Child(collection)
                 .Child(weapon)
                 .DeleteAsync();
         }
 
-        public static async Task< Weapon> GetWeapon(string weapon)
+        public static async Task< Weapon> GetWeapon(string weapon, bool ranged = false)
         {
+            string collection = ranged ? "RangedWeapons" : "MeleeWeapons";
             return await firebase
-                .Child("Weapons")
+                .Child(collection)
                 .Child(weapon)
                 .OnceSingleAsync<Weapon>();
         }

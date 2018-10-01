@@ -12,5 +12,8 @@ namespace DSACore.Models.Database
         public string Password { get; set; }
         public int Id { get; set; }
         public List<GroupChar> Chars { get; set; }= new List<GroupChar>();
+
     }
+
+    
 }

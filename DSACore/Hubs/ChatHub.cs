@@ -53,7 +53,7 @@ namespace DSACore.Hubs
         private Task SendToGroup(string message)
         {
             string group = getGroup(Context.ConnectionId).Name;
-            return Clients.Group(group).SendCoreAsync("ReceiveMessage", new object[] { getUser(Context.ConnectionId), message });
+            return Clients.Group(group).SendCoreAsync("ReceiveMessage", new object[] { getUser(Context.ConnectionId).Name, message });
         }
 
         private Models.Network.Group getGroup(string id)
@@ -78,7 +78,7 @@ namespace DSACore.Hubs
                 }
             }
 
-            await  Clients.Caller.SendCoreAsync("ListGroups", new object[] { DSAGroups });
+            await  Clients.Caller.SendCoreAsync("ListGroups", new object[] { DSAGroups.Select(x=>x.SendGroup()) });
             //throw new NotImplementedException("add database call to get groups");
         }
 
@@ -99,26 +99,46 @@ namespace DSACore.Hubs
             //throw new NotImplementedException("add database call to add groups");
         }
 
-        public async Task Login(string group, string user, string password)
+        public async Task Login(string group, string user, string hash)
         {
-            if (password == DSAGroups.First(x=>x.Name == group).Password)
+            //string password = System.Text.Encoding.UTF8.GetString(hash);
+            if (hash == DSAGroups.First(x=>x.Name == group).Password)
             {
                 DSAGroups.First(x=>x.Name.Equals(group)).Users.Add(new User{ConnectionId = Context.ConnectionId, Name = user});
                 await Groups.AddToGroupAsync(Context.ConnectionId, group);
-            }
 
-            await SendToGroup("Ein neuer Nutzer hat die Gruppe betreten");
+                await SendToGroup("Ein neuer Nutzer hat die Gruppe betreten");
+            }
+            else
+            {
+
+                await Clients.Caller.SendAsync("ReceiveMessage", "Falsches Passwort!");
+            }
+        }
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            Disconnect().Wait();
+            return base.OnDisconnectedAsync(exception);
         }
 
         public async Task Disconnect()
         {
-            var group = getGroup(Context.ConnectionId);
+            try
+            {
+                var group = getGroup(Context.ConnectionId);
 
-            await SendToGroup("Connection lost");
 
-            var user = getUser(Context.ConnectionId);
-            group.Users.Remove(user);
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, group.Name);
+                var user = getUser(Context.ConnectionId);
+                await SendToGroup(user.Name + " disconnected from the Server");
+                group.Users.Remove(user);
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, group.Name);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //throw;
+            }
 
         }
 

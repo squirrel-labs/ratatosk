@@ -1,4 +1,5 @@
 ﻿using System;
+using DSACore.Auxiliary;
 using DSACore.FireBase;
 using DSALib;
 using DSALib.Characters;
@@ -42,8 +43,6 @@ namespace DSACore.DSA_Game
             }
         }
 
-        public static void start(){}
-
         public static void Startup()
         {
             //new .Auxiliary.Calculator.StringSolver("1d100 - (1d200 + 1) * -50000").Solve();
@@ -74,10 +73,12 @@ namespace DSACore.DSA_Game
                 Database.AddSpell(new Models.Database.GeneralSpell(talent.Name, talent.Probe, talent.Complexity));
             }*/
 
+            //new WeaponImporter().DownloadWeapons().Wait();
+
 
             Session = new Session
             {
-                Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList()
+                Chars = Chars.Select(SaveChar.FromICharacter).ToList()
             };
             //Session.Save();
         }
