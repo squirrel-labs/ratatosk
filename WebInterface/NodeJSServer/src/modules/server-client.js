@@ -10,9 +10,12 @@ export default class ServerClient {
    * @param {string} url URL of server running signalR
    * @param {string} serverListingId HTML ID of server-listing element,
    *    to populate with available games
+   * @param {BannerController} notifications Notification Manager
+   * @param {array} ui UI Elements to reload on login
    * @param {boolean} [debug=false] Enable debug output?
    */
-  constructor(url, serverListingId, debug = false) {
+  constructor(url, serverListingId, notifications, ui, debug = false) {
+    this.ui = ui;
     const connectionBuilder = new signalR.HubConnectionBuilder()
         .withUrl(url);
 
@@ -30,9 +33,7 @@ export default class ServerClient {
     // Initialize refreshing (blocks new refreshes if true)
     this.refreshing = false;
 
-    this.serverListing = new ServerListing(serverListingId);
-
-    this.messageHandling();
+    this.serverListing = new ServerListing(serverListingId, notifications);
   }
 
   /**
@@ -44,7 +45,7 @@ export default class ServerClient {
     this.connection.on('ListGroups', (groups) => {
       // Populate server listing
       this.serverListing.flushElements();
-      this.serverListing.addElements(groups);
+      this.serverListing.addElements(groups, this, this.ui);
       this.connection.off('ListGroups');
 
       this.refreshing = false;
@@ -76,29 +77,17 @@ export default class ServerClient {
    */
   sendLogin(group, password, username, callback) {
     this.connection.on('LoginResponse', (result) => {
-      callback(result);
+      callback(result, this.connection);
       this.connection.off('LoginResponse');
     });
     this.connection.invoke('Login', group, username, password);
-  }
-
-  /**
-   * Registers message handling
-   */
-  messageHandling() {
-    this.connection.on('ReceiveMessage', (user, message) => {
-      let msg = message.replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
-      let encodedMsg = user + ' sagt:  ' + msg;
-      console.log(encodedMsg); // TODO: REMOVE, JUST FOR DEBUGGING
-    });
   }
 }
 
 /**
  * Callback to call with response to login request
  * @callback ServerClient~loginCallback
- * @param {number} result 0: Success, 1: PasswordError, 2:UsernameTaken
- *    , 3:Unknown Error
+ * @param {number} result 0: Success, 1: PasswordError, 2:UsernameTaken,
+ *  3:Unknown Error
+ * @param {ConnectionHub} connection Connection to the server
  */
