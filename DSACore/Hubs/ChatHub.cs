@@ -104,14 +104,21 @@ namespace DSACore.Hubs
             //string password = System.Text.Encoding.UTF8.GetString(hash);
             if (hash == DSAGroups.First(x=>x.Name == group).Password)
             {
-                DSAGroups.First(x=>x.Name.Equals(group)).Users.Add(new User{ConnectionId = Context.ConnectionId, Name = user});
-                await Groups.AddToGroupAsync(Context.ConnectionId, group);
-
-                await SendToGroup("Ein neuer Nutzer hat die Gruppe betreten");
+                var gGroup = DSAGroups.First(x => x.Name.Equals(group));
+                if (!gGroup.Users.Exists(x => x.Name.Equals(user)))
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, group);
+                    await SendToGroup("Ein neuer Nutzer hat die Gruppe betreten");
+                    await Clients.Caller.SendAsync("LoginResponse", 0 );
+                }
+                else
+                {
+                    await Clients.Caller.SendAsync("LoginResponse", 1);
+                }
             }
             else
             {
-
+                await Clients.Caller.SendAsync("LoginResponse", 2);
                 await Clients.Caller.SendAsync("ReceiveMessage", "Falsches Passwort!");
             }
         }
