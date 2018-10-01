@@ -10,6 +10,7 @@ export default class BannerController {
    * @param {string} notificationBadge ID of badge (# of notifications)
    */
   constructor(bannerId, textP, dismissBtn, notificationBadge) {
+    this.ids = {bannerId, textP, dismissBtn, notificationBadge};
     this.banner = document.getElementById(bannerId);
     this.bannerText = document.getElementById(textP);
     this.dismissBtn = document.getElementById(dismissBtn);
@@ -27,6 +28,21 @@ export default class BannerController {
     this.dismissBtn.addEventListener('click', () => {
       this.dismissCurrent();
     });
+  }
+
+  /**
+   * Reloads the object
+   */
+  refresh() {
+    this.banner = document.getElementById(this.ids.bannerId);
+    this.bannerText = document.getElementById(this.ids.textP);
+    this.dismissBtn = document.getElementById(this.ids.dismissBtn);
+    this.notificationBadge = document.getElementById(
+        this.ids.notificationBadge);
+    this.bannerMsgs = [];
+
+    // Hide Banner after JS loading finished
+    this.banner.classList.add('hidden');
   }
 
   /**

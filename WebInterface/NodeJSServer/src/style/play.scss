@@ -1,0 +1,15 @@
+@import 'partials/base';
+@import 'partials/btn';
+@import 'partials/backdrop/base';
+@import 'partials/backdrop/menu';
+@import 'partials/front-layer/base';
+@import 'partials/front-layer/notifications';
+@import 'partials/front-layer/copyright';
+@import 'partials/modal/base';
+@import 'partials/modal/login';
+
+remove_if_redirected {
+  width: 100vw;
+  height: 100vh;
+  text-align: center;
+}

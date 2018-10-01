@@ -11,6 +11,7 @@ export default class Backdrop {
    * @param {string} menuButton ID of Show / Hide Menu Button
    */
   constructor(backdropMenu, frontLayer, menuButton) {
+    this.ids = {backdropMenu, frontLayer, menuButton};
     this.backdrop = document.getElementById(backdropMenu);
     this.frontLayer = document.getElementById(frontLayer);
     this.menuButton = document.getElementById(menuButton);
@@ -22,6 +23,16 @@ export default class Backdrop {
   register() {
     this.registerButtonEvent();
     this.registerFrontLayerEvent();
+  }
+
+  /**
+   * Reloads the object
+   */
+  refresh() {
+    this.backdrop = document.getElementById(this.ids.backdropMenu);
+    this.frontLayer = document.getElementById(this.ids.frontLayer);
+    this.menuButton = document.getElementById(this.ids.menuButton);
+    this.register();
   }
 
   /**
