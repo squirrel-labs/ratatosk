@@ -1,3 +1,6 @@
+/**
+ * Creates Base64 String with SHA-256 Hash of given string
+ */
 String.prototype.getHash = async function() {
   let data = new ArrayBuffer(this.length * 2);
   let bufferView = new Uint16Array(data);
@@ -14,4 +17,4 @@ String.prototype.getHash = async function() {
   }
 
   return btoa(base64String);
-}
+};

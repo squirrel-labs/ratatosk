@@ -1,4 +1,13 @@
+/**
+ * Class for controlling the Notification banner
+ */
 export default class BannerController {
+  /**
+   * Creates references to objects and hides notification banner
+   * @param {string} bannerId ID of Notification Banner
+   * @param {string} textP ID of Notification Banner text field
+   * @param {string} dismissBtn ID of dismiss button
+   */
   constructor(bannerId, textP, dismissBtn) {
     this.banner = document.getElementById(bannerId);
     this.bannerText = document.getElementById(textP);
@@ -9,12 +18,20 @@ export default class BannerController {
     this.banner.classList.add('hidden');
   }
 
+  /**
+   * Registers dismissing via the dismiss button
+   */
   register() {
     this.dismissBtn.addEventListener('click', () => {
       this.dismissCurrent();
     });
   }
 
+  /**
+   * Pushes a new message to the notification banner and shows it
+   * @param {string} name Name to register notification (referenced in hide)
+   * @param {string} text Notification text
+   */
   show(name, text) {
     let bannerItem = {name, text, 'html': false};
     this.bannerMsgs.push(bannerItem);
@@ -22,6 +39,10 @@ export default class BannerController {
     this.update();
   }
 
+  /**
+   * Removes notification from banner
+   * @param {string} name Name, that the notification was registered under
+   */
   hide(name) {
     if (!name) {
       this.bannerMsgs = [];
@@ -37,11 +58,18 @@ export default class BannerController {
     }
   }
 
+  /**
+   * Dismisses the currently shown message
+   */
   dismissCurrent() {
     this.hide(this.current);
   }
 
+  /**
+   * Updates the notification banner with the most recent message
+   */
   update() {
+    // TODO: Show if multiple messages are there
     if (this.bannerMsgs.length === 0) {
       this.banner.classList.add('hidden');
       return;
@@ -57,19 +85,5 @@ export default class BannerController {
     else this.bannerText.innerText = text;
 
     this.current = name;
-  }
-
-  showPersistence() {
-    let text = `Storage persistence is disabled, so in-browser storage of created Wikis might not work.\n` +
-        `Click <a href="#" onclick="
-          event.preventDefault();
-          navigator.storage.persist().then((persistent) => {
-            if (persistent) notificationManager.show('storageSuccess', 'Storage persistence successfully turned on.');
-            else notificationManager.show('storageFail', 'Storage persistence has been rejected.');
-          });
-        ">here</a> to enable storage persistence.`;
-    let bannerItem = {'name': 'persistence', text, 'html': true};
-    this.bannerMsgs.push(bannerItem);
-    this.update();
   }
 }

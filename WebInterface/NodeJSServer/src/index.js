@@ -1,7 +1,7 @@
 import Backdrop from './modules/ui/backdrop.js';
 import BannerController from './modules/ui/notification-banner.js';
-import ServerClient from './modules/server-client.js'
-import LoginModal from './modules/ui/login-modal.js'; // TODO: JUST FOR DEBUGGING
+import ServerClient from './modules/server-client.js';
+import LoginModal from './modules/ui/login-modal.js'; // TODO: JUST DEBUG
 
 let backdrop = new Backdrop('menu', 'front-layer', 'show-menu');
 backdrop.register();
@@ -16,4 +16,4 @@ document.getElementById('refresh-button')
 
 new LoginModal('The Crew', client);
 
-window.client = client;  //TODO: REMOVE, JUST FOR DEBUGGING
+window.client = client; // TODO: REMOVE, JUST FOR DEBUGGING
