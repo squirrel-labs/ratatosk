@@ -8,6 +8,22 @@ namespace DSACore.Models.Database
 {
     public class DatabaseChar
     {
+        public DatabaseChar()
+        {
+        }
+
+        public DatabaseChar(int id, string name, string rasse, List<Field> skills, List<Field> talents, List<Advantage> advantages, List<CharSpell> spells, List<WeaponTalent> weaponTalents)
+        {
+            Id = id;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Rasse = rasse ?? throw new ArgumentNullException(nameof(rasse));
+            Skills = skills ?? throw new ArgumentNullException(nameof(skills));
+            Talents = talents ?? throw new ArgumentNullException(nameof(talents));
+            Advantages = advantages ?? throw new ArgumentNullException(nameof(advantages));
+            Spells = spells ?? throw new ArgumentNullException(nameof(spells));
+            WeaponTalents = weaponTalents ?? throw new ArgumentNullException(nameof(weaponTalents));
+        }
+
         public int Id { get; set; }
 
         public string Name { get; set; }

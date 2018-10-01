@@ -7,18 +7,15 @@ namespace DSACore.Models.Network
 {
     public class Group
     {
-        private int _online;
-
         public Group(string name, string password)
         {
             Name = name;
             Password = password;
         }
 
-        public Group(string name, int userCount)
+        public Group(string name, int userOnline)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            UserCount = userCount;
         }
 
         public string Name { get; set; }
@@ -27,18 +24,26 @@ namespace DSACore.Models.Network
 
         public int UserCount
         {
-            get { return _online; RefreshOnline();}
-            set { _online = value; RefreshOnline();}
+            get { return Users.Count; }
         }
 
-        private void RefreshOnline()
+        public SendGroup SendGroup()
         {
-            _online = Users.Count;
+            return new SendGroup( Name, UserCount);
+        }
+    }
+
+    public class SendGroup
+    {
+        public SendGroup(string name, int userCount)
+        {
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            UserCount = userCount;
         }
 
-        public Group SendGroup()
-        {
-            return new Group( Name, UserCount);
-        }
+        public string Name { get; set; }
+
+        public int UserCount { get; set; }
+        
     }
 }

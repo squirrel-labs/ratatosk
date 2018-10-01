@@ -52,6 +52,46 @@ namespace Firebase.Database.Http
             }
         }
 
+        /*/// <summary>
+        /// The get object collection async.
+        /// </summary>
+        /// <param name="client"> The client. </param>
+        /// <param name="requestUri"> The request uri. </param>
+        /// /// <param name="dataType"> The Data Type. </param>  
+        /// <param name="jsonSerializerSettings"> The specific JSON Serializer Settings. </param>  
+        /// <typeparam name="T"> The type of entities the collection should contain. </typeparam>
+        /// <returns> The <see cref="Task"/>. </returns>
+        public static async Task<IReadOnlyCollection<FirebaseObject<object>>> GetObjectCollectionAsync(this HttpClient client, string requestUri,
+            JsonSerializerSettings jsonSerializerSettings, Type dataType)
+        {
+            var responseData = string.Empty;
+            var statusCode = HttpStatusCode.OK;
+
+            try
+            {
+                var response = await client.GetAsync(requestUri).ConfigureAwait(false);
+                statusCode = response.StatusCode;
+                responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                response.EnsureSuccessStatusCode();
+
+                Type dicType = typeof(Dictionary<,>).MakeGenericType(typeof(string), dataType);
+
+                var dictionary = JsonConvert.DeserializeObject(responseData,dicType, jsonSerializerSettings) as Dictionary<string, object>;
+
+                if (dictionary == null)
+                {
+                    return new FirebaseObject<object>[0];
+                }
+
+                return dictionary.Select(item => new FirebaseObject<object>(item.Key, item.Value)).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException(requestUri, string.Empty, responseData, statusCode, ex);
+            }
+        }*/
+
         /// <summary>
         /// The get object collection async.
         /// </summary>

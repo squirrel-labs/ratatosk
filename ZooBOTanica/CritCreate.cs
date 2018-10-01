@@ -55,11 +55,13 @@ namespace ZooBOTanica
 
         public void LoadButton_Click(object sender, EventArgs e)
         {
-            var dig = new OpenFileDialog();
-            dig.CheckFileExists = true;
-            dig.Multiselect = false;
-            dig.Title = "Gespeicherten Gegner laden";
-            dig.Filter = "*Json Dateien (*.json)|*.json";
+            var dig = new OpenFileDialog
+            {
+                CheckFileExists = true,
+                Multiselect = false,
+                Title = "Gespeicherten Gegner laden",
+                Filter = "*Json Dateien (*.json)|*.json"
+            };
 
             if (dig.ShowDialog() == DialogResult.OK)
             {
