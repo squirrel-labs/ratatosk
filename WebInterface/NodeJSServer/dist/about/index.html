@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#546e7a">
     <title>Helden Online</title>
     <link rel="icon" href="ressources/Logo768.png">
-    <link rel="stylesheet" href="style/index.css">
+    <link rel="stylesheet" href="../style/about.css">
     <!-- <link rel="manifest" href="manifest.webmanifest"> -->
     <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed" rel="stylesheet">
   </head>
@@ -20,40 +20,20 @@
         <h1 class="header">Helden Online</h1>
       </div>
       <div class="menu-actions hidden" id="menu">
-        <a class="menu-option active" id="listing-tab" href="./">Spiele-Liste</a>
+        <a class="menu-option" id="listing-tab" href="../">Spiele-Liste</a>
         <a class="menu-option" id="github-tab" href="https://github.com/TrueDoctor/DiscoBot" target="_blank">Projekt auf GitHub</a>
-        <a class="menu-option" id="about-tab" href="about" target="_blank">About</a>
+        <a class="menu-option active" id="about-tab" href="." target="_blank">About</a>
       </div>
     </div>
     <div class="front-layer" id="front-layer">
-      <div class="banner" id="notifications">
-        <p class="banner-text" id="banner-info">Loading javascript.</p>
-        <div class="btn-container">
-          <button class="btn text-btn banner-button" id="dismiss-banner">Okay</button>
-        </div>
-        <hr>
-      </div>
-      <div class="server-listing">
-        <h1>Aktive Spiele</h1>
-        <hr>
-        <div class="server-entries" id="server-list">
 
-        </div>
-        <div class="button-container">
-          <button id="new-game-button" class="btn">
-            Spiel beginnen
-          </button>
-          <button id="refresh-button" class="btn text-btn refresh-btn">
-            Aktualisieren
-          </button>
-        </div>
-
-      </div>
+      <!-- TODO: About content here -->
 
       <div class="copyright-container">
-        <span>© 2018 Dennis Kobert & Timon Scholz</span>
+        <p>Front-End © 2018 Timon Scholz</p>
+        <p>Back-End © 2018 Dennis Kobert</p>
       </div>
     </div>
-    <script src="script/index.js"></script>
+    <script src="../script/about.js"></script>
   </body>
 </html>

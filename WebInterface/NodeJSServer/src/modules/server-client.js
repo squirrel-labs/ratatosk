@@ -1,6 +1,5 @@
 import * as signalR from '@aspnet/signalr';
 import ServerListing from './ui/server-listing.js';
-import ServerCreator from './ui/server-creator.js';
 
 export default class ServerClient {
   constructor(url, serverListingId, debug = false) {
@@ -21,6 +20,8 @@ export default class ServerClient {
     this.refreshing = false;
 
     this.serverListing = new ServerListing(serverListingId);
+
+    this.messageHandling(); //TODO: REMOVE, JUST FOR DEBUGGING
   }
 
   loadServers() {
@@ -43,7 +44,11 @@ export default class ServerClient {
   }
 
   createServer(){
+    // TODO: Create
+  }
 
+  sendLogin(group, password, username){
+    this.connection.invoke('Login', group, username, password);
   }
 
   messageHandling(){
@@ -52,6 +57,7 @@ export default class ServerClient {
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;");
       let encodedMsg = user + " sagt:  " + msg;
+      console.log(encodedMsg); //TODO: REMOVE, JUST FOR DEBUGGING
     });
   }
 }

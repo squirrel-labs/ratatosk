@@ -15,12 +15,14 @@ export default class ServerListing {
 
       let serverDiv = document.createElement('div');
       let nameSpan = document.createElement('span');
+      let rightAlignDiv = document.createElement('div');
       let onlineDot = document.createElement('div');
       let playerCountSpan = document.createElement('span');
       let playerCountStaticSpan = document.createElement('span');
       let joinButton = document.createElement('button');
       serverDiv.className = 'server';
       nameSpan.className = 'server-name';
+      rightAlignDiv.className = 'right-aligned-items';
       onlineDot.className = 'player-count-dot';
       playerCountSpan.className = 'player-count';
       playerCountStaticSpan.className = 'player-count-static';
@@ -31,11 +33,12 @@ export default class ServerListing {
       playerCountStaticSpan.textContent = 'Spieler online';
       joinButton.textContent = 'Beitreten';
 
+      rightAlignDiv.appendChild(onlineDot);
+      rightAlignDiv.appendChild(playerCountSpan);
+      rightAlignDiv.appendChild(playerCountStaticSpan);
+      rightAlignDiv.appendChild(joinButton);
       serverDiv.appendChild(nameSpan);
-      serverDiv.appendChild(onlineDot);
-      serverDiv.appendChild(playerCountSpan);
-      serverDiv.appendChild(playerCountStaticSpan);
-      serverDiv.appendChild(joinButton);
+      serverDiv.appendChild(rightAlignDiv)
       this.serverListing.appendChild(serverDiv);
     }
   }

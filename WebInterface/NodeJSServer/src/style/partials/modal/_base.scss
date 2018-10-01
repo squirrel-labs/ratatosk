@@ -1,0 +1,35 @@
+@import '../colors';
+
+.modal-container {
+  position:absolute;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000000AA;
+  display: flex;
+  opacity: 1;
+  transition: opacity 200ms ease;
+
+  &.hidden {
+    opacity: 0;
+  }
+
+  .modal {
+    background-color: $primary;
+    margin: auto;
+    padding: 1rem;
+    border-style: none;
+    border-radius: 8px;
+    box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+  }
+
+  .modal-title {
+    max-width: 85vw;
+    margin: 1rem;
+    text-align: center;
+  }
+
+  .modal-body {
+    margin: 0.25rem;
+  }
+}

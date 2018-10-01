@@ -1,0 +1,20 @@
+@import 'colors';
+
+html,body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  font-display: swap;
+  overflow: hidden;
+  background-color: $primary;
+  color: $primary-text;
+  user-select: none;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background-color: $secondary;
+  position: relative;
+}

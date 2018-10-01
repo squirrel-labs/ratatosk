@@ -1,0 +1,75 @@
+@import 'colors';
+
+.btn {
+  border: none;
+  border-radius: 4px;
+  padding: 8px;
+  margin: 0;
+  font-size: 1rem;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: bold;
+  display: inline-block;
+  background-color: $secondary;
+  color: $secondary-text;
+  text-transform: uppercase;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  cursor: pointer;
+  letter-spacing: 0.25rem;
+
+  background-position: center;
+  transition: background 800ms ease, box-shadow 100ms ease, color 200ms ease;
+
+  &:hover {
+    background: $secondary-dark radial-gradient(circle, transparent 1%, $secondary-dark 1%) center/15000%;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  }
+
+  &:active {
+    background-color: $secondary-light;
+    background-size: 100%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    transition: background 0s, box-shadow 0s;
+  }
+
+  &:disabled {
+    color: $secondary-text-disabled;
+    background: $secondary-disabled;
+    box-shadow: none;
+    transition: background 200ms ease, box-shadow 200ms ease, color 200ms ease;
+  }
+}
+
+.text-btn {
+  padding: 8px;
+  margin: 0;
+  font-size: 1rem;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: bold;
+  display: inline-block;
+  color: $secondary-text;
+  background-color: rgba(0, 0, 0, 0);
+  text-transform: uppercase;
+  box-shadow: none;
+
+  background-position: center;
+  transition: background 800ms ease, box-shadow 100ms ease, color 200ms ease;
+
+  &:hover {
+    background: $secondary-dark-transparent radial-gradient(circle, transparent 1%, $secondary-dark-transparent 1%) center/15000%;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  }
+
+  &:active {
+    background-color: $secondary-light;
+    background-size: 100%;
+    box-shadow: none;
+    transition: background 0s, box-shadow 0s;
+  }
+
+  &:disabled {
+    background: rgba(0,0,0,0);
+    color: $secondary-text-disabled;
+    box-shadow: none;
+    transition: background 200ms ease, box-shadow 200ms ease, color 200ms ease;
+  }
+}
