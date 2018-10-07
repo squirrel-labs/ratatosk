@@ -8,48 +8,69 @@ namespace DSACore.Commands
 {
     public class CommandHandler
     {
-        public static string ExecuteCommand(Command cmd)
+        public static CommandResponse ExecuteCommand(Command cmd)
         {
+            string res = string.Empty;
+            ResponseType type = ResponseType.Broadcast;
             switch (cmd.CmdIdentifier.ToLower())
             {
                 case "addChar":
-                    return FileHandler.AddChar(cmd.CharId, cmd.CmdText);
+                    res = FileHandler.AddChar(cmd.CharId, cmd.CmdText);
+                    break;
                 case "held":
                 case "wert":
                 case "werte":
                 case "char":
-                    return Commands.HeldList.ListAsync(cmd.CharId, cmd.CmdText);
+                    res = Commands.HeldList.ListAsync(cmd.CharId, cmd.CmdText);
+                    break;
                 case "help":
                 case "man":
                 case "hilfe":
                 case "h":
-                    return Help.ShowHelp(cmd.CmdTexts.ToArray());
+                    res = Help.ShowHelp(cmd.CmdTexts.ToArray());
+                    type = ResponseType.Caller;
+                    break;
                 case "le":
                 case "leben":
                 case "lp":
-                    return LE.LEAsync(cmd.CharId, cmd.CmdText);
+                    res = LE.LEAsync(cmd.CharId, cmd.CmdText);
+                    break;
                 case "ae":
                 case "astral":
                 case "asp":
-                    return AE.AEAsync(cmd.CharId, cmd.CmdText);
+                    res = AE.AEAsync(cmd.CharId, cmd.CmdText);
+                    break;
                 case "list":
-                    return List.ListAsync(cmd.CmdText);
+                    res = List.ListAsync(cmd.CmdText);
+                    type = ResponseType.Caller;
+                    break;
                 case "r":
                 case "roll":
-                    return RandomMisc.Roll(cmd.CmdText + " " + cmd.Cmdmodifier);
+                    res = RandomMisc.Roll(cmd.CmdText + " " + cmd.Cmdmodifier);
+                    break;
                 case "solve":
-                    return new Auxiliary.Calculator.StringSolver(cmd.CmdText + cmd.Cmdmodifier).Solve().ToString();
+                    res = new Auxiliary.Calculator.StringSolver(cmd.CmdText + cmd.Cmdmodifier).Solve().ToString();
+                    break;
                 case "npc":
-                    return NpcCommands.CreateNpc(cmd.CharId, cmd.CmdTexts, cmd.Cmdmodifier);
+                    res = NpcCommands.CreateNpc(cmd.CharId, cmd.CmdTexts, cmd.Cmdmodifier);
+                    break;
 
             }
 
-            return Proben(cmd.Name, cmd.CmdIdentifier, cmd.CmdText, cmd.Cmdmodifier);
+            if (res == string.Empty)
+            {
+                res= Proben(cmd.Name, cmd.CmdIdentifier, cmd.CmdText, cmd.Cmdmodifier);
+            }
+            if (res != string.Empty)
+            {
+                return new CommandResponse(res, type);
+            }
+            return new CommandResponse($"Kommando {cmd.CmdIdentifier} nicht gefunden", ResponseType.Error);
         }
 
         private static string Proben(string name, string command, string waffe, int erschwernis = 0)
         {
-            string res;
+            string res = string.Empty;
             switch (command.ToLower())
             {
                 case "f":
@@ -86,9 +107,6 @@ namespace DSACore.Commands
                 case "pa":
                 case "parade":
                     res = CheckCommand(name, CommandTypes.Parade, waffe, erschwernis);
-                    break;
-                default:
-                    res = $"Kommando {command} nicht gefunden";
                     break;
             }
 

@@ -66,6 +66,22 @@ namespace Firebase.Database.Query
                 .ConfigureAwait(false);
         }
 
+        /*public async Task<IReadOnlyCollection<FirebaseObject<Object>>> OnceAsync(Type dataType, TimeSpan? timeout = null)
+        {
+            var url = string.Empty;
+
+            try
+            {
+                url = await this.BuildUrlAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new FirebaseException("Couldn't build the url", string.Empty, string.Empty, HttpStatusCode.OK, ex);
+            }
+
+            return await this.GetClient(timeout).GetObjectCollectionAsync(url, Client.Options.JsonSerializerSettings, dataType)
+                .ConfigureAwait(false);
+        }*/
 
         /// <summary>
         /// Assumes given query is pointing to a single object of type <typeparamref name="T"/> and retrieves it.

@@ -17,5 +17,9 @@ namespace DSACore.Models.Database
         public GeneralSpell(string name, string roll) : base(name, roll)
         {
         }
+
+        public GeneralSpell()
+        {
+        }
     }
 }
