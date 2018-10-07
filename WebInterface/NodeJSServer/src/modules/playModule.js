@@ -1,3 +1,5 @@
+// TODO: Handle disconnect
+
 /**
  * Handles ingame networking;
  */

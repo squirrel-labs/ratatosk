@@ -9,7 +9,7 @@ let notifications = new BannerController('notifications',
     'banner-info', 'dismiss-banner', 'notification-amount');
 notifications.register();
 
-let client = new ServerClient('http://89.183.101.117:5000/chatHub',
+let client = new ServerClient('http://127.0.0.1:5000/chatHub',
     'server-list', notifications, [backdrop, notifications], true);
 document.getElementById('refresh-button')
     .addEventListener('click',
