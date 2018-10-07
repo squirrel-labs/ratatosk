@@ -15,8 +15,11 @@ namespace DSACore.DSA_Game
 
     public static class Dsa
     {
+#if DEBUG
         public const string rootPath = "C:\\Users\\Dennis\\Source\\Repos\\DiscoBot\\DSACore\\";//"DiscoBot\\DSACore\\";
-
+#else
+        public const string rootPath = "";//"DiscoBot\\DSACore\\";
+#endif
         private static Session s_session;
 
         public static List<ICharacter> Chars { get; set; } = new List<ICharacter>();  // list of all characters
@@ -48,7 +51,7 @@ namespace DSACore.DSA_Game
             //new .Auxiliary.Calculator.StringSolver("1d100 - (1d200 + 1) * -50000").Solve();
             /*Session = new Session();*/
             // relation.Add("Papo", "Pump aus der Gosse");
-            foreach (var filename in Directory.GetFiles(rootPath + "helden", "*.xml"))
+            /*foreach (var filename in Directory.GetFiles(rootPath + "helden", "*.xml"))
             {
                 Chars.Add(new Character(filename));
                 (Chars.Last() as Character)?.Talente.Select(x => new Talent(x.Name, x.Probe, 0))
@@ -56,9 +59,11 @@ namespace DSACore.DSA_Game
                 (Chars.Last() as Character)?.Zauber.Select(x => new Zauber(x.Name, x.Probe, 0, x.Complexity))
                     .Where(c => !Zauber.Exists(v => v.Name.Equals(c.Name))).ToList().ForEach(v => Zauber.Add(v));
             }
+*/
 
             Properties.Deserialize(rootPath+"Properties");
             Properties.Serialize(rootPath + "Properties");
+            
 
             Talente = Talente.OrderBy(x => x.Name).ToList();
             Zauber = Zauber.OrderBy(x => x.Name).ToList();

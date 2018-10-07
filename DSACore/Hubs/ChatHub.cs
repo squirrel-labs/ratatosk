@@ -15,6 +15,8 @@ namespace DSACore.Hubs
     public class ChatHub : Hub
     {
         //private static Dictionary<string, User> UserGroup = new Dictionary<string, User>();
+   
+        private const string receiveMethod = "ReceiveMessage";//receiveMethod;
 
         private static List<Group> DSAGroups = new List<Group>();
 
@@ -42,7 +44,7 @@ namespace DSACore.Hubs
             }
             catch (InvalidOperationException e)
             {
-                //await Clients.Caller.SendCoreAsync("RecieveMessage",
+                //await Clients.Caller.SendCoreAsync(receiveMethod,
                    // new object[] { "Nutzer ist in keiner Gruppe. Erst joinen!" });
             }
 
@@ -50,6 +52,7 @@ namespace DSACore.Hubs
             {
                 var args = message.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
 
+                bool Timon = args.Any(x => x == "hallo");
 
                 var ident = args.First().Replace("/", "");
                 if (args.Count > 0)
@@ -69,7 +72,7 @@ namespace DSACore.Hubs
                 {
                     case ResponseType.Caller:
                     case ResponseType.Error:
-                        await Clients.Caller.SendAsync("RecieveMessage", ret.message);
+                        await Clients.Caller.SendAsync(receiveMethod, ret.message);
                         break;
                     case ResponseType.Broadcast:
                         await SendToGroup(ret.message);
@@ -90,12 +93,12 @@ namespace DSACore.Hubs
             try
             {
                 string group = getGroup(Context.ConnectionId).Name;
-                return Clients.Group(group).SendCoreAsync("RecieveMessage",
+                return Clients.Group(group).SendCoreAsync(receiveMethod,
                     new object[] {getUser(Context.ConnectionId).Name, message});
             }
             catch (InvalidOperationException e)
             {
-                return Clients.Caller.SendCoreAsync("RecieveMessage",
+                return Clients.Caller.SendCoreAsync(receiveMethod,
                     new object[] { "Nutzer ist in keiner Gruppe. Erst joinen!" });
             }
         }
@@ -131,7 +134,7 @@ namespace DSACore.Hubs
             DSAGroups.Add(new Group(group, password));
             var Dgroup = new DSACore.Models.Database.Group { Name = group, Id = DSAGroups.Count - 1 };
             //Database.AddGroup(Dgroup);
-            await Clients.Caller.SendCoreAsync("RecieveMessage", new[] { $"group {@group} sucessfully added" });
+            await Clients.Caller.SendCoreAsync(receiveMethod, new[] { $"group {@group} sucessfully added" });
             //throw new NotImplementedException("add database call to add groups");
         }
 
@@ -166,7 +169,7 @@ namespace DSACore.Hubs
             else
             {
                 await Clients.Caller.SendAsync("LoginResponse", 2);
-                //await Clients.Caller.SendAsync("RecieveMessage", "Falsches Passwort!");
+                //await Clients.Caller.SendAsync(receiveMethod, "Falsches Passwort!");
             }
         }
 

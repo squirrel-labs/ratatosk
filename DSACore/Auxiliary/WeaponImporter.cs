@@ -21,7 +21,7 @@ namespace DSACore.Auxiliary
 
             
 
-            for (int i = 18; i <= 25; i++)
+            for (int i = 1; i <= 25; i++)
             {
                 var responseString = await client.GetStringAsync("http://diarium.eu/dsa4-forge/ajax/categoryChanged/" + i);
 
