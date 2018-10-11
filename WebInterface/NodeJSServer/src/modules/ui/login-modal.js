@@ -152,14 +152,19 @@ export default class LoginModal extends Modal {
         'play#game=' + this.serverName);
     fetch('play').then((response) => {
       response.text().then((htmlString) => {
+        // Replace all references, since we're starting one level farther up
         htmlString = htmlString.replace(/\.\.\//g, './');
+        htmlString = /<body>((.)|(\n))*<\/body>/g.exec(htmlString)[0];
         htmlString = htmlString.replace(/<script src=".*"><\/script>/, '');
-        console.log(htmlString);
         htmlString = htmlString.replace(
             /<remove_if_redirected>((.)|\n)*?<\/remove_if_redirected>/g, '');
-        document.open();
-        document.write(htmlString);
-        document.close();
+        document.body.innerHTML = htmlString;
+
+        let stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.type = 'text/css';
+        stylesheet.href = './style/play.css';
+        document.head.appendChild(stylesheet);
 
         for (let ui of this.pageUI) {
           ui.refresh();
