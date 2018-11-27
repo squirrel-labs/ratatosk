@@ -5,7 +5,7 @@ module.exports = [
   {
     mode: 'production',
     entry: {
-      index: './src/index.js',
+      index: './src/js/index.js',
     },
     output: {
       filename: '[name].js',
@@ -16,7 +16,7 @@ module.exports = [
   }, {
     mode: 'production',
     entry: {
-      about: './src/about.js',
+      about: './src/js/about.js',
     },
     output: {
       filename: '[name].js',
@@ -27,7 +27,7 @@ module.exports = [
   }, {
     mode: 'production',
     entry: {
-      play: './src/play.js',
+      play: './src/js/play.js',
     },
     output: {
       filename: '[name].js',

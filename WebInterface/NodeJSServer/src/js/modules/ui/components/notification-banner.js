@@ -1,48 +1,67 @@
 /**
+ * Object containing a message for the notification banner
+ */
+class BannerItem {
+  /**
+   * Creates new Banner Message Items
+   * @param {String} name Name the message will be referenced under
+   * @param {String} content Content, either formatted as plain text or html
+   * @param {Boolean} html Is content formatted as html?
+   */
+  constructor(name, content, html) {
+    this.name = name;
+    this.content = content;
+    this.html = html;
+  }
+}
+
+/**
  * Class for controlling the Notification banner
  */
 export default class BannerController {
   /**
    * Creates references to objects and hides notification banner
+   * @param {Interface} iface Interface to receive comm. from
    * @param {string} bannerId ID of Notification Banner
    * @param {string} textP ID of Notification Banner text field
    * @param {string} dismissBtn ID of dismiss button
-   * @param {string} notificationBadge ID of badge (# of notifications)
+   * @param {string} badge ID of badge (# of notifications)
    */
-  constructor(bannerId, textP, dismissBtn, notificationBadge) {
-    this.ids = {bannerId, textP, dismissBtn, notificationBadge};
-    this.banner = document.getElementById(bannerId);
-    this.bannerText = document.getElementById(textP);
-    this.dismissBtn = document.getElementById(dismissBtn);
-    this.notificationBadge = document.getElementById(notificationBadge);
-    this.bannerMsgs = [];
+  constructor(iface, bannerId, textP, dismissBtn, badge) {
+    iface.addObject(this, 'notifications', ['show', 'hide']);
+    this.iface = iface;
 
-    // Hide Banner after JS loading finished
-    this.banner.classList.add('hidden');
+    this.ids = {bannerId, textP, dismissBtn, badge};
   }
 
   /**
-   * Registers dismissing via the dismiss button
+   * Initializes the Banner in the DOM
    */
-  register() {
-    this.dismissBtn.addEventListener('click', () => {
-      this.dismissCurrent();
-    });
-  }
-
-  /**
-   * Reloads the object
-   */
-  refresh() {
+  initialize() {
     this.banner = document.getElementById(this.ids.bannerId);
     this.bannerText = document.getElementById(this.ids.textP);
     this.dismissBtn = document.getElementById(this.ids.dismissBtn);
-    this.notificationBadge = document.getElementById(
-        this.ids.notificationBadge);
+    this.notificationBadge = document.getElementById(this.ids.badge);
     this.bannerMsgs = [];
 
-    // Hide Banner after JS loading finished
-    this.banner.classList.add('hidden');
+    this.banner.classList.add('hidden'); // Hide banner by default
+    this.registerEvents();
+  }
+
+  /**
+   * Registers events for notification banner
+   */
+  registerEvents() {
+    this.registerDismissEvent();
+  }
+
+  /**
+   * Registers dismissing via dismiss button
+   */
+  registerDismissEvent() {
+    this.dismissBtn.addEventListener('click', () => {
+      this.dismissCurrent();
+    });
   }
 
   /**
@@ -51,7 +70,7 @@ export default class BannerController {
    * @param {string} text Notification text
    */
   show(name, text) {
-    let bannerItem = {name, text, 'html': false};
+    let bannerItem = new BannerItem(name, text, false);
     this.bannerMsgs.push(bannerItem);
 
     this.update();
@@ -59,21 +78,13 @@ export default class BannerController {
 
   /**
    * Removes notification from banner
-   * @param {string} name Name, that the notification was registered under
+   * @param {string} name The name the notification was registered under
    */
   hide(name) {
-    if (!name) {
-      this.bannerMsgs = [];
-      this.banner.classList.add('hidden');
-    } else {
-      for (let i = 0; i < this.bannerMsgs.length; i++) {
-        if (this.bannerMsgs[i].name == name) {
-          this.bannerMsgs.splice(i, 1);
-        }
-      }
+    if (name) this.bannerMsgs = this.bannerMsgs.filter(elt => elt.name != name);
+    else this.bannerMsgs = [];
 
-      this.update();
-    }
+    this.update();
   }
 
   /**
@@ -94,16 +105,21 @@ export default class BannerController {
 
     const lastNotification = this.bannerMsgs[this.bannerMsgs.length - 1];
     const name = lastNotification.name;
-    const text = lastNotification.text;
-    const html = lastNotification.html;
+    const text = lastNotification.content;
+    const isHtml = lastNotification.html;
     this.banner.classList.remove('hidden');
 
-    if (html) this.bannerText.innerHTML = text;
+    if (isHtml) this.bannerText.innerHTML = text;
     else this.bannerText.innerText = text;
 
     this.current = name;
+    this.updateNotificationBadge();
+  }
 
-    // Update notification badge
+  /**
+   * Updates the notification badge number
+   */
+  updateNotificationBadge() {
     if (this.bannerMsgs.length < 2) {
       this.notificationBadge.classList.add('hidden');
     } else if (this.bannerMsgs.length > 9) {
