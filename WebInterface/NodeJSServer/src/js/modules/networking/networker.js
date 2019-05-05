@@ -24,7 +24,7 @@ export default class Networker {
         .withUrl(url);
 
     if (debug) {
-      connectionBuilder.configureLogging(signalR.LogLevel.Debug);
+      connectionBuilder.configureLogging(signalR.LogLevel.Trace);
     } else {
       connectionBuilder.configureLogging(signalR.LogLevel.Error);
     }
