@@ -68,8 +68,9 @@ namespace DSACore
 
             app.UseSignalR(routes => { routes.MapHub<ChatHub>("/chatHub"); });
 
+            app.UseWebSockets();
             
-            //app.UseCors("AllowSpecificOrigin");
+                //app.UseCors("AllowSpecificOrigin");
             app.UseHttpsRedirection();
             app.UseMvc();
         }
