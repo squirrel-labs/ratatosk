@@ -142,7 +142,7 @@ namespace DSACore.Hubs
         {
             var group = getGroup(Context.ConnectionId);
 
-            Database.AddChar(new Character(new MemoryStream(Encoding.UTF8.GetBytes(xml))), group);
+            await Database.AddChar(new Character(new MemoryStream(Encoding.UTF8.GetBytes(xml))), group);
             //throw new NotImplementedException("add database call to add groups");
         }
 

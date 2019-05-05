@@ -29,7 +29,6 @@ namespace DSACore.FireBase
 
         private static async Task Initialize()
         {
-
             IntializeCollection("Chars", Chars);
             IntializeCollection("MeleeWeapons", MeleeList);
             IntializeCollection("RangedWeapons", RangedWeapons);
