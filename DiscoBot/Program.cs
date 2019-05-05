@@ -53,7 +53,7 @@ namespace DiscoBot
             this.client.MessageReceived += this.HandleCommandAsync;
             
             // Discover all of the commands in this assembly and load them.
-            return this.commands.AddModulesAsync(Assembly.GetEntryAssembly());
+            return this.commands.AddModulesAsync(Assembly.GetEntryAssembly(), services);
         }
 
         public async Task HandleCommandAsync(SocketMessage messageParam)
