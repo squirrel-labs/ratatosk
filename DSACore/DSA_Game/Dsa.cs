@@ -16,7 +16,7 @@ namespace DSACore.DSA_Game
     public static class Dsa
     {
 #if DEBUG
-        public const string rootPath = "";//"C:\\Users\\Dennis\\Source\\Repos\\DiscoBot\\DSACore\\";//"DiscoBot\\DSACore\\";
+        public const string rootPath = "C:\\Users\\Dennis\\Source\\Repos\\DiscoBot\\DSACore\\";//"DiscoBot\\DSACore\\";
 #else
         public const string rootPath = "";//"DiscoBot\\DSACore\\";
 #endif
@@ -61,8 +61,8 @@ namespace DSACore.DSA_Game
             }
 */
 
-            Properties.Deserialize($"{rootPath}Properties");
-            Properties.Serialize($"{rootPath}Properties");
+            Properties.Deserialize(rootPath+"Properties");
+            Properties.Serialize(rootPath + "Properties");
             
 
             Talente = Talente.OrderBy(x => x.Name).ToList();

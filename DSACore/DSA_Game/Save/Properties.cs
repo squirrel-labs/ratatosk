@@ -43,7 +43,7 @@ namespace DSACore.DSA_Game.Save
             {
                 try
                 {
-                    string name = file.Split('\\').Last().Split('/').Last().Split('.')[0].Replace('-', '.');
+                    string name = file.Split('\\').Last().Split('.')[0].Replace('-', '.');
                     string data = File.ReadAllText(file);
                     Type type = Type.GetType(name);
                     if (data.StartsWith("["))
