@@ -6,4 +6,6 @@ edition = "2018"
 description = "A general game server for connections to web clients. Currently (on the way to) deploying a skribbl.io like game."
 
 [dependencies]
+log = "0.4"
+pretty_env_logger = "0.3"
 rocket = "0.4"
