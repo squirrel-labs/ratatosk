@@ -1,0 +1,9 @@
+[package]
+name = "game-server"
+version = "0.1.0"
+authors = ["natrixaeria", "truedoctor"]
+edition = "2018"
+description = "A general game server for connections to web clients. Currently (on the way to) deploying a skribbl.io like game."
+
+[dependencies]
+rocket = "0.4"
