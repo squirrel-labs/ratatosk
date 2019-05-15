@@ -17,7 +17,6 @@ export default class Modal {
     modal.className = 'modal';
     title.className = 'modal-title';
     body.className = 'modal-body';
-
     title.textContent = titleString;
 
     modal.appendChild(title);

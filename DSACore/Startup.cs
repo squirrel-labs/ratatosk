@@ -62,7 +62,7 @@ namespace DSACore
 
             app.UseCors("CorsPolicy");
 
-            app.UseSignalR(routes => { routes.MapHub<ChatHub>("/chatHub"); });
+            app.UseSignalR(routes => { routes.MapHub<Users>("/login"); });
 
             app.UseWebSockets();
             

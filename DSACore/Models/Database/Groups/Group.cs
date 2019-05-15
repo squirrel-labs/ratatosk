@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace DSACore.Models.Database
+﻿namespace DSACore.Models.Database.Groups
 {
     public class Group
     {
@@ -11,7 +6,6 @@ namespace DSACore.Models.Database
         public string Discord { get; set; }
         public string Password { get; set; }
         public int Id { get; set; }
-        public List<GroupChar> Chars { get; set; }= new List<GroupChar>();
 
     }
 
