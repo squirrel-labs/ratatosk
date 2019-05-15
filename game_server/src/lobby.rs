@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use super::group::{Group, GroupId};
 
 pub struct Lobby {
-    groups: HashMap<GroupId, Group>,
+    groups: HashMap<GroupId, Box<Group>>,
 }
 
 impl Lobby {
@@ -13,8 +13,8 @@ impl Lobby {
         }
     }
 
-    pub fn add_group(&mut self, group: Group) {
-        self.groups.insert(group.get_id(), group);
+    pub fn add_group(&mut self, group: Box<Group>) {
+        self.groups.insert(group.id(), group);
     }
 
     pub fn iter<'a>(&'a self) -> GroupIterator<'a> {
@@ -23,11 +23,11 @@ impl Lobby {
 }
 
 pub struct GroupIterator<'a> {
-    groups: std::collections::hash_map::Values<'a, GroupId, Group>
+    groups: std::collections::hash_map::Values<'a, GroupId, Box<Group>>
 }
 
 impl<'a> Iterator for GroupIterator<'a> {
-    type Item = &'a Group;
+    type Item = &'a Box<Group>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.groups.next()
