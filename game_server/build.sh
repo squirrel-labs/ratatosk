@@ -2,9 +2,9 @@
 
 case $1 in
     ("")
-        if rustup run nightly cargo --color always build; then
+        if rustup run stable cargo --color always build; then
             echo build success!
-            RUST_LOG=info target/debug/game-server
+            RUST_LOG=debug target/debug/game-server
         else
             echo build failed!
         fi
@@ -13,7 +13,7 @@ case $1 in
         sh build.sh &> err && cat err | tac
         ;;
     -c)
-        rustup run nightly cargo clean
+        rustup run stable cargo clean
         ;;
     *)
         echo invalid argument
