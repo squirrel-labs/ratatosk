@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace DSACore.Models.Database
+namespace DSACore.Models.Database.DSA
 {
     public class Inventory
     {

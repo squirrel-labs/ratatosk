@@ -10,14 +10,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DSACore.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("dsa/[controller]")]
     public class CommandsController : Controller
     {
         // GET: api/<controller>
         [HttpGet]
         public string Get()
         {
-            return "Dies ist die supa dolle Web Api";
+            return "Usage: post the command to execute";
         }
 
         // GET api/<controller>/5

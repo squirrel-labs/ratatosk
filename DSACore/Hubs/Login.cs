@@ -12,28 +12,31 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace DSACore.Hubs
 {
-    public class ChatHub : Hub
+    public class Users : Hub
     {
         //private static Dictionary<string, User> UserGroup = new Dictionary<string, User>();
    
-        private const string receiveMethod = "ReceiveMessage";//receiveMethod;
+        private const string ReceiveMethod = "ReceiveMessage";//receiveMethod;
 
-        private static List<Group> DSAGroups = new List<Group>();
+        private static List<Group> DsaGroups {get; set; }
+        public static List<Token> Tokens { get;} = new List<Token>();
 
-        static ChatHub()
+        static Users()
         {
-            DSAGroups = Database.GetGroups().Result;
-            DSAGroups.Add(new Group("login", ""));
-            DSAGroups.Add(new Group("online", ""));
+            DsaGroups = Database.GetGroups().Result;
+            DsaGroups.Add(new Group("login", ""));
+            DsaGroups.Add(new Group("online", ""));
             //AddGroups();
         }
 
+        
+        [Obsolete]
         private static async void AddGroups()
         {
-            await Database.AddGroup(new Models.Database.Group { Name = "HalloWelt", Password = "valid" });
-            await Database.AddGroup(new Models.Database.Group { Name = "Die Krassen Gamer", Password = "valid" });
-            await Database.AddGroup(new Models.Database.Group { Name = "DSA", Password = "valid" });
-            await Database.AddGroup(new Models.Database.Group { Name = "Die Überhelden", Password = "valid" });
+            await Database.AddGroup(new Models.Database.Groups.Group { Name = "HalloWelt", Password = "valid" });
+            await Database.AddGroup(new Models.Database.Groups.Group { Name = "Die Krassen Gamer", Password = "valid" });
+            await Database.AddGroup(new Models.Database.Groups.Group { Name = "DSA", Password = "valid" });
+            await Database.AddGroup(new Models.Database.Groups.Group { Name = "Die Überhelden", Password = "valid" });
         }
 
         public async Task SendMessage(string user, string message)
@@ -72,7 +75,7 @@ namespace DSACore.Hubs
                 {
                     case ResponseType.Caller:
                     case ResponseType.Error:
-                        await Clients.Caller.SendAsync(receiveMethod, ret.message);
+                        await Clients.Caller.SendAsync(ReceiveMethod, ret.message);
                         break;
                     case ResponseType.Broadcast:
                         await SendToGroup(ret.message);
@@ -93,48 +96,48 @@ namespace DSACore.Hubs
             try
             {
                 string group = getGroup(Context.ConnectionId).Name;
-                return Clients.Group(group).SendCoreAsync(receiveMethod,
+                return Clients.Group(group).SendCoreAsync(ReceiveMethod,
                     new object[] {getUser(Context.ConnectionId).Name, message});
             }
             catch (InvalidOperationException e)
             {
-                return Clients.Caller.SendCoreAsync(receiveMethod,
+                return Clients.Caller.SendCoreAsync(ReceiveMethod,
                     new object[] { "Nutzer ist in keiner Gruppe. Erst joinen!" });
             }
         }
 
         private Models.Network.Group getGroup(string id)
         {
-            return DSAGroups.First(x => x.Users.Exists(y => y.ConnectionId.Equals(id)));
+            return DsaGroups.First(x => x.Users.Exists(y => y.ConnectionId.Equals(id)));
         }
 
         private User getUser(string id)
         {
-            return DSAGroups.First(x => x.Users.Exists(y => y.ConnectionId.Equals(id))).Users.First(z => z.ConnectionId.Equals(id));
+            return DsaGroups.First(x => x.Users.Exists(y => y.ConnectionId.Equals(id))).Users.First(z => z.ConnectionId.Equals(id));
         }
 
         public async Task GetGroups()
         {
-            var test = Database.GetGroups();
-            test.Wait();
-            foreach (var group in test.Result)
+            var test = await Database.GetGroups();
+            
+            foreach (var group in test)
             {
-                if (!DSAGroups.Exists(x => x.Name.Equals(group.Name)))
+                if (!DsaGroups.Exists(x => x.Name.Equals(group.Name)))
                 {
-                    DSAGroups.Add(group);
+                    DsaGroups.Add(group);
                 }
             }
 
-            await Clients.Caller.SendCoreAsync("ListGroups", new object[] { DSAGroups.Select(x => x.SendGroup()) });
+            await Clients.Caller.SendCoreAsync("ListGroups", new object[] { DsaGroups.Select(x => x.SendGroup()) });
             //throw new NotImplementedException("add database call to get groups");
         }
 
         public async Task AddGroup(string group, string password)
         {
-            DSAGroups.Add(new Group(group, password));
-            var Dgroup = new DSACore.Models.Database.Group { Name = group, Id = DSAGroups.Count - 1 };
+            DsaGroups.Add(new Group(group, password));
+            var Dgroup = new Models.Database.Groups.Group { Name = group, Id = DsaGroups.Count - 1 };
             //Database.AddGroup(Dgroup);
-            await Clients.Caller.SendCoreAsync(receiveMethod, new[] { $"group {@group} sucessfully added" });
+            await Clients.Caller.SendCoreAsync(ReceiveMethod, new[] { $"group {@group} sucessfully added" });
             //throw new NotImplementedException("add database call to add groups");
         }
 
@@ -149,9 +152,9 @@ namespace DSACore.Hubs
         public async Task Login(string group, string user, string hash)
         {
             //string password = System.Text.Encoding.UTF8.GetString(hash);
-            if (hash == DSAGroups.First(x => x.Name == group).Password)
+            if (hash == DsaGroups.First(x => x.Name == group).Password)
             {
-                var gGroup = DSAGroups.First(x => x.Name.Equals(group));
+                var gGroup = DsaGroups.First(x => x.Name.Equals(group));
                 if (!gGroup.Users.Exists(x => x.Name.Equals(user)))
                 {
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, "login");
@@ -160,6 +163,10 @@ namespace DSACore.Hubs
                     await SendToGroup("Ein neuer Nutzer hat die Gruppe betreten");
                     await Clients.Caller.SendAsync("LoginResponse", 0);
                     await Clients.Caller.SendAsync("PlayerStatusChanged", new[] {user, "online"});
+
+                    Tokens.Add(new Token(group));
+                    await Clients.Caller.SendAsync("Token", Tokens.Last().GetHashCode());
+                    purgeTokens();
                 }
                 else
                 {
@@ -171,6 +178,11 @@ namespace DSACore.Hubs
                 await Clients.Caller.SendAsync("LoginResponse", 2);
                 //await Clients.Caller.SendAsync(receiveMethod, "Falsches Passwort!");
             }
+        }
+
+        private void purgeTokens()
+        {
+            Tokens.RemoveAll(x => !x.IsValid());
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
@@ -189,7 +201,7 @@ namespace DSACore.Hubs
         public async Task Disconnect()
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "online");
-            if (DSAGroups.Exists(x => x.Users.Exists(y => y.ConnectionId == Context.ConnectionId)))
+            if (DsaGroups.Exists(x => x.Users.Exists(y => y.ConnectionId == Context.ConnectionId)))
             {
                 try
                 {

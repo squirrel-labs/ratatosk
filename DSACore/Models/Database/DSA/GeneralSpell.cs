@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace DSACore.Models.Database
+﻿namespace DSACore.Models.Database.DSA
 {
     public class GeneralSpell : Talent
     {
