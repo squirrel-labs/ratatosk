@@ -83,6 +83,7 @@ impl GameServer {
     fn add_client(&self, mut client: GameClient) {
         std::thread::spawn(move || {
             println!("Token: {:?}", client.require_token());
+            loop { std::thread::sleep(std::time::Duration::from_millis(100)); }
         });
     }
 
