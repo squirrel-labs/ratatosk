@@ -1,8 +1,4 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace DSACore.Controllers
 {
@@ -13,15 +9,19 @@ namespace DSACore.Controllers
         
         // GET
         [HttpGet("{token}")]
-        public async Task<ActionResult<string>> Get(int token)
+        public ActionResult<string> Get(string token)
         {
+            if (!int.TryParse(token, out var inttoken))
+            {
+                return BadRequest("The token has to be a 32 bit unsigned integer");
+            }
 
-            if (!Hubs.Users.Tokens.Exists(x => x.GetHashCode() == token))
+            if (!Hubs.Users.Tokens.Exists(x => x.GetHashCode() == inttoken))
             {
                 return NotFound();
             }
 
-            var group = Hubs.Users.Tokens.Find(x => x.GetHashCode() == token);
+            var group = Hubs.Users.Tokens.Find(x => x.GetHashCode() == inttoken);
             return Ok(group);
         }
     }
