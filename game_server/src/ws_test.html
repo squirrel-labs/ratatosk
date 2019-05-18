@@ -22,10 +22,11 @@ function get_addr() {
 function test_connection() {
     let a = 'ws://' + get_addr();
     add_text('create a new connection at "' + a + '"');
-    const ws = new WebSocket(a);
+    const ws = new WebSocket(a, 'tuesday');
     ws.addEventListener('open', function (event) {
         add_text('connection established');
         toggle_connected(true);
+        ws.send('1230123');
     });
     ws.addEventListener('error', function (event) {
         add_text('ws error occured: "' + event + '"');
@@ -36,7 +37,7 @@ function test_connection() {
         toggle_connected(false);
     });
     ws.addEventListener('message', function (event) {
-        add_text('got ws message: ' + event);
+        add_text('got ws message: ' + event.data);
     });
 }
 
