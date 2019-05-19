@@ -1,13 +1,13 @@
 namespace Firebase.Database.Streaming
 {
     /// <summary>
-    /// Firebase event which hold <see cref="EventType"/> and the object affected by the event.
+    ///     Firebase event which hold <see cref="EventType" /> and the object affected by the event.
     /// </summary>
     /// <typeparam name="T"> Type of object affected by the event. </typeparam>
     public class FirebaseEvent<T> : FirebaseObject<T>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FirebaseEvent{T}"/> class.
+        ///     Initializes a new instance of the <see cref="FirebaseEvent{T}" /> class.
         /// </summary>
         /// <param name="key"> The key of the object. </param>
         /// <param name="obj"> The object. </param>
@@ -20,12 +20,12 @@ namespace Firebase.Database.Streaming
         }
 
         /// <summary>
-        /// Gets the source of the event.
+        ///     Gets the source of the event.
         /// </summary>
         public FirebaseEventSource EventSource { get; }
 
         /// <summary>
-        /// Gets the event type.
+        ///     Gets the event type.
         /// </summary>
         public FirebaseEventType EventType { get; }
 

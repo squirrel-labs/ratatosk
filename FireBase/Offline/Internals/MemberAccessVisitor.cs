@@ -1,10 +1,10 @@
-﻿namespace Firebase.Database.Offline.Internals
-{
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
+using Newtonsoft.Json;
 
+namespace Firebase.Database.Offline.Internals
+{
     public class MemberAccessVisitor : ExpressionVisitor
     {
         private readonly IList<string> propertyNames = new List<string>();
@@ -12,10 +12,6 @@
         private bool wasDictionaryAccess;
 
         public IEnumerable<string> PropertyNames => propertyNames;
-
-        public MemberAccessVisitor()
-        {
-        }
 
         public override Expression Visit(Expression expr)
         {

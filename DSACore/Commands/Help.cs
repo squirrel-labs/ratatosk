@@ -1,39 +1,18 @@
 ﻿using System.Linq;
-using System.Threading.Tasks;
 using DSACore.Auxiliary;
+using DSACore.DSA_Game.Save;
 
 namespace DSACore.Commands
 {
     public class Help
     {
-        static Help()
-        {
-            /*TextReader stream = new StreamReader(@"..\..\Help.json"); // Load command-description file
-            var reader = new JsonTextReader(stream); // create stream reader
-
-            reader.Read(); // step into structure, until the array starts
-            reader.Read();
-            reader.Read();
-            
-            try
-            {
-                var test = new JsonSerializer().Deserialize<List<CommandInfo>>(reader); // Deserialize Data and create CommandInfo Struct
-                
-                Commands.AddRange(test); // Add new CommandInfos to List
-            }
-            catch (Exception e)
-            {
-                // ignored
-            }*/
-        }
-
         //public static List<CommandInfo> Commands { get; } = new List<CommandInfo>();
 
 
         public static string Get_Specific_Help(string command)
         {
             // return command specific help
-            var com = DSA_Game.Save.Properties.CommandInfos
+            var com = Properties.CommandInfos
                 .OrderBy(x => SpellCorrect.CompareEasy(x.Name, command.ToLower())).First(); // get best fit command
             return com.GetDescription();
         }
@@ -41,7 +20,7 @@ namespace DSACore.Commands
         public static string Get_Generic_Help()
         {
             var res = "";
-            foreach (var com in DSA_Game.Save.Properties.CommandInfos)
+            foreach (var com in Properties.CommandInfos)
             {
                 var first_column_width = 8;
                 res += ("!" + com.Name + ": ").AddSpaces(first_column_width) + com.Brief;

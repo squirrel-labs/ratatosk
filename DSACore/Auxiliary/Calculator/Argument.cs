@@ -1,9 +1,9 @@
-﻿namespace DSACore.Auxiliary.Calculator
-{
-    using System;
+﻿using System;
 
+namespace DSACore.Auxiliary.Calculator
+{
     /// <summary>
-    /// Provides an ISolvable class to save numbers. The class handles Argument checking and conversion from string to int. 
+    ///     Provides an ISolvable class to save numbers. The class handles Argument checking and conversion from string to int.
     /// </summary>
     public class Argument : ISolvable
     {

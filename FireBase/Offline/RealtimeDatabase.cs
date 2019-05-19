@@ -1,50 +1,57 @@
-﻿namespace Firebase.Database.Offline
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Extensions;
-    using Query;
-    using Streaming;
-    using System.Reactive.Threading.Tasks;
-    using System.Linq.Expressions;
-    using Internals;
-    using Newtonsoft.Json;
-    using System.Reflection;
-    using System.Reactive.Disposables;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Net;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Firebase.Database.Extensions;
+using Firebase.Database.Offline.Internals;
+using Firebase.Database.Query;
+using Firebase.Database.Streaming;
+using Newtonsoft.Json;
 
+namespace Firebase.Database.Offline
+{
     /// <summary>
-    /// The real-time Database which synchronizes online and offline data. 
+    ///     The real-time Database which synchronizes online and offline data.
     /// </summary>
     /// <typeparam name="T"> Type of entities. </typeparam>
-    public partial class RealtimeDatabase<T> : IDisposable where T : class
+    public class RealtimeDatabase<T> : IDisposable where T : class
     {
         private readonly ChildQuery childQuery;
         private readonly string elementRoot;
-        private readonly StreamingOptions streamingOptions;
-        private readonly Subject<FirebaseEvent<T>> subject;
+        private readonly FirebaseCache<T> firebaseCache;
         private readonly InitialPullStrategy initialPullStrategy;
         private readonly bool pushChanges;
-        private readonly FirebaseCache<T> firebaseCache;
+        private readonly StreamingOptions streamingOptions;
+        private readonly Subject<FirebaseEvent<T>> subject;
+        private FirebaseSubscription<T> firebaseSubscription;
 
         private bool isSyncRunning;
         private IObservable<FirebaseEvent<T>> observable;
-        private FirebaseSubscription<T> firebaseSubscription;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RealtimeDatabase{T}"/> class.
+        ///     Initializes a new instance of the <see cref="RealtimeDatabase{T}" /> class.
         /// </summary>
         /// <param name="childQuery"> The child query.  </param>
         /// <param name="elementRoot"> The element Root. </param>
         /// <param name="offlineDatabaseFactory"> The offline database factory.  </param>
         /// <param name="filenameModifier"> Custom string which will get appended to the file name.  </param>
         /// <param name="streamChanges"> Specifies whether changes should be streamed from the server.  </param>
-        /// <param name="pullEverythingOnStart"> Specifies if everything should be pull from the online storage on start. It only makes sense when <see cref="streamChanges"/> is set to true. </param>
-        /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. If this is false, then Put / Post / Delete will not affect server data. </param>
+        /// <param name="pullEverythingOnStart">
+        ///     Specifies if everything should be pull from the online storage on start. It only
+        ///     makes sense when <see cref="streamChanges" /> is set to true.
+        /// </param>
+        /// <param name="pushChanges">
+        ///     Specifies whether changed items should actually be pushed to the server. If this is false,
+        ///     then Put / Post / Delete will not affect server data.
+        /// </param>
         public RealtimeDatabase(ChildQuery childQuery, string elementRoot,
             Func<Type, string, IDictionary<string, OfflineEntry>> offlineDatabaseFactory, string filenameModifier,
             StreamingOptions streamingOptions, InitialPullStrategy initialPullStrategy, bool pushChanges,
@@ -67,24 +74,34 @@
         }
 
         /// <summary>
-        /// Event raised whenever an exception is thrown in the synchronization thread. Exception thrown in there are swallowed, so this event is the only way to get to them. 
+        ///     Gets the backing Database.
+        /// </summary>
+        public IDictionary<string, OfflineEntry> Database { get; }
+
+        public ISetHandler<T> PutHandler { private get; set; }
+
+        public void Dispose()
+        {
+            subject.OnCompleted();
+            firebaseSubscription?.Dispose();
+        }
+
+        /// <summary>
+        ///     Event raised whenever an exception is thrown in the synchronization thread. Exception thrown in there are
+        ///     swallowed, so this event is the only way to get to them.
         /// </summary>
         public event EventHandler<ExceptionEventArgs> SyncExceptionThrown;
 
         /// <summary>
-        /// Gets the backing Database.
-        /// </summary>
-        public IDictionary<string, OfflineEntry> Database { get; private set; }
-
-        public ISetHandler<T> PutHandler { private get; set; }
-
-        /// <summary>
-        /// Overwrites existing object with given key.
+        ///     Overwrites existing object with given key.
         /// </summary>
         /// <param name="key"> The key. </param>
         /// <param name="obj"> The object to set. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
-        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
+        /// <param name="priority">
+        ///     The priority. Objects with higher priority will be synced first. Higher number indicates higher
+        ///     priority.
+        /// </param>
         public void Set(string key, T obj, SyncOptions syncOptions, int priority = 1)
         {
             SetAndRaise(key, new OfflineEntry(key, obj, priority, syncOptions));
@@ -118,10 +135,13 @@
         }
 
         /// <summary>
-        /// Fetches an object with the given key and adds it to the Database.
+        ///     Fetches an object with the given key and adds it to the Database.
         /// </summary>
         /// <param name="key"> The key. </param>
-        /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
+        /// <param name="priority">
+        ///     The priority. Objects with higher priority will be synced first. Higher number indicates higher
+        ///     priority.
+        /// </param>
         public void Pull(string key, int priority = 1)
         {
             if (!Database.ContainsKey(key))
@@ -132,7 +152,7 @@
         }
 
         /// <summary>
-        /// Fetches everything from the remote database.
+        ///     Fetches everything from the remote database.
         /// </summary>
         public async Task PullAsync()
         {
@@ -142,7 +162,7 @@
                 .RetryAfterDelay<IReadOnlyCollection<FirebaseObject<T>>, FirebaseException>(
                     childQuery.Client.Options.SyncPeriod,
                     ex => ex.StatusCode ==
-                          System.Net.HttpStatusCode
+                          HttpStatusCode
                               .OK) // OK implies the request couldn't complete due to network error. 
                 .Select(e => ResetDatabaseFromInitial(e, false))
                 .SelectMany(e => e)
@@ -164,7 +184,7 @@
         }
 
         /// <summary>
-        /// Retrieves all offline items currently stored in local database.
+        ///     Retrieves all offline items currently stored in local database.
         /// </summary>
         public IEnumerable<FirebaseObject<T>> Once()
         {
@@ -174,10 +194,10 @@
                 .ToList();
         }
 
-        /// <summary> 
-        /// Starts observing the real-time Database. Events will be fired both when change is done locally and remotely.
-        /// </summary> 
-        /// <returns> Stream of <see cref="FirebaseEvent{T}"/>. </returns>
+        /// <summary>
+        ///     Starts observing the real-time Database. Events will be fired both when change is done locally and remotely.
+        /// </summary>
+        /// <returns> Stream of <see cref="FirebaseEvent{T}" />. </returns>
         public IObservable<FirebaseEvent<T>> AsObservable()
         {
             if (!isSyncRunning)
@@ -212,7 +232,7 @@
                         .RetryAfterDelay<IReadOnlyCollection<FirebaseObject<T>>, FirebaseException>(
                             childQuery.Client.Options.SyncPeriod,
                             ex => ex.StatusCode ==
-                                  System.Net.HttpStatusCode
+                                  HttpStatusCode
                                       .OK) // OK implies the request couldn't complete due to network error. 
                         .Select(e => ResetDatabaseFromInitial(e))
                         .SelectMany(e => e)
@@ -228,12 +248,6 @@
             }
 
             return observable;
-        }
-
-        public void Dispose()
-        {
-            subject.OnCompleted();
-            firebaseSubscription?.Dispose();
         }
 
         private IReadOnlyCollection<FirebaseObject<T>> ResetDatabaseFromInitial(
@@ -308,8 +322,6 @@
                     firebaseSubscription.ExceptionThrown += StreamingExceptionThrown;
 
                     return new CompositeDisposable(firebaseSubscription.Run(), completeDisposable);
-                default:
-                    break;
             }
 
             return completeDisposable;

@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using DSACore.DSA_Game;
-using DSACore.Auxiliary;
-using Microsoft.AspNetCore.Hosting.Internal;
-
-namespace DSACore.Commands
+﻿namespace DSACore.Commands
 {
     public class MiscCommands
     {

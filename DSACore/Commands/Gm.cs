@@ -1,12 +1,5 @@
-﻿using DSACore.Auxiliary;
-using DSACore.DSA_Game;
-
-namespace DSACore.Commands
+﻿namespace DSACore.Commands
 {
-    using System.Linq;
-    using System.Threading.Tasks;
-    using DSALib.Characters;
-
     /*public class Iam 
     {
 

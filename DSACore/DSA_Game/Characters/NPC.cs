@@ -4,10 +4,6 @@ using DSALib.Characters;
 
 namespace DSACore.Characters
 {
-    using System;
-    using Auxiliary;
-    using DSACore.DSA_Game.Characters;
-
     public class Npc : Being, ICharacter
     {
         private readonly int mean, stDv;

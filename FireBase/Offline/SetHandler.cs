@@ -1,8 +1,8 @@
-﻿namespace Firebase.Database.Offline
-{
-    using Query;
-    using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Firebase.Database.Query;
 
+namespace Firebase.Database.Offline
+{
     public class SetHandler<T> : ISetHandler<T>
     {
         public virtual async Task SetAsync(ChildQuery query, string key, OfflineEntry entry)

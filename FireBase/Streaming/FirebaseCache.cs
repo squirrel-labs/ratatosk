@@ -1,15 +1,15 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Firebase.Database.Http;
+using Newtonsoft.Json;
+
 namespace Firebase.Database.Streaming
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using Http;
-    using Newtonsoft.Json;
-
     /// <summary>
-    /// The firebase cache.
+    ///     The firebase cache.
     /// </summary>
     /// <typeparam name="T"> Type of top-level entities in the cache. </typeparam>
     public class FirebaseCache<T> : IEnumerable<FirebaseObject<T>>
@@ -17,13 +17,13 @@ namespace Firebase.Database.Streaming
         private readonly IDictionary<string, T> dictionary;
         private readonly bool isDictionaryType;
 
-        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings()
+        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
             ObjectCreationHandling = ObjectCreationHandling.Replace
         };
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FirebaseCache{T}"/> class.
+        ///     Initializes a new instance of the <see cref="FirebaseCache{T}" /> class.
         /// </summary>
         public FirebaseCache()
             : this(new Dictionary<string, T>())
@@ -31,7 +31,7 @@ namespace Firebase.Database.Streaming
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FirebaseCache{T}"/> class and populates it with existing data.
+        ///     Initializes a new instance of the <see cref="FirebaseCache{T}" /> class and populates it with existing data.
         /// </summary>
         /// <param name="existingItems"> The existing items. </param>
         public FirebaseCache(IDictionary<string, T> existingItems)
@@ -41,10 +41,10 @@ namespace Firebase.Database.Streaming
         }
 
         /// <summary>
-        /// The push data.
+        ///     The push data.
         /// </summary>
-        /// <param name="path"> The path of incoming data, separated by slash. </param>  
-        /// <param name="data"> The data in json format as returned by firebase. </param>  
+        /// <param name="path"> The path of incoming data, separated by slash. </param>
+        /// <param name="data"> The data in json format as returned by firebase. </param>
         /// <returns> Collection of top-level entities which were affected by the push. </returns>
         public IEnumerable<FirebaseObject<T>> PushData(string path, string data, bool removeEmptyEntries = true)
         {
@@ -63,7 +63,7 @@ namespace Firebase.Database.Streaming
                     var dictionary = obj as IDictionary;
                     var valueType = obj.GetType().GenericTypeArguments[1];
 
-                    primitiveObjSetter = (d) => dictionary[element] = d;
+                    primitiveObjSetter = d => dictionary[element] = d;
                     objDeleter = () => dictionary.Remove(element);
 
                     if (dictionary.Contains(element))
@@ -87,7 +87,7 @@ namespace Firebase.Database.Streaming
                                     element == p.GetCustomAttribute<JsonPropertyAttribute>()?.PropertyName);
 
                     objDeleter = () => property.SetValue(objParent, null);
-                    primitiveObjSetter = (d) => property.SetValue(objParent, d);
+                    primitiveObjSetter = d => property.SetValue(objParent, d);
                     obj = property.GetValue(obj);
                     if (obj == null)
                     {
@@ -138,7 +138,7 @@ namespace Firebase.Database.Streaming
 
                 // firebase sends strings without double quotes
                 var targetObject = valueType == typeof(string)
-                    ? data.ToString()
+                    ? data
                     : JsonConvert.DeserializeObject(data, valueType);
 
                 if ((valueType.GetTypeInfo().IsPrimitive || valueType == typeof(string)) && primitiveObjSetter != null)
@@ -161,8 +161,7 @@ namespace Firebase.Database.Streaming
         {
             if (type == typeof(string))
                 return string.Empty;
-            else
-                return Activator.CreateInstance(type);
+            return Activator.CreateInstance(type);
         }
 
         #region IEnumerable

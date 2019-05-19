@@ -1,9 +1,9 @@
-﻿namespace DSACore.Auxiliary
-{
-    using System;
-    using System.Diagnostics;
-    using System.Linq;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
 
+namespace DSACore.Auxiliary
+{
     public class SpellCorrect : StringComparer
     {
         public const int ErrorThreshold = 94100;

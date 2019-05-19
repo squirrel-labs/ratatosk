@@ -1,6 +1,4 @@
-﻿using DiscoBot.DSA_Game.Characters;
-
-namespace DSALib.Characters
+﻿namespace DSALib.Characters
 {
     public class Being : Entity
     {

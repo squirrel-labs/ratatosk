@@ -1,16 +1,16 @@
-﻿namespace Firebase.Database
-{
-    using System;
+﻿using System;
 
+namespace Firebase.Database
+{
     /// <summary>
-    /// Event args holding the <see cref="Exception"/> object.
+    ///     Event args holding the <see cref="Exception" /> object.
     /// </summary>
     public class ExceptionEventArgs<T> : EventArgs where T : Exception
     {
         public readonly T Exception;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExceptionEventArgs"/> class.
+        ///     Initializes a new instance of the <see cref="ExceptionEventArgs" /> class.
         /// </summary>
         /// <param name="exception"> The exception. </param>
         public ExceptionEventArgs(T exception)

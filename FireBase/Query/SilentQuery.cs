@@ -1,7 +1,7 @@
 ﻿namespace Firebase.Database.Query
 {
     /// <summary>
-    /// Appends print=silent to the url.
+    ///     Appends print=silent to the url.
     /// </summary>
     public class SilentQuery : ParameterQuery
     {

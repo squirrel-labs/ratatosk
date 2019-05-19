@@ -1,17 +1,15 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Xml;
 using DSACore.Auxiliary;
 using DSALib;
 using DSALib.Characters;
 
 namespace DSACore.DSA_Game.Characters
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Xml;
-
-
     public class Character : Being, ICharacter
     {
         public Character()

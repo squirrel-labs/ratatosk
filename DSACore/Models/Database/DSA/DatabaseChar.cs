@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DSACore.DSA_Game.Characters;
 
 namespace DSACore.Models.Database.DSA
 {
@@ -40,7 +41,7 @@ namespace DSACore.Models.Database.DSA
         public List<WeaponTalent> WeaponTalents { get; set; } = new List<WeaponTalent>();
 
 
-        public static void LoadChar(DSA_Game.Characters.Character file, out GroupChar group, out DatabaseChar data)
+        public static void LoadChar(Character file, out GroupChar group, out DatabaseChar data)
         {
             group = new GroupChar();
             data = new DatabaseChar();

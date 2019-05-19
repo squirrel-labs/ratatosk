@@ -1,19 +1,20 @@
-﻿namespace Firebase.Database.Extensions
-{
-    using System;
-    using System.Reactive.Linq;
+﻿using System;
+using System.Reactive.Linq;
 
+namespace Firebase.Database.Extensions
+{
     public static class ObservableExtensions
     {
         /// <summary>
-        /// Returns a cold observable which retries (re-subscribes to) the source observable on error until it successfully terminates. 
+        ///     Returns a cold observable which retries (re-subscribes to) the source observable on error until it successfully
+        ///     terminates.
         /// </summary>
         /// <param name="source">The source observable.</param>
         /// <param name="dueTime">How long to wait between attempts.</param>
         /// <param name="retryOnError">A predicate determining for which exceptions to retry. Defaults to all</param>
         /// <returns>
-        /// A cold observable which retries (re-subscribes to) the source observable on error up to the 
-        /// specified number of times or until it successfully terminates.
+        ///     A cold observable which retries (re-subscribes to) the source observable on error up to the
+        ///     specified number of times or until it successfully terminates.
         /// </returns>
         public static IObservable<T> RetryAfterDelay<T, TException>(
             this IObservable<T> source,

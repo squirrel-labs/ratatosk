@@ -1,30 +1,28 @@
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading;
+using System.Threading.Tasks;
+using Firebase.Database.Query;
+using Newtonsoft.Json.Linq;
+
 namespace Firebase.Database.Streaming
 {
-    using System;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Query;
-    using Newtonsoft.Json.Linq;
-    using System.Net;
-
     /// <summary>
-    /// The firebase subscription.
+    ///     The firebase subscription.
     /// </summary>
     /// <typeparam name="T"> Type of object to be streaming back to the called. </typeparam>
     internal class FirebaseSubscription<T> : IDisposable
     {
+        private static readonly HttpClient http;
+        private readonly FirebaseCache<T> cache;
         private readonly CancellationTokenSource cancel;
+        private readonly FirebaseClient client;
+        private readonly string elementRoot;
         private readonly IObserver<FirebaseEvent<T>> observer;
         private readonly IFirebaseQuery query;
-        private readonly FirebaseCache<T> cache;
-        private readonly string elementRoot;
-        private readonly FirebaseClient client;
-
-        private static HttpClient http;
 
         static FirebaseSubscription()
         {
@@ -43,7 +41,7 @@ namespace Firebase.Database.Streaming
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FirebaseSubscription{T}"/> class.
+        ///     Initializes a new instance of the <see cref="FirebaseSubscription{T}" /> class.
         /// </summary>
         /// <param name="observer"> The observer.  </param>
         /// <param name="query"> The query.  </param>
@@ -59,12 +57,12 @@ namespace Firebase.Database.Streaming
             client = query.Client;
         }
 
-        public event EventHandler<ExceptionEventArgs<FirebaseException>> ExceptionThrown;
-
         public void Dispose()
         {
             cancel.Cancel();
         }
+
+        public event EventHandler<ExceptionEventArgs<FirebaseException>> ExceptionThrown;
 
         public IDisposable Run()
         {

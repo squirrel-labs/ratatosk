@@ -1,18 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace DSACore.DSA_Game.Save
 {
-    using System.IO;
-
     public class SaveCommand
     {
         public void LoadSession(string name = "")
         {
             if (name.Equals("?") || name.Equals(string.Empty))
             {
-                Console.WriteLine($"Gespeicherte Sessions:");
+                Console.WriteLine("Gespeicherte Sessions:");
                 Console.WriteLine(ListSessions());
                 return;
             }
@@ -32,7 +30,7 @@ namespace DSACore.DSA_Game.Save
 
             if (name.Equals("?") || name.Equals(string.Empty))
             {
-                Console.WriteLine($"Gespeicherte Sessions:");
+                Console.WriteLine("Gespeicherte Sessions:");
                 Console.WriteLine(ListSessions());
                 return;
             }
@@ -49,7 +47,7 @@ namespace DSACore.DSA_Game.Save
             {
                 Directory.CreateDirectory(path);
                 Dsa.Session.SessionName = name;
-                Dsa.Session.Save(path + "\\" + name + $"-0.json");
+                Dsa.Session.Save(path + "\\" + name + "-0.json");
             }
 
             Console.WriteLine($"{name} wurde gespeichert");

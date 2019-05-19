@@ -5,26 +5,18 @@ using DSACorev.Auxiliary.Calculator;
 
 namespace DSACore.Auxiliary.Calculator
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     /// <summary>
-    /// The StringSolver divides the calculation string into operations and SubStringSolvers if the string contains parentheses 
+    ///     The StringSolver divides the calculation string into operations and SubStringSolvers if the string contains
+    ///     parentheses
     /// </summary>
     public class StringSolver : ISolvable
     {
-        private readonly string input;
         private readonly List<object> arguments = new List<object>();
+        private readonly string input;
 
         public StringSolver(string input)
         {
             this.input = input;
-        }
-
-        public override string ToString()
-        {
-            return "(0+" + input.Replace(" ", string.Empty).ToLower() + ")";
         }
 
         public int Solve()
@@ -40,6 +32,11 @@ namespace DSACore.Auxiliary.Calculator
 
             // the List now contains only the top operation node, witch can be solved recursively,
             return ((ISolvable) arguments.First()).Solve();
+        }
+
+        public override string ToString()
+        {
+            return "(0+" + input.Replace(" ", string.Empty).ToLower() + ")";
         }
 
         private static string
@@ -123,7 +120,7 @@ namespace DSACore.Auxiliary.Calculator
                 switch (c)
                 {
                     case ')':
-                        throw new ArgumentException($"Unmögliche Anordnung von Klammern");
+                        throw new ArgumentException("Unmögliche Anordnung von Klammern");
                     case '(':
                         arguments.Add(new StringSolver(GetInner(ref workInput)));
                         index = -1;

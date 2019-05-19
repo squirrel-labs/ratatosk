@@ -26,27 +26,27 @@ namespace DSACore.Models.Database.DSA
 
     public class MeleeWeapon : Weapon
     {
-        public string TpKK { get; set; }
-        public int INI { get; set; }
-        public string MW { get; set; }
-
         public MeleeWeapon(string name, string damage, int weight, string weaponTalent, string price) : base(name,
             damage, weight, weaponTalent, price)
         {
         }
+
+        public string TpKK { get; set; }
+        public int INI { get; set; }
+        public string MW { get; set; }
     }
 
     public class RangedWeapon : Weapon
     {
+        public RangedWeapon(string name, string damage, int weight, string weaponTalent, string price) : base(name,
+            damage, weight, weaponTalent, price)
+        {
+        }
+
         public int AtMod { get; set; }
         public int KKMod { get; set; }
         public string AtReach { get; set; }
         public string TpReach { get; set; }
         public int LoadTime { get; set; }
-
-        public RangedWeapon(string name, string damage, int weight, string weaponTalent, string price) : base(name,
-            damage, weight, weaponTalent, price)
-        {
-        }
     }
 }

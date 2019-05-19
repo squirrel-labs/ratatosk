@@ -1,11 +1,11 @@
+using System;
+using System.Text;
+
 namespace Firebase.Database
 {
-    using System;
-    using System.Text;
-
     /// <summary>
-    /// Offline key generator which mimics the official Firebase generators. 
-    /// Credit: https://github.com/bubbafat/FirebaseSharp/blob/master/src/FirebaseSharp.Portable/FireBasePushIdGenerator.cs
+    ///     Offline key generator which mimics the official Firebase generators.
+    ///     Credit: https://github.com/bubbafat/FirebaseSharp/blob/master/src/FirebaseSharp.Portable/FireBasePushIdGenerator.cs
     /// </summary>
     public class FirebaseKeyGenerator
     {
@@ -26,10 +26,11 @@ namespace Firebase.Database
         }
 
         /// <summary>
-        /// Returns next firebase key based on current time.  
+        ///     Returns next firebase key based on current time.
         /// </summary>
         /// <returns>
-        /// The <see cref="string"/>. </returns>
+        ///     The <see cref="string" />.
+        /// </returns>
         public static string Next()
         {
             // We generate 72-bits of randomness which get turned into 12 characters and

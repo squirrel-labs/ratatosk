@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DSACore.Models;
+using DSACore.Commands;
 using DSACore.Models.Network;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,7 +30,7 @@ namespace DSACore.Controllers
         {
             try
             {
-                return Commands.CommandHandler.ExecuteCommand(cmd).message;
+                return CommandHandler.ExecuteCommand(cmd).message;
             }
             catch (Exception e)
             {

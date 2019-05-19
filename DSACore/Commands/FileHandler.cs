@@ -1,13 +1,12 @@
-﻿using DSACore.DSA_Game;
+﻿using System;
+using System.Linq;
+using System.Net;
+using DSACore.DSA_Game;
 using DSACore.DSA_Game.Characters;
+using DSALib;
 
 namespace DSACore.Commands
 {
-    using System;
-    using System.Linq;
-    using System.Net;
-    using DSALib;
-
     public class FileHandler
     {
         public static string AddChar(ulong id, string url)

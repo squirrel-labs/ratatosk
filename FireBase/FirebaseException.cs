@@ -1,8 +1,8 @@
-﻿namespace Firebase.Database
-{
-    using System;
-    using System.Net;
+﻿using System;
+using System.Net;
 
+namespace Firebase.Database
+{
     public class FirebaseException : Exception
     {
         public FirebaseException(string requestUrl, string requestData, string responseData, HttpStatusCode statusCode)
@@ -25,22 +25,22 @@
         }
 
         /// <summary>
-        /// Post data passed to the authentication service.
+        ///     Post data passed to the authentication service.
         /// </summary>
         public string RequestData { get; }
 
         /// <summary>
-        /// Original url of the request.
+        ///     Original url of the request.
         /// </summary>
         public string RequestUrl { get; }
 
         /// <summary>
-        /// Response from the authentication service.
+        ///     Response from the authentication service.
         /// </summary>
         public string ResponseData { get; }
 
         /// <summary>
-        /// Status code of the response.
+        ///     Status code of the response.
         /// </summary>
         public HttpStatusCode StatusCode { get; }
 

@@ -1,18 +1,13 @@
 ﻿using System;
-using DSACore.Auxiliary;
-using DSACore.FireBase;
+using System.Collections.Generic;
+using System.Linq;
+using DSACore.DSA_Game.Characters;
+using DSACore.DSA_Game.Save;
 using DSALib;
 using DSALib.Characters;
-using Microsoft.EntityFrameworkCore.Design;
 
 namespace DSACore.DSA_Game
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using Characters;
-    using Save;
-
     public static class Dsa
     {
 #if DEBUG
@@ -59,7 +54,7 @@ namespace DSACore.DSA_Game
             }
 */
 
-            Properties.Deserialize(rootPath + "Properties");
+            Properties.Deserialize();
             Properties.Serialize(rootPath + "Properties");
 
 

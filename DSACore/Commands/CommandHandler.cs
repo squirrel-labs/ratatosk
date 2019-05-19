@@ -1,7 +1,7 @@
 ﻿using System;
 using DSACore.Auxiliary;
+using DSACore.Auxiliary.Calculator;
 using DSACore.DSA_Game;
-using DSACore.Models;
 using DSACore.Models.Network;
 
 namespace DSACore.Commands
@@ -49,7 +49,7 @@ namespace DSACore.Commands
                     res = RandomMisc.Roll(cmd.CmdText + " " + cmd.Cmdmodifier);
                     break;
                 case "solve":
-                    res = new Auxiliary.Calculator.StringSolver(cmd.CmdText + cmd.Cmdmodifier).Solve().ToString();
+                    res = new StringSolver(cmd.CmdText + cmd.Cmdmodifier).Solve().ToString();
                     break;
                 case "npc":
                     res = NpcCommands.CreateNpc(cmd.CharId, cmd.CmdTexts, cmd.Cmdmodifier);

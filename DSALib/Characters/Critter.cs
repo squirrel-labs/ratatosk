@@ -1,32 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using DiscoBot.DSA_Game.Characters;
+using Newtonsoft.Json;
 
 namespace DSALib.Characters
 {
-    using System.IO;
-    using DiscoBot.DSA_Game.Characters;
-    using Newtonsoft.Json;
-
     public class Critter : Being, ICombatant
     {
-        public int Rs { get; set; }
-
-        public int Mr { get; set; }
-
-        public int Ko { get; set; }
-
-        public int Pa { get; set; }
-
-        public int Gs { get; set; }
-
-        public int Gw { get; set; }
-
-        public string Ini { get; set; }
-
-        public string Comment { get; set; }
-
-        public List<CritterAttack> CritterAttacks { get; set; }
-
         public CritterAttack lastAttack;
 
         public Critter(int gw, int gs, int rs, int mr, int ko, int pa, string ini, List<CritterAttack> critterAttacks)
@@ -46,6 +27,34 @@ namespace DSALib.Characters
         {
         }
 
+        public int Rs { get; set; }
+
+        public int Mr { get; set; }
+
+        public int Ko { get; set; }
+
+        public int Pa { get; set; }
+
+        public int Gs { get; set; }
+
+        public int Gw { get; set; }
+
+        public string Ini { get; set; }
+
+        public string Comment { get; set; }
+
+        public List<CritterAttack> CritterAttacks { get; set; }
+
+        public string Angriff(string talent, int erschwernis = 0)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string Parade(string talent, int erschwernis = 0)
+        {
+            throw new NotImplementedException();
+        }
+
         public static Critter Load(string path)
         {
             try
@@ -59,16 +68,6 @@ namespace DSALib.Characters
                 Console.WriteLine($"Laden von Save-File {path} fehlgeschlagen." + e);
                 return null;
             }
-        }
-
-        public string Angriff(string talent, int erschwernis = 0)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string Parade(string talent, int erschwernis = 0)
-        {
-            throw new NotImplementedException();
         }
 
         public void Save(string path = @"..\..\Critters\")

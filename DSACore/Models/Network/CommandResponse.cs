@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DSACore.Models.Network
 {
@@ -13,8 +10,8 @@ namespace DSACore.Models.Network
             ResponseType = responseType;
         }
 
-        public string message { get; private set; }
-        public ResponseType ResponseType { get; private set; }
+        public string message { get; }
+        public ResponseType ResponseType { get; }
 
         public override string ToString()
         {

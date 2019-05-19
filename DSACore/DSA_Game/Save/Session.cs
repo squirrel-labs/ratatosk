@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using DSACore.DSA_Game.Characters;
+using Newtonsoft.Json;
 
 namespace DSACore.DSA_Game.Save
 {
-    using System.IO;
-    using Characters;
-    using Newtonsoft.Json;
-
     public class Session
     {
         public static string DirectoryPath { get; set; } = Dsa.rootPath + @"sessions";

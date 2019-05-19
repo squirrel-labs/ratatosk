@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DSACore.DSA_Game.Characters;
 using DSACore.Auxiliary;
 using DSACore.DSA_Game;
+using DSACore.DSA_Game.Characters;
 
 namespace DSACore.Commands
 {

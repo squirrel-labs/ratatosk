@@ -1,14 +1,14 @@
-﻿using DSACore.DSA_Game.Characters;
-using DSACore.FireBase;
-using DSACore.Models.Network;
-using Microsoft.AspNetCore.SignalR;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using DSACore.Commands;
+using DSACore.DSA_Game.Characters;
+using DSACore.FireBase;
+using DSACore.Models.Network;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DSACore.Hubs
 {
@@ -18,9 +18,6 @@ namespace DSACore.Hubs
 
         private const string ReceiveMethod = "ReceiveMessage"; //receiveMethod;
 
-        private static List<Group> DsaGroups { get; set; }
-        public static List<Token> Tokens { get; } = new List<Token>();
-
         static Users()
         {
             DsaGroups = Database.GetGroups().Result;
@@ -28,6 +25,9 @@ namespace DSACore.Hubs
             DsaGroups.Add(new Group("online", ""));
             //AddGroups();
         }
+
+        private static List<Group> DsaGroups { get; }
+        public static List<Token> Tokens { get; } = new List<Token>();
 
 
         [Obsolete]
@@ -60,7 +60,7 @@ namespace DSACore.Hubs
                 var ident = args.First().Replace("/", "");
                 if (args.Count > 0) args.RemoveAt(0);
 
-                var ret = Commands.CommandHandler.ExecuteCommand(new Command
+                var ret = CommandHandler.ExecuteCommand(new Command
                 {
                     CharId = 0,
                     CmdIdentifier = ident,
@@ -116,8 +116,8 @@ namespace DSACore.Hubs
             var test = await Database.GetGroups();
 
             foreach (var group in test)
-                if (!DsaGroups.Exists(x => x.Name.Equals(@group.Name)))
-                    DsaGroups.Add(@group);
+                if (!DsaGroups.Exists(x => x.Name.Equals(group.Name)))
+                    DsaGroups.Add(group);
 
             await Clients.Caller.SendCoreAsync("ListGroups", new object[] {DsaGroups.Select(x => x.SendGroup())});
             //throw new NotImplementedException("add database call to get groups");
@@ -128,7 +128,7 @@ namespace DSACore.Hubs
             DsaGroups.Add(new Group(group, password));
             var Dgroup = new Models.Database.Groups.Group {Name = group, Id = DsaGroups.Count - 1};
             //Database.AddGroup(Dgroup);
-            await Clients.Caller.SendCoreAsync(ReceiveMethod, new[] {$"group {@group} sucessfully added"});
+            await Clients.Caller.SendCoreAsync(ReceiveMethod, new[] {$"group {group} sucessfully added"});
             //throw new NotImplementedException("add database call to add groups");
         }
 
@@ -202,8 +202,8 @@ namespace DSACore.Hubs
 
                     await Clients.Caller.SendAsync("PlayerStatusChanged", new[] {user.Name, "offline"});
                     //await SendToGroup(user.Name + " disconnected from the Server");
-                    @group.Users.Remove(user);
-                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, @group.Name);
+                    group.Users.Remove(user);
+                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, group.Name);
                 }
                 catch (Exception e)
                 {

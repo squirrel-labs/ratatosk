@@ -1,5 +1,4 @@
-﻿using DSACore.Models.Database;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -7,14 +6,13 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DSACore.FireBase;
 using DSACore.Models.Database.DSA;
-using Group = System.Text.RegularExpressions.Group;
 
 namespace DSACore.Auxiliary
 {
     public class WeaponImporter
     {
-        private List<MeleeWeapon> Weapons = new List<MeleeWeapon>();
-        private List<RangedWeapon> Range = new List<RangedWeapon>();
+        private readonly List<RangedWeapon> Range = new List<RangedWeapon>();
+        private readonly List<MeleeWeapon> Weapons = new List<MeleeWeapon>();
 
         public async Task DownloadWeapons()
         {
@@ -48,7 +46,7 @@ namespace DSACore.Auxiliary
                 {
                     var talent = lines[j];
 
-                    var values = await client.GetStringAsync($"http://diarium.eu/dsa4-forge/ajax/calculate/" + i + "/" +
+                    var values = await client.GetStringAsync("http://diarium.eu/dsa4-forge/ajax/calculate/" + i + "/" +
                                                              ids[j] + "/0/0/0/0/0/10/0/0/0");
 
                     values = Regex.Unescape(values.Replace(@"\t", ""));

@@ -1,5 +1,6 @@
-using DSACore.Models.Network;
 using System;
+using DSACore.Commands;
+using DSACore.Models.Network;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DSACore.Controllers
@@ -19,7 +20,7 @@ namespace DSACore.Controllers
         {
             try
             {
-                return Commands.CommandHandler.ExecuteCommand(cmd).message;
+                return CommandHandler.ExecuteCommand(cmd).message;
             }
             catch (Exception e)
             {

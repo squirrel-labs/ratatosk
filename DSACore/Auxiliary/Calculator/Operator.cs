@@ -4,7 +4,7 @@ using DSACorev.Auxiliary.Calculator;
 namespace DSACore.Auxiliary.Calculator
 {
     /// <summary>
-    /// The Operator Class represents a binary operator with tow Arguments and an Operation type
+    ///     The Operator Class represents a binary operator with tow Arguments and an Operation type
     /// </summary>
     public class Operator : ISolvable
     {

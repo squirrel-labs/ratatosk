@@ -1,16 +1,16 @@
+using System;
+
 namespace Firebase.Database.Query
 {
-    using System;
-
     /// <summary>
-    /// Firebase query which references the child of current node.
+    ///     Firebase query which references the child of current node.
     /// </summary>
     public class ChildQuery : FirebaseQuery
     {
         private readonly Func<string> pathFactory;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ChildQuery"/> class.
+        ///     Initializes a new instance of the <see cref="ChildQuery" /> class.
         /// </summary>
         /// <param name="parent"> The parent.  </param>
         /// <param name="pathFactory"> The path to the child node.  </param>
@@ -22,7 +22,7 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ChildQuery"/> class.
+        ///     Initializes a new instance of the <see cref="ChildQuery" /> class.
         /// </summary>
         /// <param name="client"> The client. </param>
         /// <param name="pathFactory"> The path to the child node.  </param>
@@ -32,10 +32,10 @@ namespace Firebase.Database.Query
         }
 
         /// <summary>
-        /// Build the url segment of this child.
+        ///     Build the url segment of this child.
         /// </summary>
         /// <param name="child"> The child of this child. </param>
-        /// <returns> The <see cref="string"/>. </returns>
+        /// <returns> The <see cref="string" />. </returns>
         protected override string BuildUrlSegment(FirebaseQuery child)
         {
             var s = pathFactory();

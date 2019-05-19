@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,10 +9,6 @@ using Newtonsoft.Json;
 
 namespace DSACore.DSA_Game.Save
 {
-    using System.Collections;
-    using System.IO;
-    using Newtonsoft.Json;
-
     public static class Properties
     {
         public static Dictionary<string, object> objects;
@@ -64,7 +61,7 @@ namespace DSACore.DSA_Game.Save
                 foreach (var o in objects)
                 {
                     var assembly = o.Value is IList list
-                        ? ((IList) list)[0]?.GetType().FullName
+                        ? list[0]?.GetType().FullName
                         : o.Value.GetType().FullName;
 
                     var name = path + assembly.Replace('.', '-') + ".json";
@@ -76,7 +73,7 @@ namespace DSACore.DSA_Game.Save
             catch (Exception e)
             {
                 // ignored
-                Console.WriteLine($"Speichern von Save-File fehlgeschlagen." + e);
+                Console.WriteLine("Speichern von Save-File fehlgeschlagen." + e);
             }
         }
     }

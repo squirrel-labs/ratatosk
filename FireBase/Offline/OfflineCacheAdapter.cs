@@ -1,10 +1,10 @@
-﻿namespace Firebase.Database.Offline
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace Firebase.Database.Offline
+{
     internal class OfflineCacheAdapter<TKey, T> : IDictionary<string, T>, IDictionary
     {
         private readonly IDictionary<string, OfflineEntry> database;
@@ -19,13 +19,9 @@
             throw new NotImplementedException();
         }
 
-        public int Count => database.Count;
-
         public bool IsSynchronized { get; }
 
         public object SyncRoot { get; }
-
-        public bool IsReadOnly => database.IsReadOnly;
 
         object IDictionary.this[object key]
         {
@@ -42,26 +38,9 @@
             }
         }
 
-        public ICollection<string> Keys => database.Keys;
-
         ICollection IDictionary.Values { get; }
 
         ICollection IDictionary.Keys { get; }
-
-        public ICollection<T> Values => database.Values.Select(o => o.Deserialize<T>()).ToList();
-
-        public T this[string key]
-        {
-            get => database[key].Deserialize<T>();
-
-            set
-            {
-                if (database.ContainsKey(key))
-                    database[key] = new OfflineEntry(key, value, database[key].Priority, database[key].SyncOptions);
-                else
-                    database[key] = new OfflineEntry(key, value, 1, SyncOptions.None);
-            }
-        }
 
         public bool Contains(object key)
         {
@@ -80,6 +59,32 @@
 
         public bool IsFixedSize => false;
 
+        public void Add(object key, object value)
+        {
+            Add(key.ToString(), (T) value);
+        }
+
+        public int Count => database.Count;
+
+        public bool IsReadOnly => database.IsReadOnly;
+
+        public ICollection<string> Keys => database.Keys;
+
+        public ICollection<T> Values => database.Values.Select(o => o.Deserialize<T>()).ToList();
+
+        public T this[string key]
+        {
+            get => database[key].Deserialize<T>();
+
+            set
+            {
+                if (database.ContainsKey(key))
+                    database[key] = new OfflineEntry(key, value, database[key].Priority, database[key].SyncOptions);
+                else
+                    database[key] = new OfflineEntry(key, value, 1, SyncOptions.None);
+            }
+        }
+
         public IEnumerator<KeyValuePair<string, T>> GetEnumerator()
         {
             return database.Select(d => new KeyValuePair<string, T>(d.Key, d.Value.Deserialize<T>())).GetEnumerator();
@@ -93,11 +98,6 @@
         public void Add(KeyValuePair<string, T> item)
         {
             Add(item.Key, item.Value);
-        }
-
-        public void Add(object key, object value)
-        {
-            Add(key.ToString(), (T) value);
         }
 
         public void Clear()
