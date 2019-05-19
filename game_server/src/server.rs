@@ -14,6 +14,7 @@ use super::backend_connection::BackendConnection;
 const PROTOCOL: &str = "tuesday";
 
 pub type Token = u32;
+pub type UserId = u32;
 
 #[derive(Debug)]
 pub enum GameServerError {
@@ -26,8 +27,7 @@ pub enum GameServerError {
 pub struct GameServer {
     addr: SocketAddr,
     lobby: Lobby,
-    backend: Arc<Mutex<BackendConnection>>,
-    clients: Arc<Mutex<HashMap<Token, GameClient>>>,
+    backend: BackendConnection,
 }
 
 pub struct GameClient {
@@ -73,13 +73,12 @@ impl GameServer {
         info!("got a C# backend connection");
         GameServer {
             addr,
-            lobby,
-            backend: Arc::new(Mutex::new(backend)),
-            clients: Arc::new(Mutex::new(HashMap::new())),
+            lobby: lobby,
+            backend: backend,
         }
     }
 
-    pub fn run(&self) -> Result<(), GameServerError> {
+    pub fn run(&mut self) -> Result<(), GameServerError> {
         let reader = self.read_clients();
         loop {
             let connection = reader.recv().unwrap()?;
@@ -87,25 +86,29 @@ impl GameServer {
         }
     }
 
-    fn add_client(&self, mut client: GameClient) {
-        let clients = Arc::clone(&self.clients);
-        let backend = Arc::clone(&self.backend);
-        std::thread::spawn(move || {
-            let token = client.require_token();
-            if let Some(token) = token {
-                let locked_backend = backend.lock().unwrap();
-                let result = locked_backend.validate_token(&token);
-                if let Err(err) = result {
-                    warn!("client's token {} is not valid: '{:?}'", token, err);
-                } else {
+    fn add_client(&mut self, mut client: GameClient) {
+        let token = client.require_token();
+        if let Some(token) = token {
+            let result = self.backend.validate_token(&token);
+            match result {
+                Err(err) => warn!("client's token {} is not valid: '{:?}'",
+                                  token, err),
+                Ok(result) => {
                     debug!("client validation was successfull");
-                    debug!("add client: ({}, {})", token, client.host_name());
-                    clients.lock().unwrap().insert(token, client);
+                    let user_id = result.user_id;
+                    let group_id = result.group_id;
+                    let group_type = result.group_type;
+                    let group_name = result.group_name;
+                    debug!("add client: (id:{}, token:{}, host:{}) to \"{}\"",
+                        user_id, token, client.host_name(), group_name);
+                    //clients.lock().unwrap().insert(token, client);
+                    self.lobby.add_client(&group_type, group_id,
+                                     &group_name, user_id, client);
                 }
-            } else {
-                warn!("client sent invalid token");
             }
-        });
+        } else {
+            warn!("client sent invalid token");
+        }
     }
 
     fn read_clients(&self) -> Receiver<ClientConnection> {

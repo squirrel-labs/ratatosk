@@ -1,5 +1,5 @@
 mod group;
-mod test_group;
+mod scribble_group;
 mod lobby;
 mod server;
 mod backend_connection;
@@ -13,7 +13,7 @@ fn main() {
 
     let addr = ("127.0.0.1", 5001);
     info!("create game server on {:?}", addr);
-    let gameserver = server::GameServer::new(addr);
+    let mut gameserver = server::GameServer::new(addr);
     gameserver.run().unwrap();
 
 }

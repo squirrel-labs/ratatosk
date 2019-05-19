@@ -1,15 +1,27 @@
 use std::collections::HashMap;
 
 use super::group::{Group, GroupId};
+use super::scribble_group::ScribbleGroup;
+
+use super::server::{UserId, GameClient};
 
 pub struct Lobby {
     groups: HashMap<GroupId, Box<Group>>,
 }
 
 impl Lobby {
-    pub fn new() -> Lobby {
+    pub fn new() -> Self {
         Self {
             groups: HashMap::new(),
+        }
+    }
+
+    fn generate_group(group_type: &str, id: GroupId, name: &str) -> Option<Box<Group>> {
+        match group_type {
+            "scribble" => {
+                Some(Box::new(ScribbleGroup::new(id, name.to_string())))
+            },
+            other => None,
         }
     }
 
@@ -17,7 +29,21 @@ impl Lobby {
         self.groups.insert(group.id(), group);
     }
 
-    pub fn iter<'a>(&'a self) -> GroupIterator<'a> {
+    pub fn add_client(&mut self, group_type: &str, group_id: GroupId, group_name: &str,
+                   user_id: UserId, client: GameClient) {
+        if !self.groups.contains_key(&group_id) {
+            let mut group = match Self::generate_group(group_type, group_id, group_name) {
+                    Some(x) => x,
+                    _ => return,
+            };
+            group.run();
+            self.groups.insert(group_id, group);
+        }
+        let group = self.groups.get_mut(&group_id).unwrap();
+        group.add_client(user_id, client);
+    }
+
+    pub fn iter<'b>(&'b self) -> GroupIterator<'b> {
         GroupIterator { groups: self.groups.values() }
     }
 }

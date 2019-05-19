@@ -1,7 +1,8 @@
 use reqwest::{Response, Client, Url, UrlError, Error as ReqError};
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
-use super::server::Token;
+use super::server::{UserId, Token};
+use super::group::GroupId;
 
 pub struct BackendConnection {
     host: String,
@@ -18,9 +19,16 @@ pub enum BackendError {
     BadResponse(Response),
 }
 
-pub type TokenValidity = Result<(), BackendError>;
+pub type TokenValidity = Result<TokenResponse, BackendError>;
 pub type RequestData = Url;
 pub type ResponseResult = Result<Response, ReqError>;
+
+pub struct TokenResponse {
+    pub group_id: GroupId,
+    pub group_type: String,
+    pub group_name: String,
+    pub user_id: UserId,
+}
 
 impl BackendConnection {
     fn run_background(req_rec: Receiver<RequestData>, res_sender: Sender<ResponseResult>) {
@@ -60,7 +68,14 @@ impl BackendConnection {
         self.request(&location).map_err(|err| BackendError::UrlError(err))?;
         let response = self.get_response().map_err(|err| BackendError::RequestError(err))?;
         if response.status().is_success() {
-            Ok(())
+            // zu Testzwecken werden noch keine JSON-Daten deserialisiert
+            // Dennis Server gibt ja noch nix zurück
+            Ok(TokenResponse {
+                group_id: 12,
+                group_type: "scribble".to_string(),
+                group_name: "Scribble".to_string(),
+                user_id: 420
+            })
         } else if response.status() == reqwest::StatusCode::NOT_FOUND {
             Err(BackendError::InvalidToken)
         } else if response.status().is_client_error() {
