@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DSACore.DSA_Game.Characters;
 using DSACore.Auxiliary;
 using DSACore.DSA_Game;
+using DSACore.DSA_Game.Characters;
 
 namespace DSACore.Commands
 {
@@ -15,63 +15,65 @@ namespace DSACore.Commands
 
             var character = Dsa.GetCharacter(id) as Character;
 
-            int first_column_width = 18;
-            
+            var first_column_width = 18;
 
-            if (prop_list.Length == 0 || prop_list[0].ToLower().StartsWith("all") || prop_list[0].ToLower().StartsWith("brief") || prop_list[0].ToLower().StartsWith("zettel"))
+
+            if (prop_list.Length == 0 || prop_list[0].ToLower().StartsWith("all") ||
+                prop_list[0].ToLower().StartsWith("brief") || prop_list[0].ToLower().StartsWith("zettel"))
             {
-
                 res.Add(character.Name + ":\n");
                 //Eigenschaften
                 res.AddRange(
-                character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
+                    character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
                 res.Add("");
                 //LE/AE
                 res.Add("LE:\t " + character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis);
                 if (character.Astralpunkte_Basis > 0)
-                {
                     res.Add("AE:\t " + character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis);
-                }
                 res.Add("");
                 //Kampfwerte
                 res.Add("".AddSpaces(first_column_width) + " AT/PA");
                 res.AddRange(
-                    character.Kampftalente.Select(s => s.Name.AddSpaces(first_column_width) + " " + s.At.ToString().AddSpacesAtHead(2) + "/" + s.Pa.ToString().AddSpacesAtHead(2)));
+                    character.Kampftalente.Select(s =>
+                        s.Name.AddSpaces(first_column_width) + " " + s.At.ToString().AddSpacesAtHead(2) + "/" +
+                        s.Pa.ToString().AddSpacesAtHead(2)));
                 res.Add("");
                 //Fernkampf
                 res.Add("".AddSpaces(first_column_width) + " FK");
                 res.AddRange(
-                    character.Talente.Where(x => x.IstFernkampftalent()).Select(s => s.Name.AddSpaces(first_column_width) + " " + (character.Eigenschaften["fk"] + s.Value).ToString().AddSpacesAtHead(2)));
+                    character.Talente.Where(x => x.IstFernkampftalent()).Select(s =>
+                        s.Name.AddSpaces(first_column_width) + " " +
+                        (character.Eigenschaften["fk"] + s.Value).ToString().AddSpacesAtHead(2)));
                 res.Add("");
                 //Vorteile
                 res.AddRange(
                     character.Vorteile
-                    .Select(s => s.Name + "\t " + s.Value));
+                        .Select(s => s.Name + "\t " + s.Value));
                 res.Add("");
                 //Talente
                 res.AddRange(
-                    character.Talente.Select(s => (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(first_column_width + 5) + " " + s.Probe));
+                    character.Talente.Select(s =>
+                        (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(first_column_width + 5) + " " +
+                        s.Probe));
                 res.Add("");
                 //evtl Zauber
                 if (character.Zauber.Count > 0)
-                {
                     res.AddRange(
-                      character.Zauber.Select(s => (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(first_column_width + 5) + " " + s.Probe));
-                }
-
+                        character.Zauber.Select(s =>
+                            (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(first_column_width + 5) +
+                            " " + s.Probe));
             }
-            else if (prop_list[0].ToLower().StartsWith("man") || prop_list[0].ToLower().StartsWith("help") || prop_list[0].ToLower().StartsWith("hilf"))
+            else if (prop_list[0].ToLower().StartsWith("man") || prop_list[0].ToLower().StartsWith("help") ||
+                     prop_list[0].ToLower().StartsWith("hilf"))
             {
                 return "```xl\n" + Help.Get_Specific_Help("Held") + "\n```";
             }
             else
             {
-
                 res.Add(character.Name + ":\n");
 
-                foreach (string prop in prop_list)
+                foreach (var prop in prop_list)
                 {
-
                     switch (prop.ToLower())
                     {
                         case "e":
@@ -79,18 +81,16 @@ namespace DSACore.Commands
                         case "eigenschaft":
                         case "eigenschaften":
                             res.AddRange(
-                            character.Eigenschaften.Take(8).Select(s => s.Key + ":\t " + s.Value));
+                                character.Eigenschaften.Take(8).Select(s => s.Key + ":\t " + s.Value));
                             break;
                         case "stat":
                         case "stats":
                             res.AddRange(
-                            character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
+                                character.Eigenschaften.Take(9).Select(s => s.Key + ":\t " + s.Value));
                             res.Add("");
                             res.Add("LE:\t " + character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis);
                             if (character.Astralpunkte_Basis > 0)
-                            {
                                 res.Add("AE:\t " + character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis);
-                            }
                             break;
                         case "le":
                             res.Add("LE:\t " + character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis);
@@ -103,12 +103,16 @@ namespace DSACore.Commands
                         case "talent":
                         case "talente":
                             res.AddRange(
-                                character.Talente.Select(s => (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(first_column_width + 5) + " " + s.Probe));
+                                character.Talente.Select(s =>
+                                    (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(
+                                        first_column_width + 5) + " " + s.Probe));
                             break;
                         case "zauber":
                         case "z":
                             res.AddRange(
-                                character.Zauber.Select(s => (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(first_column_width + 5) + " " + s.Probe));
+                                character.Zauber.Select(s =>
+                                    (s.Name.AddSpaces(first_column_width) + " " + s.Value).AddSpaces(
+                                        first_column_width + 5) + " " + s.Probe));
                             break;
                         case "w":
                         case "waffe":
@@ -118,13 +122,17 @@ namespace DSACore.Commands
                         case "kampfwerte":
                             res.Add("".AddSpaces(first_column_width) + " AT/PA");
                             res.AddRange(
-                                character.Kampftalente.Select(s => s.Name.AddSpaces(first_column_width) + " " + s.At.ToString().AddSpacesAtHead(2) + "/" + s.Pa.ToString().AddSpacesAtHead(2)));
+                                character.Kampftalente.Select(s =>
+                                    s.Name.AddSpaces(first_column_width) + " " + s.At.ToString().AddSpacesAtHead(2) +
+                                    "/" + s.Pa.ToString().AddSpacesAtHead(2)));
                             break;
                         case "f":
                         case "fern":
                             res.Add("".AddSpaces(first_column_width) + " FK");
                             res.AddRange(
-                                character.Talente.Where(x => x.IstFernkampftalent()).Select(s => s.Name.AddSpaces(first_column_width) + " " + (character.Eigenschaften["fk"] + s.Value).ToString().AddSpacesAtHead(2)));
+                                character.Talente.Where(x => x.IstFernkampftalent()).Select(s =>
+                                    s.Name.AddSpaces(first_column_width) + " " +
+                                    (character.Eigenschaften["fk"] + s.Value).ToString().AddSpacesAtHead(2)));
                             break;
                         case "v":
                         case "vt":
@@ -135,7 +143,7 @@ namespace DSACore.Commands
                         case "nachteile":
                             res.AddRange(
                                 character.Vorteile
-                                .Select(s => s.Name + "\t " + s.Value));
+                                    .Select(s => s.Name + "\t " + s.Value));
                             break;
 
                         default:
@@ -145,15 +153,11 @@ namespace DSACore.Commands
 
                     res.Add("");
                 }
-
             }
 
 
             var sb = new StringBuilder();
-            foreach (string re in res)
-            {
-                sb.AppendLine(re);
-            }
+            foreach (var re in res) sb.AppendLine(re);
 
             return sb.ToString();
             /* 

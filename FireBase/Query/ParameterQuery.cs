@@ -1,9 +1,9 @@
+using System;
+
 namespace Firebase.Database.Query
 {
-    using System;
-
     /// <summary>
-    /// Represents a parameter in firebase query, e.g. "?data=foo".
+    ///     Represents a parameter in firebase query, e.g. "?data=foo".
     /// </summary>
     public abstract class ParameterQuery : FirebaseQuery
     {
@@ -11,7 +11,7 @@ namespace Firebase.Database.Query
         private readonly string separator;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParameterQuery"/> class.
+        ///     Initializes a new instance of the <see cref="ParameterQuery" /> class.
         /// </summary>
         /// <param name="parent"> The parent of this query. </param>
         /// <param name="parameterFactory"> The parameter. </param>
@@ -20,24 +20,24 @@ namespace Firebase.Database.Query
             : base(parent, client)
         {
             this.parameterFactory = parameterFactory;
-            this.separator = (this.Parent is ChildQuery) ? "?" : "&";
+            separator = Parent is ChildQuery ? "?" : "&";
         }
 
         /// <summary>
-        /// Build the url segment represented by this query. 
-        /// </summary> 
-        /// <param name="child"> The child. </param>
-        /// <returns> The <see cref="string"/>. </returns>
-        protected override string BuildUrlSegment(FirebaseQuery child)
-        {
-            return $"{this.separator}{this.parameterFactory()}={this.BuildUrlParameter(child)}";
-        }
-
-        /// <summary>
-        /// The build url parameter.
+        ///     Build the url segment represented by this query.
         /// </summary>
         /// <param name="child"> The child. </param>
-        /// <returns> The <see cref="string"/>. </returns>
+        /// <returns> The <see cref="string" />. </returns>
+        protected override string BuildUrlSegment(FirebaseQuery child)
+        {
+            return $"{separator}{parameterFactory()}={BuildUrlParameter(child)}";
+        }
+
+        /// <summary>
+        ///     The build url parameter.
+        /// </summary>
+        /// <param name="child"> The child. </param>
+        /// <returns> The <see cref="string" />. </returns>
         protected abstract string BuildUrlParameter(FirebaseQuery child);
     }
 }

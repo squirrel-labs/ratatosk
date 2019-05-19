@@ -1,5 +1,6 @@
-using DSACore.Models.Network;
 using System;
+using DSACore.Commands;
+using DSACore.Models.Network;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DSACore.Controllers
@@ -13,20 +14,18 @@ namespace DSACore.Controllers
         {
             return "Usage: get /tokens/{Token}";
         }
-        
+
         [HttpPost]
-        public string Post([FromBody]Command cmd)
+        public string Post([FromBody] Command cmd)
         {
             try
             {
-                return Commands.CommandHandler.ExecuteCommand(cmd).message;
+                return CommandHandler.ExecuteCommand(cmd).message;
             }
             catch (Exception e)
             {
                 return $"Ein Fehler ist aufgetreten: \n {e.Message}";
             }
-            
-        } 
-        
+        }
     }
 }

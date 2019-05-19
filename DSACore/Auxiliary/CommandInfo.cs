@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace DSACore.Auxiliary
 {
@@ -10,10 +6,10 @@ namespace DSACore.Auxiliary
     {
         public CommandInfo(string name, string brief, string[] description, string scope)
         {
-            this.Name = name;
-            this.Scope = scope;
-            this.Brief = brief;
-            this.Description = description;
+            Name = name;
+            Scope = scope;
+            Brief = brief;
+            Description = description;
         }
 
         public string Name { get; }
@@ -26,7 +22,7 @@ namespace DSACore.Auxiliary
 
         public string GetDescription()
         {
-            return this.Description.Aggregate((s, c) => s + c);
+            return Description.Aggregate((s, c) => s + c);
         }
     }
 }

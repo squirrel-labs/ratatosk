@@ -1,14 +1,13 @@
-﻿using DSACore.DSA_Game.Characters;
-using DSACore.Models.Database;
-using Firebase.Database;
-using Firebase.Database.Query;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DSACore.DSA_Game;
+using DSACore.DSA_Game.Characters;
 using DSACore.Models.Database.DSA;
-using DSACore.Models.Database.Groups;
-
+using DSACore.Models.Network;
+using Firebase.Database;
+using Firebase.Database.Query;
 
 namespace DSACore.FireBase
 {
@@ -16,9 +15,20 @@ namespace DSACore.FireBase
     {
         public static FirebaseClient firebase;
 
+        public static Dictionary<string, DatabaseChar> Chars = new Dictionary<string, DatabaseChar>();
+
+        public static Dictionary<string, MeleeWeapon> MeleeList = new Dictionary<string, MeleeWeapon>();
+
+        public static Dictionary<string, RangedWeapon> RangedWeapons = new Dictionary<string, RangedWeapon>();
+
+        public static Dictionary<string, Talent> Talents = new Dictionary<string, Talent>();
+
+        public static Dictionary<string, GeneralSpell> Spells = new Dictionary<string, GeneralSpell>();
+
         static Database()
         {
-            var auth = File.ReadAllText(DSACore.DSA_Game.Dsa.rootPath + "Token"); ; // your app secret
+            var auth = File.ReadAllText(Dsa.rootPath + "Token");
+            ; // your app secret
             firebase = new FirebaseClient(
                 "https://heldenonline-4d828.firebaseio.com/",
                 new FirebaseOptions
@@ -45,32 +55,19 @@ namespace DSACore.FireBase
                 .OrderByKey()
                 .OnceAsync<T>();
 
-            foreach (var firebaseObject in temp)
-            {
-                list.Add(firebaseObject.Key, firebaseObject.Object);
-            }
+            foreach (var firebaseObject in temp) list.Add(firebaseObject.Key, firebaseObject.Object);
         }
 
-        public static Dictionary<string,DatabaseChar> Chars = new Dictionary<string, DatabaseChar>();
-
-        public static Dictionary<string, MeleeWeapon> MeleeList = new Dictionary<string, MeleeWeapon>();
-
-        public static Dictionary<string, RangedWeapon> RangedWeapons = new Dictionary<string, RangedWeapon>();
-
-        public static Dictionary<string, Talent> Talents = new Dictionary<string, Talent>();
-
-        public static Dictionary<string, GeneralSpell> Spells = new Dictionary<string, GeneralSpell>();
-
-        public static async Task<int> AddChar(Character file, Models.Network.Group group)
+        public static async Task<int> AddChar(Character file, Group group)
         {
-            DatabaseChar.LoadChar(file, out GroupChar groupChar, out DatabaseChar data);
+            DatabaseChar.LoadChar(file, out var groupChar, out var data);
 
             var lastChar = await firebase
                 .Child("Chars")
                 .OrderByKey()
                 .LimitToLast(1)
                 .OnceAsync<DatabaseChar>();
-            int id = groupChar.Id = data.Id = lastChar.First().Object.Id + 1;
+            var id = groupChar.Id = data.Id = lastChar.First().Object.Id + 1;
 
             await firebase //TODO Reomve await Operators
                 .Child("Groups")
@@ -94,7 +91,6 @@ namespace DSACore.FireBase
 
         public static async Task RemoveChar(int id)
         {
-
             await firebase
                 .Child("Groups")
                 .Child("Char" + id)
@@ -111,7 +107,6 @@ namespace DSACore.FireBase
                 .Child("Inventories")
                 .Child("Inventory" + id)
                 .DeleteAsync();
-
         }
 
         public static async Task<DatabaseChar> GetChar(int id)
@@ -158,11 +153,12 @@ namespace DSACore.FireBase
         }
 
         public static async Task<Talent> GetTalent(string talent)
-        {/*
-            return await firebase
-                .Child("Talents")
-                .Child(talent)
-                .OnceSingleAsync<Talent>();*/
+        {
+            /*
+                        return await firebase
+                            .Child("Talents")
+                            .Child(talent)
+                            .OnceSingleAsync<Talent>();*/
             return Talents[talent];
         }
 
@@ -194,7 +190,7 @@ namespace DSACore.FireBase
 
         public static async Task AddWeapon(Weapon wep)
         {
-            string collection = wep.GetType() == typeof(MeleeWeapon) ? "MeleeWeapons" : "RangedWeapons";
+            var collection = wep.GetType() == typeof(MeleeWeapon) ? "MeleeWeapons" : "RangedWeapons";
             await firebase
                 .Child(collection)
                 .Child(wep.Name)
@@ -203,7 +199,7 @@ namespace DSACore.FireBase
 
         public static async Task RemoveWeapon(string weapon, bool ranged = false)
         {
-            string collection = ranged ? "RangedWeapons" : "MeleeWeapons";
+            var collection = ranged ? "RangedWeapons" : "MeleeWeapons";
             await firebase
                 .Child(collection)
                 .Child(weapon)
@@ -212,46 +208,44 @@ namespace DSACore.FireBase
 
         public static async Task<Weapon> GetWeapon(string weapon, bool ranged = false)
         {
-            string collection = ranged ? "RangedWeapons" : "MeleeWeapons";
+            var collection = ranged ? "RangedWeapons" : "MeleeWeapons";
             return await firebase
                 .Child(collection)
                 .Child(weapon)
                 .OnceSingleAsync<Weapon>();
         }
 
-        public static async Task<List<Models.Network.Group>> GetGroups()
+        public static async Task<List<Group>> GetGroups()
         {
             var groups = await firebase
                 .Child("Groups")
                 .OrderByKey()
-                .OnceAsync<Group>();
-            var ret = new List<Models.Network.Group>();
+                .OnceAsync<Models.Database.Groups.Group>();
+            var ret = new List<Group>();
 
             foreach (var firebaseObject in groups)
-            {
-                ret.Add(new Models.Network.Group(firebaseObject.Object.Name, firebaseObject.Object.Password));
-            }
+                ret.Add(new Group(firebaseObject.Object.Name, firebaseObject.Object.Password));
 
             return ret;
         }
 
-        public static async Task<Group> GetGroup(int id)
+        public static async Task<Models.Database.Groups.Group> GetGroup(int id)
         {
             var group = await firebase
                 .Child("Groups")
                 .Child("Group" + id)
-                .OnceSingleAsync<Group>();
+                .OnceSingleAsync<Models.Database.Groups.Group>();
             return group;
         }
 
-        public static async Task AddGroup(Group group)
+        public static async Task AddGroup(Models.Database.Groups.Group group)
         {
             var lastChar = await firebase
                 .Child("Groups")
                 .OrderByKey()
                 .LimitToLast(1)
-                .OnceAsync<Group>();
-            int id = group.Id = lastChar.First().Object.Id + 1;
+                .OnceAsync<Models.Database.Groups.Group>();
+            var id = group.Id = lastChar.First().Object.Id + 1;
 
             await firebase
                 .Child("Groups")
@@ -259,7 +253,7 @@ namespace DSACore.FireBase
                 .PutAsync(group);
         }
 
-        public static async void SetGroup(Group group)
+        public static async void SetGroup(Models.Database.Groups.Group group)
         {
             await firebase
                 .Child("Groups")

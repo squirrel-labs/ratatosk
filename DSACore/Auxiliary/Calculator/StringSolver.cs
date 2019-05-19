@@ -5,49 +5,47 @@ using DSACorev.Auxiliary.Calculator;
 
 namespace DSACore.Auxiliary.Calculator
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     /// <summary>
-    /// The StringSolver divides the calculation string into operations and SubStringSolvers if the string contains parentheses 
+    ///     The StringSolver divides the calculation string into operations and SubStringSolvers if the string contains
+    ///     parentheses
     /// </summary>
     public class StringSolver : ISolvable
     {
-        private readonly string input;
         private readonly List<object> arguments = new List<object>();
+        private readonly string input;
 
         public StringSolver(string input)
         {
             this.input = input;
         }
 
-        public override string ToString()
-        {
-            return "(0+" + this.input.Replace(" ", string.Empty).ToLower() + ")";
-        }
-
         public int Solve()
         {
-            string workInput = "0+" + this.input.Replace(" ", string.Empty).ToLower();
+            var workInput = "0+" + input.Replace(" ", string.Empty).ToLower();
             workInput = ExpandParentheses(workInput);
-            
+
             // Create a List of the different parts of the calculation, e.g.:{"0", "+", "(5+6)", "d", "3"}.
-            this.AtomizeOperations(workInput);
+            AtomizeOperations(workInput);
 
             // traverse the List in order of Operation to Create the binary operation tree .
-            this.NestOperations();
+            NestOperations();
 
             // the List now contains only the top operation node, witch can be solved recursively,
-            return ((ISolvable)this.arguments.First()).Solve();
+            return ((ISolvable) arguments.First()).Solve();
         }
 
-        private static string GetInner(ref string input) // extract the inner bracket an remove the section from the input string
+        public override string ToString()
         {
-            int depth = 0;
+            return "(0+" + input.Replace(" ", string.Empty).ToLower() + ")";
+        }
+
+        private static string
+            GetInner(ref string input) // extract the inner bracket an remove the section from the input string
+        {
+            var depth = 0;
             for (var index = 1; index < input.Length; index++)
             {
-                char c = input[index];
+                var c = input[index];
                 switch (c)
                 {
                     case '(':
@@ -92,21 +90,13 @@ namespace DSACore.Auxiliary.Calculator
 
         private static string ExpandParentheses(string input) // insert * between Parentheses and digits
         {
-            for (int i = 0; i < input.Length - 1; i++)
-            {
+            for (var i = 0; i < input.Length - 1; i++)
                 if (input[i + 1] == '(' && char.IsNumber(input[i]))
-                {
                     input = input.Insert(i + 1, "*");
-                }
-            }
 
-            for (int i = 1; i < input.Length; i++)
-            {
+            for (var i = 1; i < input.Length; i++)
                 if (input[i - 1] == ')' && char.IsNumber(input[i]))
-                {
                     input = input.Insert(i, "*");
-                }
-            }
 
             return input;
         }
@@ -115,16 +105,14 @@ namespace DSACore.Auxiliary.Calculator
         {
             for (var index = 0; index < workInput.Length; index++)
             {
-                char c = workInput[index];
+                var c = workInput[index];
 
                 if (char.IsNumber(c))
                 {
                     // if char number, check if at end of string, else continue looping
                     if (index == workInput.Length - 1)
-                    {
                         // if at end of string; add remaining number to arguments
-                        this.arguments.Add(new Argument(workInput.Substring(0, index + 1)));
-                    }
+                        arguments.Add(new Argument(workInput.Substring(0, index + 1)));
 
                     continue;
                 }
@@ -132,18 +120,15 @@ namespace DSACore.Auxiliary.Calculator
                 switch (c)
                 {
                     case ')':
-                        throw new ArgumentException($"Unmögliche Anordnung von Klammern");
+                        throw new ArgumentException("Unmögliche Anordnung von Klammern");
                     case '(':
-                        this.arguments.Add(new StringSolver(GetInner(ref workInput)));
+                        arguments.Add(new StringSolver(GetInner(ref workInput)));
                         index = -1;
                         break;
                     default:
-                        if (index > 0)
-                        {
-                            this.arguments.Add(new Argument(workInput.Substring(0, index)));
-                        }
+                        if (index > 0) arguments.Add(new Argument(workInput.Substring(0, index)));
 
-                        this.arguments.Add(GetOps(c));
+                        arguments.Add(GetOps(c));
                         workInput = workInput.Remove(0, index + 1);
                         index = -1;
                         break;
@@ -154,58 +139,44 @@ namespace DSACore.Auxiliary.Calculator
         private void NestOperations()
         {
             foreach (Ops currentOp in Enum.GetValues(typeof(Ops)))
-            {
                 // cycle through operators in operational order
-                for (var index = 0; index < this.arguments.Count; index++)
+                for (var index = 0; index < arguments.Count; index++)
                 {
-                    var arg = this.arguments[index];
+                    var arg = arguments[index];
 
-                    if (arg.GetType() != typeof(Ops))
-                    {
-                        continue;
-                    }
+                    if (arg.GetType() != typeof(Ops)) continue;
 
                     // arg is of type Ops
-                    var op = (Ops)arg;
+                    var op = (Ops) arg;
 
-                    if (op != currentOp)
-                    {
-                        continue;
-                    }
+                    if (op != currentOp) continue;
 
                     // arg describes the current operation
-                    this.HandleSpecialFormatting(ref index, op); // Deal with special needs...
+                    HandleSpecialFormatting(ref index, op); // Deal with special needs...
 
                     // replace the previous current and next Element in the List with one Operation object
-                    var temp = new Operator((ISolvable)this.arguments[index - 1], (ISolvable)this.arguments[index + 1], op); 
-                    this.arguments[index - 1] = temp;
-                    this.arguments.RemoveRange(index, 2);
+                    var temp = new Operator((ISolvable) arguments[index - 1], (ISolvable) arguments[index + 1], op);
+                    arguments[index - 1] = temp;
+                    arguments.RemoveRange(index, 2);
                     index--;
                 }
-            }
         }
 
         private void HandleSpecialFormatting(ref int index, Ops op)
         {
-            var arg1 = this.arguments[index - 1];
+            var arg1 = arguments[index - 1];
             if (arg1.GetType() == typeof(Ops))
             {
-                if (op == Ops.Dice)
-                {
-                    this.arguments.Insert(index++, new Argument("1")); // w6 -> 1w6
-                }
+                if (op == Ops.Dice) arguments.Insert(index++, new Argument("1")); // w6 -> 1w6
 
-                if (op == Ops.Subtract)
-                {
-                    this.arguments.Insert(index++, new Argument("0")); // +-3 -> +0-3
-                }
+                if (op == Ops.Subtract) arguments.Insert(index++, new Argument("0")); // +-3 -> +0-3
             }
 
-            var arg2 = this.arguments[index + 1]; // 3+-5 -> 3+(0-5)
+            var arg2 = arguments[index + 1]; // 3+-5 -> 3+(0-5)
             if (arg2.GetType() == typeof(Ops))
             {
-                this.arguments[index + 1] = new Operator(new Argument("0"), (ISolvable)this.arguments[index + 2], (Ops)arg2);
-                this.arguments.RemoveAt(index + 2);
+                arguments[index + 1] = new Operator(new Argument("0"), (ISolvable) arguments[index + 2], (Ops) arg2);
+                arguments.RemoveAt(index + 2);
             }
         }
     }

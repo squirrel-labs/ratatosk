@@ -1,79 +1,75 @@
-namespace Firebase.Database.Query 
-{
-    using System;
-    using System.Globalization;
+using System;
+using System.Globalization;
 
+namespace Firebase.Database.Query
+{
     /// <summary>
-    /// Represents a firebase filtering query, e.g. "?LimitToLast=10".
+    ///     Represents a firebase filtering query, e.g. "?LimitToLast=10".
     /// </summary>
-    public class FilterQuery : ParameterQuery 
+    public class FilterQuery : ParameterQuery
     {
-        private readonly Func<string> valueFactory;
-        private readonly Func<double> doubleValueFactory;
         private readonly Func<bool> boolValueFactory;
+        private readonly Func<double> doubleValueFactory;
+        private readonly Func<string> valueFactory;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterQuery"/> class.
+        ///     Initializes a new instance of the <see cref="FilterQuery" /> class.
         /// </summary>
         /// <param name="parent"> The parent. </param>
         /// <param name="filterFactory"> The filter. </param>
         /// <param name="valueFactory"> The value for filter. </param>
-        /// <param name="client"> The owning client. </param>  
-        public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<string> valueFactory, FirebaseClient client)
+        /// <param name="client"> The owning client. </param>
+        public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<string> valueFactory,
+            FirebaseClient client)
             : base(parent, filterFactory, client)
         {
             this.valueFactory = valueFactory;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterQuery"/> class.
+        ///     Initializes a new instance of the <see cref="FilterQuery" /> class.
         /// </summary>
         /// <param name="parent"> The parent. </param>
         /// <param name="filterFactory"> The filter. </param>
         /// <param name="valueFactory"> The value for filter. </param>
         /// <param name="client"> The owning client. </param>
-        public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<double> valueFactory, FirebaseClient client)
+        public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<double> valueFactory,
+            FirebaseClient client)
             : base(parent, filterFactory, client)
         {
-            this.doubleValueFactory = valueFactory;
+            doubleValueFactory = valueFactory;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterQuery"/> class.
+        ///     Initializes a new instance of the <see cref="FilterQuery" /> class.
         /// </summary>
         /// <param name="parent"> The parent. </param>
         /// <param name="filterFactory"> The filter. </param>
         /// <param name="valueFactory"> The value for filter. </param>
         /// <param name="client"> The owning client. </param>
-        public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<bool> valueFactory, FirebaseClient client)
+        public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<bool> valueFactory,
+            FirebaseClient client)
             : base(parent, filterFactory, client)
         {
-            this.boolValueFactory = valueFactory;
+            boolValueFactory = valueFactory;
         }
 
         /// <summary>
-        /// The build url parameter.
+        ///     The build url parameter.
         /// </summary>
-        /// <param name="child"> The child. </param> 
-        /// <returns> Url parameter part of the resulting path. </returns> 
+        /// <param name="child"> The child. </param>
+        /// <returns> Url parameter part of the resulting path. </returns>
         protected override string BuildUrlParameter(FirebaseQuery child)
         {
-            if (this.valueFactory != null)
+            if (valueFactory != null)
             {
-                if(this.valueFactory() == null)
-                {
-                    return $"null";
-                }
-                return $"\"{this.valueFactory()}\"";
+                if (valueFactory() == null) return "null";
+                return $"\"{valueFactory()}\"";
             }
-            else if (this.doubleValueFactory != null)
-            {
-                return this.doubleValueFactory().ToString(CultureInfo.InvariantCulture);
-            }
-            else if (this.boolValueFactory != null)
-            {
-                return $"{this.boolValueFactory().ToString().ToLower()}";
-            }
+
+            if (doubleValueFactory != null)
+                return doubleValueFactory().ToString(CultureInfo.InvariantCulture);
+            if (boolValueFactory != null) return $"{boolValueFactory().ToString().ToLower()}";
 
             return string.Empty;
         }

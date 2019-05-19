@@ -1,7 +1,7 @@
 ﻿using System;
 using DSACore.Auxiliary;
+using DSACore.Auxiliary.Calculator;
 using DSACore.DSA_Game;
-using DSACore.Models;
 using DSACore.Models.Network;
 
 namespace DSACore.Commands
@@ -10,8 +10,8 @@ namespace DSACore.Commands
     {
         public static CommandResponse ExecuteCommand(Command cmd)
         {
-            string res = string.Empty;
-            ResponseType type = ResponseType.Broadcast;
+            var res = string.Empty;
+            var type = ResponseType.Broadcast;
             switch (cmd.CmdIdentifier.ToLower())
             {
                 case "addChar":
@@ -21,7 +21,7 @@ namespace DSACore.Commands
                 case "wert":
                 case "werte":
                 case "char":
-                    res = Commands.HeldList.ListAsync(cmd.CharId, cmd.CmdText);
+                    res = HeldList.ListAsync(cmd.CharId, cmd.CmdText);
                     break;
                 case "help":
                 case "man":
@@ -49,28 +49,21 @@ namespace DSACore.Commands
                     res = RandomMisc.Roll(cmd.CmdText + " " + cmd.Cmdmodifier);
                     break;
                 case "solve":
-                    res = new Auxiliary.Calculator.StringSolver(cmd.CmdText + cmd.Cmdmodifier).Solve().ToString();
+                    res = new StringSolver(cmd.CmdText + cmd.Cmdmodifier).Solve().ToString();
                     break;
                 case "npc":
                     res = NpcCommands.CreateNpc(cmd.CharId, cmd.CmdTexts, cmd.Cmdmodifier);
                     break;
-
             }
 
-            if (res == string.Empty)
-            {
-                res= Proben(cmd.Name, cmd.CmdIdentifier, cmd.CmdText, cmd.Cmdmodifier);
-            }
-            if (res != string.Empty)
-            {
-                return new CommandResponse(res, type);
-            }
+            if (res == string.Empty) res = Proben(cmd.Name, cmd.CmdIdentifier, cmd.CmdText, cmd.Cmdmodifier);
+            if (res != string.Empty) return new CommandResponse(res, type);
             return new CommandResponse($"Kommando {cmd.CmdIdentifier} nicht gefunden", ResponseType.Error);
         }
 
         private static string Proben(string name, string command, string waffe, int erschwernis = 0)
         {
-            string res = string.Empty;
+            var res = string.Empty;
             switch (command.ToLower())
             {
                 case "f":

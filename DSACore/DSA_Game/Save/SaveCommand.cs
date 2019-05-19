@@ -1,23 +1,21 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace DSACore.DSA_Game.Save
 {
-    using System.IO;
-
-    public class SaveCommand 
+    public class SaveCommand
     {
         public void LoadSession(string name = "")
         {
             if (name.Equals("?") || name.Equals(string.Empty))
             {
-                Console.WriteLine($"Gespeicherte Sessions:");
-                Console.WriteLine(this.ListSessions());
+                Console.WriteLine("Gespeicherte Sessions:");
+                Console.WriteLine(ListSessions());
                 return;
             }
 
-            var path = Save.Session.DirectoryPath + @"\" + name;
+            var path = Session.DirectoryPath + @"\" + name;
 
             var files = Directory.GetFiles(path);
             var session = files.OrderByDescending(x => Convert.ToInt32(x.Split('-').Last().Split('.').First())).First();
@@ -32,16 +30,16 @@ namespace DSACore.DSA_Game.Save
 
             if (name.Equals("?") || name.Equals(string.Empty))
             {
-                Console.WriteLine($"Gespeicherte Sessions:");
-                Console.WriteLine(this.ListSessions());
+                Console.WriteLine("Gespeicherte Sessions:");
+                Console.WriteLine(ListSessions());
                 return;
             }
 
-            var path = DSA_Game.Save.Session.DirectoryPath + @"\" + name;
+            var path = Session.DirectoryPath + @"\" + name;
             if (Directory.Exists(path))
             {
                 var files = Directory.GetFiles(path);
-                int current = files.Max(x => Convert.ToInt32(x.Split('-').Last().Split('.').First()));
+                var current = files.Max(x => Convert.ToInt32(x.Split('-').Last().Split('.').First()));
                 Dsa.Session.SessionName = name;
                 Dsa.Session.Save(path + "\\" + name + $"-{++current}.json");
             }
@@ -49,7 +47,7 @@ namespace DSACore.DSA_Game.Save
             {
                 Directory.CreateDirectory(path);
                 Dsa.Session.SessionName = name;
-                Dsa.Session.Save(path + "\\" + name + $"-0.json");
+                Dsa.Session.Save(path + "\\" + name + "-0.json");
             }
 
             Console.WriteLine($"{name} wurde gespeichert");
@@ -58,11 +56,9 @@ namespace DSACore.DSA_Game.Save
 
         private string[] ListSessions()
         {
-            string[] dirs = Directory.GetDirectories(Session.DirectoryPath).OrderByDescending(x => new DirectoryInfo(x).LastAccessTime.Ticks).ToArray();
-            for (int i = 0; i < dirs.Length; i++)
-            {
-                dirs[i] += "; " + new DirectoryInfo(dirs[i]).LastAccessTime;
-            }
+            var dirs = Directory.GetDirectories(Session.DirectoryPath)
+                .OrderByDescending(x => new DirectoryInfo(x).LastAccessTime.Ticks).ToArray();
+            for (var i = 0; i < dirs.Length; i++) dirs[i] += "; " + new DirectoryInfo(dirs[i]).LastAccessTime;
 
             return dirs;
         }

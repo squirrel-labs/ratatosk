@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DiscoBot.DSA_Game.Characters
+﻿namespace DiscoBot.DSA_Game.Characters
 {
     public interface ICombatant
     {
@@ -18,7 +12,7 @@ namespace DiscoBot.DSA_Game.Characters
 
         int Astralpunkte_Basis { get; set; }
         int Astralpunkte_Aktuell { get; set; }
-        
+
         string Angriff(string talent, int erschwernis = 0);
 
         string Parade(string talent, int erschwernis = 0);

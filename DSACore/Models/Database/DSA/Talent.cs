@@ -13,7 +13,7 @@ namespace DSACore.Models.Database.DSA
             Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
-        public Talent(string name, String roll)
+        public Talent(string name, string roll)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Roll = roll.Split('/');

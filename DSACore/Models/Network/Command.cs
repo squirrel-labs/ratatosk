@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace DSACore.Models.Network
 {
@@ -14,7 +12,7 @@ namespace DSACore.Models.Network
         public List<string> CmdTexts { get; set; }
         public string CmdText => CmdTexts.Count != 0 ? CmdTexts.First() : "";
 
-        public int Cmdmodifier => CmdTexts.Count != 0 && int.TryParse(CmdTexts.Last(), out int mod) ? mod : 0;
+        public int Cmdmodifier => CmdTexts.Count != 0 && int.TryParse(CmdTexts.Last(), out var mod) ? mod : 0;
         public bool IsDm { get; set; } = false;
     }
 }

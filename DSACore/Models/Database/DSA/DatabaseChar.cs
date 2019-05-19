@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DSACore.DSA_Game.Characters;
 
 namespace DSACore.Models.Database.DSA
 {
@@ -10,7 +11,8 @@ namespace DSACore.Models.Database.DSA
         {
         }
 
-        public DatabaseChar(int id, string name, string rasse, List<Field> skills, List<Field> talents, List<Advantage> advantages, List<CharSpell> spells, List<WeaponTalent> weaponTalents)
+        public DatabaseChar(int id, string name, string rasse, List<Field> skills, List<Field> talents,
+            List<Advantage> advantages, List<CharSpell> spells, List<WeaponTalent> weaponTalents)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -39,7 +41,7 @@ namespace DSACore.Models.Database.DSA
         public List<WeaponTalent> WeaponTalents { get; set; } = new List<WeaponTalent>();
 
 
-        public static void LoadChar(DSA_Game.Characters.Character file, out GroupChar group, out DatabaseChar data)
+        public static void LoadChar(Character file, out GroupChar group, out DatabaseChar data)
         {
             group = new GroupChar();
             data = new DatabaseChar();

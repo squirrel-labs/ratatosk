@@ -1,57 +1,49 @@
+using System;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
+using Firebase.Database.Query;
 
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Firebase.Database.Tests")]
+[assembly: InternalsVisibleTo("Firebase.Database.Tests")]
 
 namespace Firebase.Database
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-
-    using Firebase.Database.Offline;
-    using Firebase.Database.Query;
-
     /// <summary>
-    /// Firebase client which acts as an entry point to the online database.
+    ///     Firebase client which acts as an entry point to the online database.
     /// </summary>
     public class FirebaseClient : IDisposable
     {
+        private readonly string baseUrl;
         internal readonly HttpClient HttpClient;
         internal readonly FirebaseOptions Options;
 
-        private readonly string baseUrl;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="FirebaseClient"/> class.
+        ///     Initializes a new instance of the <see cref="FirebaseClient" /> class.
         /// </summary>
         /// <param name="baseUrl"> The base url. </param>
-        /// <param name="offlineDatabaseFactory"> Offline database. </param>  
+        /// <param name="offlineDatabaseFactory"> Offline database. </param>
         public FirebaseClient(string baseUrl, FirebaseOptions options = null)
         {
-            this.HttpClient = new HttpClient();
-            this.Options = options ?? new FirebaseOptions();
+            HttpClient = new HttpClient();
+            Options = options ?? new FirebaseOptions();
 
             this.baseUrl = baseUrl;
 
-            if (!this.baseUrl.EndsWith("/"))
-            {
-                this.baseUrl += "/";
-            }
-        }
-
-        /// <summary>
-        /// Queries for a child of the data root.
-        /// </summary>
-        /// <param name="resourceName"> Name of the child. </param>
-        /// <returns> <see cref="ChildQuery"/>. </returns>
-        public ChildQuery Child(string resourceName)
-        {
-            return new ChildQuery(this, () => this.baseUrl + resourceName);
+            if (!this.baseUrl.EndsWith("/")) this.baseUrl += "/";
         }
 
         public void Dispose()
         {
             HttpClient?.Dispose();
+        }
+
+        /// <summary>
+        ///     Queries for a child of the data root.
+        /// </summary>
+        /// <param name="resourceName"> Name of the child. </param>
+        /// <returns> <see cref="ChildQuery" />. </returns>
+        public ChildQuery Child(string resourceName)
+        {
+            return new ChildQuery(this, () => baseUrl + resourceName);
         }
     }
 }

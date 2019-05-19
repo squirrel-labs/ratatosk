@@ -1,28 +1,24 @@
 ﻿using System;
-using DSACore.Auxiliary;
-using DSACore.FireBase;
+using System.Collections.Generic;
+using System.Linq;
+using DSACore.DSA_Game.Characters;
+using DSACore.DSA_Game.Save;
 using DSALib;
 using DSALib.Characters;
-using Microsoft.EntityFrameworkCore.Design;
 
 namespace DSACore.DSA_Game
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using DSACore.DSA_Game.Characters;
-    using DSACore.DSA_Game.Save;
-
     public static class Dsa
     {
 #if DEBUG
-        public const string rootPath = "";//"C:\\Users\\Dennis\\Source\\Repos\\DiscoBot\\DSACore\\";//"DiscoBot\\DSACore\\";
+        public const string
+            rootPath = ""; //"C:\\Users\\Dennis\\Source\\Repos\\DiscoBot\\DSACore\\";//"DiscoBot\\DSACore\\";
 #else
         public const string rootPath = "";//"DiscoBot\\DSACore\\";
 #endif
         private static Session s_session;
 
-        public static List<ICharacter> Chars { get; set; } = new List<ICharacter>();  // list of all characters
+        public static List<ICharacter> Chars { get; set; } = new List<ICharacter>(); // list of all characters
 
         public static List<Talent> Talente { get; set; } = new List<Talent>();
 
@@ -39,10 +35,7 @@ namespace DSACore.DSA_Game
             set
             {
                 s_session = value;
-                foreach (var x in value.Chars)
-                {
-                    Chars.Find(c => c.Name.Equals(x.Name)).Update(x);
-                }
+                foreach (var x in value.Chars) Chars.Find(c => c.Name.Equals(x.Name)).Update(x);
             }
         }
 
@@ -61,9 +54,9 @@ namespace DSACore.DSA_Game
             }
 */
 
-            Properties.Deserialize(rootPath+"Properties");
+            Properties.Deserialize();
             Properties.Serialize(rootPath + "Properties");
-            
+
 
             Talente = Talente.OrderBy(x => x.Name).ToList();
             Zauber = Zauber.OrderBy(x => x.Name).ToList();

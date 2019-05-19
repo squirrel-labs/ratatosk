@@ -1,34 +1,27 @@
-﻿namespace DiscoBot.Audio
+﻿using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Audio;
+
+namespace DiscoBot.Audio
 {
-    using System.Collections.Concurrent;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Threading.Tasks;
-
-    using DiscoBot.DSA_Game;
-
-    using Discord;
-    using Discord.Audio;
-
     public class AudioService
     {
-        private readonly ConcurrentDictionary<ulong, IAudioClient> connectedChannels = new ConcurrentDictionary<ulong, IAudioClient>();
+        private readonly ConcurrentDictionary<ulong, IAudioClient> connectedChannels =
+            new ConcurrentDictionary<ulong, IAudioClient>();
 
         public async Task JoinAudio(IGuild guild, IVoiceChannel target)
         {
-            if (this.connectedChannels.TryGetValue(guild.Id, out var client))
-            {
-                return;
-            }
+            if (connectedChannels.TryGetValue(guild.Id, out var client)) return;
 
-            if (target.Guild.Id != guild.Id)
-            {
-                return;
-            }
+            if (target.Guild.Id != guild.Id) return;
 
             var audioClient = await target.ConnectAsync();
 
-            if (this.connectedChannels.TryAdd(guild.Id, audioClient))
+            if (connectedChannels.TryAdd(guild.Id, audioClient))
             {
                 // If you add a method to log happenings from this service,
                 // you can uncomment these commented lines to make use of that.
@@ -38,11 +31,9 @@
 
         public async Task LeaveAudio(IGuild guild)
         {
-            if (this.connectedChannels.TryRemove(guild.Id, out var client))
-            {
+            if (connectedChannels.TryRemove(guild.Id, out var client))
                 await client.StopAsync();
-                //await Log(LogSeverity.Info, $"Disconnected from voice on {guild.Name}.");
-            }
+            //await Log(LogSeverity.Info, $"Disconnected from voice on {guild.Name}.");
         }
 
         public async Task SendAudioAsync(IGuild guild, IMessageChannel channel, string path)
@@ -54,28 +45,31 @@
                 return;
             }
 
-            if (this.connectedChannels.TryGetValue(guild.Id, out var client))
-            {
+            if (connectedChannels.TryGetValue(guild.Id, out var client))
                 //await Log(LogSeverity.Debug, $"Starting playback of {path} in {guild.Name}");
-                using (var ffmpeg = this.CreateStream(path))
+                using (var ffmpeg = CreateStream(path))
                 using (var stream = client.CreatePCMStream(AudioApplication.Music))
                 {
-                    try { await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream); }
-                    finally { await stream.FlushAsync(); }
+                    try
+                    {
+                        await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream);
+                    }
+                    finally
+                    {
+                        await stream.FlushAsync();
+                    }
                 }
-            }
         }
 
-        public async Task SendAudioAsync(string path, int Volume)
+        public async Task SendAudioAsync(string path, int volume)
         {
             // Your task: Get a full path to the file if the value of 'path' is only a filename.
             if (!File.Exists(path) && false)
-            {
                 //await channel.SendMessageAsync("File does not exist.");
                 return;
-            }
 
-            if (this.connectedChannels.TryGetValue(Dsa.GeneralContext.Guild.Id, out var client))
+            throw new NotImplementedException("get channel data from server");
+            /*if (this.connectedChannels.TryGetValue())
             {
                 //await Log(LogSeverity.Debug, $"Starting playback of {path} in {guild.Name}");
                 using (var ffmpeg = this.CreateStream(path))
@@ -84,10 +78,10 @@
                     try { await ffmpeg.StandardOutput.BaseStream.CopyToAsync(stream); }
                     finally { await stream.FlushAsync(); }
                 }
-            }
+            }*/
         }
 
-        private Process CreateStream(string path)
+        private static Process CreateStream(string path)
         {
             return Process.Start(new ProcessStartInfo
             {

@@ -4,9 +4,9 @@
     {
         public KampfTalent(string name, int at, int pa)
         {
-            this.Name = name;
-            this.At = at;
-            this.Pa = pa;
+            Name = name;
+            At = at;
+            Pa = pa;
         }
 
         public string Name { get; set; }

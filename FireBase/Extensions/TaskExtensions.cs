@@ -1,12 +1,12 @@
-﻿namespace Firebase.Database.Extensions
-{
-    using System;
-    using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
+namespace Firebase.Database.Extensions
+{
     public static class TaskExtensions
     {
         /// <summary>
-        /// Instead of unwrapping <see cref="AggregateException"/> it throws it as it is.
+        ///     Instead of unwrapping <see cref="AggregateException" /> it throws it as it is.
         /// </summary>
         public static async Task WithAggregateException(this Task source)
         {

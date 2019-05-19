@@ -1,17 +1,17 @@
 using System;
-using Microsoft.EntityFrameworkCore;
 
 namespace DSACore.Models.Network
 {
     public class Token
     {
-        public string Group { get; set; }
-        private DateTime creation = DateTime.Now;
+        private readonly DateTime creation = DateTime.Now;
 
-        public Token(string @group)
+        public Token(string group)
         {
-            Group = @group;
+            Group = group;
         }
+
+        public string Group { get; set; }
 
         public bool IsValid()
         {
