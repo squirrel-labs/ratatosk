@@ -23,7 +23,8 @@ pub fn init_logger() {
         })
         .level(log::LevelFilter::Debug)
         .level_for("hyper", log::LevelFilter::Off)
-        .level_for("tokio-reactor", log::LevelFilter::Off)
+        .level_for("tokio_reactor", log::LevelFilter::Off)
+        .level_for("reqwest", log::LevelFilter::Off)
         .chain(std::io::stdout())
         .apply().unwrap();
 }
