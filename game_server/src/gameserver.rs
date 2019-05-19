@@ -13,7 +13,7 @@ use super::backend_connection::BackendConnection;
 
 const PROTOCOL: &str = "tuesday";
 
-type Token = u32;
+pub type Token = u32;
 
 #[derive(Debug)]
 pub enum GameServerError {
@@ -26,7 +26,7 @@ pub enum GameServerError {
 pub struct GameServer {
     addr: SocketAddr,
     lobby: Lobby,
-    backend: BackendConnection,
+    backend: Arc<Mutex<BackendConnection>>,
     clients: Arc<Mutex<HashMap<Token, GameClient>>>,
 }
 
@@ -70,7 +70,7 @@ impl GameServer {
         GameServer {
             addr,
             lobby,
-            backend,
+            backend: Arc::new(Mutex::new(backend)),
             clients: Arc::new(Mutex::new(HashMap::new())),
         }
     }
@@ -86,13 +86,20 @@ impl GameServer {
 
     fn add_client(&self, mut client: GameClient) {
         let clients = Arc::clone(&self.clients);
+        let backend = Arc::clone(&self.backend);
         std::thread::spawn(move || {
             let token = client.require_token();
             if let Some(token) = token {
                 println!("Token: {}", token);
-                clients.lock().unwrap().insert(token, client);
+                let locked_backend = backend.lock().unwrap();
+                let result = locked_backend.validate_token(&token);
+                if let Err(err) = result {
+                    warn!("token {} is invalid: '{:?}'", token, err);
+                } else {
+                    clients.lock().unwrap().insert(token, client);
+                }
             } else {
-                warn!("Client sent invalid token");
+                warn!("client sent invalid token");
             }
         });
     }
