@@ -18,10 +18,6 @@ pub enum BackendError {
     BadResponse(Response),
 }
 
-struct TokenResponseStruct {
-
-}
-
 pub type TokenValidity = Result<(), BackendError>;
 pub type RequestData = Url;
 pub type ResponseResult = Result<Response, ReqError>;
@@ -59,14 +55,10 @@ impl BackendConnection {
         self.res_rec.recv().unwrap()
     }
     
-    pub fn host_name<'a>(&'a self) -> &'a str {
-        &self.host
-    }
-
     pub fn validate_token(&self, token: &Token) -> TokenValidity {
         let location = format!("/api/lobby/tokens/{}", token);
         self.request(&location).map_err(|err| BackendError::UrlError(err))?;
-        let mut response = self.get_response().map_err(|err| BackendError::RequestError(err))?;
+        let response = self.get_response().map_err(|err| BackendError::RequestError(err))?;
         if response.status().is_success() {
             Ok(())
         } else if response.status() == reqwest::StatusCode::NOT_FOUND {

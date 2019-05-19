@@ -8,8 +8,6 @@ mod game_logger;
 
 #[macro_use] extern crate log;
 
-use backend_connection::BackendConnection;
-
 fn main() {
     game_logger::init_logger();
 

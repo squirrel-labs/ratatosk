@@ -1,7 +1,7 @@
 use websocket::{OwnedMessage,
     sync::Server,
     client::sync::Client,
-    server::{NoTlsAcceptor, InvalidConnection,
+    server::{NoTlsAcceptor,
         sync::AcceptResult}};
 use std::net::{SocketAddr, ToSocketAddrs, TcpStream};
 use std::sync::{mpsc,
@@ -82,10 +82,9 @@ impl GameServer {
     pub fn run(&self) -> Result<(), GameServerError> {
         let reader = self.read_clients();
         loop {
-            let mut connection = reader.recv().unwrap()?;
+            let connection = reader.recv().unwrap()?;
             self.add_client(connection);
         }
-        Ok(())
     }
 
     fn add_client(&self, mut client: GameClient) {
@@ -160,7 +159,7 @@ impl GameServer {
                     }
                 }
             },
-            Err(e) => {
+            Err(_) => {
                 warn!("invalid client request");
                 Err(GameServerError::HandshakeRequestError)
             }
