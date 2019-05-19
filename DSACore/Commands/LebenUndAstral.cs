@@ -12,9 +12,9 @@ namespace DSACore.Commands
         public static string LEAsync(ulong id, string modifier)
         {
             //This is the string that will be printed
-            string res = "";
+            var res = "";
 
-            
+
             //Get the actual text
             res += Dsa.GetCharacter(id).get_LE_Text(modifier);
 
@@ -23,17 +23,17 @@ namespace DSACore.Commands
         }
     }
 
-    public class AE 
+    public class AE
     {
         public static string AEAsync(ulong id, string modifier)
         {
             //This is the string that will be printed
-            string res = "";
+            var res = "";
 
 
             //Get the actual text
             res += Dsa.GetCharacter(id).get_AE_Text(modifier);
-            
+
             return res;
         }
     }
@@ -42,11 +42,11 @@ namespace DSACore.Commands
     {
         public static string get_LE_Text(this ICharacter c, string prop)
         {
-            string res = "";
+            var res = "";
             var comp = new SpellCorrect();
             var character = c;
 
-            res += (character.Name + ":\n");
+            res += character.Name + ":\n";
 
             //If there is actual input we process it
             if (prop.Length > 0)
@@ -60,15 +60,20 @@ namespace DSACore.Commands
                     //Allow overflowing the max
                     if (prop.StartsWith("++"))
                     {
-                        character.Lebenspunkte_Aktuell = character.Lebenspunkte_Aktuell + Convert.ToInt32(prop.Substring(1, prop.Length - 1));
+                        character.Lebenspunkte_Aktuell = character.Lebenspunkte_Aktuell +
+                                                         Convert.ToInt32(prop.Substring(1, prop.Length - 1));
                     }
                     else
                     {
-                        int temp = character.Lebenspunkte_Aktuell + Convert.ToInt32(prop) - character.Lebenspunkte_Basis;
+                        var temp = character.Lebenspunkte_Aktuell + Convert.ToInt32(prop) -
+                                   character.Lebenspunkte_Basis;
                         //Stop from overflow overflow
                         if (temp > 0 && prop.StartsWith("+"))
                         {
-                            character.Lebenspunkte_Aktuell = (character.Lebenspunkte_Basis > character.Lebenspunkte_Aktuell) ? character.Lebenspunkte_Basis : character.Lebenspunkte_Aktuell;
+                            character.Lebenspunkte_Aktuell =
+                                character.Lebenspunkte_Basis > character.Lebenspunkte_Aktuell
+                                    ? character.Lebenspunkte_Basis
+                                    : character.Lebenspunkte_Aktuell;
                             res += " Maximale Lebenspunkte sind erreicht ";
                         }
                         //Simply apply change
@@ -91,23 +96,23 @@ namespace DSACore.Commands
             //If no value is passed, the curent value is displayed
             else
             {
-                res += ("LE: " + character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis);
+                res += "LE: " + character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis;
             }
 
             return res;
         }
+
         public static string get_AE_Text(this ICharacter c, string prop)
         {
-            string res = "";
+            var res = "";
             var comp = new SpellCorrect();
             var character = c;
 
-            res += (character.Name + ":\n");
+            res += character.Name + ":\n";
 
             //If there is actual input we process it
             if (prop.Length > 0)
             {
-
                 res += "AE: ";
                 res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis + " -> ";
 
@@ -117,15 +122,20 @@ namespace DSACore.Commands
                     //Allow overflowing the max
                     if (prop.StartsWith("++"))
                     {
-                        character.Astralpunkte_Aktuell = character.Astralpunkte_Aktuell + Convert.ToInt32(prop.Substring(1, prop.Length - 1));
+                        character.Astralpunkte_Aktuell = character.Astralpunkte_Aktuell +
+                                                         Convert.ToInt32(prop.Substring(1, prop.Length - 1));
                     }
                     else
                     {
-                        int temp = character.Astralpunkte_Aktuell + Convert.ToInt32(prop) - character.Astralpunkte_Basis;
+                        var temp = character.Astralpunkte_Aktuell + Convert.ToInt32(prop) -
+                                   character.Astralpunkte_Basis;
                         //Stop from overflow overflow
                         if (temp > 0 && prop.StartsWith("+"))
                         {
-                            character.Astralpunkte_Aktuell = (character.Astralpunkte_Basis > character.Astralpunkte_Aktuell) ? character.Astralpunkte_Basis : character.Astralpunkte_Aktuell;
+                            character.Astralpunkte_Aktuell =
+                                character.Astralpunkte_Basis > character.Astralpunkte_Aktuell
+                                    ? character.Astralpunkte_Basis
+                                    : character.Astralpunkte_Aktuell;
                             res += " Maximale Astralpunkte sind erreicht ";
                         }
                         //Simply apply change
@@ -142,7 +152,6 @@ namespace DSACore.Commands
                     }
 
                     res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis;
-
                 }
                 //Set to new value regardless of original
                 else
@@ -155,7 +164,7 @@ namespace DSACore.Commands
             //If no value is passed, the curent value is displayed
             else
             {
-                res += ("AE: " + character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis);
+                res += "AE: " + character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis;
             }
 
 
@@ -163,6 +172,3 @@ namespace DSACore.Commands
         }
     }
 }
-
-
-

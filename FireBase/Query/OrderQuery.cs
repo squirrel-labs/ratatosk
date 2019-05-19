@@ -28,7 +28,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="string"/>. </returns>
         protected override string BuildUrlParameter(FirebaseQuery child)
         {
-            return $"\"{this.propertyNameFactory()}\"";
+            return $"\"{propertyNameFactory()}\"";
         }
     }
 }

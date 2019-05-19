@@ -15,12 +15,10 @@ namespace DSACore.Auxiliary
             var tTalent = List.OrderBy(x => sc.Compare(talent, x.Name)).First();
 
             if (sc.Compare(talent, tTalent.Name) > SpellCorrect.ErrorThreshold)
-            {
                 return $"{c.Name} kann nicht {talent}...";
-            }
 
             var props = tTalent.GetEigenschaften(); // get the required properties
-            int tap = tTalent.Value; // get taw
+            var tap = tTalent.Value; // get taw
             var werte = props.Select(p => c.Eigenschaften[c.PropTable[p]]).ToList();
 
             output.AppendFormat(
@@ -34,48 +32,39 @@ namespace DSACore.Auxiliary
 
             output.Append("         ");
             tap -= erschwernis;
-            int gesamtErschwernis = tap;
+            var gesamtErschwernis = tap;
             if (gesamtErschwernis < 0)
             {
                 tap = 0;
-                for (int i = 0; i <= 2; i++)
+                for (var i = 0; i <= 2; i++)
                 {
                     // foreach property, dice and tap 
-                    int temp = Dice.Roll();
-                    int eigenschaft = c.Eigenschaften[c.PropTable[props[i]]];
+                    var temp = Dice.Roll();
+                    var eigenschaft = c.Eigenschaften[c.PropTable[props[i]]];
 
-                    if (eigenschaft + gesamtErschwernis < temp)
-                    {
-                        tap -= temp - (eigenschaft + gesamtErschwernis);
-                    }
+                    if (eigenschaft + gesamtErschwernis < temp) tap -= temp - (eigenschaft + gesamtErschwernis);
 
                     output.Append($"[{temp}]"); // add to string
                 }
 
-                if (tap >= 0)
-                {
-                    tap = 1;
-                }
+                if (tap >= 0) tap = 1;
             }
             else
             {
-                for (int i = 0; i <= 2; i++)
+                for (var i = 0; i <= 2; i++)
                 {
                     // foreach property, dice and tap 
-                    int temp = Dice.Roll();
-                    int eigenschaft = c.Eigenschaften[c.PropTable[props[i]]];
+                    var temp = Dice.Roll();
+                    var eigenschaft = c.Eigenschaften[c.PropTable[props[i]]];
 
-                    if (eigenschaft < temp)
-                    {
-                        tap -= temp - eigenschaft;
-                    }
+                    if (eigenschaft < temp) tap -= temp - eigenschaft;
 
                     output.Append($"[{temp}]"); // add to string
                 }
             }
 
-            tap = (tap == 0) ? 1 : tap;
-            
+            tap = tap == 0 ? 1 : tap;
+
             output.AppendFormat(" tap: {0,2}", tap);
 
             return output.ToString(); // return output

@@ -2,7 +2,7 @@
 
 namespace DSACore.Models.Database.DSA
 {
-  public class WeaponTalent
+    public class WeaponTalent
     {
         public WeaponTalent(string name, int at, int pa)
         {

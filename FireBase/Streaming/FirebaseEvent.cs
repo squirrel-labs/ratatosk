@@ -15,26 +15,23 @@ namespace Firebase.Database.Streaming
         public FirebaseEvent(string key, T obj, FirebaseEventType eventType, FirebaseEventSource eventSource)
             : base(key, obj)
         {
-            this.EventType = eventType;
-            this.EventSource = eventSource;
+            EventType = eventType;
+            EventSource = eventSource;
         }
 
         /// <summary>
         /// Gets the source of the event.
         /// </summary>
-        public FirebaseEventSource EventSource
-        {
-            get;
-        }
+        public FirebaseEventSource EventSource { get; }
 
         /// <summary>
         /// Gets the event type.
         /// </summary>
-        public FirebaseEventType EventType
-        {
-            get;
-        }
+        public FirebaseEventType EventType { get; }
 
-        public static FirebaseEvent<T> Empty(FirebaseEventSource source) => new FirebaseEvent<T>(string.Empty, default(T), FirebaseEventType.InsertOrUpdate, source);
+        public static FirebaseEvent<T> Empty(FirebaseEventSource source)
+        {
+            return new FirebaseEvent<T>(string.Empty, default(T), FirebaseEventType.InsertOrUpdate, source);
+        }
     }
 }

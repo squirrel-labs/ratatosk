@@ -4,7 +4,7 @@
     {
         public char Comlexity = 'A';
 
-        public GeneralSpell(string name, string roll, char comlexity = 'A') :base(name, roll)
+        public GeneralSpell(string name, string roll, char comlexity = 'A') : base(name, roll)
         {
             Comlexity = comlexity;
         }

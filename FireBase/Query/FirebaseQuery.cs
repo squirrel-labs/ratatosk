@@ -5,11 +5,9 @@ namespace Firebase.Database.Query
     using System.Net.Http;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-
-    using Firebase.Database.Http;
-    using Firebase.Database.Offline;
-    using Firebase.Database.Streaming;
-
+    using Http;
+    using Offline;
+    using Streaming;
     using Newtonsoft.Json;
     using System.Net;
 
@@ -31,17 +29,14 @@ namespace Firebase.Database.Query
         /// <param name="client"> The owning client. </param>
         protected FirebaseQuery(FirebaseQuery parent, FirebaseClient client)
         {
-            this.Client = client;
-            this.Parent = parent;
+            Client = client;
+            Parent = parent;
         }
 
         /// <summary>
         /// Gets the client.
         /// </summary>
-        public FirebaseClient Client
-        {
-            get;
-        }
+        public FirebaseClient Client { get; }
 
         /// <summary>
         /// Queries the firebase server once returning collection of items.
@@ -55,14 +50,15 @@ namespace Firebase.Database.Query
 
             try
             {
-                url = await this.BuildUrlAsync().ConfigureAwait(false);
+                url = await BuildUrlAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                throw new FirebaseException("Couldn't build the url", string.Empty, string.Empty, HttpStatusCode.OK, ex);
+                throw new FirebaseException("Couldn't build the url", string.Empty, string.Empty, HttpStatusCode.OK,
+                    ex);
             }
 
-            return await this.GetClient(timeout).GetObjectCollectionAsync<T>(url, Client.Options.JsonSerializerSettings)
+            return await GetClient(timeout).GetObjectCollectionAsync<T>(url, Client.Options.JsonSerializerSettings)
                 .ConfigureAwait(false);
         }
 
@@ -97,7 +93,7 @@ namespace Firebase.Database.Query
 
             try
             {
-                url = await this.BuildUrlAsync().ConfigureAwait(false);
+                url = await BuildUrlAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -106,7 +102,7 @@ namespace Firebase.Database.Query
 
             try
             {
-                var response = await this.GetClient(timeout).GetAsync(url).ConfigureAwait(false);
+                var response = await GetClient(timeout).GetAsync(url).ConfigureAwait(false);
                 statusCode = response.StatusCode;
                 responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
@@ -127,7 +123,8 @@ namespace Firebase.Database.Query
         /// <typeparam name="T"> Type of elements. </typeparam>
         /// <param name="elementRoot"> Optional custom root element of received json items. </param>
         /// <returns> Observable stream of <see cref="FirebaseEvent{T}"/>. </returns>
-        public IObservable<FirebaseEvent<T>> AsObservable<T>(EventHandler<ExceptionEventArgs<FirebaseException>> exceptionHandler = null, string elementRoot = "")
+        public IObservable<FirebaseEvent<T>> AsObservable<T>(
+            EventHandler<ExceptionEventArgs<FirebaseException>> exceptionHandler = null, string elementRoot = "")
         {
             return Observable.Create<FirebaseEvent<T>>(observer =>
             {
@@ -144,13 +141,13 @@ namespace Firebase.Database.Query
         public async Task<string> BuildUrlAsync()
         {
             // if token factory is present on the parent then use it to generate auth token
-            if (this.Client.Options.AuthTokenAsyncFactory != null)
+            if (Client.Options.AuthTokenAsyncFactory != null)
             {
-                var token = await this.Client.Options.AuthTokenAsyncFactory().ConfigureAwait(false);
+                var token = await Client.Options.AuthTokenAsyncFactory().ConfigureAwait(false);
                 return this.WithAuth(token).BuildUrl(null);
             }
 
-            return this.BuildUrl(null);
+            return BuildUrl(null);
         }
 
         /// <summary>
@@ -161,20 +158,21 @@ namespace Firebase.Database.Query
         /// <param name="timeout"> Optional timeout value. </param>
         /// <typeparam name="T"> Type of <see cref="obj"/> </typeparam>
         /// <returns> Resulting firebase object with populated key. </returns>
-        public async Task<FirebaseObject<string>> PostAsync(string data, bool generateKeyOffline = true, TimeSpan? timeout = null)
+        public async Task<FirebaseObject<string>> PostAsync(string data, bool generateKeyOffline = true,
+            TimeSpan? timeout = null)
         {
             // post generates a new key server-side, while put can be used with an already generated local key
             if (generateKeyOffline)
             {
                 var key = FirebaseKeyGenerator.Next();
-                await new ChildQuery(this, () => key, this.Client).PutAsync(data).ConfigureAwait(false);
+                await new ChildQuery(this, () => key, Client).PutAsync(data).ConfigureAwait(false);
 
                 return new FirebaseObject<string>(key, data);
             }
             else
             {
-                var c = this.GetClient(timeout);
-                var sendData = await this.SendAsync(c, data, HttpMethod.Post).ConfigureAwait(false);
+                var c = GetClient(timeout);
+                var sendData = await SendAsync(c, data, HttpMethod.Post).ConfigureAwait(false);
                 var result = JsonConvert.DeserializeObject<PostResult>(sendData, Client.Options.JsonSerializerSettings);
 
                 return new FirebaseObject<string>(result.Name, data);
@@ -190,7 +188,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="Task"/>. </returns>
         public async Task PatchAsync(string data, TimeSpan? timeout = null)
         {
-            var c = this.GetClient(timeout);
+            var c = GetClient(timeout);
 
             await this.Silent().SendAsync(c, data, new HttpMethod("PATCH")).ConfigureAwait(false);
         }
@@ -204,7 +202,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="Task"/>. </returns>
         public async Task PutAsync(string data, TimeSpan? timeout = null)
         {
-            var c = this.GetClient(timeout);
+            var c = GetClient(timeout);
 
             await this.Silent().SendAsync(c, data, HttpMethod.Put).ConfigureAwait(false);
         }
@@ -216,14 +214,14 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="Task"/>. </returns>
         public async Task DeleteAsync(TimeSpan? timeout = null)
         {
-            var c = this.GetClient(timeout);
+            var c = GetClient(timeout);
             var url = string.Empty;
             var responseData = string.Empty;
             var statusCode = HttpStatusCode.OK;
 
             try
             {
-                url = await this.BuildUrlAsync().ConfigureAwait(false);
+                url = await BuildUrlAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -249,7 +247,7 @@ namespace Firebase.Database.Query
         /// </summary>
         public void Dispose()
         {
-            this.client?.Dispose();
+            client?.Dispose();
         }
 
         /// <summary>
@@ -261,33 +259,23 @@ namespace Firebase.Database.Query
 
         private string BuildUrl(FirebaseQuery child)
         {
-            var url = this.BuildUrlSegment(child);
+            var url = BuildUrlSegment(child);
 
-            if (this.Parent != null)
-            {
-                url = this.Parent.BuildUrl(this) + url;
-            }
+            if (Parent != null) url = Parent.BuildUrl(this) + url;
 
             return url;
         }
 
         private HttpClient GetClient(TimeSpan? timeout = null)
         {
-            if (this.client == null)
-            {
-                this.client = new HttpClient();
-            }
+            if (client == null) client = new HttpClient();
 
             if (!timeout.HasValue)
-            {
-                this.client.Timeout = DEFAULT_HTTP_CLIENT_TIMEOUT;
-            }
+                client.Timeout = DEFAULT_HTTP_CLIENT_TIMEOUT;
             else
-            {
-                this.client.Timeout = timeout.Value;
-            }
+                client.Timeout = timeout.Value;
 
-            return this.client;
+            return client;
         }
 
         private async Task<string> SendAsync(HttpClient client, string data, HttpMethod method)
@@ -299,7 +287,7 @@ namespace Firebase.Database.Query
 
             try
             {
-                url = await this.BuildUrlAsync().ConfigureAwait(false);
+                url = await BuildUrlAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {

@@ -2,7 +2,6 @@
 
 namespace DSACore.DSA_Game.Characters
 {
-
     public class SaveChar
     {
         public string Name { get; set; }

@@ -4,9 +4,7 @@ using System.Collections.Generic;
 namespace DSALib.Characters
 {
     using System.IO;
-
     using DiscoBot.DSA_Game.Characters;
-
     using Newtonsoft.Json;
 
     public class Critter : Being, ICombatant
@@ -33,15 +31,15 @@ namespace DSALib.Characters
 
         public Critter(int gw, int gs, int rs, int mr, int ko, int pa, string ini, List<CritterAttack> critterAttacks)
         {
-            this.Gw = gw;
-            this.Gs = gs;
-            this.Rs = rs;
-            this.Mr = mr;
-            this.Ko = ko;
-            this.Pa = pa;
-            this.Ini = ini;
-            this.CritterAttacks = critterAttacks;
-            this.lastAttack = this.CritterAttacks[new Random().Next(critterAttacks.Count)];
+            Gw = gw;
+            Gs = gs;
+            Rs = rs;
+            Mr = mr;
+            Ko = ko;
+            Pa = pa;
+            Ini = ini;
+            CritterAttacks = critterAttacks;
+            lastAttack = CritterAttacks[new Random().Next(critterAttacks.Count)];
         }
 
         public Critter()
@@ -52,7 +50,9 @@ namespace DSALib.Characters
         {
             try
             {
-                return JsonConvert.DeserializeObject<Critter>(File.ReadAllText(path)); // Deserialize Data and create Session Object
+                return
+                    JsonConvert.DeserializeObject<Critter>(
+                        File.ReadAllText(path)); // Deserialize Data and create Session Object
             }
             catch (Exception e)
             {
@@ -75,7 +75,9 @@ namespace DSALib.Characters
         {
             try
             {
-                File.WriteAllText(path + this.Name + ".json", JsonConvert.SerializeObject(this, Formatting.Indented)); // Deserialize Data and create CommandInfo Struct
+                File.WriteAllText(path + Name + ".json",
+                    JsonConvert.SerializeObject(this,
+                        Formatting.Indented)); // Deserialize Data and create CommandInfo Struct
             }
             catch (Exception e)
             {

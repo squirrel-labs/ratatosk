@@ -1,7 +1,7 @@
 namespace Firebase.Database.Query
 {
     using System;
-    
+
     /// <summary>
     /// Firebase query which references the child of current node.
     /// </summary>
@@ -38,17 +38,11 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="string"/>. </returns>
         protected override string BuildUrlSegment(FirebaseQuery child)
         {
-            var s = this.pathFactory();
+            var s = pathFactory();
 
-            if (s != string.Empty && !s.EndsWith("/"))
-            {
-                s += '/';
-            }
+            if (s != string.Empty && !s.EndsWith("/")) s += '/';
 
-            if (!(child is ChildQuery))
-            {
-                return s + ".json";
-            }
+            if (!(child is ChildQuery)) return s + ".json";
 
             return s;
         }

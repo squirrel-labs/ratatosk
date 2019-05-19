@@ -6,7 +6,6 @@ namespace Firebase.Database.Http
     using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
-
     using Newtonsoft.Json;
     using System.Net;
 
@@ -23,7 +22,8 @@ namespace Firebase.Database.Http
         /// <param name="jsonSerializerSettings"> The specific JSON Serializer Settings. </param>  
         /// <typeparam name="T"> The type of entities the collection should contain. </typeparam>
         /// <returns> The <see cref="Task"/>. </returns>
-        public static async Task<IReadOnlyCollection<FirebaseObject<T>>> GetObjectCollectionAsync<T>(this HttpClient client, string requestUri,
+        public static async Task<IReadOnlyCollection<FirebaseObject<T>>> GetObjectCollectionAsync<T>(
+            this HttpClient client, string requestUri,
             JsonSerializerSettings jsonSerializerSettings)
         {
             var responseData = string.Empty;
@@ -37,12 +37,10 @@ namespace Firebase.Database.Http
 
                 response.EnsureSuccessStatusCode();
 
-                var dictionary = JsonConvert.DeserializeObject<Dictionary<string, T>>(responseData, jsonSerializerSettings);
+                var dictionary =
+                    JsonConvert.DeserializeObject<Dictionary<string, T>>(responseData, jsonSerializerSettings);
 
-                if (dictionary == null)
-                {
-                    return new FirebaseObject<T>[0];
-                }
+                if (dictionary == null) return new FirebaseObject<T>[0];
 
                 return dictionary.Select(item => new FirebaseObject<T>(item.Key, item.Value)).ToList();
             }
@@ -116,15 +114,10 @@ namespace Firebase.Database.Http
                 dictionary = JsonConvert.DeserializeObject(data, dictionaryType) as IDictionary;
             }
 
-            if (dictionary == null)
-            {
-                yield break;
-            }
+            if (dictionary == null) yield break;
 
             foreach (DictionaryEntry item in dictionary)
-            {
-                yield return new FirebaseObject<object>((string)item.Key, item.Value);
-            }
+                yield return new FirebaseObject<object>((string) item.Key, item.Value);
         }
     }
 }

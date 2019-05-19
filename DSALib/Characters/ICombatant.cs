@@ -18,7 +18,7 @@ namespace DiscoBot.DSA_Game.Characters
 
         int Astralpunkte_Basis { get; set; }
         int Astralpunkte_Aktuell { get; set; }
-        
+
         string Angriff(string talent, int erschwernis = 0);
 
         string Parade(string talent, int erschwernis = 0);

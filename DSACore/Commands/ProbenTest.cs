@@ -1,6 +1,6 @@
 ﻿namespace DSACore.Commands
 {
-    public class ProbenTest 
+    public class ProbenTest
     {
         /*[Command("t"), Summary("Würfelt ein Talent-/Zauberprobe")]
         [Alias("T", "Talent", "talent", "versuche")]

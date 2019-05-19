@@ -14,7 +14,7 @@ namespace DSACore.Auxiliary.Calculator
         {
             this.arg1 = arg1;
             this.arg2 = arg2;
-            this.OperatorType = operatorType;
+            OperatorType = operatorType;
         }
 
         public Ops OperatorType { get; set; }
@@ -22,19 +22,19 @@ namespace DSACore.Auxiliary.Calculator
         public int Solve()
         {
             int result;
-            switch (this.OperatorType)
+            switch (OperatorType)
             {
                 case Ops.Dice:
-                    result = Dice.Roll(this.arg1.Solve(), this.arg2.Solve());
+                    result = Dice.Roll(arg1.Solve(), arg2.Solve());
                     break;
                 case Ops.Multiply:
-                    result = this.arg1.Solve() * this.arg2.Solve();
+                    result = arg1.Solve() * arg2.Solve();
                     break;
                 case Ops.Add:
-                    result = this.arg1.Solve() + this.arg2.Solve();
+                    result = arg1.Solve() + arg2.Solve();
                     break;
                 case Ops.Subtract:
-                    result = this.arg1.Solve() - this.arg2.Solve();
+                    result = arg1.Solve() - arg2.Solve();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -45,7 +45,7 @@ namespace DSACore.Auxiliary.Calculator
 
         public override string ToString()
         {
-            return $"({this.arg1} {this.OperatorType} {this.arg2})";
+            return $"({arg1} {OperatorType} {arg2})";
         }
     }
 }

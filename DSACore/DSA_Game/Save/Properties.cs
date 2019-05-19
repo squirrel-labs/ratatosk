@@ -39,17 +39,13 @@ namespace DSACore.DSA_Game.Save
         {
             var files = Directory.GetFiles(path, "*.json");
 
-            foreach (string file in files)
-            {
+            foreach (var file in files)
                 try
                 {
-                    string name = file.Split('\\').Last().Split('.')[0].Replace('-', '.');
-                    string data = File.ReadAllText(file);
-                    Type type = Type.GetType(name);
-                    if (data.StartsWith("["))
-                    {
-                        type = typeof(List<>).MakeGenericType(type);
-                    }
+                    var name = file.Split('\\').Last().Split('.')[0].Replace('-', '.');
+                    var data = File.ReadAllText(file);
+                    var type = Type.GetType(name);
+                    if (data.StartsWith("[")) type = typeof(List<>).MakeGenericType(type);
 
                     var o = JsonConvert.DeserializeObject(data, type);
                     objects.Add(name.Split('.').Last(), o);
@@ -59,7 +55,6 @@ namespace DSACore.DSA_Game.Save
                     // ignored
                     Console.WriteLine($"Laden von Save-File {file} fehlgeschlagen." + e);
                 }
-            }
         }
 
         public static void Serialize(string path = @"..\..\Properties\")
@@ -68,7 +63,7 @@ namespace DSACore.DSA_Game.Save
             {
                 foreach (var o in objects)
                 {
-                    string assembly = o.Value is IList list
+                    var assembly = o.Value is IList list
                         ? ((IList) list)[0]?.GetType().FullName
                         : o.Value.GetType().FullName;
 

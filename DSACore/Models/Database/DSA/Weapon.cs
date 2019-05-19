@@ -30,7 +30,8 @@ namespace DSACore.Models.Database.DSA
         public int INI { get; set; }
         public string MW { get; set; }
 
-        public MeleeWeapon(string name, string damage, int weight, string weaponTalent, string price) : base(name, damage, weight, weaponTalent, price)
+        public MeleeWeapon(string name, string damage, int weight, string weaponTalent, string price) : base(name,
+            damage, weight, weaponTalent, price)
         {
         }
     }
@@ -43,7 +44,8 @@ namespace DSACore.Models.Database.DSA
         public string TpReach { get; set; }
         public int LoadTime { get; set; }
 
-        public RangedWeapon(string name, string damage, int weight, string weaponTalent, string price) : base(name, damage, weight, weaponTalent, price)
+        public RangedWeapon(string name, string damage, int weight, string weaponTalent, string price) : base(name,
+            damage, weight, weaponTalent, price)
         {
         }
     }

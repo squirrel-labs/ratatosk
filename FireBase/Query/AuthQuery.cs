@@ -15,7 +15,8 @@ namespace Firebase.Database.Query
         /// <param name="parent"> The parent.  </param>  
         /// <param name="tokenFactory"> The authentication token factory. </param>
         /// <param name="client"> The owner. </param>
-        public AuthQuery(FirebaseQuery parent, Func<string> tokenFactory, FirebaseClient client) : base(parent, () => client.Options.AsAccessToken ? "access_token" : "auth", client)
+        public AuthQuery(FirebaseQuery parent, Func<string> tokenFactory, FirebaseClient client) : base(parent,
+            () => client.Options.AsAccessToken ? "access_token" : "auth", client)
         {
             this.tokenFactory = tokenFactory;
         }
@@ -27,7 +28,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="string"/>. </returns>
         protected override string BuildUrlParameter(FirebaseQuery child)
         {
-            return this.tokenFactory();
+            return tokenFactory();
         }
     }
 }

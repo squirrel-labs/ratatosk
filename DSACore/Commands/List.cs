@@ -12,7 +12,7 @@ namespace DSACore.Commands
         public static string ListAsync(string prop)
         {
             var res = new List<string>();
-            
+
             //int persist = 0;
 
             switch (prop.ToLower())
@@ -20,7 +20,7 @@ namespace DSACore.Commands
                 case "man":
                 case "help":
                     return Help.Get_Specific_Help("List");
-                   // break;
+                // break;
                 case "chars":
                     res.AddRange(Dsa.Chars.Select(x => x.Name));
                     break;

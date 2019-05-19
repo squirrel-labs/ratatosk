@@ -2,8 +2,7 @@
 {
     using System;
     using System.Collections.ObjectModel;
-
-    using Firebase.Database.Streaming;
+    using Streaming;
 
     /// <summary>
     /// Extensions for <see cref="IObservable{T}"/>.
@@ -25,10 +24,7 @@
                 if (f.EventType == FirebaseEventType.InsertOrUpdate)
                 {
                     var i = collection.IndexOf(f.Object);
-                    if (i >= 0)
-                    {
-                        collection.RemoveAt(i);
-                    }
+                    if (i >= 0) collection.RemoveAt(i);
 
                     collection.Add(f.Object);
                 }

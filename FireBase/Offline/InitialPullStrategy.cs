@@ -8,7 +8,7 @@
         /// <summary>
         /// Don't pull anything.
         /// </summary>
-        None, 
+        None,
 
         /// <summary>
         /// Pull only what isn't already stored offline.

@@ -5,7 +5,7 @@
     /// </summary>
     public class SilentQuery : ParameterQuery
     {
-        public SilentQuery(FirebaseQuery parent, FirebaseClient client) 
+        public SilentQuery(FirebaseQuery parent, FirebaseClient client)
             : base(parent, () => "print", client)
         {
         }

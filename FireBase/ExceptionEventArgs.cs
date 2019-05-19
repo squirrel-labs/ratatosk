@@ -15,7 +15,7 @@
         /// <param name="exception"> The exception. </param>
         public ExceptionEventArgs(T exception)
         {
-            this.Exception = exception;
+            Exception = exception;
         }
     }
 

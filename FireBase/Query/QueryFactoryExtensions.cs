@@ -139,7 +139,7 @@ namespace Firebase.Database.Query
         {
             return new FilterQuery(child, () => "equalTo", valueFactory, child.Client);
         }
-		
+
         /// <summary>
         /// Instructs firebase to send data equal to the <see cref="valueFactory"/>. This must be preceded by an OrderBy query.
         /// </summary>
@@ -149,7 +149,7 @@ namespace Firebase.Database.Query
         public static FilterQuery EqualTo(this ParameterQuery child, Func<bool> valueFactory)
         {
             return new FilterQuery(child, () => "equalTo", valueFactory, child.Client);
-        }		
+        }
 
         /// <summary>
         /// Limits the result to first <see cref="countFactory"/> items.

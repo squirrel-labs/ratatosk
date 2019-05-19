@@ -1,7 +1,6 @@
 ﻿namespace Firebase.Database.Offline
 {
-    using Firebase.Database.Query;
-
+    using Query;
     using System.Threading.Tasks;
 
     public interface ISetHandler<in T>

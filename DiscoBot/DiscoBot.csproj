@@ -97,38 +97,14 @@
     <Compile Include="Audio\AudioModule.cs" />
     <Compile Include="Audio\AudioService.cs" />
     <Compile Include="Audio\Sound.cs" />
-    <Compile Include="Auxiliary\Calculator\Argument.cs" />
-    <Compile Include="Auxiliary\Calculator\ISolvable.cs" />
-    <Compile Include="Auxiliary\Calculator\Operator.cs" />
-    <Compile Include="Auxiliary\Calculator\Ops.cs" />
-    <Compile Include="Auxiliary\Calculator\StringSolver.cs" />
-    <Compile Include="Auxiliary\CommandInfo.cs" />
-    <Compile Include="Auxiliary\Extensions.cs" />
-    <Compile Include="DSA_Game\Characters\Character.cs" />
-    <Compile Include="DSA_Game\Characters\NPC.cs" />
-    <Compile Include="DSA_Game\Characters\SaveChar.cs" />
-    <Compile Include="Commands\Help.cs" />
+    <Compile Include="Auxiliary\CommandExtension.cs" />
     <Compile Include="Auxiliary\Dice.cs" />
-    <Compile Include="Auxiliary\TalentEnumerableExtension.cs" />
-    <Compile Include="Commands\LebenUndAstral.cs" />
-    <Compile Include="Commands\HeldList.cs" />
-    <Compile Include="Audio\Soundeffects.cs" />
-    <Compile Include="ToRework\Permissions.cs" />
+    <Compile Include="Auxiliary\Permissions.cs" />
     <Compile Include="Commands\MiscCommands.cs" />
     <Compile Include="Auxiliary\SpellCorrect.cs" />
-    <Compile Include="DSA_Game\Save\Properties.cs" />
-    <Compile Include="DSA_Game\Save\SaveCommand.cs" />
-    <Compile Include="DSA_Game\Save\Session.cs" />
-    <Compile Include="ToRework\CommandExtension.cs" />
-    <Compile Include="Commands\CommandTypes.cs" />
     <Compile Include="Commands\FileHandler.cs" />
-    <Compile Include="Commands\Gm.cs" />
-    <Compile Include="Commands\List.cs" />
-    <Compile Include="Commands\NpcCommands.cs" />
-    <Compile Include="Commands\ProbenTest.cs" />
     <Compile Include="Audio\Voice.cs" />
     <Compile Include="Auxiliary\RandomMisc.cs" />
-    <Compile Include="DSA_Game\Dsa.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -151,6 +127,9 @@
       <Project>{388dd4ed-29c4-4127-ac8f-34dd3fe9f9b0}</Project>
       <Name>DSALib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ToRework" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />

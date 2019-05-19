@@ -10,10 +10,10 @@ namespace DSALib
     {
         public CritterAttack(string name, int at, string tp, string comment = "")
         {
-            this.Name = name;
-            this.At = at;
-            this.Tp = tp;
-            this.Comment = comment;
+            Name = name;
+            At = at;
+            Tp = tp;
+            Comment = comment;
         }
 
         public string Name { get; set; }

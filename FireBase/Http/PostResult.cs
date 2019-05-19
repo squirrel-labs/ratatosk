@@ -8,10 +8,6 @@ namespace Firebase.Database.Http
         /// <summary>
         /// Gets or sets the generated key after a successful post. 
         /// </summary>
-        public string Name
-        {
-            get;
-            set;
-        }
+        public string Name { get; set; }
     }
 }

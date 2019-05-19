@@ -10,7 +10,8 @@ namespace DSACore.Models.Database.DSA
         {
         }
 
-        public DatabaseChar(int id, string name, string rasse, List<Field> skills, List<Field> talents, List<Advantage> advantages, List<CharSpell> spells, List<WeaponTalent> weaponTalents)
+        public DatabaseChar(int id, string name, string rasse, List<Field> skills, List<Field> talents,
+            List<Advantage> advantages, List<CharSpell> spells, List<WeaponTalent> weaponTalents)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));

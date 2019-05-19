@@ -20,7 +20,7 @@ namespace Firebase.Database.Query
             : base(parent, client)
         {
             this.parameterFactory = parameterFactory;
-            this.separator = (this.Parent is ChildQuery) ? "?" : "&";
+            separator = Parent is ChildQuery ? "?" : "&";
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Firebase.Database.Query
         /// <returns> The <see cref="string"/>. </returns>
         protected override string BuildUrlSegment(FirebaseQuery child)
         {
-            return $"{this.separator}{this.parameterFactory()}={this.BuildUrlParameter(child)}";
+            return $"{separator}{parameterFactory()}={BuildUrlParameter(child)}";
         }
 
         /// <summary>

@@ -52,21 +52,17 @@ namespace DSACore
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
-            {
                 app.UseHsts();
-            }
 
             app.UseCors("CorsPolicy");
 
             app.UseSignalR(routes => { routes.MapHub<Users>("/login"); });
 
             app.UseWebSockets();
-            
-                //app.UseCors("AllowSpecificOrigin");
+
+            //app.UseCors("AllowSpecificOrigin");
             app.UseHttpsRedirection();
             app.UseMvc();
         }

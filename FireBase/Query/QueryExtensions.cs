@@ -119,7 +119,7 @@ namespace Firebase.Database.Query
         {
             return child.EqualTo(() => value);
         }
-        
+
         /// <summary>
         /// Instructs firebase to send data equal to the <see cref="value"/>. This must be preceded by an OrderBy query.
         /// </summary>
@@ -129,7 +129,7 @@ namespace Firebase.Database.Query
         public static FilterQuery EqualTo(this ParameterQuery child, bool value)
         {
             return child.EqualTo(() => value);
-        }  
+        }
 
         /// <summary>
         /// Instructs firebase to send data equal to null. This must be preceded by an OrderBy query.
@@ -139,7 +139,7 @@ namespace Firebase.Database.Query
         public static FilterQuery EqualTo(this ParameterQuery child)
         {
             return child.EqualTo(() => null);
-        }        
+        }
 
         /// <summary>
         /// Limits the result to first <see cref="count"/> items.
@@ -173,9 +173,12 @@ namespace Firebase.Database.Query
             return query.PatchAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings));
         }
 
-        public static async Task<FirebaseObject<T>> PostAsync<T>(this FirebaseQuery query, T obj, bool generateKeyOffline = true)
+        public static async Task<FirebaseObject<T>> PostAsync<T>(this FirebaseQuery query, T obj,
+            bool generateKeyOffline = true)
         {
-            var result = await query.PostAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings), generateKeyOffline);
+            var result =
+                await query.PostAsync(JsonConvert.SerializeObject(obj, query.Client.Options.JsonSerializerSettings),
+                    generateKeyOffline);
 
             return new FirebaseObject<T>(result.Key, obj);
         }
@@ -189,17 +192,11 @@ namespace Firebase.Database.Query
         /// <param name="relativePaths"> Locations where to store the item. </param>
         public static async Task FanOut<T>(this ChildQuery child, T item, params string[] relativePaths)
         {
-            if (relativePaths == null)
-            {
-                throw new ArgumentNullException(nameof(relativePaths));
-            }
+            if (relativePaths == null) throw new ArgumentNullException(nameof(relativePaths));
 
             var fanoutObject = new Dictionary<string, T>(relativePaths.Length);
 
-            foreach (var path in relativePaths)
-            {
-                fanoutObject.Add(path, item);
-            }
+            foreach (var path in relativePaths) fanoutObject.Add(path, item);
 
             await child.PatchAsync(fanoutObject);
         }

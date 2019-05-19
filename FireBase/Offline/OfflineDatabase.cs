@@ -5,7 +5,6 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-
     using LiteDB;
 
     /// <summary>
@@ -23,21 +22,18 @@
         /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
         public OfflineDatabase(Type itemType, string filenameModifier)
         {
-            var fullName = this.GetFileName(itemType.ToString());
-            if(fullName.Length > 100)
-            {
-                fullName = fullName.Substring(0, 100);
-            }
+            var fullName = GetFileName(itemType.ToString());
+            if (fullName.Length > 100) fullName = fullName.Substring(0, 100);
 
-            BsonMapper mapper = BsonMapper.Global;
+            var mapper = BsonMapper.Global;
             mapper.Entity<OfflineEntry>().Id(o => o.Key);
 
-            string root = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string filename = fullName + filenameModifier + ".db";
+            var root = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var filename = fullName + filenameModifier + ".db";
             var path = Path.Combine(root, filename);
-            this.db = new LiteRepository(new LiteDatabase(path, mapper));
+            db = new LiteRepository(new LiteDatabase(path, mapper));
 
-            this.cache = db.Database.GetCollection<OfflineEntry>().FindAll()
+            cache = db.Database.GetCollection<OfflineEntry>().FindAll()
                 .ToDictionary(o => o.Key, o => o);
         }
 
@@ -45,24 +41,24 @@
         /// Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.
         /// </summary>
         /// <returns> The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>. </returns>
-        public int Count => this.cache.Count;
+        public int Count => cache.Count;
 
         /// <summary>
         /// Gets a value indicating whether this is a read-only collection.
         /// </summary>
-        public bool IsReadOnly => this.cache.IsReadOnly;
+        public bool IsReadOnly => cache.IsReadOnly;
 
         /// <summary>
         /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the keys of the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
         /// </summary>
         /// <returns> An <see cref="T:System.Collections.Generic.ICollection`1"/> containing the keys of the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/>. </returns>
-        public ICollection<string> Keys => this.cache.Keys;
+        public ICollection<string> Keys => cache.Keys;
 
         /// <summary>
         /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
         /// </summary>
         /// <returns> An <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/>. </returns>
-        public ICollection<OfflineEntry> Values => this.cache.Values;
+        public ICollection<OfflineEntry> Values => cache.Values;
 
         /// <summary>
         /// Gets or sets the element with the specified key.
@@ -71,15 +67,12 @@
         /// <returns> The element with the specified key. </returns>   
         public OfflineEntry this[string key]
         {
-            get
-            {
-                return this.cache[key];
-            }
+            get => cache[key];
 
             set
             {
-                this.cache[key] = value;
-                this.db.Upsert(value);
+                cache[key] = value;
+                db.Upsert(value);
             }
         }
 
@@ -89,12 +82,12 @@
         /// <returns> An enumerator that can be used to iterate through the collection. </returns>
         public IEnumerator<KeyValuePair<string, OfflineEntry>> GetEnumerator()
         {
-            return this.cache.GetEnumerator();
+            return cache.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         /// <summary>
@@ -103,7 +96,7 @@
         /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
         public void Add(KeyValuePair<string, OfflineEntry> item)
         {
-            this.Add(item.Key, item.Value);
+            Add(item.Key, item.Value);
         }
 
         /// <summary>
@@ -111,8 +104,8 @@
         /// </summary> 
         public void Clear()
         {
-            this.cache.Clear();
-            this.db.Delete<OfflineEntry>(Query.All());
+            cache.Clear();
+            db.Delete<OfflineEntry>(Query.All());
         }
 
         /// <summary>
@@ -122,7 +115,7 @@
         /// <returns> True if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false. </returns>
         public bool Contains(KeyValuePair<string, OfflineEntry> item)
         {
-            return this.ContainsKey(item.Key);
+            return ContainsKey(item.Key);
         }
 
         /// <summary>
@@ -132,7 +125,7 @@
         /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
         public void CopyTo(KeyValuePair<string, OfflineEntry>[] array, int arrayIndex)
         {
-            this.cache.CopyTo(array, arrayIndex);
+            cache.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
@@ -142,7 +135,7 @@
         /// <returns> True if <paramref name="item"/> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false. This method also returns false if <paramref name="item"/> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1"/>. </returns>
         public bool Remove(KeyValuePair<string, OfflineEntry> item)
         {
-            return this.Remove(item.Key);
+            return Remove(item.Key);
         }
 
         /// <summary>
@@ -152,7 +145,7 @@
         /// <returns> True if the <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the key; otherwise, false. </returns>
         public bool ContainsKey(string key)
         {
-            return this.cache.ContainsKey(key);
+            return cache.ContainsKey(key);
         }
 
         /// <summary>
@@ -162,8 +155,8 @@
         /// <param name="value">The object to use as the value of the element to add.</param>
         public void Add(string key, OfflineEntry value)
         {
-            this.cache.Add(key, value);
-            this.db.Insert(value);
+            cache.Add(key, value);
+            db.Insert(value);
         }
 
         /// <summary>
@@ -173,8 +166,8 @@
         /// <returns> True if the element is successfully removed; otherwise, false.  This method also returns false if <paramref name="key"/> was not found in the original <see cref="T:System.Collections.Generic.IDictionary`2"/>. </returns>
         public bool Remove(string key)
         {
-            this.cache.Remove(key);
-            return this.db.Delete<OfflineEntry>(key);
+            cache.Remove(key);
+            return db.Delete<OfflineEntry>(key);
         }
 
         /// <summary>
@@ -184,16 +177,14 @@
         /// <returns> True if the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the specified key; otherwise, false. </returns>
         public bool TryGetValue(string key, out OfflineEntry value)
         {
-            return this.cache.TryGetValue(key, out value);
+            return cache.TryGetValue(key, out value);
         }
 
         private string GetFileName(string fileName)
         {
-            var invalidChars = new[] { '`', '[', ',', '=' };
-            foreach(char c in invalidChars.Concat(System.IO.Path.GetInvalidFileNameChars()).Distinct())
-            {
+            var invalidChars = new[] {'`', '[', ',', '='};
+            foreach (var c in invalidChars.Concat(Path.GetInvalidFileNameChars()).Distinct())
                 fileName = fileName.Replace(c, '_');
-            }
 
             return fileName;
         }

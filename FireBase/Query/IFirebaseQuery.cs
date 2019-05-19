@@ -3,8 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-
-    using Firebase.Database.Streaming;
+    using Streaming;
 
     /// <summary>
     /// The FirebaseQuery interface.
@@ -14,10 +13,7 @@
         /// <summary>
         /// Gets the owning client of this query.
         /// </summary>
-        FirebaseClient Client
-        {
-            get;
-        }
+        FirebaseClient Client { get; }
 
         /// <summary>
         /// Retrieves items which exist on the location specified by this query instance.
@@ -32,7 +28,8 @@
         /// </summary>
         /// <typeparam name="T"> Type of the items. </typeparam>
         /// <returns> Cold observable of <see cref="FirebaseEvent{T}"/>. </returns>
-        IObservable<FirebaseEvent<T>> AsObservable<T>(EventHandler<ExceptionEventArgs<FirebaseException>> exceptionHandler, string elementRoot = "");
+        IObservable<FirebaseEvent<T>> AsObservable<T>(
+            EventHandler<ExceptionEventArgs<FirebaseException>> exceptionHandler, string elementRoot = "");
 
         /// <summary>
         /// Builds the actual url of this query.

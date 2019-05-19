@@ -29,7 +29,7 @@ namespace DSACore.Controllers
 
         // POST api/<controller>/Felis
         [HttpPost]
-        public string Post([FromBody]Command cmd)
+        public string Post([FromBody] Command cmd)
         {
             try
             {
@@ -39,7 +39,6 @@ namespace DSACore.Controllers
             {
                 return $"Ein Fehler ist aufgetreten: \n {e.Message}";
             }
-            
         }
 
 /*

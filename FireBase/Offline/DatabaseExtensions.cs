@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Firebase.Database.Query;
+    using Query;
 
     public static class DatabaseExtensions
     {
@@ -19,10 +19,13 @@
         /// <param name="initialPullStrategy"> Specifies what strategy should be used for initial pulling of server data. </param>
         /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. It this is false, then Put / Post / Delete will not affect server data. </param>
         /// <returns> The <see cref="RealtimeDatabase{T}"/>. </returns>
-        public static RealtimeDatabase<T> AsRealtimeDatabase<T>(this ChildQuery query, string filenameModifier = "", string elementRoot = "", StreamingOptions streamingOptions = StreamingOptions.LatestOnly, InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true)
+        public static RealtimeDatabase<T> AsRealtimeDatabase<T>(this ChildQuery query, string filenameModifier = "",
+            string elementRoot = "", StreamingOptions streamingOptions = StreamingOptions.LatestOnly,
+            InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true)
             where T : class
         {
-            return new RealtimeDatabase<T>(query, elementRoot, query.Client.Options.OfflineDatabaseFactory, filenameModifier, streamingOptions, initialPullStrategy, pushChanges);
+            return new RealtimeDatabase<T>(query, elementRoot, query.Client.Options.OfflineDatabaseFactory,
+                filenameModifier, streamingOptions, initialPullStrategy, pushChanges);
         }
 
         /// <summary>
@@ -36,11 +39,16 @@
         /// <param name="initialPullStrategy"> Specifies what strategy should be used for initial pulling of server data. </param>
         /// <param name="pushChanges"> Specifies whether changed items should actually be pushed to the server. It this is false, then Put / Post / Delete will not affect server data. </param>
         /// <returns> The <see cref="RealtimeDatabase{T}"/>. </returns>
-        public static RealtimeDatabase<T> AsRealtimeDatabase<T, TSetHandler>(this ChildQuery query, string filenameModifier = "", string elementRoot = "", StreamingOptions streamingOptions = StreamingOptions.LatestOnly, InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true)
+        public static RealtimeDatabase<T> AsRealtimeDatabase<T, TSetHandler>(this ChildQuery query,
+            string filenameModifier = "", string elementRoot = "",
+            StreamingOptions streamingOptions = StreamingOptions.LatestOnly,
+            InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true)
             where T : class
             where TSetHandler : ISetHandler<T>, new()
         {
-            return new RealtimeDatabase<T>(query, elementRoot, query.Client.Options.OfflineDatabaseFactory, filenameModifier, streamingOptions, initialPullStrategy, pushChanges, Activator.CreateInstance<TSetHandler>());
+            return new RealtimeDatabase<T>(query, elementRoot, query.Client.Options.OfflineDatabaseFactory,
+                filenameModifier, streamingOptions, initialPullStrategy, pushChanges,
+                Activator.CreateInstance<TSetHandler>());
         }
 
         /// <summary>
@@ -50,8 +58,9 @@
         /// <param name="obj"> The object to set. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
-        public static void Patch<T>(this RealtimeDatabase<T> db, string key, T obj, bool syncOnline = true, int priority = 1)
-            where T: class
+        public static void Patch<T>(this RealtimeDatabase<T> db, string key, T obj, bool syncOnline = true,
+            int priority = 1)
+            where T : class
         {
             db.Set(key, obj, syncOnline ? SyncOptions.Patch : SyncOptions.None, priority);
         }
@@ -63,8 +72,9 @@
         /// <param name="obj"> The object to set. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
-        public static void Put<T>(this RealtimeDatabase<T> db, string key, T obj, bool syncOnline = true, int priority = 1)
-            where T: class
+        public static void Put<T>(this RealtimeDatabase<T> db, string key, T obj, bool syncOnline = true,
+            int priority = 1)
+            where T : class
         {
             db.Set(key, obj, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
         }
@@ -77,7 +87,7 @@
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param>
         /// <returns> The generated key for this object. </returns>
         public static string Post<T>(this RealtimeDatabase<T> db, T obj, bool syncOnline = true, int priority = 1)
-            where T: class
+            where T : class
         {
             var key = FirebaseKeyGenerator.Next();
 
@@ -93,7 +103,7 @@
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
         public static void Delete<T>(this RealtimeDatabase<T> db, string key, bool syncOnline = true, int priority = 1)
-            where T: class
+            where T : class
         {
             db.Set(key, null, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
         }
@@ -109,8 +119,10 @@
         /// <param name="value"> Value to put. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
-        public static void Put<T, TProperty>(this RealtimeDatabase<T> db, string key, Expression<Func<T, TProperty>> propertyExpression, TProperty value, bool syncOnline = true, int priority = 1)
-            where T: class
+        public static void Put<T, TProperty>(this RealtimeDatabase<T> db, string key,
+            Expression<Func<T, TProperty>> propertyExpression, TProperty value, bool syncOnline = true,
+            int priority = 1)
+            where T : class
         {
             db.Set(key, propertyExpression, value, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
         }
@@ -126,8 +138,10 @@
         /// <param name="value"> Value to patch. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
-        public static void Patch<T, TProperty>(this RealtimeDatabase<T> db, string key, Expression<Func<T, TProperty>> propertyExpression, TProperty value, bool syncOnline = true, int priority = 1)
-            where T: class
+        public static void Patch<T, TProperty>(this RealtimeDatabase<T> db, string key,
+            Expression<Func<T, TProperty>> propertyExpression, TProperty value, bool syncOnline = true,
+            int priority = 1)
+            where T : class
         {
             db.Set(key, propertyExpression, value, syncOnline ? SyncOptions.Patch : SyncOptions.None, priority);
         }
@@ -143,9 +157,10 @@
         /// <param name="value"> Value to put. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
-        public static void Delete<T, TProperty>(this RealtimeDatabase<T> db, string key, Expression<Func<T, TProperty>> propertyExpression, bool syncOnline = true, int priority = 1)
-            where T: class
-            where TProperty: class
+        public static void Delete<T, TProperty>(this RealtimeDatabase<T> db, string key,
+            Expression<Func<T, TProperty>> propertyExpression, bool syncOnline = true, int priority = 1)
+            where T : class
+            where TProperty : class
         {
             db.Set(key, propertyExpression, null, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
         }
@@ -163,12 +178,17 @@
         /// <param name="value"> Value to put. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
-        public static void Post<T, TSelector, TProperty>(this RealtimeDatabase<T> db, string key, Expression<Func<T, TSelector>> propertyExpression, TProperty value, bool syncOnline = true, int priority = 1)
-            where T: class
-            where TSelector: IDictionary<string, TProperty>
+        public static void Post<T, TSelector, TProperty>(this RealtimeDatabase<T> db, string key,
+            Expression<Func<T, TSelector>> propertyExpression, TProperty value, bool syncOnline = true,
+            int priority = 1)
+            where T : class
+            where TSelector : IDictionary<string, TProperty>
         {
             var nextKey = FirebaseKeyGenerator.Next();
-            var expression = Expression.Lambda<Func<T, TProperty>>(Expression.Call(propertyExpression.Body, typeof(TSelector).GetRuntimeMethod("get_Item", new[] { typeof(string) }), Expression.Constant(nextKey)), propertyExpression.Parameters);
+            var expression = Expression.Lambda<Func<T, TProperty>>(
+                Expression.Call(propertyExpression.Body,
+                    typeof(TSelector).GetRuntimeMethod("get_Item", new[] {typeof(string)}),
+                    Expression.Constant(nextKey)), propertyExpression.Parameters);
             db.Set(key, expression, value, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
         }
 
@@ -185,10 +205,15 @@
         /// <param name="dictionaryKey"> Key within the nested dictionary to delete. </param>
         /// <param name="syncOnline"> Indicates whether the item should be synced online. </param>
         /// <param name="priority"> The priority. Objects with higher priority will be synced first. Higher number indicates higher priority. </param> 
-        public static void Delete<T, TProperty>(this RealtimeDatabase<T> db, string key, Expression<Func<T, IDictionary<string, TProperty>>> propertyExpression, string dictionaryKey, bool syncOnline = true, int priority = 1)
-            where T: class
+        public static void Delete<T, TProperty>(this RealtimeDatabase<T> db, string key,
+            Expression<Func<T, IDictionary<string, TProperty>>> propertyExpression, string dictionaryKey,
+            bool syncOnline = true, int priority = 1)
+            where T : class
         {
-            var expression = Expression.Lambda<Func<T, TProperty>>(Expression.Call(propertyExpression.Body, typeof(IDictionary<string, TProperty>).GetRuntimeMethod("get_Item", new[] { typeof(string) }), Expression.Constant(dictionaryKey)), propertyExpression.Parameters);
+            var expression = Expression.Lambda<Func<T, TProperty>>(
+                Expression.Call(propertyExpression.Body,
+                    typeof(IDictionary<string, TProperty>).GetRuntimeMethod("get_Item", new[] {typeof(string)}),
+                    Expression.Constant(dictionaryKey)), propertyExpression.Parameters);
             db.Set(key, expression, null, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
         }
     }

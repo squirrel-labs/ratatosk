@@ -15,11 +15,11 @@ namespace DSACore.Hubs
     public class Users : Hub
     {
         //private static Dictionary<string, User> UserGroup = new Dictionary<string, User>();
-   
-        private const string ReceiveMethod = "ReceiveMessage";//receiveMethod;
 
-        private static List<Group> DsaGroups {get; set; }
-        public static List<Token> Tokens { get;} = new List<Token>();
+        private const string ReceiveMethod = "ReceiveMessage"; //receiveMethod;
+
+        private static List<Group> DsaGroups { get; set; }
+        public static List<Token> Tokens { get; } = new List<Token>();
 
         static Users()
         {
@@ -29,39 +29,36 @@ namespace DSACore.Hubs
             //AddGroups();
         }
 
-        
+
         [Obsolete]
         private static async void AddGroups()
         {
-            await Database.AddGroup(new Models.Database.Groups.Group { Name = "HalloWelt", Password = "valid" });
-            await Database.AddGroup(new Models.Database.Groups.Group { Name = "Die Krassen Gamer", Password = "valid" });
-            await Database.AddGroup(new Models.Database.Groups.Group { Name = "DSA", Password = "valid" });
-            await Database.AddGroup(new Models.Database.Groups.Group { Name = "Die Überhelden", Password = "valid" });
+            await Database.AddGroup(new Models.Database.Groups.Group {Name = "HalloWelt", Password = "valid"});
+            await Database.AddGroup(new Models.Database.Groups.Group {Name = "Die Krassen Gamer", Password = "valid"});
+            await Database.AddGroup(new Models.Database.Groups.Group {Name = "DSA", Password = "valid"});
+            await Database.AddGroup(new Models.Database.Groups.Group {Name = "Die Überhelden", Password = "valid"});
         }
 
         public async Task SendMessage(string user, string message)
         {
             try
             {
-                string group = getGroup(Context.ConnectionId).Name;
+                var group = getGroup(Context.ConnectionId).Name;
             }
             catch (InvalidOperationException e)
             {
                 //await Clients.Caller.SendCoreAsync(receiveMethod,
-                   // new object[] { "Nutzer ist in keiner Gruppe. Erst joinen!" });
+                // new object[] { "Nutzer ist in keiner Gruppe. Erst joinen!" });
             }
 
             if (message[0] == '/')
             {
                 var args = message.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
 
-                bool Timon = args.Any(x => x == "hallo");
+                var Timon = args.Any(x => x == "hallo");
 
                 var ident = args.First().Replace("/", "");
-                if (args.Count > 0)
-                {
-                    args.RemoveAt(0);
-                }
+                if (args.Count > 0) args.RemoveAt(0);
 
                 var ret = Commands.CommandHandler.ExecuteCommand(new Command
                 {
@@ -81,63 +78,57 @@ namespace DSACore.Hubs
                         await SendToGroup(ret.message);
                         break;
                 }
-
-                
             }
             else
             {
                 await SendToGroup(message);
             }
-
         }
 
         private Task SendToGroup(string message)
         {
             try
             {
-                string group = getGroup(Context.ConnectionId).Name;
+                var group = getGroup(Context.ConnectionId).Name;
                 return Clients.Group(group).SendCoreAsync(ReceiveMethod,
                     new object[] {getUser(Context.ConnectionId).Name, message});
             }
             catch (InvalidOperationException e)
             {
                 return Clients.Caller.SendCoreAsync(ReceiveMethod,
-                    new object[] { "Nutzer ist in keiner Gruppe. Erst joinen!" });
+                    new object[] {"Nutzer ist in keiner Gruppe. Erst joinen!"});
             }
         }
 
-        private Models.Network.Group getGroup(string id)
+        private Group getGroup(string id)
         {
             return DsaGroups.First(x => x.Users.Exists(y => y.ConnectionId.Equals(id)));
         }
 
         private User getUser(string id)
         {
-            return DsaGroups.First(x => x.Users.Exists(y => y.ConnectionId.Equals(id))).Users.First(z => z.ConnectionId.Equals(id));
+            return DsaGroups.First(x => x.Users.Exists(y => y.ConnectionId.Equals(id))).Users
+                .First(z => z.ConnectionId.Equals(id));
         }
 
         public async Task GetGroups()
         {
             var test = await Database.GetGroups();
-            
-            foreach (var group in test)
-            {
-                if (!DsaGroups.Exists(x => x.Name.Equals(group.Name)))
-                {
-                    DsaGroups.Add(group);
-                }
-            }
 
-            await Clients.Caller.SendCoreAsync("ListGroups", new object[] { DsaGroups.Select(x => x.SendGroup()) });
+            foreach (var group in test)
+                if (!DsaGroups.Exists(x => x.Name.Equals(@group.Name)))
+                    DsaGroups.Add(@group);
+
+            await Clients.Caller.SendCoreAsync("ListGroups", new object[] {DsaGroups.Select(x => x.SendGroup())});
             //throw new NotImplementedException("add database call to get groups");
         }
 
         public async Task AddGroup(string group, string password)
         {
             DsaGroups.Add(new Group(group, password));
-            var Dgroup = new Models.Database.Groups.Group { Name = group, Id = DsaGroups.Count - 1 };
+            var Dgroup = new Models.Database.Groups.Group {Name = group, Id = DsaGroups.Count - 1};
             //Database.AddGroup(Dgroup);
-            await Clients.Caller.SendCoreAsync(ReceiveMethod, new[] { $"group {@group} sucessfully added" });
+            await Clients.Caller.SendCoreAsync(ReceiveMethod, new[] {$"group {@group} sucessfully added"});
             //throw new NotImplementedException("add database call to add groups");
         }
 
@@ -159,7 +150,7 @@ namespace DSACore.Hubs
                 {
                     await Groups.RemoveFromGroupAsync(Context.ConnectionId, "login");
                     await Groups.AddToGroupAsync(Context.ConnectionId, group);
-                    gGroup.Users.Add(new User { ConnectionId = Context.ConnectionId, Name = user });
+                    gGroup.Users.Add(new User {ConnectionId = Context.ConnectionId, Name = user});
                     await SendToGroup("Ein neuer Nutzer hat die Gruppe betreten");
                     await Clients.Caller.SendAsync("LoginResponse", 0);
                     await Clients.Caller.SendAsync("PlayerStatusChanged", new[] {user, "online"});
@@ -202,7 +193,6 @@ namespace DSACore.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "online");
             if (DsaGroups.Exists(x => x.Users.Exists(y => y.ConnectionId == Context.ConnectionId)))
-            {
                 try
                 {
                     var group = getGroup(Context.ConnectionId);
@@ -210,19 +200,16 @@ namespace DSACore.Hubs
 
                     var user = getUser(Context.ConnectionId);
 
-                    await Clients.Caller.SendAsync("PlayerStatusChanged", new[] { user.Name, "offline" });
+                    await Clients.Caller.SendAsync("PlayerStatusChanged", new[] {user.Name, "offline"});
                     //await SendToGroup(user.Name + " disconnected from the Server");
-                    group.Users.Remove(user);
-                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, group.Name);
+                    @group.Users.Remove(user);
+                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, @group.Name);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                     //throw;
                 }
-            }
-
         }
-
     }
 }

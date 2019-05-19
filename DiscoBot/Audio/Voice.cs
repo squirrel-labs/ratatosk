@@ -1,42 +1,34 @@
-﻿namespace DiscoBot.Audio
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using DiscoBot.Auxiliary;
+using Discord;
+using Discord.Audio;
+using Discord.Commands;
+
+namespace DiscoBot.Audio
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Threading.Tasks;
-
-    using DiscoBot.Auxiliary;
-    using DiscoBot.DSA_Game;
-
-    using Discord;
-    using Discord.Audio;
-    using Discord.Commands;
-    using Discord.WebSocket;
-
     public class Voice : ModuleBase
     {
         public static IAudioClient Client { get; set; }
 
         public static void Send(string path, int volume = 256)
         {
-            if (Client == null)
-            {
-                throw new NullReferenceException("Bot befindet sich nicht in einem Sprachchannel");
-            }
+            if (Client == null) throw new NullReferenceException("Bot befindet sich nicht in einem Sprachchannel");
 
             // Create FFmpeg using the previous example
             var ffmpeg = CreateStream(path, volume);
             var output = ffmpeg.StandardOutput.BaseStream;
             var barInvoker = new BackgroundWorker();
             barInvoker.DoWork += delegate
-                {
-                    var discord = Client.CreatePCMStream(AudioApplication.Music);
-                    output.CopyToAsync(discord);
+            {
+                var discord = Client.CreatePCMStream(AudioApplication.Music);
+                output.CopyToAsync(discord);
 
-                    discord.FlushAsync();
-                };
+                discord.FlushAsync();
+            };
 
             barInvoker.RunWorkerAsync();
         }
@@ -44,7 +36,7 @@
         [Command("join", RunMode = RunMode.Async)]
         public async Task JoinChannelAsync(IVoiceChannel channel = null)
         {
-            var msg = this.Context.Message;
+            var msg = Context.Message;
 
             // Get the audio channel
             channel = channel ?? (msg.Author as IGuildUser)?.VoiceChannel;
@@ -67,37 +59,22 @@
 
             if (Client != null)
             {
-                SoundEffects.Play("Nooo");
                 await Client.StopAsync();
                 Client = null;
             }
         }
 
-        [Command("volume")]
-        public void SetVolume(int volume)
-        {
-            if (volume <= 100 && volume >= 0)
-            {
-                SoundEffects.MaxVolume = volume;
-            }
-        }
 
         [Command("play", RunMode = RunMode.Async)]
         public async Task PlayAudioAsync(string path)
         {
-            if (Client == null)
-            {
-                await this.Context.Channel.SendMessageAsync("Erst Joinen!");
-            }
+            if (Client == null) await Context.Channel.SendMessageAsync("Erst Joinen!");
 
-            SoundEffects.Play(path);
+            //SoundEffects.Play(path);
 
             var sounds = Enum.GetValues(typeof(Sound));
             var soundList = new List<Sound>();
-            foreach (var sound in sounds)
-            {
-                soundList.Add((Sound)sound);
-            }
+            foreach (var sound in sounds) soundList.Add((Sound) sound);
 
             var sc = new SpellCorrect();
         }
@@ -109,7 +86,7 @@
                 FileName = "ffmpeg",
                 Arguments = $"-i {path}  -ac 2 -f s16le -ar 48000 -ab 620000 -vol {vol} pipe:1",
                 UseShellExecute = false,
-                RedirectStandardOutput = true,
+                RedirectStandardOutput = true
             };
             return Process.Start(ffmpeg);
         }

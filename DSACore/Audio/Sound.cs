@@ -4,9 +4,9 @@
     {
         public Sound(string name, string url, int volume)
         {
-            this.Name = name;
-            this.Url = url;
-            this.Volume = volume;
+            Name = name;
+            Url = url;
+            Volume = volume;
         }
 
         public string Name { get; }

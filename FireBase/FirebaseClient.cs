@@ -7,9 +7,8 @@ namespace Firebase.Database
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-
-    using Firebase.Database.Offline;
-    using Firebase.Database.Query;
+    using Offline;
+    using Query;
 
     /// <summary>
     /// Firebase client which acts as an entry point to the online database.
@@ -28,15 +27,12 @@ namespace Firebase.Database
         /// <param name="offlineDatabaseFactory"> Offline database. </param>  
         public FirebaseClient(string baseUrl, FirebaseOptions options = null)
         {
-            this.HttpClient = new HttpClient();
-            this.Options = options ?? new FirebaseOptions();
+            HttpClient = new HttpClient();
+            Options = options ?? new FirebaseOptions();
 
             this.baseUrl = baseUrl;
 
-            if (!this.baseUrl.EndsWith("/"))
-            {
-                this.baseUrl += "/";
-            }
+            if (!this.baseUrl.EndsWith("/")) this.baseUrl += "/";
         }
 
         /// <summary>
@@ -46,7 +42,7 @@ namespace Firebase.Database
         /// <returns> <see cref="ChildQuery"/>. </returns>
         public ChildQuery Child(string resourceName)
         {
-            return new ChildQuery(this, () => this.baseUrl + resourceName);
+            return new ChildQuery(this, () => baseUrl + resourceName);
         }
 
         public void Dispose()

@@ -1,7 +1,6 @@
 ﻿namespace Firebase.Database.Offline
 {
-    using Firebase.Database.Query;
-
+    using Query;
     using System.Threading.Tasks;
 
     public class SetHandler<T> : ISetHandler<T>
@@ -11,13 +10,9 @@
             using (var child = query.Child(key))
             {
                 if (entry.SyncOptions == SyncOptions.Put)
-                {
                     await child.PutAsync(entry.Data);
-                }
                 else
-                {
                     await child.PatchAsync(entry.Data);
-                }
             }
         }
     }
