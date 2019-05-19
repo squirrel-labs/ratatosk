@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DSACore.Auxiliary;
-using DSACore.DSA_Game;
-using DSACore.DSA_Game.Characters;
+using DSALib.Auxiliary;
+using DSALib.DSA_Game;
+using DSALib.DSA_Game.Characters;
 
-namespace DSACore.Commands
+namespace DSALib.Commands
 {
     public class HeldList
     {

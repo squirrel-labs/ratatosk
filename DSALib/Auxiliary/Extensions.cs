@@ -1,4 +1,4 @@
-﻿namespace DSACore.Auxiliary
+﻿namespace DSALib.Auxiliary
 {
     public static class StringExtension
     {

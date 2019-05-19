@@ -19,23 +19,7 @@ namespace DSACore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            /*services.AddCors(options => options.AddPolicy("CorsPolicy",
-                builder =>
-                {
-                    builder.AllowAnyOrigin()//.WithOrigins("https://dsa.truekuehli.de", "127.0.0.1")
-                        .WithHeaders("Access-Control-Allow-Origin")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                }));
-            /*
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin().AllowCredentials()/*WithOrigins("https://dsa.truekuehli.de")#1#);
-            });
-
-*/
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSignalR();

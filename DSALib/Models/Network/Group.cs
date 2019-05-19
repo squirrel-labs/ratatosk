@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DSACore.Models.Network
+namespace DSALib.Models.Network
 {
     public class Group
     {

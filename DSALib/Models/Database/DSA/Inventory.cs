@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DSACore.Models.Database.DSA
+namespace DSALib.Models.Database.DSA
 {
     public class Inventory
     {

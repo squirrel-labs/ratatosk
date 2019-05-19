@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DSACore.Characters;
-using DSACore.DSA_Game;
-using DSACore.DSA_Game.Characters;
+using DSALib.Characters;
+using DSALib.DSA_Game;
+using DSALib.DSA_Game.Characters;
 
-namespace DSACore.Commands
+namespace DSALib.Commands
 {
     public class NpcCommands
     {
@@ -19,17 +19,17 @@ namespace DSACore.Commands
         private static string Random(ulong id, string npcName, int mean = 9, int stDv = 1)
         {
             throw new NotImplementedException();
-            Dsa.Chars.Add(new Npc(npcName, mean, stDv));
-            return $"{npcName} wurde zufällig generiert";
+            //Dsa.Chars.Add(new Npc(npcName, mean, stDv));
+            //return $"{npcName} wurde zufällig generiert";
         }
 
         private static string Copy(ulong id, string npcName, string source, int stDv = 1)
         {
             if (Dsa.Chars.Exists(x => x.Name.Equals(npcName))) throw new Exception("Char gibt es schon");
             throw new NotImplementedException();
-            var chr = Dsa.GetCharacter(id);
-            Dsa.Chars.Add(new Character(chr as Character, npcName, stDv));
-            return $"{npcName} wurde als variierte Kopie von {source} erstellt";
+            //var chr = Dsa.GetCharacter(id);
+            //Dsa.Chars.Add(new Character(chr as Character, npcName, stDv));
+            //return $"{npcName} wurde als variierte Kopie von {source} erstellt";
         }
     }
 }

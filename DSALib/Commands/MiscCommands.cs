@@ -1,4 +1,4 @@
-﻿namespace DSACore.Commands
+﻿namespace DSALib.Commands
 {
     public class MiscCommands
     {
@@ -13,7 +13,7 @@
         [Command("rd"), Summary("Würfel Dennis ")]
         public Task RollDennisAsync([Remainder, Summary("Weapon")] string roll)
         {
-            return this.ReplyAsync("```xl\n" + new DSACore.Auxiliary.Calculator.StringSolver(roll).Solve() + "\n```");
+            return this.ReplyAsync("```xl\n" + new DSALib.Auxiliary.Calculator.StringSolver(roll).Solve() + "\n```");
         }*/
 /*
 

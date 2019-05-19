@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using DiscoBot.Audio;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -15,7 +14,7 @@ namespace DiscoBot
     {
         private DiscordSocketClient client;
         private CommandService commands;
-        private IServiceProvider services;
+        private IServiceProvider services = null;
 
         public static void Main(string[] args)
         {
@@ -109,7 +108,6 @@ namespace DiscoBot
         private static void OnProcessExit(object sender, EventArgs e)
         {
             Console.WriteLine("I'm out of here");
-            Voice.Client.StopAsync();
         }
     }
 }

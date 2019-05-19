@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DSACorev.Auxiliary.Calculator;
+using DSALibv.Auxiliary.Calculator;
 
-namespace DSACore.Auxiliary.Calculator
+namespace DSALib.Auxiliary.Calculator
 {
     /// <summary>
     ///     The StringSolver divides the calculation string into operations and SubStringSolvers if the string contains

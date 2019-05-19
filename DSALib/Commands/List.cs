@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DSACore.Audio;
-using DSACore.DSA_Game;
+using DSALib.DSA_Game;
 
-namespace DSACore.Commands
+namespace DSALib.Commands
 {
     public class List
     {
@@ -26,12 +25,6 @@ namespace DSACore.Commands
                 case "commands":
                     // res.AddRange(Help.Commands.Select(x => x.Name));
                     res.Add(Help.Get_Generic_Help());
-                    break;
-                case "play":
-                case "sound":
-                case "sounds":
-                    res.AddRange(
-                        Enum.GetNames(typeof(Sound)));
                     break;
 
                 default:

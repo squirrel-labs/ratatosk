@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace DSACore.Auxiliary
+namespace DSALib.Auxiliary
 {
     public struct CommandInfo
     {

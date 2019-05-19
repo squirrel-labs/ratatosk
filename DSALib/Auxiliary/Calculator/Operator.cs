@@ -1,7 +1,7 @@
 ﻿using System;
-using DSACorev.Auxiliary.Calculator;
+using DSALibv.Auxiliary.Calculator;
 
-namespace DSACore.Auxiliary.Calculator
+namespace DSALib.Auxiliary.Calculator
 {
     /// <summary>
     ///     The Operator Class represents a binary operator with tow Arguments and an Operation type

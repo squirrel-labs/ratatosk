@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using DSACore.Auxiliary;
-using DSALib;
+using DSALib.Auxiliary;
 using DSALib.Characters;
+using DSALib.Models.Dsa;
 
-namespace DSACore.DSA_Game.Characters
+namespace DSALib.DSA_Game.Characters
 {
     public class Character : Being, ICharacter
     {
@@ -99,11 +100,9 @@ namespace DSACore.DSA_Game.Characters
         public string Angriff(string talent, int erschwernis = 0) // pretty self explanatory
         {
             var output = new StringBuilder();
-            var sc = new SpellCorrect();
-            var attack = Kampftalente.OrderBy(x => sc.Compare(talent, x.Name)).First();
-            if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
+            if (!Kampftalente.TryMatch(out var iattack, talent))
                 return $"{Name} kann nicht mit der Waffenart {talent} umgehen...";
-
+            var attack = (KampfTalent) iattack;
             var tap = attack.At;
             output.AppendFormat(
                 "{0}-Angriff taw:{1} {2} \n",
@@ -119,12 +118,12 @@ namespace DSACore.DSA_Game.Characters
         public string Parade(string talent, int erschwernis = 0)
         {
             var output = new StringBuilder();
-            var sc = new SpellCorrect();
-            var attack = Kampftalente.OrderBy(x => sc.Compare(talent, x.Name)).First();
 
-            if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
+            if (Kampftalente.TryMatch(out var iAttack , talent))
                 return $"{Name} kann nicht mit der Waffenart {talent} umgehen...";
 
+
+            var attack = (KampfTalent) iAttack;
             var tap = attack.Pa;
             output.AppendFormat(
                 "{0}-Parade taw:{1} {2}\n",
@@ -140,12 +139,11 @@ namespace DSACore.DSA_Game.Characters
         public string Fernkampf(string talent, int erschwernis = 0)
         {
             var output = new StringBuilder();
-            var sc = new SpellCorrect();
             var fk = Eigenschaften["fk"];
-            var attack = Talente.OrderBy(x => sc.Compare(talent, x.Name)).First();
-            if (sc.Compare(talent, attack.Name) > SpellCorrect.ErrorThreshold)
+            if (! Talente.TryMatch(out var iAttack, talent))
                 return $"{Name} kann nicht mit der Waffenart {talent} umgehen...";
 
+            var attack = (Talent) iAttack;
             var tap = attack.Value;
             output.AppendFormat(
                 "{0} taw:{1} {2} \n",

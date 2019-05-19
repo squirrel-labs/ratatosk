@@ -3,11 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using DSACore.Audio;
-using DSACore.Auxiliary;
+using DSALib.Auxiliary;
 using Newtonsoft.Json;
 
-namespace DSACore.DSA_Game.Save
+namespace DSALib.DSA_Game.Save
 {
     public static class Properties
     {
@@ -26,11 +25,6 @@ namespace DSACore.DSA_Game.Save
             set => objects["CommandInfo"] = value;
         } // use Properties.Commandinfos to access the abstract Object array
 
-        public static List<Sound> Sounds
-        {
-            get => objects["Sound"] as List<Sound>;
-            set => objects["Sound"] = value;
-        }
 
         public static void Deserialize(string path = @"Properties")
         {

@@ -1,4 +1,4 @@
-﻿namespace DSACore.Auxiliary.Calculator
+﻿namespace DSALib.Auxiliary.Calculator
 {
     /// <summary>
     ///     Object has to be able to return an integer as it's value

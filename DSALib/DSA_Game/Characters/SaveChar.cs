@@ -1,6 +1,6 @@
 ﻿using DSALib.Characters;
 
-namespace DSACore.DSA_Game.Characters
+namespace DSALib.DSA_Game.Characters
 {
     public class SaveChar
     {

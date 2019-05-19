@@ -1,4 +1,4 @@
-﻿namespace DSACore.Models.Network
+﻿namespace DSALib.Models.Network
 {
     public class User
     {

@@ -1,4 +1,4 @@
-﻿namespace DSACorev.Auxiliary.Calculator
+﻿namespace DSALibv.Auxiliary.Calculator
 {
     /// <summary>
     ///     The Different Operations, witch can be performed in execution-order

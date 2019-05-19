@@ -1,10 +1,11 @@
 ﻿using System;
-using DSACore.Auxiliary;
-using DSACore.Auxiliary.Calculator;
-using DSACore.DSA_Game;
-using DSACore.Models.Network;
+using DSALib.Auxiliary;
+using DSALib.Auxiliary.Calculator;
+using DSALib.Commands;
+using DSALib.DSA_Game;
+using DSALib.Models.Network;
 
-namespace DSACore.Commands
+namespace DSALib.Commands
 {
     public class CommandHandler
     {

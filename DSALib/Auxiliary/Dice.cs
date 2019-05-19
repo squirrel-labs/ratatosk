@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace DSACore.Auxiliary
+namespace DSALib.Auxiliary
 {
     public static class Dice // roll it!
     {

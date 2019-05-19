@@ -1,6 +1,6 @@
 ﻿using System;
-using DSACore.Commands;
-using DSACore.Models.Network;
+using DSALib.Commands;
+using DSALib.Models.Network;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860

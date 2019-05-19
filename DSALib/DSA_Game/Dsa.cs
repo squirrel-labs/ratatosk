@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DSACore.DSA_Game.Characters;
-using DSACore.DSA_Game.Save;
+using DSALib.DSA_Game.Characters;
+using DSALib.DSA_Game.Save;
 using DSALib;
 using DSALib.Characters;
+using DSALib.Models.Dsa;
 
-namespace DSACore.DSA_Game
+namespace DSALib.DSA_Game
 {
     public static class Dsa
     {
 #if DEBUG
         public const string
-            rootPath = ""; //"C:\\Users\\Dennis\\Source\\Repos\\DiscoBot\\DSACore\\";//"DiscoBot\\DSACore\\";
+            rootPath = ""; //"C:\\Users\\Dennis\\Source\\Repos\\DiscoBot\\DSALib\\";//"DiscoBot\\DSALib\\";
 #else
-        public const string rootPath = "";//"DiscoBot\\DSACore\\";
+        public const string rootPath = "";//"DiscoBot\\DSALib\\";
 #endif
         private static Session s_session;
 

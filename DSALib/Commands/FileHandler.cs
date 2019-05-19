@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
-using DSACore.DSA_Game;
-using DSACore.DSA_Game.Characters;
+using DSALib.DSA_Game;
+using DSALib.DSA_Game.Characters;
 using DSALib;
+using DSALib.Models.Dsa;
 
-namespace DSACore.Commands
+namespace DSALib.Commands
 {
     public class FileHandler
     {

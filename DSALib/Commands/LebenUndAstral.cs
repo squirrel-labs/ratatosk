@@ -1,9 +1,9 @@
 ﻿using System;
-using DSACore.Auxiliary;
-using DSACore.DSA_Game;
+using DSALib.Auxiliary;
+using DSALib.DSA_Game;
 using DSALib.Characters;
 
-namespace DSACore.Commands
+namespace DSALib.Commands
 {
     public class LE
     {

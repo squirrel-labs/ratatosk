@@ -124,7 +124,7 @@ namespace DiscoBot.Commands
 
         [Command("clear")]
         [Summary("Cleans up messages.")]
-        public async Task DeleteAsync(int count)
+        public void DeleteAsync(int count)
         {
             var messagesAsync = Context.Channel.GetMessagesAsync(count);
             if (messagesAsync != null)

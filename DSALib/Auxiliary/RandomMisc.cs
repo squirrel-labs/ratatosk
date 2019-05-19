@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace DSACore.Auxiliary
+namespace DSALib.Auxiliary
 {
     public static class RandomMisc
     {

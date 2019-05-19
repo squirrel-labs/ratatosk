@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using DSACore.DSA_Game.Characters;
+using DSALib.DSA_Game.Characters;
 using Newtonsoft.Json;
 
-namespace DSACore.DSA_Game.Save
+namespace DSALib.DSA_Game.Save
 {
     public class Session
     {

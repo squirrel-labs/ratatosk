@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace DSACore.Models.Network
+namespace DSALib.Models.Network
 {
     public class Command
     {

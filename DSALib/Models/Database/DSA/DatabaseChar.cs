@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DSACore.DSA_Game.Characters;
+using DSALib.DSA_Game.Characters;
 
-namespace DSACore.Models.Database.DSA
+namespace DSALib.Models.Database.DSA
 {
     public class DatabaseChar
     {

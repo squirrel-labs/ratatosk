@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DSACore.Models.Database.DSA
+namespace DSALib.Models.Database.DSA
 {
     public class WeaponTalent
     {

@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "DSACore": {
+    "DSALib": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/commands",

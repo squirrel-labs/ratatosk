@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DSACore.Commands;
-using DSACore.DSA_Game.Characters;
-using DSACore.FireBase;
-using DSACore.Models.Network;
+using DSALib.Commands;
+using DSALib.DSA_Game.Characters;
+using DSALib.Models.Network;
+using DSALib.FireBase;
 using Microsoft.AspNetCore.SignalR;
+using Group = DSALib.Models.Network.Group;
 
 namespace DSACore.Hubs
 {
@@ -30,25 +31,16 @@ namespace DSACore.Hubs
         public static List<Token> Tokens { get; } = new List<Token>();
 
 
-        [Obsolete]
-        private static async void AddGroups()
-        {
-            await Database.AddGroup(new Models.Database.Groups.Group {Name = "HalloWelt", Password = "valid"});
-            await Database.AddGroup(new Models.Database.Groups.Group {Name = "Die Krassen Gamer", Password = "valid"});
-            await Database.AddGroup(new Models.Database.Groups.Group {Name = "DSA", Password = "valid"});
-            await Database.AddGroup(new Models.Database.Groups.Group {Name = "Die Überhelden", Password = "valid"});
-        }
-
         public async Task SendMessage(string user, string message)
         {
             try
             {
                 var group = getGroup(Context.ConnectionId).Name;
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
-                //await Clients.Caller.SendCoreAsync(receiveMethod,
-                // new object[] { "Nutzer ist in keiner Gruppe. Erst joinen!" });
+                await Clients.Caller.SendCoreAsync(ReceiveMethod, 
+                    new object[] { "Nutzer ist in keiner Gruppe. Erst joinen!" });
             }
 
             if (message[0] == '/')
@@ -93,7 +85,7 @@ namespace DSACore.Hubs
                 return Clients.Group(group).SendCoreAsync(ReceiveMethod,
                     new object[] {getUser(Context.ConnectionId).Name, message});
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 return Clients.Caller.SendCoreAsync(ReceiveMethod,
                     new object[] {"Nutzer ist in keiner Gruppe. Erst joinen!"});
@@ -126,7 +118,7 @@ namespace DSACore.Hubs
         public async Task AddGroup(string group, string password)
         {
             DsaGroups.Add(new Group(group, password));
-            var Dgroup = new Models.Database.Groups.Group {Name = group, Id = DsaGroups.Count - 1};
+            var Dgroup = new DSALib.Models.Database.Groups.Group {Name = group, Id = DsaGroups.Count - 1};
             //Database.AddGroup(Dgroup);
             await Clients.Caller.SendCoreAsync(ReceiveMethod, new[] {$"group {group} sucessfully added"});
             //throw new NotImplementedException("add database call to add groups");

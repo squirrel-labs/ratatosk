@@ -1,8 +1,8 @@
 ﻿using System;
-using DSACore.Auxiliary;
+using DSALib.Auxiliary;
 using DSALib.Characters;
 
-namespace DSACore.Characters
+namespace DSALib.Characters
 {
     public class Npc : Being, ICharacter
     {

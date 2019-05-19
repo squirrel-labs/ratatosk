@@ -1,4 +1,4 @@
-﻿namespace DSACore.Models.Database.DSA
+﻿namespace DSALib.Models.Database.DSA
 {
     public class GroupChar
     {

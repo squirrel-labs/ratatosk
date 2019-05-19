@@ -1,4 +1,4 @@
-﻿namespace DSACore.Commands
+﻿namespace DSALib.Commands
 {
     public class ProbenTest
     {

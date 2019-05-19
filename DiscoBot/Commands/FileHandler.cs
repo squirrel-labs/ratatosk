@@ -8,7 +8,7 @@ namespace DiscoBot.Commands
     public class FileHandler : ModuleBase
     {
         //[Command("send"), Summary("fügt Helden hinzu")]
-        public async Task AddChar()
+        public void AddChar()
         {
             var msg = Context.Message;
             if (msg.Attachments == null) throw new ArgumentException("Es wurde keine Datei angehängt");

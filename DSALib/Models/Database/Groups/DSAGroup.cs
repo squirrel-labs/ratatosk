@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using DSACore.Models.Database.DSA;
+using DSALib.Models.Database.DSA;
 
-namespace DSACore.Models.Database.Groups
+namespace DSALib.Models.Database.Groups
 {
     public class DSAGroup : Group
     {

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace DSACore.DSA_Game.Save
+namespace DSALib.DSA_Game.Save
 {
     public class SaveCommand
     {

@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using DSACore.Auxiliary;
-using DSACore.DSA_Game.Save;
+using DSALib.Auxiliary;
+using DSALib.DSA_Game.Save;
 
-namespace DSACore.Commands
+namespace DSALib.Commands
 {
     public class Help
     {
@@ -13,7 +13,7 @@ namespace DSACore.Commands
         {
             // return command specific help
             var com = Properties.CommandInfos
-                .OrderBy(x => SpellCorrect.CompareEasy(x.Name, command.ToLower())).First(); // get best fit command
+                .OrderBy(x => SpellCorrect.Compare(x.Name, command.ToLower())).Last(); // get best fit command
             return com.GetDescription();
         }
 

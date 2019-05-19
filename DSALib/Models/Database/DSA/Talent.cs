@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace DSACore.Models.Database.DSA
+namespace DSALib.Models.Database.DSA
 {
-    public class Talent
+    public class Talent : DSALib.Models.Database.DataObject
     {
         public Talent()
         {
@@ -18,8 +18,6 @@ namespace DSACore.Models.Database.DSA
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Roll = roll.Split('/');
         }
-
-        public string Name { get; set; }
 
         public string[] Roll { get; set; } = new string[3];
     }

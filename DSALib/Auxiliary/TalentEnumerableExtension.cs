@@ -1,33 +1,34 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DSACore.DSA_Game.Characters;
-using DSALib;
+using DSACore.Auxiliary;
+using DSALib.DSA_Game.Characters;
+using DSALib.Models.Dsa;
 
-namespace DSACore.Auxiliary
+namespace DSALib.Auxiliary
 {
     public static class TalentEnumerableExtension
     {
-        public static string ProbenTest(this IEnumerable<Talent> List, Character c, string talent, int erschwernis = 0)
+        public static string ProbenTest(this IEnumerable<Talent> List, Character c, string talentName, int erschwernis = 0)
         {
             var output = new StringBuilder();
             var sc = new SpellCorrect();
-            var tTalent = List.OrderBy(x => sc.Compare(talent, x.Name)).First();
 
-            if (sc.Compare(talent, tTalent.Name) > SpellCorrect.ErrorThreshold)
-                return $"{c.Name} kann nicht {talent}...";
+            if (!List.TryMatch(out var iTalent, talentName))
+                return $"{c.Name} kann nicht {talentName}...";
 
-            var props = tTalent.GetEigenschaften(); // get the required properties
-            var tap = tTalent.Value; // get taw
-            var werte = props.Select(p => c.Eigenschaften[c.PropTable[p]]).ToList();
+            var talent = (Talent) iTalent;
+            var props = talent.GetEigenschaften(); // get the required properties
+            var tap = talent.Value; // get taw
+            var werte = props.Select(p => c.Eigenschaften[c.PropTable[p]]).ToArray();
 
             output.AppendFormat(
                 "{0} würfelt: {1} \n{2} - {3}   taw:{4} {5} \n",
                 c.Name,
-                tTalent.Name,
-                tTalent.Probe,
+                talent.Name,
+                talent.Probe,
                 string.Join("/", werte),
-                tTalent.Value,
+                talent.Value,
                 erschwernis.Equals(0) ? string.Empty : "Erschwernis: " + erschwernis);
 
             output.Append("         ");

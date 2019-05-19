@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using DiscoBot.DSA_Game.Characters;
+using DSALib.Models.Dsa;
 using Newtonsoft.Json;
 
 namespace DSALib.Characters

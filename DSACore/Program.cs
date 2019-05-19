@@ -1,5 +1,5 @@
-﻿using DSACore.DSA_Game;
-using DSACore.FireBase;
+﻿using DSALib.DSA_Game;
+using DSALib.FireBase;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 

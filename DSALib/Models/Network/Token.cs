@@ -1,6 +1,6 @@
 using System;
 
-namespace DSACore.Models.Network
+namespace DSALib.Models.Network
 {
     public class Token
     {

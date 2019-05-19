@@ -1,6 +1,6 @@
 using System;
-using DSACore.Commands;
-using DSACore.Models.Network;
+using DSALib.Models.Network;
+using DSALib.Commands;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DSACore.Controllers
