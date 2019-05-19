@@ -4,8 +4,10 @@ use websocket::{OwnedMessage,
     server::{NoTlsAcceptor, InvalidConnection,
         sync::AcceptResult}};
 use std::net::{SocketAddr, ToSocketAddrs, TcpStream};
-use std::sync::mpsc;
-use std::sync::mpsc::{Sender, Receiver};
+use std::sync::{mpsc,
+                mpsc::{Sender, Receiver},
+                Arc, Mutex};
+use std::collections::HashMap;
 use super::lobby::Lobby;
 use super::backend_connection::BackendConnection;
 
@@ -25,6 +27,7 @@ pub struct GameServer {
     addr: SocketAddr,
     lobby: Lobby,
     backend: BackendConnection,
+    clients: Arc<Mutex<HashMap<Token, GameClient>>>,
 }
 
 pub struct GameClient {
@@ -47,7 +50,7 @@ impl GameClient {
                  .recv_message()
                  .ok()?;
         if let OwnedMessage::Text(text) = message {
-            text.parse::<Token>().ok()
+            text.parse().ok()
         } else {
             None
         }
@@ -68,6 +71,7 @@ impl GameServer {
             addr,
             lobby,
             backend,
+            clients: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 
@@ -81,9 +85,15 @@ impl GameServer {
     }
 
     fn add_client(&self, mut client: GameClient) {
+        let clients = Arc::clone(&self.clients);
         std::thread::spawn(move || {
-            println!("Token: {:?}", client.require_token());
-            loop { std::thread::sleep(std::time::Duration::from_millis(100)); }
+            let token = client.require_token();
+            if let Some(token) = token {
+                println!("Token: {}", token);
+                clients.lock().unwrap().insert(token, client);
+            } else {
+                warn!("Client sent invalid token");
+            }
         });
     }
 
