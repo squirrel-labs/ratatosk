@@ -55,6 +55,10 @@ impl GameClient {
             None
         }
     }
+
+    fn host_name(&self) -> SocketAddr {
+        self.addr
+    }
 }
 
 type ClientConnection = Result<GameClient, GameServerError>;
@@ -90,12 +94,13 @@ impl GameServer {
         std::thread::spawn(move || {
             let token = client.require_token();
             if let Some(token) = token {
-                println!("Token: {}", token);
                 let locked_backend = backend.lock().unwrap();
                 let result = locked_backend.validate_token(&token);
                 if let Err(err) = result {
-                    warn!("token {} is invalid: '{:?}'", token, err);
+                    warn!("client's token {} is not valid: '{:?}'", token, err);
                 } else {
+                    debug!("client validation was successfull");
+                    debug!("add client: ({}, {})", token, client.host_name());
                     clients.lock().unwrap().insert(token, client);
                 }
             } else {

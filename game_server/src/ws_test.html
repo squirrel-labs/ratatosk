@@ -26,7 +26,8 @@ function test_connection() {
     ws.addEventListener('open', function (event) {
         add_text('connection established');
         toggle_connected(true);
-        ws.send('1230123');
+        // send token
+        ws.send('42');
     });
     ws.addEventListener('error', function (event) {
         add_text('ws error occured: "' + event + '"');
