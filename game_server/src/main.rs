@@ -4,13 +4,14 @@ mod lobby;
 mod gameserver;
 mod backend_connection;
 
+mod game_logger;
+
 #[macro_use] extern crate log;
-use pretty_env_logger;
 
 use backend_connection::BackendConnection;
 
 fn main() {
-    pretty_env_logger::init();
+    game_logger::init_logger();
 
     let addr = ("127.0.0.1", 5001);
     info!("create game server on {:?}", addr);

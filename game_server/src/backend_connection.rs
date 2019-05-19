@@ -29,7 +29,7 @@ impl BackendConnection {
             let location = request_data;
             let request = client.get(location);
             let response = request.send();
-            res_sender.send(response);
+            res_sender.send(response).unwrap();
         }
     }
 
