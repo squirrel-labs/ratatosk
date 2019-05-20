@@ -8,6 +8,7 @@ pub struct BackendConnection {
     host: String,
     req_sender: Sender<RequestData>,
     res_rec: Receiver<ResponseResult>,
+    max_uid: u32,
 }
 
 #[derive(Debug)]
@@ -52,6 +53,7 @@ impl BackendConnection {
             host: host.to_string(),
             req_sender,
             res_rec,
+            max_uid: 420,
         }
     }
 
@@ -63,18 +65,19 @@ impl BackendConnection {
         self.res_rec.recv().unwrap()
     }
     
-    pub fn validate_token(&self, token: &Token) -> TokenValidity {
+    pub fn validate_token(&mut self, token: &Token) -> TokenValidity {
         let location = format!("/api/lobby/tokens/{}", token);
         self.request(&location).map_err(|err| BackendError::UrlError(err))?;
         let response = self.get_response().map_err(|err| BackendError::RequestError(err))?;
         if response.status().is_success() {
             // zu Testzwecken werden noch keine JSON-Daten deserialisiert
             // Dennis Server gibt ja noch nix zurück
+            self.max_uid += 1;
             Ok(TokenResponse {
                 group_id: 12,
                 group_type: "scribble".to_string(),
                 group_name: "Scribble".to_string(),
-                user_id: 420
+                user_id: self.max_uid - 1,
             })
         } else if response.status() == reqwest::StatusCode::NOT_FOUND {
             Err(BackendError::InvalidToken)

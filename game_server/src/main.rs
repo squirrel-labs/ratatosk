@@ -11,7 +11,7 @@ mod game_logger;
 fn main() {
     game_logger::init_logger();
 
-    let addr = ("127.0.0.1", 5001);
+    let addr = ("0.0.0.0", 5001);
     info!("create game server on {:?}", addr);
     let mut gameserver = server::GameServer::new(addr);
     gameserver.run().unwrap();

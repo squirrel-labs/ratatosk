@@ -1,15 +1,19 @@
 use websocket::{OwnedMessage,
+    stream::sync::Splittable,
     sync::Server,
     client::sync::Client,
     server::{NoTlsAcceptor,
-        sync::AcceptResult}};
+        sync::AcceptResult},
+    receiver, sender};
 use std::net::{SocketAddr, ToSocketAddrs, TcpStream};
 use std::sync::{mpsc,
-                mpsc::{Sender, Receiver},
-                Arc, Mutex};
+                mpsc::{Sender, Receiver}};
 use std::collections::HashMap;
 use super::lobby::Lobby;
 use super::backend_connection::BackendConnection;
+
+pub type ClientReceiver = receiver::Reader<<TcpStream as Splittable>::Reader>;
+pub type ClientSender = sender::Writer<<TcpStream as Splittable>::Writer>;
 
 const PROTOCOL: &str = "tuesday";
 
@@ -58,6 +62,11 @@ impl GameClient {
 
     fn host_name(&self) -> SocketAddr {
         self.addr
+    }
+
+    pub fn split(self) -> (ClientSender, ClientReceiver) {
+        let (mut rec, mut sen) = self.client.split().unwrap();
+        (sen, rec)
     }
 }
 

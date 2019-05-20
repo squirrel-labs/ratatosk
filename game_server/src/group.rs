@@ -10,5 +10,4 @@ pub trait Group {
     fn run(&mut self);
 
     fn add_client(&mut self, id: UserId, client: GameClient);
-    fn get_client(&self, client_id: UserId) -> Option<&GameClient>;
 }
