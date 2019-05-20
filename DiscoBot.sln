@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireBase", "FireBase\FireBa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSALib", "DSALib\DSALib.csproj", "{C5D9AFDF-70E2-4A47-96FF-1EC47C1DE38D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBot", "DiscordBot\DiscordBot.csproj", "{F1418B62-F043-4761-9BDD-AE078B6A99FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordBot", "DiscordBot\DiscordBot.csproj", "{F1418B62-F043-4761-9BDD-AE078B6A99FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTest", "NUnitTestProject1\NUnitTest.csproj", "{CF821E64-B50E-420F-98A2-07315B362ED0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{F1418B62-F043-4761-9BDD-AE078B6A99FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1418B62-F043-4761-9BDD-AE078B6A99FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1418B62-F043-4761-9BDD-AE078B6A99FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF821E64-B50E-420F-98A2-07315B362ED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF821E64-B50E-420F-98A2-07315B362ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF821E64-B50E-420F-98A2-07315B362ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF821E64-B50E-420F-98A2-07315B362ED0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

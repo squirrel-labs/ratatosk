@@ -67,7 +67,7 @@ namespace DSALib.Auxiliary.Calculator
                 }
             }
 
-            return string.Empty;
+            throw new ArgumentException("Invalid brace sequence");
         }
 
         private static Ops GetOps(char c)
@@ -120,7 +120,7 @@ namespace DSALib.Auxiliary.Calculator
                 switch (c)
                 {
                     case ')':
-                        throw new ArgumentException("Unmögliche Anordnung von Klammern");
+                        throw new ArgumentException("Invalid brace sequence");
                     case '(':
                         arguments.Add(new StringSolver(GetInner(ref workInput)));
                         index = -1;
