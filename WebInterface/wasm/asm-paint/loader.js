@@ -1,5 +1,6 @@
 console.log('js> create import object');
-let importObject = { imports: { imported_func: arg => console.log(arg) } };
+let importObject = { imports: { my_alert: arg => alert(arg) } };
+//let importObject = {};
 
 console.log('js> create fetch object');
 
@@ -9,7 +10,7 @@ console.log('js> instantiate streaming');
 
 function and_then(obj) {
    console.log('js> reached instantiate streaming\'s then');
-   return obj.instance.exports.exported_func();
+   return obj.instance.exports.greet();
 }
 
 WebAssembly.instantiateStreaming(asm_paint_bg, importObject)
