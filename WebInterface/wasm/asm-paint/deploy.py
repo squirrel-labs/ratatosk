@@ -9,7 +9,7 @@ HTML_MIME = 'text/html'
 
 REQUESTS = {
     '/': ('index.html', HTML_MIME),
-#    '/load_ws.js': ('load_ws.js', JS_MIME),
+    '/loader.js': ('loader.js', JS_MIME),
     '/asm_paint_bg.wasm': ('pkg/asm_paint_bg.wasm', WASM_MIME)
 }
 

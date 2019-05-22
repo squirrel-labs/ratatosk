@@ -1,14 +1,10 @@
 <!doctype html>
 <html>
-    <header>
+    <head>
+        <meta charset="UTF-8">
         <title> Scribblio </title>
-    <script> 
-var importObject = { imports: { imported_func: arg => console.log(arg) } };
-
-WebAssembly.instantiateStreaming(fetch('pkg/asm_paint_bg.wasm'), importObject)
-.then(obj => obj.instance.exports.exported_func());
-    </script>
-    </header>
+        <script src='loader.js'></script>
+    </head>
     <body>
     </body>
 </html>
