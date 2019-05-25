@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from socket import (socket, AF_INET, SOCK_STREAM, IPPROTO_TCP,
                     SOL_SOCKET, SO_REUSEADDR)
 from threading import Thread
@@ -10,8 +12,8 @@ HTML_MIME = 'text/html'
 REQUESTS = {
     '/': ('index.html', HTML_MIME),
     '/loader.js': ('loader.js', JS_MIME),
-    '/asm-paint.js': ('target/wasm32-unknown-emscripten/release/asm-paint.js', JS_MIME),
-    '/asm_paint.wasm': ('target/wasm32-unknown-emscripten/release/asm_paint.wasm', WASM_MIME),
+    '/asm_paint_rs.js': ('pkg/asm_paint_rs.js', JS_MIME),
+    '/asm_paint_rs_bg.wasm': ('pkg/asm_paint_rs_bg.wasm', WASM_MIME),
 }
 
 PAGE_404 = '''<!doctype html><html><head></head>
