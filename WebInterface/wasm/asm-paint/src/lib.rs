@@ -8,20 +8,14 @@ macro_rules! console_log {
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
+
+    #[wasm_bindgen(js_namespace = document)]
+    fn write(s: &str);
 }
 
 #[wasm_bindgen(start)]
 pub fn entry() {
-    use web_sys;
-    console_log!("hello {} wasm", 42);
+    console_log!("hello {} wasm", 44);
 
-    let window = web_sys::window().unwrap();
-
-    let document = window.document().unwrap();
-
-    let body = document.body().unwrap();
-
-    //body.set_inner_html("<marquee><h1 style='font-size: 100px'>Hello from WASM</h1></marquee>");
-
-    body.set_inner_html("oho");
+    write("gooo");
 }
