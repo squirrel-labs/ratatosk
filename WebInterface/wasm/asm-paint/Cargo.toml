@@ -1,7 +1,10 @@
 [package]
 name = "asm-paint-rs"
 version = "0.1.0"
-authors = ["Dennis Kobert <d-kobert@web.de>"]
+authors = [
+    "natrixaeria",
+    "Dennis Kobert <d-kobert@web.de>"
+]
 edition = "2018"
 
 [lib]
@@ -9,3 +12,18 @@ crate-type = ["cdylib"]
 
 [dependencies]
 wasm-bindgen = "0.2"
+log = "0.4"
+fern = "0.5"
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+    'Document',
+    'Element',
+    'HtmlCanvasElement',
+    'WebGlBuffer',
+    'WebGlRenderingContext',
+    'WebGlProgram',
+    'WebGlShader',
+    'Window'
+]
