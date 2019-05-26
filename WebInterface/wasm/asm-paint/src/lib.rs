@@ -1,4 +1,6 @@
 mod client_logger;
+mod site;
+mod app;
 
 use wasm_bindgen::prelude::*;
 
@@ -9,5 +11,8 @@ extern crate log;
 pub fn entry() {
     client_logger::init_logger();
 
-    info!("{}", 42);
+    info!("begin running wasm application");
+
+    let app = app::App::new().unwrap();
+    app.run();
 }

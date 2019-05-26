@@ -3,7 +3,7 @@ name = "asm-paint-rs"
 version = "0.1.0"
 authors = [
     "natrixaeria",
-    "Dennis Kobert <d-kobert@web.de>"
+    "TrueDoctor"
 ]
 edition = "2018"
 
