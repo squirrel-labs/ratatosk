@@ -1,10 +1,12 @@
 use web_sys;
 use web_sys::{WebGl2RenderingContext};
 use wasm_bindgen::JsCast;
+use crate::shader::Shaders;
 
 pub struct Canvas {
     element: web_sys::HtmlCanvasElement,
     ctx: WebGl2RenderingContext,
+    shaders: Shaders,
 }
 
 impl Canvas {
@@ -17,11 +19,23 @@ impl Canvas {
             .dyn_into::<WebGl2RenderingContext>().ok()?;
         info!("created webgl2 context successfully");
         Some(Self {
-            element, ctx
+            element, ctx,
+            shaders: Shaders::new(),
         })
     }
 
-    pub fn render(&self) {
-        info!("do a barrel roll");
+    pub fn init(&mut self) -> Result<(), ()> {
+        debug!("create program");
+        self.shaders.create_program(&self.ctx)
+            .map_err(|e| error!("webgl2 create program: {}", e))?;
+        debug!("create vertex shader");
+        self.shaders.create_vertex_shader(&self.ctx)
+            .map_err(|e| error!("webgl2 create vertex shader: {}", e))?;
+        debug!("create fragment shader");
+        self.shaders.create_fragment_shader(&self.ctx)
+            .map_err(|e| error!("webgl2 create fragment shader: {}", e))?;
+        debug!("compile shader program");
+        self.shaders.compile(&self.ctx)
+            .map_err(|e| error!("webgl2 shader: {}", e))
     }
 }

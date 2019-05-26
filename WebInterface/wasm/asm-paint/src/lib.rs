@@ -1,4 +1,5 @@
 mod client_logger;
+mod shader;
 mod canvas;
 mod site;
 mod app;
@@ -14,7 +15,7 @@ pub fn entry() {
 
     info!("begin running wasm application");
 
-    let app = app::App::new().unwrap();
+    let mut app = app::App::new().unwrap();
     app.run();
 }
 

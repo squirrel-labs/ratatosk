@@ -11,8 +11,9 @@ impl App {
         })
     }
 
-    pub fn run(&self) {
-        let canvas = self.site.create_canvas().unwrap();
-        canvas.render();
+    pub fn run(&mut self) {
+        let mut canvas = self.site.create_canvas().unwrap();
+        canvas.init().unwrap();
+        info!("canvas initialisation was succuessfull");
     }
 }

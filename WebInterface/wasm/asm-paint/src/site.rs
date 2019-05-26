@@ -22,6 +22,7 @@ impl Site {
         let element = self.document.get_element_by_id("canvas")
             .or_else(|| {error!("could not gain canvas element"); None})?;
         Canvas::new(element)
-            .or_else(|| {error!("could not create a webgl2 canvas"); None})
+            .or_else(|| {error!("could not create a webgl2 canvas.
+ Your browser doesn't seem to support webgl2"); None})
     }
 }
