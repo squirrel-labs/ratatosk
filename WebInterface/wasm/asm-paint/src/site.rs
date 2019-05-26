@@ -1,4 +1,5 @@
 use web_sys;
+use crate::canvas::Canvas;
 
 pub struct Site {
     window: web_sys::Window,
@@ -14,5 +15,13 @@ impl Site {
         Some(Self { 
             window, document
         })
+    }
+
+    pub fn create_canvas(&self) -> Option<Canvas> {
+        debug!("gain canvas element");
+        let element = self.document.get_element_by_id("canvas")
+            .or_else(|| {error!("could not gain canvas element"); None})?;
+        Canvas::new(element)
+            .or_else(|| {error!("could not create a webgl2 canvas"); None})
     }
 }

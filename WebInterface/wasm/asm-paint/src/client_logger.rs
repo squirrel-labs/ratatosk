@@ -2,12 +2,24 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace=console, js_name=log)]
-    fn __console_log_colored2(f: &str, c1: &str, c2: &str);
+    #[wasm_bindgen(js_namespace=console, js_name=debug)]
+    fn __console_debug_colored2(f: &str, c1: &str, c2: &str);
+    #[wasm_bindgen(js_namespace=console, js_name=info)]
+    fn __console_info_colored2(f: &str, c1: &str, c2: &str);
+    #[wasm_bindgen(js_namespace=console, js_name=warn)]
+    fn __console_warn_colored2(f: &str, c1: &str, c2: &str);
+    #[wasm_bindgen(js_namespace=console, js_name=error)]
+    fn __console_error_colored2(f: &str, c1: &str, c2: &str);
 }
 
 fn log(rec: &log::Record) {
-    __console_log_colored2(&format!("{}", rec.args()),
+    let log_fn = match rec.level() {
+        log::Level::Trace | log::Level::Debug => __console_debug_colored2,
+        log::Level::Info => __console_info_colored2,
+        log::Level::Warn => __console_warn_colored2,
+        log::Level::Error => __console_error_colored2,
+    };
+    log_fn(&format!("{}", rec.args()),
                            &format!("color: {}", match rec.level() {
         log::Level::Trace => "violet",
         log::Level::Debug => "blue",

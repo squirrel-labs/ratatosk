@@ -12,5 +12,7 @@ impl App {
     }
 
     pub fn run(&self) {
+        let canvas = self.site.create_canvas().unwrap();
+        canvas.render();
     }
 }

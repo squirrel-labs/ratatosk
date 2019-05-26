@@ -1,4 +1,5 @@
 mod client_logger;
+mod canvas;
 mod site;
 mod app;
 
