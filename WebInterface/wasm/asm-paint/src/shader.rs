@@ -57,6 +57,17 @@ impl Shaders {
     }
 
     pub fn compile(&mut self, ctx: &WebGl2RenderingContext) -> Result<(), String> {
-        Ok(())
+        let program = self.program.as_ref().ok_or("could not find created program")?;
+        ctx.link_program(program);
+        let status = ctx.get_program_parameter(program, WebGl2RenderingContext::LINK_STATUS);
+        if status == wasm_bindgen::JsValue::TRUE {
+            Ok(())
+        } else {
+            Err(format!("\n{}", ctx.get_program_info_log(program).unwrap_or_default()))
+        }
+    }
+
+    pub fn remove(&mut self, ctx: &WebGl2RenderingContext) {
+        ctx.delete_program(self.program.as_ref())
     }
 }

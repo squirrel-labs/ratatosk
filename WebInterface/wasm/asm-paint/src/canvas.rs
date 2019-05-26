@@ -39,3 +39,9 @@ impl Canvas {
             .map_err(|e| error!("webgl2 shader: {}", e))
     }
 }
+
+impl Drop for Canvas {
+    fn drop(&mut self) {
+        self.shaders.remove(&self.ctx);
+    }
+}
