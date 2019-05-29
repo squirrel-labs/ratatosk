@@ -1,13 +1,15 @@
 use web_sys::{WebGlProgram, WebGl2RenderingContext};
 
-const VERTEX_SHADER: &str = r#"#version 300 es
+const VERTEX_SHADER: &str =
+r#"#version 300 es
 in vec4 pos;
 void main() {
     gl_Position = pos;
 }
 "#;
 
-const FRAGMENT_SHADER: &str = r#"#version 300 es
+const FRAGMENT_SHADER: &str =
+r#"#version 300 es
 precision mediump float;
 out vec4 color;
 
