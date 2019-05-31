@@ -40,7 +40,7 @@ impl Group for WebhoggGroup {
         self.senders.lock().unwrap().insert(id, sen);
         let senders_mutex = self.senders.clone();
         let self_uid = id;
-        std::thread::spawn(move || Self::launch_game(self_uid, rec, senders_mutex));
+        std::thread::spawn(move || Self::broadcast_clients(self_uid, rec, senders_mutex));
         Ok(())
     }
 }
@@ -50,7 +50,7 @@ impl WebhoggGroup {
         Self { id, name, senders: Arc::new(Mutex::new(HashMap::new())) }
     }
 
-    fn launch_game(self_uid: UserId, mut rec: ClientReceiver, senders_mutex: Arc<Mutex<HashMap<UserId, ClientSender>>>) {
+    fn broadcast_clients(self_uid: UserId, mut rec: ClientReceiver, senders_mutex: Arc<Mutex<HashMap<UserId, ClientSender>>>) {
         loop {
             let message = match rec.recv_message() {
                 Ok(x) => x,
