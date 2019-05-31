@@ -1,2 +1,4 @@
 #!/bin/sh
-lighttpd -f ./lighttpd.config
+#killall darkhttpd
+#darkhttpd . --addr 127.0.0.1 --port 8080 --mimetypes mimes
+python3 deploy.py

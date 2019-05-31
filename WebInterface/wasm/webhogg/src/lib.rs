@@ -6,6 +6,7 @@ mod app;
 
 use wasm_bindgen::prelude::*;
 use app::WebhoggApplication as App;
+use web_sys::Worker;
 
 #[macro_use]
 extern crate log;
@@ -18,14 +19,14 @@ fn run_application() {
 }
 
 #[wasm_bindgen]
-pub fn game_logic_entry() {
+pub fn game_logic_entry(worker: Worker) {
     client_logger::init_logger();
 
     info!("game logic initialisation");
 }
 
 #[wasm_bindgen]
-pub fn graphics_entry() {
+pub fn graphics_entry(worker: Worker) {
     client_logger::init_logger();
 
     info!("graphics initialisation");

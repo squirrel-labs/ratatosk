@@ -50,16 +50,16 @@ __exports.__wbg_error_56a861ecc80f27e1 = __wbg_error_56a861ecc80f27e1
 /**
 * @returns {void}
 */
-export function game_logic_entry() {
-    return wasm.game_logic_entry();
+export function game_logic_entry(worker) {
+    return wasm.game_logic_entry(addHeapObject(worker));
 }
 __exports.game_logic_entry = game_logic_entry
 
 /**
 * @returns {void}
 */
-export function graphics_entry() {
-    return wasm.graphics_entry();
+export function graphics_entry(worker) {
+    return wasm.graphics_entry(addHeapObject(worker));
 }
 __exports.graphics_entry = graphics_entry
 

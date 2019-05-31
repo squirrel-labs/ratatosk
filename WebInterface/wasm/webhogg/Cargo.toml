@@ -25,5 +25,6 @@ features = [
     'WebGlShader',
     'WebGlProgram',
     'WebGlBuffer',
-    'Window'
+    'Window',
+    'Worker'
 ]
