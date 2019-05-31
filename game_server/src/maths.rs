@@ -93,10 +93,10 @@ impl std::ops::Sub<Vec2> for Box {
 
 pub struct RBox {
     /// Point 1
-    pub p1: Vec2,
+    pub pos: Vec2,
     /// Point 2
-    pub p2: Vec2, 
-    /// Width
+    pub size: Vec2, 
+    /// Width Attention manhatten distance!!!
     pub w: f32,
 }
 
@@ -104,8 +104,8 @@ impl std::ops::Add<Vec2> for RBox {
     type Output = Self;
     fn add(self, other: Vec2) -> Self {
         Self {
-            p1: self.p1 + other,
-            p2: self.p2 + other,
+            pos: self.p1 + other,
+            size: self.p2 + other,
             w: self.w,
         }
     }
@@ -115,8 +115,8 @@ impl std::ops::Sub<Vec2> for RBox {
     type Output = Self;
     fn sub(self, other: Vec2) -> Self {
         Self {
-            p1: self.p1 + other,
-            p2: self.p2 + other,
+            pos: self.p1 + other,
+            size: self.p2 + other,
             w: self.w,
         }
     }

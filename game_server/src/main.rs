@@ -1,12 +1,9 @@
 mod group;
 mod maths;
 mod scribble_group;
-<<<<<<< Updated upstream
-=======
 mod webhogg_group;
 mod webhogg_game;
 mod collide;
->>>>>>> Stashed changes
 mod lobby;
 mod server;
 mod backend_connection;
