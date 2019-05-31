@@ -9,6 +9,7 @@ pub struct Lobby {
     groups: HashMap<GroupId, Box<Group>>,
 }
 
+#[allow(dead_code)]
 impl Lobby {
     pub fn new() -> Self {
         Self {
@@ -21,7 +22,7 @@ impl Lobby {
             "scribble" => {
                 Some(Box::new(ScribbleGroup::new(id, name.to_string())))
             },
-            other => None,
+            _ => None,
         }
     }
 
@@ -48,6 +49,7 @@ impl Lobby {
     }
 }
 
+#[allow(dead_code)]
 pub struct GroupIterator<'a> {
     groups: std::collections::hash_map::Values<'a, GroupId, Box<Group>>
 }

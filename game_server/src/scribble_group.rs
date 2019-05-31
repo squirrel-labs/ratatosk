@@ -29,7 +29,7 @@ impl Group for ScribbleGroup {
 
     fn add_client(&mut self, id: UserId, client: GameClient) {
         debug!("user {} joined the group {}:'{}'", id, self.id, self.name);
-        let (sen, mut rec) = client.split();
+        let (sen, rec) = client.split();
         self.senders.lock().unwrap().insert(id, sen);
         let senders_mutex = self.senders.clone();
         let self_uid = id;
