@@ -17,8 +17,21 @@ fn run_application() {
     }
 }
 
-#[wasm_bindgen(start)]
-pub fn entry() {
+#[wasm_bindgen]
+pub fn game_logic_entry() {
+    client_logger::init_logger();
+
+    info!("game logic initialisation");
+}
+
+#[wasm_bindgen]
+pub fn graphics_entry() {
+    client_logger::init_logger();
+
+    info!("graphics initialisation");
+}
+
+pub fn entry2() {
     client_logger::init_logger();
 
     info!("begin running wasm application");
