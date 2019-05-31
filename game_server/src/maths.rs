@@ -75,8 +75,8 @@ impl std::ops::Add<Vec2> for Box {
     type Output = Self;
     fn add(self, other: Vec2) -> Self {
         Self {
-            p1: self.p1 + other,
-            p2: self.p2 + other,
+            pos: self.pos + other,
+            size: self.size + other,
         }
     }
 }
@@ -104,8 +104,8 @@ impl std::ops::Add<Vec2> for RBox {
     type Output = Self;
     fn add(self, other: Vec2) -> Self {
         Self {
-            pos: self.p1 + other,
-            size: self.p2 + other,
+            pos: self.pos + other,
+            size: self.size + other,
             w: self.w,
         }
     }
@@ -115,8 +115,8 @@ impl std::ops::Sub<Vec2> for RBox {
     type Output = Self;
     fn sub(self, other: Vec2) -> Self {
         Self {
-            pos: self.p1 + other,
-            size: self.p2 + other,
+            pos: self.pos + other,
+            size: self.size + other,
             w: self.w,
         }
     }

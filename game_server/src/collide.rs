@@ -12,40 +12,41 @@ impl Collide<Vec2> for Vec2 {
 
 impl Collide<Vec2> for Box {
     fn collides(&self, other: &Vec2) -> bool {
-        self.pos < other && other < self.pos + self.size 
+        self.pos < *other && other < &(self.pos + self.size) 
     }
 }
 
 impl Collide<Box> for Box {
     fn collides(&self, other: &Self) -> bool {
-        self.collides(other.pos)
-        || self.collides(other.pos + Vec2{x: other.x, y: 0})
-        || self.collides(other.pos + Vec2{x: 0, y: other.y})
-        || self.collides(other.pos + other.size)
+        self.collides(&other.pos)
+        || self.collides(&(other.pos + Vec2{x: other.size.x, y: 0.0}))
+        || self.collides(&(other.pos + Vec2{x: 0.0, y: other.size.y}))
+        || self.collides(&(other.pos + other.size))
 
-        || other.collides(self.pos)
-        || other.collides(self.pos + Vec2{x: self.x, y: 0})
-        || other.collides(self.pos + Vec2{x: 0, y: self.y})
-        || other.collides(self.pos + self.size)
+        || other.collides(&(self.pos))
+        || other.collides(&(self.pos + Vec2{x: self.size.x, y: 0.0}))
+        || other.collides(&(self.pos + Vec2{x: 0.0, y: self.size.y}))
+        || other.collides(&(self.pos + self.size))
     }
 }
 
 impl Collide<Vec2> for RBox {
     fn collides(&self, other: &Vec2) -> bool {
-        let dx = self.size.x;
-        let dy = self.size.y;
-        let len = f32::sqrt(dx*dx+dy*dy);
+        let mut dx = self.size.x;
+        let mut dy = self.size.y;
+        let len = self.size.distance();
         dx /= len;
         dy /= len;
 
-        let dax = other.x - self.p1.x;
-        let day = other.y - self.p1.y;
+        let dax = other.x - self.pos.x;
+        let day = other.y - self.pos.y;
         
         let dot = dax * dx + day * dy;
         let px = self.pos.x + dx * dot;
         let py = self.pos.y + dy * dot;
        
-        if !(self.pos < px && px < self.pos + self.size) {
+        let p = Vec2{x: px, y: py};
+        if !(self.pos < p && p < self.pos + self.size) {
             return false; 
         } 
 
@@ -59,15 +60,15 @@ impl Collide<Vec2> for RBox {
 
 impl Collide<Box> for RBox {
     fn collides(&self, other: &Box) -> bool {
-        self.collides(other.pos)
-        || self.collides(other.pos + Vec2{x: other.x, y: 0})
-        || self.collides(other.pos + Vec2{x: 0, y: other.y})
-        || self.collides(other.pos + other.size)
-        
-        || other.collides(self.pos)
-        || other.collides(self.pos + Vec2{x: self.x, y: 0})
-        || other.collides(self.pos + Vec2{x: 0, y: self.y})
-        || other.collides(self.pos + self.size)
+        self.collides(&other.pos)
+        || self.collides(&(other.pos + Vec2{x: other.size.x, y: 0.0}))
+        || self.collides(&(other.pos + Vec2{x: 0.0, y: other.size.y}))
+        || self.collides(&(other.pos + other.size))
+
+        || other.collides(&(self.pos))
+        || other.collides(&(self.pos + Vec2{x: self.size.x, y: 0.0}))
+        || other.collides(&(self.pos + Vec2{x: 0.0, y: self.size.y}))
+        || other.collides(&(self.pos + self.size))
         
     }
 }
