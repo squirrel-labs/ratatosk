@@ -1,5 +1,6 @@
 mod group;
 mod scribble_group;
+mod webhogg_group;
 mod lobby;
 mod server;
 mod backend_connection;

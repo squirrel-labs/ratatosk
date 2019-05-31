@@ -1,8 +1,8 @@
 use reqwest::{Response, Client, Url, UrlError, Error as ReqError};
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
-use super::server::{UserId, Token};
-use super::group::GroupId;
+use crate::server::{UserId, Token};
+use crate::group::GroupId;
 
 pub struct BackendConnection {
     host: String,

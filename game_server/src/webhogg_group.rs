@@ -5,19 +5,19 @@ use crate::server::{UserId, GameClient,
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-pub struct ScribbleGroup {
+pub struct WebhoggGroup {
     id: GroupId,
     name: String,
     senders: Arc<Mutex<HashMap<UserId, ClientSender>>>
 }
 
-impl Group for ScribbleGroup {
+impl Group for WebhoggGroup {
     fn id(&self) -> GroupId {
         self.id
     }
 
     fn group_type(&self) -> String {
-        "scribble".to_string()
+        "webhogg".to_string()
     }
 
     fn name(&self) -> String {
@@ -29,6 +29,12 @@ impl Group for ScribbleGroup {
     }
 
     fn add_client(&mut self, id: UserId, client: GameClient) -> Result<(), GameServerError> {
+        if self.senders.lock().unwrap().len() > 1 {
+            return Err(GameServerError::GroupError(
+                    format!("user {} was not able to join the {} group, {}",
+                            "because the client limit has been exceeded",
+                            id, self.name)));
+        } 
         debug!("user {} joined the group {}:'{}'", id, self.id, self.name);
         let (sen, rec) = client.split();
         self.senders.lock().unwrap().insert(id, sen);
@@ -39,7 +45,7 @@ impl Group for ScribbleGroup {
     }
 }
 
-impl ScribbleGroup {
+impl WebhoggGroup {
     pub fn new(id: GroupId, name: String) -> Self {
         Self { id, name, senders: Arc::new(Mutex::new(HashMap::new())) }
     }
