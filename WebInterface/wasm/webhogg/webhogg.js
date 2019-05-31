@@ -1,6 +1,4 @@
-
 const __exports = {};
-let wasm;
 
 let cachedTextDecoder = new TextDecoder('utf-8');
 
@@ -47,9 +45,7 @@ function __wbg_error_56a861ecc80f27e1(arg0, arg1, arg2, arg3, arg4, arg5) {
     console.error(varg0, varg2, varg4);
 }
 __exports.__wbg_error_56a861ecc80f27e1 = __wbg_error_56a861ecc80f27e1
-/**
-* @returns {void}
-*/
+
 export function game_logic_entry(worker) {
     return wasm.game_logic_entry(addHeapObject(worker));
 }
@@ -58,8 +54,8 @@ __exports.game_logic_entry = game_logic_entry
 /**
 * @returns {void}
 */
-export function graphics_entry(worker) {
-    return wasm.graphics_entry(addHeapObject(worker));
+export function graphics_entry() {
+    return wasm.graphics_entry();
 }
 __exports.graphics_entry = graphics_entry
 
@@ -102,11 +98,10 @@ function init_r(module) {
     return result;
 }
 
-function _init_x(result, bx) {
+function _init_x(result, worker) {
     return result.then(({instance, module}) => {
         wasm = instance.exports;
-        if (bx == 1) wasm.game_logic_entry();
-        else         wasm.graphics_entry();
+        wasm.game_logic_entry(worker);
         //init_r.__wbindgen_wasm_module = module;
         //wasm.__wbindgen_start();
         return wasm;

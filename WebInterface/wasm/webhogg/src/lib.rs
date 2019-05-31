@@ -23,10 +23,11 @@ pub fn game_logic_entry(worker: Worker) {
     client_logger::init_logger();
 
     info!("game logic initialisation");
+    //worker.post_message(&wasm_bindgen::JsValue::from_str("msg frm wasm_gLe")).unwrap();
 }
 
 #[wasm_bindgen]
-pub fn graphics_entry(worker: Worker) {
+pub fn graphics_entry() {
     client_logger::init_logger();
 
     info!("graphics initialisation");

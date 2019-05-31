@@ -2,8 +2,20 @@
 
 from socket import socket, SOL_SOCKET, SO_REUSEADDR
 
-ADD_HEADERS = 'Content-Security-Policy: worker-src localhost:*'
-ADD_HEADERS = "Content-Security-Policy: script-src 'inline' *; worker-src *"
+if False:
+    CSP = {
+        'script-src': ["*", "'unsafe-inline'"],
+        'worker-src': ["*", "'unsafe-inline'"],
+        'style-src': ["*", "'unsafe-inline'"],
+        'default-src': ["*", "'unsafe-inline'"],
+    }
+
+    ADD_HEADERS = 'Content-Security-Policy: ' + '; '.join(
+            k + ' ' + ' '.join(v) for k, v in CSP.items())
+    # ADD_HEADERS += '\r\n' + ADD_HEADERS.replace('cy: ', 'cy-Report-Only: ')
+    print(ADD_HEADERS)
+    ADD_HEADERS = '\r\n' + ADD_HEADERS
+ADD_HEADERS = ''
 
 class Client:
     def __init__(self, sock, addr):
@@ -40,11 +52,16 @@ class Client:
                 mime = 'application/wasm'
             else:
                 mime = 'text/plain'
-            packet = f'HTTP/1.1 200 Success\r\nContent-Length: {len(c)}\r\nContent-Type: {mime}\r\n{ADD_HEADERS}\r\n\r\n'.encode('utf-8') + c
+            packet = f'HTTP/1.1 200 Success\r\nContent-Length: {len(c)}\r\nContent-Type: {mime}{ADD_HEADERS}\r\n\r\n'.encode('utf-8') + c
             self.sock.send(packet)
         except FileNotFoundError:
             print(f'error request {loc}')
             self.sock.send(f'HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nContent-Type: text/plain\r\n\r\n'.encode('utf-8'))
+        finally:
+            try:
+                f.close()
+            except:
+                ...
 
     def run(self):
         while True:
@@ -71,9 +88,10 @@ def run_server():
 if __name__ == '__main__':
     from sys import argv
     if len(argv) > 1 and argv[1] in ('-d', '--daemon'):
+        import sys
         from os import getcwd
         from daemon import DaemonContext
-        with DaemonContext(working_directory=getcwd()):
+        with DaemonContext(working_directory=getcwd(), stderr=sys.stderr):
             run_server()
     else:
         run_server()
