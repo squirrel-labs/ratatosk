@@ -33,29 +33,31 @@ impl Group for ScribbleGroup {
         self.senders.lock().unwrap().insert(id, sen);
         let senders_mutex = self.senders.clone();
         let self_uid = id;
-        std::thread::spawn(move || {
-            loop {
-                let message = match rec.recv_message() {
-                    Ok(x) => x,
-                    _ => break
-                };
-                //trace!("got message: '{:?}'", message);
-                let mut senders = senders_mutex.lock().unwrap();
-                for (uid, sender) in senders.iter_mut() {
-                    if self_uid != *uid {
-                        sender.send_message(&message)
-                            .unwrap_or_else(|_| debug!("tried to send message to {}, but failed", *uid));
-                    }
-                }
-            }
-            senders_mutex.lock().unwrap().remove(&self_uid);
-            info!("client {} has left", self_uid);
-        });
+        std::thread::spawn(move || Self::broadcast_clients(self_uid, rec, senders_mutex));
     }
 }
 
 impl ScribbleGroup {
     pub fn new(id: GroupId, name: String) -> Self {
         Self { id, name, senders: Arc::new(Mutex::new(HashMap::new())) }
+    }
+
+    fn broadcast_clients(self_uid: UserId, mut rec: ClientReceiver, senders_mutex: Arc<Mutex<HashMap<UserId, ClientSender>>>) {
+        loop {
+            let message = match rec.recv_message() {
+                Ok(x) => x,
+                _ => break
+            };
+            //trace!("got message: '{:?}'", message);
+            let mut senders = senders_mutex.lock().unwrap();
+            for (uid, sender) in senders.iter_mut() {
+                if self_uid != *uid {
+                    sender.send_message(&message)
+                        .unwrap_or_else(|_| debug!("tried to send message to {}, but failed", *uid));
+                }
+            }
+        }
+        senders_mutex.lock().unwrap().remove(&self_uid);
+        info!("client {} has left", self_uid);
     }
 }
