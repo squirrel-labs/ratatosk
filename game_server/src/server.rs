@@ -65,7 +65,7 @@ impl GameClient {
     }
 
     pub fn split(self) -> (ClientSender, ClientReceiver) {
-        let (mut rec, mut sen) = self.client.split().unwrap();
+        let (rec, sen) = self.client.split().unwrap();
         (sen, rec)
     }
 }
