@@ -67,7 +67,7 @@ function addHeapObject(obj) {
 * @param {any} worker
 * @returns {void}
 */
-export function game_logic_entry(worker) {
+function game_logic_entry(worker) {
     return wasm.game_logic_entry(addHeapObject(worker));
 }
 __exports.game_logic_entry = game_logic_entry
@@ -75,7 +75,7 @@ __exports.game_logic_entry = game_logic_entry
 /**
 * @returns {void}
 */
-export function graphics_entry() {
+function graphics_entry() {
     return wasm.graphics_entry();
 }
 __exports.graphics_entry = graphics_entry
@@ -258,6 +258,8 @@ function dropObject(idx) {
 function __wbindgen_object_drop_ref(i) { dropObject(i); }
 __exports.__wbindgen_object_drop_ref = __wbindgen_object_drop_ref
 
+//!IMPORTANT_STUFF
+
 const WASM_URL = './pkg/webhogg_bg.wasm';
 
 const imports = { './webhogg': __exports };
@@ -268,6 +270,7 @@ let graphics = new Worker('./graphics.js', {type: 'module', credentials: 'includ
 res.then(result => {
     console.log(result);
     wasm = result.instance.exports;
-    wasm.game_logic_entry(graphics);
+    console.log('jsjs value', graphics);
+    game_logic_entry(graphics);
 });
 

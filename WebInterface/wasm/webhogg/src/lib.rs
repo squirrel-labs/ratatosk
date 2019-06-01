@@ -19,11 +19,12 @@ fn run_application() {
 }
 
 #[wasm_bindgen]
-pub fn game_logic_entry(worker: Worker) {
+pub fn game_logic_entry(worker: web_sys::Worker) {
     client_logger::init_logger();
 
     info!("game logic initialisation");
-    //worker.post_message(&wasm_bindgen::JsValue::from_str("msg frm wasm_gLe")).unwrap();
+    info!("js value: {:?}", worker);
+    worker.post_message(&wasm_bindgen::JsValue::from_str("msg frm wasm_gLe")).unwrap();
 }
 
 #[wasm_bindgen]
