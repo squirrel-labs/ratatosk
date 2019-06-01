@@ -1,14 +1,15 @@
 use std::collections::HashMap;
 
-use super::group::{Group, GroupId};
-use super::scribble_group::ScribbleGroup;
+use crate::group::{Group, GroupId};
+use crate::scribble_group::ScribbleGroup;
 
-use super::server::{UserId, GameClient};
+use crate::server::{UserId, GameClient, GameServerError};
 
 pub struct Lobby {
     groups: HashMap<GroupId, Box<Group>>,
 }
 
+#[allow(dead_code)]
 impl Lobby {
     pub fn new() -> Self {
         Self {
@@ -21,7 +22,7 @@ impl Lobby {
             "scribble" => {
                 Some(Box::new(ScribbleGroup::new(id, name.to_string())))
             },
-            other => None,
+            _ => None,
         }
     }
 
@@ -30,17 +31,17 @@ impl Lobby {
     }
 
     pub fn add_client(&mut self, group_type: &str, group_id: GroupId, group_name: &str,
-                   user_id: UserId, client: GameClient) {
+                   user_id: UserId, client: GameClient) -> Result<(), GameServerError> {
         if !self.groups.contains_key(&group_id) {
             let mut group = match Self::generate_group(group_type, group_id, group_name) {
                     Some(x) => x,
-                    _ => return,
+                    _ => return Err(GameServerError::GroupCreationError(format!("failed to generate '{}' group", group_type))),
             };
             group.run();
             self.groups.insert(group_id, group);
         }
         let group = self.groups.get_mut(&group_id).unwrap();
-        group.add_client(user_id, client);
+        group.add_client(user_id, client)
     }
 
     pub fn iter<'b>(&'b self) -> GroupIterator<'b> {
@@ -48,6 +49,7 @@ impl Lobby {
     }
 }
 
+#[allow(dead_code)]
 pub struct GroupIterator<'a> {
     groups: std::collections::hash_map::Values<'a, GroupId, Box<Group>>
 }
