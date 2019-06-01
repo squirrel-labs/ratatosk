@@ -63,30 +63,37 @@ impl Vec2 {
     pub fn distance2(&self) -> f32 {
         self.x * self.x + self.y * self.y
     }
+
+    pub fn norm(&self) -> Vec2 {
+        let len = self.size.distance();
+        Vec2 {
+            x: self.x / len,
+            y: self.y / len,    
+        }
+    }
 }
 
-pub struct Box {
+pub struct AABox {
     pub pos: Vec2,
     /// the size may not be smaller than zero
     pub size: Vec2, 
 }
 
-impl std::ops::Add<Vec2> for Box {
+impl std::ops::Add<Vec2> for AABox {
     type Output = Self;
     fn add(self, other: Vec2) -> Self {
         Self {
             pos: self.pos + other,
-            size: self.size + other,
         }
     }
 }
 
-impl std::ops::Sub<Vec2> for Box {
+impl std::ops::Sub<Vec2> for AABox {
     type Output = Self;
     fn sub(self, other: Vec2) -> Self {
         Self {
             pos: self.pos + other,
-            size: self.size + other
+            size: self.size
         }
     }
 }
@@ -105,7 +112,7 @@ impl std::ops::Add<Vec2> for RBox {
     fn add(self, other: Vec2) -> Self {
         Self {
             pos: self.pos + other,
-            size: self.size + other,
+            size: self.size,
             w: self.w,
         }
     }
