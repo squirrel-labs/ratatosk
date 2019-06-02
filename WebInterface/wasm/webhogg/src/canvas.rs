@@ -19,7 +19,7 @@ impl Canvas {
             .map_err(|_| WebhoggException::WebGlContextError(
                     "obtained invalid webgl2 context js object".to_string()))?;
         info!("successfully obtained webgl2 context");
-        ctx.clear_color(1.0, 0.0, 0.0, 1.0);
+        ctx.clear_color(0.6, 0.0, 0.6, 1.0);
         ctx.clear(WebGl2::COLOR_BUFFER_BIT);
         Ok(Self {
             ctx,
