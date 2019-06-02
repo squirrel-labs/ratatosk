@@ -53,10 +53,31 @@ impl std::ops::Mul<f32> for Vec2 {
     fn mul(self, scale: f32) -> Self {
         Self {
             x: self.x * scale,
-            y: -self.y * scale
+            y: self.y * scale
         }
     }
 }
+
+impl std::ops::Div<f32> for Vec2 {
+    type Output = Self;
+    fn div(self, scale: f32) -> Self {
+        Self {
+            x: self.x / scale,
+            y: self.y / scale
+        }
+    }
+}
+
+impl std::ops::Div<Vec2> for Vec2 {
+    type Output = Self;
+    fn div(self, scale: Vec2) -> Self {
+        Self {
+            x: self.x / scale.x,
+            y: self.y / scale.y
+        }
+    }
+}
+
 
 impl std::cmp::PartialOrd for Vec2 {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
