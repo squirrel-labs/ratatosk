@@ -28,11 +28,11 @@ __exports.game_logic_entry = game_logic_entry
 
 /**
 * @param {any} worker
-* @param {any} canvas
+* @param {any} ecanvas
 * @returns {void}
 */
-function graphics_entry(worker, canvas) {
-    return wasm.graphics_entry(addHeapObject(worker), addHeapObject(canvas));
+function graphics_entry(worker, ecanvas) {
+    return wasm.graphics_entry(addHeapObject(worker), addHeapObject(ecanvas));
 }
 __exports.graphics_entry = graphics_entry
 
@@ -89,21 +89,14 @@ function __widl_f_set_onmessage_DedicatedWorkerGlobalScope(arg0, arg1) {
 }
 __exports.__widl_f_set_onmessage_DedicatedWorkerGlobalScope = __widl_f_set_onmessage_DedicatedWorkerGlobalScope
 
+function __widl_f_data_MessageEvent(arg0) {
+    return addHeapObject(getObject(arg0).data);
+}
+__exports.__widl_f_data_MessageEvent = __widl_f_data_MessageEvent
+
 function isLikeNone(x) {
     return x === undefined || x === null;
 }
-
-function __widl_f_get_element_by_id_Document(arg0, arg1, arg2) {
-    let varg1 = getStringFromWasm(arg1, arg2);
-
-    const val = getObject(arg0).getElementById(varg1);
-    return isLikeNone(val) ? 0 : addHeapObject(val);
-
-}
-__exports.__widl_f_get_element_by_id_Document = __widl_f_get_element_by_id_Document
-
-function __widl_instanceof_HTMLCanvasElement(idx) { return getObject(idx) instanceof HTMLCanvasElement ? 1 : 0; }
-__exports.__widl_instanceof_HTMLCanvasElement = __widl_instanceof_HTMLCanvasElement
 
 let cachegetUint32Memory = null;
 function getUint32Memory() {
@@ -119,7 +112,7 @@ function handleError(exnptr, e) {
     view[exnptr / 4 + 1] = addHeapObject(e);
 }
 
-function __widl_f_get_context_HTMLCanvasElement(arg0, arg1, arg2, exnptr) {
+function __widl_f_get_context_OffscreenCanvas(arg0, arg1, arg2, exnptr) {
     let varg1 = getStringFromWasm(arg1, arg2);
     try {
 
@@ -130,26 +123,20 @@ function __widl_f_get_context_HTMLCanvasElement(arg0, arg1, arg2, exnptr) {
         handleError(exnptr, e);
     }
 }
-__exports.__widl_f_get_context_HTMLCanvasElement = __widl_f_get_context_HTMLCanvasElement
-
-function __widl_f_data_MessageEvent(arg0) {
-    return addHeapObject(getObject(arg0).data);
-}
-__exports.__widl_f_data_MessageEvent = __widl_f_data_MessageEvent
+__exports.__widl_f_get_context_OffscreenCanvas = __widl_f_get_context_OffscreenCanvas
 
 function __widl_instanceof_WebGL2RenderingContext(idx) { return getObject(idx) instanceof WebGL2RenderingContext ? 1 : 0; }
 __exports.__widl_instanceof_WebGL2RenderingContext = __widl_instanceof_WebGL2RenderingContext
 
-function __widl_instanceof_Window(idx) { return getObject(idx) instanceof Window ? 1 : 0; }
-__exports.__widl_instanceof_Window = __widl_instanceof_Window
-
-function __widl_f_document_Window(arg0) {
-
-    const val = getObject(arg0).document;
-    return isLikeNone(val) ? 0 : addHeapObject(val);
-
+function __widl_f_clear_WebGL2RenderingContext(arg0, arg1) {
+    getObject(arg0).clear(arg1 >>> 0);
 }
-__exports.__widl_f_document_Window = __widl_f_document_Window
+__exports.__widl_f_clear_WebGL2RenderingContext = __widl_f_clear_WebGL2RenderingContext
+
+function __widl_f_clear_color_WebGL2RenderingContext(arg0, arg1, arg2, arg3, arg4) {
+    getObject(arg0).clearColor(arg1, arg2, arg3, arg4);
+}
+__exports.__widl_f_clear_color_WebGL2RenderingContext = __widl_f_clear_color_WebGL2RenderingContext
 
 function __widl_f_post_message_Worker(arg0, arg1, exnptr) {
     try {
@@ -160,21 +147,6 @@ function __widl_f_post_message_Worker(arg0, arg1, exnptr) {
 }
 __exports.__widl_f_post_message_Worker = __widl_f_post_message_Worker
 
-function __wbg_newnoargs_a172f39151049128(arg0, arg1) {
-    let varg0 = getStringFromWasm(arg0, arg1);
-    return addHeapObject(new Function(varg0));
-}
-__exports.__wbg_newnoargs_a172f39151049128 = __wbg_newnoargs_a172f39151049128
-
-function __wbg_call_8a9c8b0a32a202ff(arg0, arg1, exnptr) {
-    try {
-        return addHeapObject(getObject(arg0).call(getObject(arg1)));
-    } catch (e) {
-        handleError(exnptr, e);
-    }
-}
-__exports.__wbg_call_8a9c8b0a32a202ff = __wbg_call_8a9c8b0a32a202ff
-
 function __wbg_new0_b4c0f6100aa61878() {
     return addHeapObject(new Date());
 }
@@ -184,6 +156,15 @@ function __wbg_toISOString_580e1bcc780bf968(arg0) {
     return addHeapObject(getObject(arg0).toISOString());
 }
 __exports.__wbg_toISOString_580e1bcc780bf968 = __wbg_toISOString_580e1bcc780bf968
+
+function __wbg_get_48d637c66043532c(arg0, arg1, exnptr) {
+    try {
+        return addHeapObject(Reflect.get(getObject(arg0), getObject(arg1)));
+    } catch (e) {
+        handleError(exnptr, e);
+    }
+}
+__exports.__wbg_get_48d637c66043532c = __wbg_get_48d637c66043532c
 
 function __wbindgen_string_new(p, l) { return addHeapObject(getStringFromWasm(p, l)); }
 __exports.__wbindgen_string_new = __wbindgen_string_new
@@ -360,9 +341,9 @@ function __wbindgen_throw(ptr, len) {
 }
 __exports.__wbindgen_throw = __wbindgen_throw
 
-function __wbindgen_closure_wrapper59(a, b, _ignored) {
-    const f = wasm.__wbg_function_table.get(25);
-    const d = wasm.__wbg_function_table.get(26);
+function __wbindgen_closure_wrapper55(a, b, _ignored) {
+    const f = wasm.__wbg_function_table.get(23);
+    const d = wasm.__wbg_function_table.get(24);
     const cb = function(arg0) {
         this.cnt++;
         let a = this.a;
@@ -383,7 +364,7 @@ function __wbindgen_closure_wrapper59(a, b, _ignored) {
     real.original = cb;
     return addHeapObject(real);
 }
-__exports.__wbindgen_closure_wrapper59 = __wbindgen_closure_wrapper59
+__exports.__wbindgen_closure_wrapper55 = __wbindgen_closure_wrapper55
 
 function __wbindgen_object_clone_ref(idx) {
     return addHeapObject(getObject(idx));
