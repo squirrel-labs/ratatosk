@@ -32,8 +32,9 @@ fn log(rec: &log::Record) {
 pub fn init_logger() {
     fern::Dispatch::new().format(|out, message, record|{
         out.finish(format_args!(
-                "%c{}%c {} > {}",
+                "%c{}%c |{}| {} > {}",
                 record.level(),
+                String::from(js_sys::Date::new_0().to_iso_string()),
                 record.target(),
                 message
                 )

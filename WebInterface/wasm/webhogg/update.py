@@ -9,7 +9,7 @@ def rf(fn):
     return c
 
 nc = rf('pkg/webhogg.js')
-m1 = rf('loader.js')
+m1 = rf('game_logic.js')
 m2 = rf('graphics.js')
 
 nc = nc.split('function init(module) {')[0].strip('\n')
@@ -22,7 +22,7 @@ nc += '\n' * 2 + ISC
 m1 = nc + m1
 m2 = nc + m2
 
-with open('loader.js', 'w') as f:
+with open('game_logic.js', 'w') as f:
     f.write(m1)
 
 with open('graphics.js', 'w') as f:

@@ -396,13 +396,12 @@ __exports.__wbindgen_object_drop_ref = __wbindgen_object_drop_ref
 const WASM_URL = './pkg/webhogg_bg.wasm';
 
 const imports = { './webhogg': __exports };
+
+let graphics = new Worker('./graphics.js', {type: 'module', credentials: 'include'});
+
 let res = WebAssembly.instantiateStreaming(fetch(WASM_URL), imports);
 
 res.then(result => {
     wasm = result.instance.exports;
-    graphics_entry(self);
+    game_logic_entry(graphics);
 });
-
-/*onmessage = function (e) {
-    console.log('gooot messaaage', e.data);
-}*/
