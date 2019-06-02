@@ -268,4 +268,4 @@ __pycache__/
 Cargo.lock
 
 # dont save that target (bad boy)
-/game_server/target
+**/*/target
