@@ -38,7 +38,7 @@ impl Collide<Vec2> for RBox {
         let day = other.y - self.pos.y;
         
         let dot = dax * da.x + day * da.y;
-        let px = self.pos.x + dx * dot;
+        let px = self.pos.x + da.x * dot;
         let py = self.pos.y + da.y * dot;
        
         let p = Vec2{x: px, y: py};
@@ -55,7 +55,7 @@ impl Collide<Vec2> for RBox {
 }
 
 impl Collide<AABox> for RBox {
-    fn collides(&self, other: &Box) -> bool {
+    fn collides(&self, other: &AABox) -> bool {
         self.collides(&other.pos)
         || self.collides(&(other.pos + Vec2{x: other.size.x, y: 0.0}))
         || self.collides(&(other.pos + Vec2{x: 0.0, y: other.size.y}))
