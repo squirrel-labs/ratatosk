@@ -18,54 +18,31 @@ impl Collide<Vec2> for AABox {
 
 impl Collide<AABox> for AABox {
     fn collides(&self, other: &Self) -> bool {
-        self.collides(&other.pos)
-        || self.collides(&(other.pos + Vec2{x: other.size.x, y: 0.0}))
-        || self.collides(&(other.pos + Vec2{x: 0.0, y: other.size.y}))
-        || self.collides(&(other.pos + other.size))
-
-        || other.collides(&(self.pos))
-        || other.collides(&(self.pos + Vec2{x: self.size.x, y: 0.0}))
-        || other.collides(&(self.pos + Vec2{x: 0.0, y: self.size.y}))
-        || other.collides(&(self.pos + self.size))
+        self.pos.x < other.pos.x + other.size.x && other.pos.x < self.pos.x + self.size.x
+        && self.pos.y < other.pos.y + other.size.y && other.pos.y < self.pos.y + self.size.y
     }
 }
 
 impl Collide<Vec2> for RBox {
     fn collides(&self, other: &Vec2) -> bool {
+        let v1_diff = *other + self.v1 * (-self.v1.scalar(&other) / self.v1.distance2());
+        let v2_diff = *other + self.v2 * (-self.v2.scalar(&other) / self.v2.distance2());
 
-        let da = self.size.norm();
-        let dax = other.x - self.pos.x;
-        let day = other.y - self.pos.y;
-        
-        let dot = dax * da.x + day * da.y;
-        let px = self.pos.x + da.x * dot;
-        let py = self.pos.y + da.y * dot;
-       
-        let p = Vec2{x: px, y: py};
-        if !(self.pos < p && p < self.pos + self.size) {
-            return false; 
-        } 
-
-        let ddx = other.x-px; 
-        let ddy = other.y-py;
-        let manhattenDistance = ddx + ddy;
-
-        manhattenDistance < self.w 
+        self.pos < v1_diff && v1_diff < self.pos + self.v2
+        && self.pos < v2_diff && v2_diff < self.pos + self.v1
     }
 }
 
 impl Collide<AABox> for RBox {
     fn collides(&self, other: &AABox) -> bool {
-        self.collides(&other.pos)
-        || self.collides(&(other.pos + Vec2{x: other.size.x, y: 0.0}))
-        || self.collides(&(other.pos + Vec2{x: 0.0, y: other.size.y}))
-        || self.collides(&(other.pos + other.size))
+        let v1_diff = other.pos + self.v1 * (-self.v1.scalar(&other.pos) / self.v1.distance2());
+        let v2_diff = other.pos + self.v2 * (-self.v2.scalar(&other.pos) / self.v2.distance2());
+        let other_size = other.pos + other.size;
+        let v1_diff_size = other_size + self.v1 * (-self.v1.scalar(&other_size) / self.v1.distance2());
+        let v2_diff_size = other_size + self.v2 * (-self.v2.scalar(&other_size) / self.v2.distance2());
 
-        || other.collides(&(self.pos))
-        || other.collides(&(self.pos + Vec2{x: self.size.x, y: 0.0}))
-        || other.collides(&(self.pos + Vec2{x: 0.0, y: self.size.y}))
-        || other.collides(&(self.pos + self.size))
-        
+        self.pos < v1_diff + other.size && v1_diff < self.pos + self.v2
+        && self.pos < v2_diff + other.size && v2_diff < self.pos + self.v1
     }
 }
 
@@ -73,4 +50,66 @@ impl<S, T: Collide<S>> Collide<S> for Vec<T> {
     fn collides(&self, other: &S) -> bool {
         self.iter().any(|x| x.collides(other))
     }
+}
+
+#[cfg(test)]
+    mod tests {
+        use super::*;
+        
+        #[test]
+        fn test_collide_dot_dot() {
+             let a = Vec2{x: 1.0, y: 7.5};
+             assert!(a.collides(&a));
+        }
+    
+        #[test]
+        fn test_not_collide_dot_dot() {
+             let a = Vec2{x: 1.0, y: 7.5};
+             let b = Vec2{x: 5.0, y: 7.5};
+             assert!(!a.collides(&b));
+        }
+
+        #[test]
+        fn test_collide_aabox_dot() {
+             let a = Vec2{x: 1.0, y: 2.5};
+             let b = Vec2{x: 3.0, y: 7.5};
+             let c = Vec2{x: 1.5, y: 5.0};
+             let aa_box = AABox{pos: a, size: b};
+
+             assert!(aa_box.collides(&c));
+        }
+    
+        #[test]
+        fn test_not_collide_aabox_aabox() {
+             let a = Vec2{x: 1.0, y: 7.5};
+             let b = Vec2{x: 3.0, y: 2.5};
+             let c = Vec2{x: 0.5, y: 5.0};
+             let aa_box = AABox{pos: a, size: b};
+             let a = Vec2{x: 1.0, y: 7.5};
+             let b = Vec2{x: 3.0, y: 2.5};
+             let c = Vec2{x: 0.5, y: 5.0};
+             let aa_box = AABox{pos: a, size: b};
+
+             assert!(!(aa_box.collides(&c)));
+        }
+
+        #[test]
+        fn test_collide_Rbox_dot() {
+             let a = Vec2{x: 1.0, y: 2.5};
+             let b = Vec2{x: 3.0, y: 7.5};
+             let c = Vec2{x: 1.5, y: 5.0};
+             let aa_box = AABox{pos: a, size: b};
+
+             assert!(aa_box.collides(&c));
+        }
+    
+        #[test]
+        fn test_not_collide_Rbox_dot() {
+             let a = Vec2{x: 1.0, y: 7.5};
+             let b = Vec2{x: 3.0, y: 2.5};
+             let c = Vec2{x: 0.5, y: 5.0};
+             let aa_box = AABox{pos: a, size: b};
+
+             assert!(!(aa_box.collides(&c)));
+        }
 }

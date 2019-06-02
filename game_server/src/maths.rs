@@ -48,9 +48,19 @@ impl std::ops::Neg for Vec2 {
     }
 }
 
+impl std::ops::Mul<f32> for Vec2 {
+    type Output = Self;
+    fn mul(self, scale: f32) -> Self {
+        Self {
+            x: self.x * scale,
+            y: -self.y * scale
+        }
+    }
+}
+
 impl std::cmp::PartialOrd for Vec2 {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        if self.x < other.x && self.y < other.y {
+        if self.x <= other.x && self.y <= other.y {
             Some(std::cmp::Ordering::Less)
         } else if self.x > other.x && self.y > other.y {
             Some(std::cmp::Ordering::Greater)
@@ -75,7 +85,11 @@ impl Vec2 {
     }
 
     pub fn distance2(&self) -> f32 {
-        self.x * self.x + self.y * self.y
+        self.scalar(self)
+    }
+
+    pub fn scalar(&self, other: &Vec2) -> f32 {
+        self.x * other.x + self.y * other.y
     }
 
     pub fn norm(&self) -> Vec2 {
@@ -137,12 +151,12 @@ impl std::cmp::Eq for AABox {}
 
 #[derive(Clone, Copy, Debug)]
 pub struct RBox {
-    /// Point 1
+    /// origin
     pub pos: Vec2,
-    /// Point 2
-    pub size: Vec2, 
-    /// Width Attention manhatten distance!!!
-    pub w: f32,
+    /// Vwctor1
+    pub v1: Vec2, 
+    /// Vector2
+    pub v2: Vec2,
 }
 
 impl std::ops::Add<Vec2> for RBox {
@@ -150,8 +164,8 @@ impl std::ops::Add<Vec2> for RBox {
     fn add(self, other: Vec2) -> Self {
         Self {
             pos: self.pos + other,
-            size: self.size,
-            w: self.w,
+            v1: self.v1,
+            v2: self.v2,
         }
     }
 }
@@ -167,8 +181,8 @@ impl std::ops::Sub<Vec2> for RBox {
     fn sub(self, other: Vec2) -> Self {
         Self {
             pos: self.pos + other,
-            size: self.size + other,
-            w: self.w,
+            v1: self.v1 + other,
+            v2: self.v2,
         }
     }
 }
@@ -182,8 +196,8 @@ impl std::ops::SubAssign<Vec2> for RBox {
 impl std::cmp::PartialEq for RBox {
     fn eq(&self, other: &Self) -> bool {
         self.pos == other.pos
-            && self.size == other.size
-            && f32::abs(self.w - other.w) < 1e-8
+            && self.v1 == other.v1
+            && self.v1 == self.v2
     }
 }
 
@@ -193,6 +207,39 @@ impl std::cmp::Eq for RBox {}
 mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
+
+    #[test]
+    fn test_less_vec2() {
+        let a = Vec2{x: 1.0, y: 7.5};
+        let b = Vec2{x: -3.0, y: 2.5};
+
+        assert!(b < a);
+    }
+
+    #[test]
+    fn test_less_vec2_fail() {
+        let a = Vec2{x: 1.0, y: 7.5};
+        let b = Vec2{x: 3.0, y: 2.5};
+
+        assert!(!(a < b));
+    }
+
+    #[test]
+    fn test_greater_vec2() {
+        let a = Vec2{x: 1.0, y: 7.5};
+        let b = Vec2{x: -3.0, y: 2.5};
+
+        assert!(a > b);
+    }
+
+    #[test]
+    fn test_greater_vec2_fail() {
+        let a = Vec2{x: 1.0, y: 7.5};
+        let b = Vec2{x: 3.0, y: 2.5};
+
+        assert!(!(a > b));
+    }
+
 
     #[test]
     fn test_add_vec2() {
@@ -233,6 +280,7 @@ mod tests {
 
         assert!(f32::abs(a.distance2() - 5.0) < 1e8);
     }
+
     #[test]
     fn test_norm_vec2() {
         let a = Vec2{x: 2.0, y: -2.0};
@@ -267,8 +315,9 @@ mod tests {
     fn test_add_rbox_vec2() {
         let a = Vec2{x: 1.0, y: 7.5};
         let b = Vec2{x: -3.0, y: 2.5};
-        let mut aa_box = RBox{pos: a, size: b, w: 8.0};
-        let bb_box = RBox{pos: a + b,size: b, w: 8.0};
+        let c = Vec2{x: -3.0, y: 2.5};
+        let mut aa_box = RBox{pos: a, v1: b, v2: c};
+        let bb_box = RBox{pos: a + b, v1: b, v2: c};
         aa_box += b;
 
         assert_eq!(aa_box, bb_box);
@@ -278,8 +327,9 @@ mod tests {
     fn test_sub_rbox_vec2() {
         let a = Vec2{x: 1.0, y: 7.5};
         let b = Vec2{x: -3.0, y: 2.5};
-        let mut aa_box = RBox{pos: a, size: b, w: 8.0};
-        let bb_box = RBox{pos: a - b,size: b, w: 8.0};
+        let c = Vec2{x: -3.0, y: 2.5};
+        let mut aa_box = RBox{pos: a, v1: b, v2: c};
+        let bb_box = RBox{pos: a - b, v1: b, v2: c};
         aa_box -= b;
 
         assert_eq!(aa_box, bb_box);
