@@ -28,10 +28,11 @@ __exports.game_logic_entry = game_logic_entry
 
 /**
 * @param {any} worker
+* @param {any} canvas
 * @returns {void}
 */
-function graphics_entry(worker) {
-    return wasm.graphics_entry(addHeapObject(worker));
+function graphics_entry(worker, canvas) {
+    return wasm.graphics_entry(addHeapObject(worker), addHeapObject(canvas));
 }
 __exports.graphics_entry = graphics_entry
 
@@ -359,9 +360,9 @@ function __wbindgen_throw(ptr, len) {
 }
 __exports.__wbindgen_throw = __wbindgen_throw
 
-function __wbindgen_closure_wrapper61(a, b, _ignored) {
-    const f = wasm.__wbg_function_table.get(22);
-    const d = wasm.__wbg_function_table.get(23);
+function __wbindgen_closure_wrapper59(a, b, _ignored) {
+    const f = wasm.__wbg_function_table.get(25);
+    const d = wasm.__wbg_function_table.get(26);
     const cb = function(arg0) {
         this.cnt++;
         let a = this.a;
@@ -382,7 +383,7 @@ function __wbindgen_closure_wrapper61(a, b, _ignored) {
     real.original = cb;
     return addHeapObject(real);
 }
-__exports.__wbindgen_closure_wrapper61 = __wbindgen_closure_wrapper61
+__exports.__wbindgen_closure_wrapper59 = __wbindgen_closure_wrapper59
 
 function __wbindgen_object_clone_ref(idx) {
     return addHeapObject(getObject(idx));
@@ -396,13 +397,24 @@ __exports.__wbindgen_object_drop_ref = __wbindgen_object_drop_ref
 const WASM_URL = './pkg/webhogg_bg.wasm';
 
 const imports = { './webhogg': __exports };
+
 let res = WebAssembly.instantiateStreaming(fetch(WASM_URL), imports);
 
-res.then(result => {
-    wasm = result.instance.exports;
-    graphics_entry(self);
-});
-
-/*onmessage = function (e) {
-    console.log('gooot messaaage', e.data);
-}*/
+let first = true;
+let msg = null;
+onmessage = function (e) {
+    if (first) {
+        first = false;
+        console.log('got context: ', e.data);
+        msg = e.data;
+    }
+}
+while (msg === null) {
+    console.log('yay');
+    res.then(result => {
+        wasm = result.instance.exports;
+        console.log('context sndng: ', msg);
+        graphics_entry(self, msg);
+    });
+    break;
+}

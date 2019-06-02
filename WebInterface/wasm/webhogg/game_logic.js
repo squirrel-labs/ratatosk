@@ -28,10 +28,11 @@ __exports.game_logic_entry = game_logic_entry
 
 /**
 * @param {any} worker
+* @param {any} canvas
 * @returns {void}
 */
-function graphics_entry(worker) {
-    return wasm.graphics_entry(addHeapObject(worker));
+function graphics_entry(worker, canvas) {
+    return wasm.graphics_entry(addHeapObject(worker), addHeapObject(canvas));
 }
 __exports.graphics_entry = graphics_entry
 
@@ -359,9 +360,9 @@ function __wbindgen_throw(ptr, len) {
 }
 __exports.__wbindgen_throw = __wbindgen_throw
 
-function __wbindgen_closure_wrapper61(a, b, _ignored) {
-    const f = wasm.__wbg_function_table.get(22);
-    const d = wasm.__wbg_function_table.get(23);
+function __wbindgen_closure_wrapper59(a, b, _ignored) {
+    const f = wasm.__wbg_function_table.get(25);
+    const d = wasm.__wbg_function_table.get(26);
     const cb = function(arg0) {
         this.cnt++;
         let a = this.a;
@@ -382,7 +383,7 @@ function __wbindgen_closure_wrapper61(a, b, _ignored) {
     real.original = cb;
     return addHeapObject(real);
 }
-__exports.__wbindgen_closure_wrapper61 = __wbindgen_closure_wrapper61
+__exports.__wbindgen_closure_wrapper59 = __wbindgen_closure_wrapper59
 
 function __wbindgen_object_clone_ref(idx) {
     return addHeapObject(getObject(idx));
@@ -397,11 +398,15 @@ const WASM_URL = './pkg/webhogg_bg.wasm';
 
 const imports = { './webhogg': __exports };
 
-let graphics = new Worker('./graphics.js', {type: 'module', credentials: 'include'});
+onmessage = function (e) {
+    console.log('transport canvas');
 
-let res = WebAssembly.instantiateStreaming(fetch(WASM_URL), imports);
+    let res = WebAssembly.instantiateStreaming(fetch(WASM_URL), imports);
 
-res.then(result => {
-    wasm = result.instance.exports;
-    game_logic_entry(graphics);
-});
+    res.then(result => {
+        wasm = result.instance.exports;
+        game_logic_entry(graphics);
+    });
+    let graphics = new Worker('./graphics.js', {type: 'module', credentials: 'include'});
+    graphics.postMessage(e.data, [e.data.canvas]);
+}

@@ -26,6 +26,7 @@ features = [
     'HtmlCanvasElement',
     'WorkerGlobalScope',
     'DedicatedWorkerGlobalScope',
+    'OffscreenCanvas',
     'WebGl2RenderingContext',
     'WebGlShader',
     'WebGlProgram',

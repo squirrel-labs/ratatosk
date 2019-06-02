@@ -30,10 +30,11 @@ pub fn game_logic_entry(worker: web_sys::Worker) {
 }
 
 #[wasm_bindgen]
-pub fn graphics_entry(worker: web_sys::DedicatedWorkerGlobalScope) {
+pub fn graphics_entry(worker: web_sys::DedicatedWorkerGlobalScope,
+                      canvas: web_sys::OffscreenCanvas) {
     client_logger::init_logger();
 
-    info!("hello from graphics wasm");
+    info!("hello from graphics wasm {:?}", canvas);
     let handler = wasm_bindgen::closure::Closure::once_into_js(
                     (|e: web_sys::MessageEvent| {
         info!("things are getting wired: {:?}", e.data());
