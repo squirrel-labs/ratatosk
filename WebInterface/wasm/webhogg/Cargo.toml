@@ -11,6 +11,7 @@ edition = "2018"
 crate-type = ["cdylib"]
 
 [dependencies]
+js-sys = "0.3"
 wasm-bindgen = "0.2"
 log = "0.4"
 fern = "0.5"
@@ -19,8 +20,13 @@ fern = "0.5"
 version = "0.3.22"
 features = [
     'Document',
+    'Event',
+    'MessageEvent',
     'Element',
     'HtmlCanvasElement',
+    'WorkerGlobalScope',
+    'DedicatedWorkerGlobalScope',
+    'OffscreenCanvas',
     'WebGl2RenderingContext',
     'WebGlShader',
     'WebGlProgram',

@@ -22,20 +22,31 @@ fn run_application() {
 pub fn game_logic_entry(worker: web_sys::Worker) {
     client_logger::init_logger();
 
-    info!("game logic initialisation");
-    info!("js value: {:?}", worker);
-    worker.post_message(&wasm_bindgen::JsValue::from_str("msg frm wasm_gLe")).unwrap();
+    info!("hello from game logic wasm");
+    info!("begin long calculation in game logic thread");
+    worker.post_message(&wasm_bindgen::JsValue::from_str("premsg frm wasm_gLe"))
+        .unwrap();
+    info!("killed game logic");
 }
 
 #[wasm_bindgen]
-pub fn graphics_entry() {
+pub fn graphics_entry(worker: web_sys::DedicatedWorkerGlobalScope,
+                      canvas: web_sys::OffscreenCanvas) {
     client_logger::init_logger();
 
-    info!("graphics initialisation");
+    info!("hello from graphics wasm {:?}", canvas);
+    let handler = wasm_bindgen::closure::Closure::once_into_js(
+                    (|e: web_sys::MessageEvent| {
+        info!("things are getting wired: {:?}", e.data());
+    }));
+
+    worker.set_onmessage(Some(&js_sys::Function::from(handler)));
+    entry2();
+    info!("killed graphics");
 }
 
 pub fn entry2() {
-    client_logger::init_logger();
+    // client_logger::init_logger();
 
     info!("begin running wasm application");
 

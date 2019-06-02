@@ -398,23 +398,15 @@ const WASM_URL = './pkg/webhogg_bg.wasm';
 
 const imports = { './webhogg': __exports };
 
-let res = WebAssembly.instantiateStreaming(fetch(WASM_URL), imports);
-
-let first = true;
-let msg = null;
 onmessage = function (e) {
-    if (first) {
-        first = false;
-        console.log('got context: ', e.data);
-        msg = e.data;
-    }
-}
-while (msg === null) {
-    console.log('yay');
+    console.log('transport canvas');
+
+    let res = WebAssembly.instantiateStreaming(fetch(WASM_URL), imports);
+
     res.then(result => {
         wasm = result.instance.exports;
-        console.log('context sndng: ', msg);
-        graphics_entry(self, msg);
+        game_logic_entry(graphics);
     });
-    break;
+    let graphics = new Worker('./graphics.js', {type: 'module', credentials: 'include'});
+    graphics.postMessage(e.data, [e.data.canvas]);
 }
