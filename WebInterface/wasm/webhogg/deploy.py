@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from threading import Thread
 from socket import socket, SOL_SOCKET, SO_REUSEADDR
 
 if False:
@@ -68,11 +69,15 @@ class Client:
             method, loc, attrs, ver = self.rec()
             self.sen(loc, ver)
 
+    def run_threaded(self):
+        thread = Thread(target=self.run, daemon=True)
+        thread.run()
 
-def run_server():
+
+def run_server(addr, port):
     ws = socket()
     ws.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-    ws.bind(('localhost', 8080))
+    ws.bind((addr, port))
     ws.listen()
 
     clients = []
@@ -82,16 +87,36 @@ def run_server():
         print(f'{a[0]}:{a[1]} connected')
         client = Client(c, a)
         clients.append(clients)
-        client.run()
+        client.run_threaded()
 
 
 if __name__ == '__main__':
     from sys import argv
-    if len(argv) > 1 and argv[1] in ('-d', '--daemon'):
+    daemon = False
+    addr = 'localhost'
+    flag = None
+    for arg in argv[1:]:
+        if flag is not None:
+            if flag == 'addr':
+                addr = arg
+            elif flag == 'port':
+                port = int(arg)
+            flag = None
+        elif arg in ('-d', '--daemon'):
+            daemon = True
+        elif arg in ('-a', '--addr', '--address'):
+            flag = 'addr'
+        elif arg in ('-p', '--port'):
+            flag = 'port'
+    daemon = len(argv) > 1 and argv[1] in ('-d', '--daemon')
+    if ':' in addr:
+        addr, port = addr.split(':')
+        port = int(port)
+    if daemon:
         import sys
         from os import getcwd
         from daemon import DaemonContext
         with DaemonContext(working_directory=getcwd(), stderr=sys.stderr):
-            run_server()
+            run_server(addr, port)
     else:
-        run_server()
+        run_server(addr, port)
