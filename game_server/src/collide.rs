@@ -65,8 +65,8 @@ impl Collide<AABox> for RBox {
 
         0.0 <= v1_dist_size && v1_dist <= 1.0
         && 0.0 <= v2_dist_size && v2_dist <= 1.0
-        && other.pos.x < maxx && minx < other.pos.x + other.size.x
-        && other.pos.y < maxy && miny < other.pos.y + other.size.y
+        && other.pos.x <= maxx && minx <= other.pos.x + other.size.x
+        && other.pos.y <= maxy && miny <= other.pos.y + other.size.y
     }
 }
 
@@ -162,7 +162,7 @@ impl<S, T: Collide<S>> Collide<S> for Vec<T> {
         }
     
         #[test]
-        fn test_not_collide_Rbox_dot() {
+        fn test_not_collide_rbox_dot() {
              let a = Vec2{x: 1.0, y: 1.0};
              let b = Vec2{x: 1.0, y: 1.0};
              let c = Vec2{x: 1.0, y: -1.0};
@@ -174,7 +174,7 @@ impl<S, T: Collide<S>> Collide<S> for Vec<T> {
         }
 
         #[test]
-        fn test_collide_rbox_rbox_intersecting() {
+        fn test_collide_rbox_aabox_intersecting() {
              let a = Vec2{x: 1.0, y: 2.5};
              let b = Vec2{x: 0.0, y: 2.5};
              let c = Vec2{x: 3.0, y: 0.5};
@@ -187,20 +187,43 @@ impl<S, T: Collide<S>> Collide<S> for Vec<T> {
         }
 
         #[test]
-        fn test_collide_rbox_rbox_crossed() {
+        fn test_collide_rbox_aabox_edges_touch() {
+             let a = Vec2{x: 4.0, y: 5.5};
+             let b = Vec2{x: 1.0, y: 7.5};
+             let aa_box = RBox::new(a, b, 3.9);
+             let a = Vec2{x: 0.0, y: 0.5};
+             let b = Vec2{x: 4.0, y: 5.0};
+             let bb_box = AABox{pos: a, size: b};
+
+             assert!(aa_box.collides(&bb_box));
+        }
+
+        #[test]
+        fn test_collide_rbox_aabox_crossed() {
              let a = Vec2{x: 2.0, y: 0.5};
-             let b = Vec2{x: 1.0, y: 0.0};
-             let c = Vec2{x: 0.0, y: 7.5};
-             let aa_box = RBox{pos: a, v1: b, v2: c};
-             let a = Vec2{x: 1.0, y: 3.5};
-             let b = Vec2{x: 5.0, y: 4.5};
+             let b = Vec2{x: 1.0, y: 7.5};
+             let aa_box = RBox::new(a, b, 3.9);
+             let a = Vec2{x: 0.0, y: 4.5};
+             let b = Vec2{x: 15.0, y: 1.5};
              let bb_box = AABox{pos: a, size: b};
 
              assert!(aa_box.collides(&bb_box));
         }
     
         #[test]
-        fn test_not_collide_rbox_rbox() {
+        fn test_not_collide_rbox_aabox_next_to() {
+             let a = Vec2{x: 2.0, y: 0.5};
+             let b = Vec2{x: 1.0, y: 7.5};
+             let aa_box = RBox::new(a, b, 3.9);
+             let a = Vec2{x: 5.0, y: 40.5};
+             let b = Vec2{x: 15.0, y: 1.5};
+             let bb_box = AABox{pos: a, size: b};
+
+             assert!(!aa_box.collides(&bb_box));
+        }
+    
+        #[test]
+        fn test_not_collide_rbox_aabox() {
              let a = Vec2{x: 1.0, y: 1.0};
              let b = Vec2{x: 0.0, y: 1.0};
              let c = Vec2{x: 1.0, y: 0.0};

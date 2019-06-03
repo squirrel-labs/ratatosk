@@ -180,6 +180,18 @@ pub struct RBox {
     pub v2: Vec2,
 }
 
+impl RBox {
+    pub fn new(pos: Vec2, orientation: Vec2, width: f32) -> Self {
+        let scale = width / orientation.distance();
+        let orth = Vec2 {x: orientation.x / scale, y: -orientation.y / scale};
+        Self {
+            pos: pos,
+            v1: orientation,
+            v2: orth,
+        }
+    }
+}   
+
 impl std::ops::Add<Vec2> for RBox {
     type Output = Self;
     fn add(self, other: Vec2) -> Self {
