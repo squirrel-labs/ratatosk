@@ -1,3 +1,0 @@
-#!/bin/sh
-killall python3
-python3 deploy.py -d

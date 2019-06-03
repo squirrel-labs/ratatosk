@@ -3,12 +3,14 @@
 from threading import Thread
 from socket import socket, SOL_SOCKET, SO_REUSEADDR
 
-if False:
+def enable_csp():
+    global ADD_HEADERS
+    ALL = ["'self'", "developer.mozilla.org"]
     CSP = {
-        'script-src': ["*", "'unsafe-inline'"],
-        'worker-src': ["*", "'unsafe-inline'"],
-        'style-src': ["*", "'unsafe-inline'"],
-        'default-src': ["*", "'unsafe-inline'"],
+        'script-src': ["'unsafe-inline'", *ALL],
+        'worker-src': [*ALL],
+        'style-src': ["'unsafe-inline'", *ALL],
+        'default-src': [*ALL],
     }
 
     ADD_HEADERS = 'Content-Security-Policy: ' + '; '.join(
@@ -16,11 +18,13 @@ if False:
     # ADD_HEADERS += '\r\n' + ADD_HEADERS.replace('cy: ', 'cy-Report-Only: ')
     print(ADD_HEADERS)
     ADD_HEADERS = '\r\n' + ADD_HEADERS
+
 ADD_HEADERS = ''
 
 class Client:
     def __init__(self, sock, addr):
         self.sock, self.addr = sock, addr
+        self.thread = None
 
     def rec(self):
         b = b''
@@ -34,6 +38,7 @@ class Client:
 
     def sen(self, loc, ver):
         print(f'request {loc}')
+        closing = False
         if loc.startswith('/'):
             loc = loc[1:]
         if not loc:
@@ -54,7 +59,10 @@ class Client:
             else:
                 mime = 'text/plain'
             packet = f'HTTP/1.1 200 Success\r\nContent-Length: {len(c)}\r\nContent-Type: {mime}{ADD_HEADERS}\r\n\r\n'.encode('utf-8') + c
-            self.sock.send(packet)
+            pl = len(packet)
+            if pl != self.sock.send(packet):
+                self.sock.close()
+                closing = True
         except FileNotFoundError:
             print(f'error request {loc}')
             self.sock.send(f'HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nContent-Type: text/plain\r\n\r\n'.encode('utf-8'))
@@ -63,15 +71,17 @@ class Client:
                 f.close()
             except:
                 ...
+        if closing:
+            return True
 
     def run(self):
         while True:
             method, loc, attrs, ver = self.rec()
-            self.sen(loc, ver)
+            if self.sen(loc, ver): break
 
     def run_threaded(self):
-        thread = Thread(target=self.run, daemon=True)
-        thread.run()
+        self.thread = Thread(target=self.run)
+        self.thread.start()
 
 
 def run_server(addr, port):
@@ -88,6 +98,7 @@ def run_server(addr, port):
         client = Client(c, a)
         clients.append(clients)
         client.run_threaded()
+        print('lnuertdenuvtdevn')
 
 
 if __name__ == '__main__':
@@ -108,6 +119,10 @@ if __name__ == '__main__':
             flag = 'addr'
         elif arg in ('-p', '--port'):
             flag = 'port'
+        elif arg in ('--csp',):
+            enable_csp()
+        else:
+            print(f'warn: ignore invalid argument "{arg}"')
     daemon = len(argv) > 1 and argv[1] in ('-d', '--daemon')
     if ':' in addr:
         addr, port = addr.split(':')
