@@ -1,38 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscoBot", "DiscoBot\DiscoBot.csproj", "{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSACore", "dsa\DSACore\DSACore.csproj", "{35A5E2CC-0FD4-4BC0-ACBF-38599CAED1C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZooBOTanica", "ZooBOTanica\ZooBOTanica.csproj", "{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireBase", "dsa\FireBase\FireBase.csproj", "{87CC30E6-CBEA-4282-A3CC-FD5119A1993B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSALib", "DSALib\DSALib.csproj", "{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSALib", "dsa\DSALib\DSALib.csproj", "{C5D9AFDF-70E2-4A47-96FF-1EC47C1DE38D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DSACore", "DSACore\DSACore.csproj", "{35A5E2CC-0FD4-4BC0-ACBF-38599CAED1C4}"
-EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "dist", "WebInterface\NodeJSServer\dist\", "{3FEC1233-072D-4031-BBEB-B9804C58BD15}"
-	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_1915"
-		Debug.AspNetCompiler.PhysicalPath = "WebInterface\NodeJSServer\dist\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_1915\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_1915"
-		Release.AspNetCompiler.PhysicalPath = "WebInterface\NodeJSServer\dist\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_1915\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "1915"
-		SlnRelativePath = "WebInterface\NodeJSServer\dist\"
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FireBase", "FireBase\FireBase.csproj", "{87CC30E6-CBEA-4282-A3CC-FD5119A1993B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUnitTest", "dsa\NUnitTestProject1\NUnitTest.csproj", "{CF821E64-B50E-420F-98A2-07315B362ED0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,30 +17,22 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1186AF1C-BC46-4B3D-BEE0-CE478B8AEAC7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{58917D99-DC94-4CDD-AD2B-C6E0BAFFCF47}.Release|Any CPU.Build.0 = Release|Any CPU
-		{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{388DD4ED-29C4-4127-AC8F-34DD3FE9F9B0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{35A5E2CC-0FD4-4BC0-ACBF-38599CAED1C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{35A5E2CC-0FD4-4BC0-ACBF-38599CAED1C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35A5E2CC-0FD4-4BC0-ACBF-38599CAED1C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35A5E2CC-0FD4-4BC0-ACBF-38599CAED1C4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3FEC1233-072D-4031-BBEB-B9804C58BD15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3FEC1233-072D-4031-BBEB-B9804C58BD15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3FEC1233-072D-4031-BBEB-B9804C58BD15}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{3FEC1233-072D-4031-BBEB-B9804C58BD15}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{87CC30E6-CBEA-4282-A3CC-FD5119A1993B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{87CC30E6-CBEA-4282-A3CC-FD5119A1993B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87CC30E6-CBEA-4282-A3CC-FD5119A1993B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87CC30E6-CBEA-4282-A3CC-FD5119A1993B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5D9AFDF-70E2-4A47-96FF-1EC47C1DE38D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5D9AFDF-70E2-4A47-96FF-1EC47C1DE38D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5D9AFDF-70E2-4A47-96FF-1EC47C1DE38D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5D9AFDF-70E2-4A47-96FF-1EC47C1DE38D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF821E64-B50E-420F-98A2-07315B362ED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF821E64-B50E-420F-98A2-07315B362ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF821E64-B50E-420F-98A2-07315B362ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF821E64-B50E-420F-98A2-07315B362ED0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

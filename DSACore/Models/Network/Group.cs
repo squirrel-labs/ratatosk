@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace DSACore.Models.Network
 {
@@ -22,14 +20,11 @@ namespace DSACore.Models.Network
         public string Password { get; set; }
         public List<User> Users { get; set; } = new List<User>();
 
-        public int UserCount
-        {
-            get { return Users.Count; }
-        }
+        public int UserCount => Users.Count;
 
         public SendGroup SendGroup()
         {
-            return new SendGroup( Name, UserCount);
+            return new SendGroup(Name, UserCount);
         }
     }
 
@@ -44,6 +39,5 @@ namespace DSACore.Models.Network
         public string Name { get; set; }
 
         public int UserCount { get; set; }
-        
     }
 }
