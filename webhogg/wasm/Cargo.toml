@@ -1,5 +1,5 @@
 [package]
-name = "wasm"
+name = "webhogg-wasm"
 version = "0.1.0"
 authors = [
     "natrixaeria",
