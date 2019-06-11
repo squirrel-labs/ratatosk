@@ -1,0 +1,11 @@
+[package]
+name = "wasm"
+version = "0.1.0"
+authors = [
+    "natrixaeria",
+    "TrueDoctor <dennis@kobert.dev>"
+]
+edition = "2018"
+description = "WebAssembly frontend for the webhogg project"
+
+[dependencies]

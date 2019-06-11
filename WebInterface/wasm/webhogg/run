@@ -1,6 +1,0 @@
-#!/bin/sh
-
-wasm-pack build --release --target web
-python update.py
-sh killpy
-python3 deploy.py -d -a 0.0.0.0:8080
