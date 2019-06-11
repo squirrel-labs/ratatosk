@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DSALib\DSALib.csproj" />
-    <ProjectReference Include="..\FireBase\FireBase.csproj" />
+    <ProjectReference Include="..\dsa\DSALib\DSALib.csproj" />
+    <ProjectReference Include="..\dsa\FireBase\FireBase.csproj" />
   </ItemGroup>
 
   <ItemGroup>
