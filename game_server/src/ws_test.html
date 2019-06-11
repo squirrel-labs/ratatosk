@@ -12,6 +12,7 @@
         <div id='cons'>connected</div><br>
         <button onclick='test_connection()'>Launch</button><br>
         <span>Server address: </span><input id='addr'></input>
+        <div align='right'><span>Message</span><input id='msg'></input> <button onclick='send_text()'>Send</button></div>
         <div id='chat' style='background: rgb(20, 20, 20); padding-left: 20px; margin: 40px' />
     </body>
     <script>
@@ -22,11 +23,12 @@ function get_addr() {
 function test_connection() {
     let a = 'ws://' + get_addr();
     add_text('create a new connection at "' + a + '"');
-    const ws = new WebSocket(a, 'tuesday');
+    ws = new WebSocket(a, 'tuesday');
     ws.addEventListener('open', function (event) {
         add_text('connection established');
         toggle_connected(true);
-        ws.send('1230123');
+        // send token
+        ws.send('42');
     });
     ws.addEventListener('error', function (event) {
         add_text('ws error occured: "' + event + '"');
@@ -37,8 +39,14 @@ function test_connection() {
         toggle_connected(false);
     });
     ws.addEventListener('message', function (event) {
-        add_text('got ws message: ' + event.data);
+        add_text('got ws message: "' + event.data + '"');
     });
+}
+
+function send_text() {
+    let msg = document.getElementById('msg').value;
+    ws.send(msg);
+    add_text('sent message: "' + msg + '"');
 }
 
 function add_text(text, color='white') {

@@ -7,7 +7,8 @@ description = "A general game server for connections to web clients. Currently (
 
 [dependencies]
 log = "0.4"
-pretty_env_logger = "0.3"
+fern = "0.5.8"
+colored = "1.8"
 reqwest = "0.9"
 websocket = "0.22"
 hyper = "0.10"

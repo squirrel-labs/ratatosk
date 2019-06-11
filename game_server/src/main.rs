@@ -1,20 +1,23 @@
 mod group;
-mod test_group;
+mod maths;
+mod scribble_group;
+mod webhogg_group;
+mod webhogg_game;
+mod collide;
 mod lobby;
-mod gameserver;
+mod server;
 mod backend_connection;
 
-#[macro_use] extern crate log;
-use pretty_env_logger;
+mod game_logger;
 
-use backend_connection::BackendConnection;
+#[macro_use] extern crate log;
 
 fn main() {
-    pretty_env_logger::init();
+    game_logger::init_logger();
 
-    let addr = ("127.0.0.1", 5001);
+    let addr = ("0.0.0.0", 5001);
     info!("create game server on {:?}", addr);
-    let gameserver = gameserver::GameServer::new(addr);
+    let mut gameserver = server::GameServer::new(addr);
     gameserver.run().unwrap();
 
 }
