@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DSALib.DSA_Game.Characters;
 
-namespace DSALib.Models.Database.DSA
+namespace DSALib.Models.Database.Dsa
 {
     public class DatabaseChar
     {
@@ -16,7 +16,7 @@ namespace DSALib.Models.Database.DSA
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            Rasse = rasse ?? throw new ArgumentNullException(nameof(rasse));
+            Race = rasse ?? throw new ArgumentNullException(nameof(rasse));
             Skills = skills ?? throw new ArgumentNullException(nameof(skills));
             Talents = talents ?? throw new ArgumentNullException(nameof(talents));
             Advantages = advantages ?? throw new ArgumentNullException(nameof(advantages));
@@ -28,7 +28,7 @@ namespace DSALib.Models.Database.DSA
 
         public string Name { get; set; }
 
-        public string Rasse { get; set; }
+        public string Race { get; set; }
 
         public List<Field> Skills { get; set; } = new List<Field>();
 

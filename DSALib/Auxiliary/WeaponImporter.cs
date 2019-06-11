@@ -4,8 +4,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using DSALib.Models.Database.DSA;
 using DSALib.FireBase;
+using DSALib.Models.Database.Dsa;
 
 namespace DSALib.Auxiliary
 {

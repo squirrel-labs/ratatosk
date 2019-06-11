@@ -269,3 +269,6 @@ Cargo.lock
 
 # dont save that target (bad boy)
 /game_server/target
+/DSACore/PropertiesDSALib-Auxiliary-CommandInfo.json
+/DSACore/PropertiesDSALib-DSA_Game-Characters-Character.json
+/DSACore/PropertiesNewtonsoft-Json-Linq-JProperty.json

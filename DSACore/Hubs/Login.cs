@@ -4,12 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DSACore.Models.Network;
 using DSALib.Commands;
 using DSALib.DSA_Game.Characters;
-using DSALib.Models.Network;
 using DSALib.FireBase;
+using DSALib.Models.Network;
 using Microsoft.AspNetCore.SignalR;
-using Group = DSALib.Models.Network.Group;
+using Group = DSACore.Models.Network.Group;
 
 namespace DSACore.Hubs
 {
@@ -19,9 +20,8 @@ namespace DSACore.Hubs
 
         private const string ReceiveMethod = "ReceiveMessage"; //receiveMethod;
 
-        static Users()
-        {
-            DsaGroups = Database.GetGroups().Result;
+        static Users() {
+            DsaGroups = Database.GetGroups().Result.Select(x=>new Group(x.Item1, x.Item2)).ToList();
             DsaGroups.Add(new Group("login", ""));
             DsaGroups.Add(new Group("online", ""));
             //AddGroups();
@@ -103,11 +103,9 @@ namespace DSACore.Hubs
                 .First(z => z.ConnectionId.Equals(id));
         }
 
-        public async Task GetGroups()
-        {
+        public async Task GetGroups() {
             var test = await Database.GetGroups();
-
-            foreach (var group in test)
+            foreach (var group in test.Select(x => new Group(x.Item1, x.Item2)).ToList())
                 if (!DsaGroups.Exists(x => x.Name.Equals(group.Name)))
                     DsaGroups.Add(group);
 
@@ -128,7 +126,7 @@ namespace DSACore.Hubs
         {
             var group = getGroup(Context.ConnectionId);
 
-            await Database.AddChar(new Character(new MemoryStream(Encoding.UTF8.GetBytes(xml))), group);
+            await Database.AddChar(new Character(new MemoryStream(Encoding.UTF8.GetBytes(xml))), group.Name);
             //throw new NotImplementedException("add database call to add groups");
         }
 

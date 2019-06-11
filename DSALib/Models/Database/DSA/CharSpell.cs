@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DSALib.Models.Database.DSA
+namespace DSALib.Models.Database.Dsa
 {
     public class CharSpell
     {
