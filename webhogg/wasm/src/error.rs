@@ -2,7 +2,7 @@ use std::error::Error;
 
 #[derive(Debug)]
 pub enum WasmError {
-    TestError(String),
+    WebGl2ContextCreation(String),
 }
 
 impl std::fmt::Display for WasmError {
@@ -14,7 +14,7 @@ impl std::fmt::Display for WasmError {
 impl Error for WasmError {
     fn description(&self) -> &str {
         match self {
-            WasmError::TestError(msg) => msg,
+            WasmError::WebGl2ContextCreation(msg) => msg,
         }
     }
 
@@ -24,7 +24,7 @@ impl Error for WasmError {
 impl WasmError {
     pub fn name(&self) -> &str {
         match self {
-            WasmError::TestError(_) => "TestError",
+            WasmError::WebGl2ContextCreation(_) => "WebGl2ContextCreationError",
         }
     }
 }
