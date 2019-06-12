@@ -1,0 +1,18 @@
+[package]
+name = "webhogg-wasm"
+version = "0.1.0"
+authors = [
+    "natrixaeria",
+    "TrueDoctor <dennis@kobert.dev>"
+]
+edition = "2018"
+description = "WebAssembly frontend for the webhogg project"
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+lto = true
+
+[dependencies]
+wasm-bindgen = "0.2"

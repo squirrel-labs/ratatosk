@@ -244,6 +244,11 @@ FakesAssemblies/
 **/*.Server/ModelManifest.xml
 _Pvt_Extensions
 
+# auxiliary files
+/DSACore/PropertiesDSALib-Auxiliary-CommandInfo.json
+/DSACore/PropertiesDSALib-DSA_Game-Characters-Character.json
+/DSACore/PropertiesNewtonsoft-Json-Linq-JProperty.json
+
 # Paket dependency manager
 .paket/paket.exe
 paket-files/
@@ -268,7 +273,4 @@ __pycache__/
 Cargo.lock
 
 # dont save that target (bad boy)
-/game_server/target
-/DSACore/PropertiesDSALib-Auxiliary-CommandInfo.json
-/DSACore/PropertiesDSALib-DSA_Game-Characters-Character.json
-/DSACore/PropertiesNewtonsoft-Json-Linq-JProperty.json
+**/*/target
