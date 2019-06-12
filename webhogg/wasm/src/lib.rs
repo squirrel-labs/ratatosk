@@ -1,8 +1,16 @@
 use wasm_bindgen::prelude::*;
+use log::*;
+
+mod logger;
 
 #[wasm_bindgen]
-pub fn enrty() {
+pub fn start_graphics() {
+    logger::init_logger();
+    info!("hello from wasm graphics");
 }
 
-fn main() {
+#[wasm_bindgen]
+pub fn start_logic() {
+    logger::init_logger();
+    debug!("hello from wasm logic");
 }
