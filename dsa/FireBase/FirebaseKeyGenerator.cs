@@ -1,14 +1,12 @@
 using System;
 using System.Text;
 
-namespace Firebase.Database
-{
+namespace Firebase.Database {
     /// <summary>
     ///     Offline key generator which mimics the official Firebase generators.
     ///     Credit: https://github.com/bubbafat/FirebaseSharp/blob/master/src/FirebaseSharp.Portable/FireBasePushIdGenerator.cs
     /// </summary>
-    public class FirebaseKeyGenerator
-    {
+    public class FirebaseKeyGenerator {
         // Modeled after base64 web-safe chars, but ordered by ASCII.
         private const string PushCharsString = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
         private static readonly char[] PushChars;
@@ -20,8 +18,7 @@ namespace Firebase.Database
         // Timestamp of last push, used to prevent local collisions if you push twice in one ms.
         private static long lastPushTime;
 
-        static FirebaseKeyGenerator()
-        {
+        static FirebaseKeyGenerator() {
             PushChars = Encoding.UTF8.GetChars(Encoding.UTF8.GetBytes(PushCharsString));
         }
 
@@ -31,8 +28,7 @@ namespace Firebase.Database
         /// <returns>
         ///     The <see cref="string" />.
         /// </returns>
-        public static string Next()
-        {
+        public static string Next() {
             // We generate 72-bits of randomness which get turned into 12 characters and
             // appended to the timestamp to prevent collisions with other clients. We store the last
             // characters we generated because in the event of a collision, we'll use those same
@@ -43,8 +39,7 @@ namespace Firebase.Database
             lastPushTime = now;
 
             var timeStampChars = new char[8];
-            for (var i = 7; i >= 0; i--)
-            {
+            for (var i = 7; i >= 0; i--) {
                 var index = (int) (now % PushChars.Length);
                 timeStampChars[i] = PushChars[index];
                 now = (long) Math.Floor((double) now / PushChars.Length);
@@ -54,12 +49,10 @@ namespace Firebase.Database
 
             id.Append(timeStampChars);
 
-            if (!duplicateTime)
-            {
+            if (!duplicateTime) {
                 for (var i = 0; i < 12; i++) lastRandChars[i] = (byte) random.Next(0, PushChars.Length);
             }
-            else
-            {
+            else {
                 // If the timestamp hasn't changed since last push, use the same random number,
                 // except incremented by 1.
                 var lastIndex = 11;

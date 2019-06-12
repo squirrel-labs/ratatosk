@@ -1,20 +1,16 @@
 using System;
 
-namespace DSACore.Models.Network
-{
-    public class Token
-    {
+namespace DSACore.Models.Network {
+    public class Token {
         private readonly DateTime creation = DateTime.Now;
 
-        public Token(string group)
-        {
+        public Token(string group) {
             Group = group;
         }
 
         public string Group { get; set; }
 
-        public bool IsValid()
-        {
+        public bool IsValid() {
             return DateTime.Now - creation < TimeSpan.FromMinutes(1);
         }
     }

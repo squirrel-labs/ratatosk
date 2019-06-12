@@ -1,7 +1,5 @@
-﻿namespace DSALib.Commands
-{
-    public class MiscCommands
-    {
+﻿namespace DSALib.Commands {
+    public class MiscCommands {
         /*[Command("r"), Summary("Würfelt ")]
         [Alias("R", "Roll", "roll", "Würfle")]
         public Task RollAsync([Remainder, Summary("Weapon")] string roll)

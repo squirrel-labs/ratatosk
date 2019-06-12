@@ -1,24 +1,18 @@
 ﻿using System;
 using DSALib.Auxiliary;
-using DSALib.Characters;
 
-namespace DSALib.Characters
-{
-    public class Npc : Being, ICharacter
-    {
+namespace DSALib.Characters {
+    public class Npc : Being, ICharacter {
         private readonly int mean, stDv;
 
-        public Npc(string name, int mean, int stDv)
-        {
+        public Npc(string name, int mean, int stDv) {
             this.mean = mean;
             this.stDv = stDv;
             Name = name;
         }
 
-        public string TestTalent(string talent, int tap = 3)
-        {
-            for (var i = 0; i <= 2; i++)
-            {
+        public string TestTalent(string talent, int tap = 3) {
+            for (var i = 0; i <= 2; i++) {
                 // foreach property, dice and tap 
                 var temp = Dice.Roll();
                 var eigenschaft = (int) Math.Round(RandomMisc.Random(stDv, mean));
@@ -32,8 +26,7 @@ namespace DSALib.Characters
             return $"{Name} scheitert an {talent}";
         }
 
-        public string TestEigenschaft(string eigenschaft, int erschwernis = 0)
-        {
+        public string TestEigenschaft(string eigenschaft, int erschwernis = 0) {
             var temp = Dice.Roll();
             var prop = (int) Math.Round(RandomMisc.Random(stDv, stDv));
 
@@ -42,8 +35,7 @@ namespace DSALib.Characters
             return $"{Name} scheitert an {eigenschaft}";
         }
 
-        public string Angriff(string waffe, int erschwernis = 0)
-        {
+        public string Angriff(string waffe, int erschwernis = 0) {
             var temp = Dice.Roll();
 
             if (temp == 1) return $"{Name} greift kritisch mit {waffe} an";
@@ -53,8 +45,7 @@ namespace DSALib.Characters
             return $"{Name} haut mit {waffe} daneben";
         }
 
-        public string Parade(string waffe, int erschwernis = 0)
-        {
+        public string Parade(string waffe, int erschwernis = 0) {
             var temp = Dice.Roll();
 
             if (temp == 1) return $"{Name} pariert mit {waffe} meisterlich";
@@ -64,8 +55,7 @@ namespace DSALib.Characters
             return $"{Name} schafft es nicht mit {waffe} zu parieren";
         }
 
-        public string Fernkampf(string waffe, int erschwernis = 0)
-        {
+        public string Fernkampf(string waffe, int erschwernis = 0) {
             var temp = Dice.Roll();
 
             if (temp == 1) return $"{Name} trifft kritisch mit {waffe}";
@@ -75,8 +65,7 @@ namespace DSALib.Characters
             return $"{Name} schießt mit {waffe} daneben";
         }
 
-        public string TestZauber(string zauber, int erschwernis)
-        {
+        public string TestZauber(string zauber, int erschwernis) {
             return TestTalent(zauber, erschwernis);
         }
     }

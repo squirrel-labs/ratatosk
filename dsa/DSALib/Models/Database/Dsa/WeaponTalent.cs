@@ -1,11 +1,8 @@
 ﻿using System;
 
-namespace DSALib.Models.Database.Dsa
-{
-    public class WeaponTalent
-    {
-        public WeaponTalent(string name, int at, int pa)
-        {
+namespace DSALib.Models.Database.Dsa {
+    public class WeaponTalent {
+        public WeaponTalent(string name, int at, int pa) {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             At = at;
             Pa = pa;

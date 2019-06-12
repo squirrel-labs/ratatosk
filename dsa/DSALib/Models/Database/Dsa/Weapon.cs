@@ -1,15 +1,11 @@
 ﻿using System;
 
-namespace DSALib.Models.Database.Dsa
-{
-    public class Weapon
-    {
-        public Weapon()
-        {
+namespace DSALib.Models.Database.Dsa {
+    public class Weapon {
+        public Weapon() {
         }
 
-        public Weapon(string name, string damage, int weight, string weaponTalent, string price)
-        {
+        public Weapon(string name, string damage, int weight, string weaponTalent, string price) {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Damage = damage ?? throw new ArgumentNullException(nameof(damage));
             Weight = weight;
@@ -24,11 +20,9 @@ namespace DSALib.Models.Database.Dsa
         public string Price { get; set; }
     }
 
-    public class MeleeWeapon : Weapon
-    {
+    public class MeleeWeapon : Weapon {
         public MeleeWeapon(string name, string damage, int weight, string weaponTalent, string price) : base(name,
-            damage, weight, weaponTalent, price)
-        {
+            damage, weight, weaponTalent, price) {
         }
 
         public string TpKK { get; set; }
@@ -36,11 +30,9 @@ namespace DSALib.Models.Database.Dsa
         public string MW { get; set; }
     }
 
-    public class RangedWeapon : Weapon
-    {
+    public class RangedWeapon : Weapon {
         public RangedWeapon(string name, string damage, int weight, string weaponTalent, string price) : base(name,
-            damage, weight, weaponTalent, price)
-        {
+            damage, weight, weaponTalent, price) {
         }
 
         public int AtMod { get; set; }

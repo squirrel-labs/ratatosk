@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Firebase.Database.Streaming;
 
-namespace Firebase.Database.Query
-{
+namespace Firebase.Database.Query {
     /// <summary>
     ///     The FirebaseQuery interface.
     /// </summary>
-    public interface IFirebaseQuery
-    {
+    public interface IFirebaseQuery {
         /// <summary>
         ///     Gets the owning client of this query.
         /// </summary>

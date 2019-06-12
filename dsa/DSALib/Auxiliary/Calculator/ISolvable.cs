@@ -1,10 +1,8 @@
-﻿namespace DSALib.Auxiliary.Calculator
-{
+﻿namespace DSALib.Auxiliary.Calculator {
     /// <summary>
     ///     Object has to be able to return an integer as it's value
     /// </summary>
-    public interface ISolvable
-    {
+    public interface ISolvable {
         int Solve();
     }
 }
