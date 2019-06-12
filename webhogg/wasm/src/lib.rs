@@ -1,16 +1,9 @@
-use wasm_bindgen::prelude::*;
-use log::*;
-
 mod logger;
+pub mod error;
+pub mod context;
 
-#[wasm_bindgen]
-pub fn start_graphics() {
-    logger::init_logger();
-    info!("hello from wasm graphics");
-}
+pub mod logic;
+pub mod graphics;
 
-#[wasm_bindgen]
-pub fn start_logic() {
-    logger::init_logger();
-    debug!("hello from wasm logic");
-}
+pub use logic::*;
+pub use graphics::*;

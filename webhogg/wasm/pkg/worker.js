@@ -1,9 +1,11 @@
 onmessage = async function (e) {
     importScripts('../bin/webhogg-wasm.js');
-    let ctx = await wasm_bindgen(e.data[1]);
+    let type = e.data[0];
+    let source = e.data[1];
+    let args = e.data[2];
+    let dt = e.data[3];
+    let ctx = await wasm_bindgen(source);
 
-    if (e.data[0] === 'graphics')
-        ctx.start_graphics();
-    else if (e.data[0] === 'logic')
-        ctx.start_logic();
+    ctx['start_' + type].apply(args);
+    setInterval(ctx['loop_' + type], dt);
 }
