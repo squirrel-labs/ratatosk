@@ -20,7 +20,7 @@ async function main() {
         { type: 'graphics',
             source: source,
             canvas: offCanvas,
-            dt: 10000 },
+            dt: 16 },
         { type: 'logic',
             source: source,
             canvas: [],

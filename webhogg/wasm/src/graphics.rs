@@ -16,5 +16,7 @@ pub fn start_graphics(canvas: web_sys::OffscreenCanvas) {
 
 #[wasm_bindgen]
 pub fn loop_graphics() {
-    debug!("graphics: loopin'");
+    context::get_graphics().update()
+        .map_err(|e| error!("gaphics loop {}", e))
+        .unwrap();
 }
