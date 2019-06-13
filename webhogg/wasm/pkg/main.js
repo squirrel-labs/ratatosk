@@ -17,12 +17,22 @@ async function main() {
     source = await fetchedSource.arrayBuffer();
 
     const modules = [
-        ['graphics', source, [offCanvas], 100],
-        ['logic', source, [], 1000]
+        { type: 'graphics',
+            source: source,
+            canvas: offCanvas,
+            dt: 10000 },
+        { type: 'logic',
+            source: source,
+            canvas: [],
+            dt: 10000 },
     ];
     for (var module of modules) {
         let worker = new Worker('pkg/worker.js');
-        worker.postMessage(module, module[2]);
+        if (module.type === 'graphics') {
+            worker.postMessage(module, [module.canvas]);
+        } else {
+            worker.postMessage(module);
+        }
         workers.push(worker);
     }
 }

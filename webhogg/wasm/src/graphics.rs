@@ -6,6 +6,7 @@ use crate::*;
 pub fn start_graphics(canvas: web_sys::OffscreenCanvas) {
     logger::init_logger();
     info!("graphics: wasm entry-point reached");
+    //debug!("js value is?: undefined: {}", canvas.is_undefined());
 
     match context::graphics::GraphicsContext::from_canvas(canvas) {
         Ok(ctx) => context::set_graphics(ctx),

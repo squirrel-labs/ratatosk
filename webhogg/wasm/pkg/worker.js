@@ -1,11 +1,17 @@
-onmessage = async function (e) {
-    importScripts('../bin/webhogg-wasm.js');
-    let type = e.data[0];
-    let source = e.data[1];
-    let args = e.data[2];
-    let dt = e.data[3];
-    let ctx = await wasm_bindgen(source);
+let data = null;
 
-    ctx['start_' + type].apply(args);
-    setInterval(ctx['loop_' + type], dt);
+onmessage = function (e) {
+    data = e.data;
+
+    importScripts('../bin/webhogg-wasm.js');
+    wasm_bindgen(data.source).then(ctx => {
+        if (data.type === 'graphics') {
+            wasm_bindgen.start_graphics(data.canvas);
+            setInterval(wasm_bindgen.loop_graphics, data.dt);
+        } else if (data.type === 'logic') {
+            wasm_bindgen.start_logic();
+            setInterval(wasm_bindgen.loop_logic, data.dt);
+        }
+
+    });
 }
