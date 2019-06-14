@@ -10,7 +10,10 @@ pub fn start_graphics(canvas: web_sys::OffscreenCanvas) {
 
     match context::graphics::GraphicsContext::from_canvas(canvas) {
         Ok(ctx) => context::set_graphics(ctx),
-        Err(e) => error!("graphics {}", e)
+        Err(e) => {
+            error!("graphics {}", e);
+            panic!()
+        }
     }
 }
 

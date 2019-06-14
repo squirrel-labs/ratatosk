@@ -3,6 +3,8 @@ use std::error::Error;
 #[derive(Debug)]
 pub enum WasmError {
     WebGl2ContextCreation(String),
+    Shader(String),
+    WebGlBuffer(String),
 }
 
 impl std::fmt::Display for WasmError {
@@ -15,6 +17,8 @@ impl Error for WasmError {
     fn description(&self) -> &str {
         match self {
             WasmError::WebGl2ContextCreation(msg) => msg,
+            WasmError::Shader(msg) => msg,
+            WasmError::WebGlBuffer(msg) => msg,
         }
     }
 
@@ -25,6 +29,8 @@ impl WasmError {
     pub fn name(&self) -> &str {
         match self {
             WasmError::WebGl2ContextCreation(_) => "WebGl2ContextCreationError",
+            WasmError::Shader(_) => "ShaderError",
+            WasmError::WebGlBuffer(_) => "WebGlBufferError",
         }
     }
 }

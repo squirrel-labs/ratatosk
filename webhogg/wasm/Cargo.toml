@@ -24,5 +24,9 @@ js-sys = "0.3"
 version = "0.3"
 features = [
     "OffscreenCanvas",
-    "WebGl2RenderingContext"
+    "WebGl2RenderingContext",
+    "WebGlShader",
+    "WebGlProgram",
+    "WebGlBuffer",
+    "WebGlVertexArrayObject"
 ]
