@@ -23,12 +23,21 @@ impl ShaderProgram {
         }
         gl.link_program(&program)
             .map_err(|e| WasmError::Shader(format!("linker error in program: {}", e)))?;
-        Ok(Self {
-            program
-        })
+        let err = gl.get_error();
+        if err.is_err() {
+            Err(WasmError::Shader(format!("program compile/link error: {}", err)))
+        } else {
+            Ok(Self {
+                program
+            })
+        }
     }
 
     pub fn run(&self, gl: &WebGl2) {
         gl.use_program(&self.program)
+    }
+
+    pub fn get_location(&self, gl: &WebGl2, name: &str) -> Option<webgl::WebGlUniformLocation> {
+        gl.gl.get_uniform_location(&self.program, name)
     }
 }

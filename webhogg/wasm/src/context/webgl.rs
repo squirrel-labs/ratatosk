@@ -2,6 +2,7 @@ pub use web_sys::{
     WebGl2RenderingContext as GlContext,
     WebGlProgram, WebGlShader,
     WebGlBuffer, WebGlVertexArrayObject,
+    WebGlUniformLocation
 };
 use wasm_bindgen::prelude::*;
 use std::fmt::Display;
@@ -45,8 +46,37 @@ pub fn create_f32_buffer(buffer: &[f32]) -> js_sys::Float32Array {
     _create_f32_buffer(buffer)
 }
 
+pub struct WebGlError {
+    num: u32,
+}
+
+impl Display for WebGlError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", match self.num {
+            GlContext::NO_ERROR => "NO_ERROR",
+            GlContext::INVALID_OPERATION => "INVALID_OPERATION",
+            GlContext::INVALID_ENUM => "INVALID_ENUM",
+            GlContext::INVALID_VALUE => "INVALID_VALUE",
+            GlContext::INVALID_FRAMEBUFFER_OPERATION => "INVALID_FRAMEBUFFER_OPERATION",
+            GlContext::OUT_OF_MEMORY => "OUT_OF_MEMORY",
+            _ => "UNKNOWN ERROR"
+        })
+    }
+}
+
+impl From<u32> for WebGlError {
+    fn from(n: u32) -> Self {
+        WebGlError { num: n }
+    }
+}
+
+impl WebGlError {
+    pub fn is_ok(&self) -> bool { self.num == 0 }
+    pub fn is_err(&self) -> bool { self.num != 0 }
+}
+
 pub struct WebGl2 {
-    gl: GlContext,
+    pub gl: GlContext,
 }
 
 impl WebGl2 {
@@ -64,7 +94,7 @@ impl WebGl2 {
         self.gl.create_shader(shader_type.to_id()).ok_or(())
     }
 
-    pub fn get_error(&self) -> u32 { self.gl.get_error() }
+    pub fn get_error(&self) -> WebGlError { self.gl.get_error().into() }
     pub fn shader_source(&self, id: &WebGlShader, source: &str) { self.gl.shader_source(id, source) }
     pub fn compile_shader(&self, id: &WebGlShader) -> Result<(), String> {
         self.gl.compile_shader(id);
@@ -130,5 +160,9 @@ impl WebGl2 {
 
     pub fn use_program(&self, program: &WebGlProgram) {
         self.gl.use_program(Some(program))
+    }
+
+    pub fn uniform_f32v2(&self, location: &WebGlUniformLocation, data: &[f32]) {
+        self.gl.uniform2fv_with_f32_array(Some(location), data)
     }
 }
