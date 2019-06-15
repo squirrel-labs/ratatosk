@@ -6,6 +6,7 @@ use super::webgl;
 use super::webgl::{Color4, ShaderType, WebGl2};
 use super::shader::{MAIN_VERTEX_SHADER, MAIN_FRAGMENT_SHADER};
 use super::shader::ShaderProgram;
+use super::draw_sprite::DrawSprite;
 
 pub struct GraphicsContext {
     gl: WebGl2,
@@ -13,6 +14,7 @@ pub struct GraphicsContext {
     shader: ShaderProgram,
     vao: webgl::WebGlVertexArrayObject,
     buffer: webgl::WebGlBuffer,
+    sprites: Vec<DrawSprite>,
 }
 
 impl GraphicsContext {
@@ -53,10 +55,16 @@ impl GraphicsContext {
         gl.enable_vertex_attrib_array(0);
         //gl.unbind_array_buffer();
         //gl.unbind_vertex_array();
+        
+        let sprites = vec![
+            DrawSprite::new((0.0, 0.0), (0.1, 0.1)),
+            DrawSprite::new((0.5, 0.0), (0.1, 0.5)),
+        ];
             
         Ok(Self {
             gl, frame_nr: 0,
             shader, vao, buffer,
+            sprites,
         })
     }
 
@@ -69,19 +77,22 @@ impl GraphicsContext {
         self.gl.bind_array_buffer(&self.buffer);
         self.gl.enable_vertex_attrib_array(0);
 
-        let xpos = f32::sin(self.frame_nr as f32 / 50.0);
-        let ypos = f32::cos(self.frame_nr as f32 / 50.0);
-        let radius = f32::sin(self.frame_nr as f32 / 500.0) * 0.8;
-        let loc = self.shader.get_location(&self.gl, "offset")
-            .ok_or(WasmError::WebGlUniform(format!("could not find location \"offset\" in glsl shader")))?;
-        self.gl.uniform_f32v2(&loc, &[xpos * radius, ypos * radius]);
+        for sprite in self.sprites.iter() {
+            let pos = sprite.pos;
+            let size = sprite.size;
 
-        let loc = self.shader.get_location(&self.gl, "size")
-            .ok_or(WasmError::WebGlUniform(format!("could not find location \"size\" in glsl shader")))?;
-        self.gl.uniform_f32v2(&loc, &[0.1 * radius, 0.1 * radius]);
+            let loc = self.shader.get_location(&self.gl, "offset")
+                .ok_or(WasmError::WebGlUniform(format!("could not find location \"offset\" in glsl shader")))?;
+            self.gl.uniform_f32v2(&loc, &[pos.0, pos.1]);
 
-        self.gl.vertex_attrib_f32_pointer(0, 2);
-        self.gl.draw_triangle_arrays(6);
+            let loc = self.shader.get_location(&self.gl, "size")
+                .ok_or(WasmError::WebGlUniform(format!("could not find location \"size\" in glsl shader")))?;
+            self.gl.uniform_f32v2(&loc, &[size.0, size.1]);
+
+            self.gl.vertex_attrib_f32_pointer(0, 2);
+            self.gl.draw_triangle_arrays(6);
+        }
+
         use log::info;
         let err = self.gl.get_error();
         if err.is_err() {

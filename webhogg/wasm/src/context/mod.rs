@@ -1,4 +1,5 @@
 mod shader;
+mod draw_sprite;
 mod webgl;
 pub mod graphics;
 pub mod logic;
