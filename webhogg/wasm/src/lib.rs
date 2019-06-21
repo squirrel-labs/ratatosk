@@ -1,8 +1,9 @@
-use wasm_bindgen::prelude::*;
+mod logger;
+pub mod error;
+pub mod context;
 
-#[wasm_bindgen]
-pub fn enrty() {
-}
+pub mod logic;
+pub mod graphics;
 
-fn main() {
-}
+pub use logic::*;
+pub use graphics::*;

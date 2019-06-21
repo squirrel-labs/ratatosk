@@ -1,4 +1,4 @@
-use crate::maths::Vec2;
+use crate::math::Vec2;
 
 pub struct WebhoggPlayer {
     pos: Vec2,

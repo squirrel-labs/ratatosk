@@ -1,5 +1,5 @@
 mod group;
-mod maths;
+mod math;
 mod scribble_group;
 mod webhogg_group;
 mod webhogg_game;
