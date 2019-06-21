@@ -7,20 +7,16 @@ using System.Threading.Tasks;
 using DSALib.FireBase;
 using DSALib.Models.Database.Dsa;
 
-namespace DSALib.Auxiliary
-{
-    public class WeaponImporter
-    {
+namespace DSALib.Auxiliary {
+    public class WeaponImporter {
         private readonly List<RangedWeapon> Range = new List<RangedWeapon>();
         private readonly List<MeleeWeapon> Weapons = new List<MeleeWeapon>();
 
-        public async Task DownloadWeapons()
-        {
+        public async Task DownloadWeapons() {
             var client = new HttpClient();
 
 
-            for (var i = 1; i <= 25; i++)
-            {
+            for (var i = 1; i <= 25; i++) {
                 var responseString =
                     await client.GetStringAsync("http://diarium.eu/dsa4-forge/ajax/categoryChanged/" + i);
 
@@ -35,15 +31,13 @@ namespace DSALib.Auxiliary
                 var ids = new List<int>();
 
                 foreach (var matchGroup in talentMatch.ToList())
-                    if (matchGroup.Success)
-                    {
+                    if (matchGroup.Success) {
                         lines.Add(matchGroup.Groups[3].Value);
                         ids.Add(int.Parse(matchGroup.Groups[1].Value));
                     }
 
 
-                for (var j = 0; j < lines.Count; j++)
-                {
+                for (var j = 0; j < lines.Count; j++) {
                     var talent = lines[j];
 
                     var values = await client.GetStringAsync("http://diarium.eu/dsa4-forge/ajax/calculate/" + i + "/" +
@@ -71,18 +65,15 @@ namespace DSALib.Auxiliary
             Console.ReadLine();
         }
 
-        private async Task AddMelee(int i, string talent, List<string> matches)
-        {
+        private async Task AddMelee(int i, string talent, List<string> matches) {
             var name = talent.Replace(' ', '_').Replace(".", "");
-            if (!matches[1].Equals(string.Empty))
-            {
+            if (!matches[1].Equals(string.Empty)) {
                 var temp = new MeleeWeapon(
                     name,
                     matches[1],
                     int.TryParse(matches[10], out var weight) ? weight : 0,
                     matches[0].Split(':', StringSplitOptions.RemoveEmptyEntries).First(),
-                    matches[11])
-                {
+                    matches[11]) {
                     INI = int.TryParse(matches[3], out var ini) ? ini : 0,
                     MW = matches[4],
                     TpKK = matches[2]
@@ -111,15 +102,13 @@ namespace DSALib.Auxiliary
                 await Database.AddWeapon(range);
                 return;
             }*/
-            if (i > 18)
-            {
+            if (i > 18) {
                 var range = new RangedWeapon(
                     name,
                     matches[13].Replace(' ', '+'),
                     int.TryParse(matches[10], out var weight) ? weight : 0,
                     matches[0].Split(':', StringSplitOptions.RemoveEmptyEntries).First(),
-                    matches[11])
-                {
+                    matches[11]) {
                     AtMod = int.TryParse(matches[18], out var atMod) ? atMod : 0,
                     KKMod = int.TryParse(matches[17], out var kkMod) ? kkMod : 0,
                     AtReach = matches[14],
@@ -131,18 +120,15 @@ namespace DSALib.Auxiliary
             }
         }
 
-        private async Task AddRanged(int i, string talent, List<string> matches)
-        {
+        private async Task AddRanged(int i, string talent, List<string> matches) {
             var name = talent.Replace(' ', '_').Replace(".", "");
-            if (!matches[1].Equals(string.Empty))
-            {
+            if (!matches[1].Equals(string.Empty)) {
                 var temp = new MeleeWeapon(
                     name,
                     matches[1],
                     int.TryParse(matches[10], out var weight) ? weight : 0,
                     matches[0].Split(':', StringSplitOptions.RemoveEmptyEntries).First(),
-                    matches[11])
-                {
+                    matches[11]) {
                     INI = int.TryParse(matches[3], out var ini) ? ini : 0,
                     MW = matches[4],
                     TpKK = matches[2]
@@ -152,15 +138,13 @@ namespace DSALib.Auxiliary
                 await Database.AddWeapon(temp);
             }
 
-            if (i > 18)
-            {
+            if (i > 18) {
                 var range = new RangedWeapon(
                     name,
                     matches[13].Replace(' ', '+'),
                     int.TryParse(matches[10], out var weight) ? weight : 0,
                     matches[0].Split(':', StringSplitOptions.RemoveEmptyEntries).First(),
-                    matches[11])
-                {
+                    matches[11]) {
                     AtMod = int.TryParse(matches[18], out var atMod) ? atMod : 0,
                     KKMod = int.TryParse(matches[17], out var kkMod) ? kkMod : 0,
                     AtReach = matches[14],

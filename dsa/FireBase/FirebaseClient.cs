@@ -5,13 +5,11 @@ using Firebase.Database.Query;
 
 [assembly: InternalsVisibleTo("Firebase.Database.Tests")]
 
-namespace Firebase.Database
-{
+namespace Firebase.Database {
     /// <summary>
     ///     Firebase client which acts as an entry point to the online database.
     /// </summary>
-    public class FirebaseClient : IDisposable
-    {
+    public class FirebaseClient : IDisposable {
         private readonly string baseUrl;
         internal readonly HttpClient HttpClient;
         internal readonly FirebaseOptions Options;
@@ -21,8 +19,7 @@ namespace Firebase.Database
         /// </summary>
         /// <param name="baseUrl"> The base url. </param>
         /// <param name="offlineDatabaseFactory"> Offline database. </param>
-        public FirebaseClient(string baseUrl, FirebaseOptions options = null)
-        {
+        public FirebaseClient(string baseUrl, FirebaseOptions options = null) {
             HttpClient = new HttpClient();
             Options = options ?? new FirebaseOptions();
 
@@ -31,8 +28,7 @@ namespace Firebase.Database
             if (!this.baseUrl.EndsWith("/")) this.baseUrl += "/";
         }
 
-        public void Dispose()
-        {
+        public void Dispose() {
             HttpClient?.Dispose();
         }
 
@@ -41,8 +37,7 @@ namespace Firebase.Database
         /// </summary>
         /// <param name="resourceName"> Name of the child. </param>
         /// <returns> <see cref="ChildQuery" />. </returns>
-        public ChildQuery Child(string resourceName)
-        {
+        public ChildQuery Child(string resourceName) {
             return new ChildQuery(this, () => baseUrl + resourceName);
         }
     }

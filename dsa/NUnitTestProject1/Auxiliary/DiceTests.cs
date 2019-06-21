@@ -1,63 +1,52 @@
+using System;
 using DSALib.Auxiliary;
 using Moq;
 using NUnit.Framework;
-using System;
 
-namespace NUnitTest.Auxiliary
-{
+namespace NUnitTest.Auxiliary {
     [TestFixture]
-    public class DiceTests
-    {
-        private MockRepository mockRepository;
-
-
-
+    public class DiceTests {
         [SetUp]
-        public void SetUp()
-        {
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-
+        public void SetUp() {
+            mockRepository = new MockRepository(MockBehavior.Strict);
         }
 
         [TearDown]
-        public void TearDown()
-        {
-            this.mockRepository.VerifyAll();
+        public void TearDown() {
+            mockRepository.VerifyAll();
         }
 
-        private void CreateDice()
-        {}
+        private MockRepository mockRepository;
+
+        private void CreateDice() {
+        }
 
         [Test]
-        public void Roll_StateUnderTest_ExpectedBehavior()
-        {
+        public void Roll_StateUnderTest_ExpectedBehavior() {
             // Arrange
-            int d = 20;
+            var d = 20;
 
             // Act
             var result = Dice.Roll(d);
 
             // Assert
-            Assert.True(result > 0 && result < d+1);
+            Assert.True(result > 0 && result < d + 1);
         }
 
         [Test]
-        public void Roll_StateUnderTest_ExpectedBehavior1()
-        {
+        public void Roll_StateUnderTest_ExpectedBehavior1() {
             // Arrange
-            string input = "w";
+            var input = "w";
 
             // Act
-            Assert.Throws<ArgumentException>( () => Dice.Roll(input));
+            Assert.Throws<ArgumentException>(() => Dice.Roll(input));
         }
 
         [Test]
-        public void Roll_zero_dice()
-        {
+        public void Roll_zero_dice() {
             // Arrange
-            int count = 0;
-            int d = 2;
+            var count = 0;
+            var d = 2;
 
             // Act
             var result = Dice.Roll(

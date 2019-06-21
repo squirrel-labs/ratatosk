@@ -3,24 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using DSALibv.Auxiliary.Calculator;
 
-namespace DSALib.Auxiliary.Calculator
-{
+namespace DSALib.Auxiliary.Calculator {
     /// <summary>
     ///     The StringSolver divides the calculation string into operations and SubStringSolvers if the string contains
     ///     parentheses
     /// </summary>
-    public class StringSolver : ISolvable
-    {
+    public class StringSolver : ISolvable {
         private readonly List<object> arguments = new List<object>();
         private readonly string input;
 
-        public StringSolver(string input)
-        {
+        public StringSolver(string input) {
             this.input = input;
         }
 
-        public int Solve()
-        {
+        public int Solve() {
             var workInput = "0+" + input.Replace(" ", string.Empty).ToLower();
             workInput = ExpandParentheses(workInput);
 
@@ -34,8 +30,7 @@ namespace DSALib.Auxiliary.Calculator
             return ((ISolvable) arguments.First()).Solve();
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             return "(0+" + input.Replace(" ", string.Empty).ToLower() + ")";
         }
 
@@ -43,23 +38,19 @@ namespace DSALib.Auxiliary.Calculator
             GetInner(ref string input) // extract the inner bracket an remove the section from the input string
         {
             var depth = 0;
-            for (var index = 1; index < input.Length; index++)
-            {
+            for (var index = 1; index < input.Length; index++) {
                 var c = input[index];
-                switch (c)
-                {
+                switch (c) {
                     case '(':
                         depth++;
                         break;
                     case ')':
-                        if (depth == 0)
-                        {
+                        if (depth == 0) {
                             var split = input.Substring(1, index - 1);
                             input = input.Substring(index + 1);
                             return split.Equals(string.Empty) ? "0" : split;
                         }
-                        else
-                        {
+                        else {
                             depth--;
                         }
 
@@ -70,10 +61,8 @@ namespace DSALib.Auxiliary.Calculator
             throw new ArgumentException("Invalid brace sequence");
         }
 
-        private static Ops GetOps(char c)
-        {
-            switch (c)
-            {
+        private static Ops GetOps(char c) {
+            switch (c) {
                 case 'd':
                 case 'w':
                     return Ops.Dice;
@@ -101,14 +90,11 @@ namespace DSALib.Auxiliary.Calculator
             return input;
         }
 
-        private void AtomizeOperations(string workInput)
-        {
-            for (var index = 0; index < workInput.Length; index++)
-            {
+        private void AtomizeOperations(string workInput) {
+            for (var index = 0; index < workInput.Length; index++) {
                 var c = workInput[index];
 
-                if (char.IsNumber(c))
-                {
+                if (char.IsNumber(c)) {
                     // if char number, check if at end of string, else continue looping
                     if (index == workInput.Length - 1)
                         // if at end of string; add remaining number to arguments
@@ -117,8 +103,7 @@ namespace DSALib.Auxiliary.Calculator
                     continue;
                 }
 
-                switch (c)
-                {
+                switch (c) {
                     case ')':
                         throw new ArgumentException("Invalid brace sequence");
                     case '(':
@@ -136,12 +121,10 @@ namespace DSALib.Auxiliary.Calculator
             }
         }
 
-        private void NestOperations()
-        {
+        private void NestOperations() {
             foreach (Ops currentOp in Enum.GetValues(typeof(Ops)))
                 // cycle through operators in operational order
-                for (var index = 0; index < arguments.Count; index++)
-                {
+                for (var index = 0; index < arguments.Count; index++) {
                     var arg = arguments[index];
 
                     if (arg.GetType() != typeof(Ops)) continue;
@@ -162,19 +145,16 @@ namespace DSALib.Auxiliary.Calculator
                 }
         }
 
-        private void HandleSpecialFormatting(ref int index, Ops op)
-        {
+        private void HandleSpecialFormatting(ref int index, Ops op) {
             var arg1 = arguments[index - 1];
-            if (arg1.GetType() == typeof(Ops))
-            {
+            if (arg1.GetType() == typeof(Ops)) {
                 if (op == Ops.Dice) arguments.Insert(index++, new Argument("1")); // w6 -> 1w6
 
                 if (op == Ops.Subtract) arguments.Insert(index++, new Argument("0")); // +-3 -> +0-3
             }
 
             var arg2 = arguments[index + 1]; // 3+-5 -> 3+(0-5)
-            if (arg2.GetType() == typeof(Ops))
-            {
+            if (arg2.GetType() == typeof(Ops)) {
                 arguments[index + 1] = new Operator(new Argument("0"), (ISolvable) arguments[index + 2], (Ops) arg2);
                 arguments.RemoveAt(index + 2);
             }

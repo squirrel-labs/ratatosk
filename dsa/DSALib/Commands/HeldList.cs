@@ -5,12 +5,9 @@ using DSALib.Auxiliary;
 using DSALib.DSA_Game;
 using DSALib.DSA_Game.Characters;
 
-namespace DSALib.Commands
-{
-    public class HeldList
-    {
-        public static string ListAsync(ulong id, params string[] prop_list)
-        {
+namespace DSALib.Commands {
+    public class HeldList {
+        public static string ListAsync(ulong id, params string[] prop_list) {
             var res = new List<string>();
 
             var character = Dsa.GetCharacter(id) as Character;
@@ -19,8 +16,7 @@ namespace DSALib.Commands
 
 
             if (prop_list.Length == 0 || prop_list[0].ToLower().StartsWith("all") ||
-                prop_list[0].ToLower().StartsWith("brief") || prop_list[0].ToLower().StartsWith("zettel"))
-            {
+                prop_list[0].ToLower().StartsWith("brief") || prop_list[0].ToLower().StartsWith("zettel")) {
                 res.Add(character.Name + ":\n");
                 //Eigenschaften
                 res.AddRange(
@@ -64,18 +60,14 @@ namespace DSALib.Commands
                             " " + s.Probe));
             }
             else if (prop_list[0].ToLower().StartsWith("man") || prop_list[0].ToLower().StartsWith("help") ||
-                     prop_list[0].ToLower().StartsWith("hilf"))
-            {
+                     prop_list[0].ToLower().StartsWith("hilf")) {
                 return "```xl\n" + Help.Get_Specific_Help("Held") + "\n```";
             }
-            else
-            {
+            else {
                 res.Add(character.Name + ":\n");
 
-                foreach (var prop in prop_list)
-                {
-                    switch (prop.ToLower())
-                    {
+                foreach (var prop in prop_list) {
+                    switch (prop.ToLower()) {
                         case "e":
                         case "eig":
                         case "eigenschaft":

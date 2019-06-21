@@ -1,9 +1,9 @@
-﻿namespace DSALib.Models.Dsa
-{
-    public class Vorteil : Database.DataObject // talent objekt
+﻿using DSALib.Models.Database;
+
+namespace DSALib.Models.Dsa {
+    public class Vorteil : DataObject // talent objekt
     {
-        public Vorteil(string name, string value = "")
-        {
+        public Vorteil(string name, string value = "") {
             Name = name;
             Value = value;
             // this.Choice = choice;

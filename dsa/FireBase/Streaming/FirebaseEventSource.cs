@@ -1,10 +1,8 @@
-﻿namespace Firebase.Database.Streaming
-{
+﻿namespace Firebase.Database.Streaming {
     /// <summary>
     ///     Specifies the origin of given <see cref="FirebaseEvent{T}" />
     /// </summary>
-    public enum FirebaseEventSource
-    {
+    public enum FirebaseEventSource {
         /// <summary>
         ///     Event comes from an offline source.
         /// </summary>

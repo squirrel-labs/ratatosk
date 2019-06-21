@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Reactive.Linq;
 
-namespace Firebase.Database.Extensions
-{
-    public static class ObservableExtensions
-    {
+namespace Firebase.Database.Extensions {
+    public static class ObservableExtensions {
         /// <summary>
         ///     Returns a cold observable which retries (re-subscribes to) the source observable on error until it successfully
         ///     terminates.
@@ -20,12 +18,10 @@ namespace Firebase.Database.Extensions
             this IObservable<T> source,
             TimeSpan dueTime,
             Func<TException, bool> retryOnError)
-            where TException : Exception
-        {
+            where TException : Exception {
             var attempt = 0;
 
-            return Observable.Defer(() =>
-                {
+            return Observable.Defer(() => {
                     return (++attempt == 1 ? source : source.DelaySubscription(dueTime))
                         .Select(item => new Tuple<bool, T, Exception>(true, item, null))
                         .Catch<Tuple<bool, T, Exception>, TException>(e => retryOnError(e)

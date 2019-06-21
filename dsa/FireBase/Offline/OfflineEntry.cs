@@ -1,13 +1,11 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Firebase.Database.Offline
-{
+namespace Firebase.Database.Offline {
     /// <summary>
     ///     Represents an object stored in offline storage.
     /// </summary>
-    public class OfflineEntry
-    {
+    public class OfflineEntry {
         private object dataInstance;
 
         /// <summary>
@@ -21,8 +19,7 @@ namespace Firebase.Database.Offline
         /// </param>
         /// <param name="syncOptions"> The sync options. </param>
         public OfflineEntry(string key, object obj, string data, int priority, SyncOptions syncOptions,
-            bool isPartial = false)
-        {
+            bool isPartial = false) {
             Key = key;
             Priority = priority;
             Data = data;
@@ -44,15 +41,13 @@ namespace Firebase.Database.Offline
         /// </param>
         /// <param name="syncOptions"> The sync options. </param>
         public OfflineEntry(string key, object obj, int priority, SyncOptions syncOptions, bool isPartial = false)
-            : this(key, obj, JsonConvert.SerializeObject(obj), priority, syncOptions, isPartial)
-        {
+            : this(key, obj, JsonConvert.SerializeObject(obj), priority, syncOptions, isPartial) {
         }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="OfflineEntry" /> class.
         /// </summary>
-        public OfflineEntry()
-        {
+        public OfflineEntry() {
         }
 
         /// <summary>
@@ -91,8 +86,7 @@ namespace Firebase.Database.Offline
         /// </summary>
         /// <typeparam name="T"> Type of object to deserialize into. </typeparam>
         /// <returns> Instance of <typeparamref name="T" />. </returns>
-        public T Deserialize<T>()
-        {
+        public T Deserialize<T>() {
             return (T) (dataInstance ?? (dataInstance = JsonConvert.DeserializeObject<T>(Data)));
         }
     }

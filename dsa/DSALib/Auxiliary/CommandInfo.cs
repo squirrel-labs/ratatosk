@@ -1,11 +1,8 @@
 ﻿using System.Linq;
 
-namespace DSALib.Auxiliary
-{
-    public struct CommandInfo
-    {
-        public CommandInfo(string name, string brief, string[] description, string scope)
-        {
+namespace DSALib.Auxiliary {
+    public struct CommandInfo {
+        public CommandInfo(string name, string brief, string[] description, string scope) {
             Name = name;
             Scope = scope;
             Brief = brief;
@@ -20,8 +17,7 @@ namespace DSALib.Auxiliary
 
         public string[] Description { get; }
 
-        public string GetDescription()
-        {
+        public string GetDescription() {
             return Description.Aggregate((s, c) => s + c);
         }
     }

@@ -1,20 +1,16 @@
 ﻿using System;
-using DSACore.Models.Network;
 using DSALib.Commands;
 using DSALib.Models.Network;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace DSACore.Controllers
-{
+namespace DSACore.Controllers {
     [Route("dsa/[controller]")]
-    public class CommandsController : Controller
-    {
+    public class CommandsController : Controller {
         // GET: api/<controller>
         [HttpGet]
-        public string Get()
-        {
+        public string Get() {
             return "Usage: post the command to execute";
         }
 
@@ -27,14 +23,11 @@ namespace DSACore.Controllers
 
         // POST api/<controller>/Felis
         [HttpPost]
-        public string Post([FromBody] Command cmd)
-        {
-            try
-            {
+        public string Post([FromBody] Command cmd) {
+            try {
                 return CommandHandler.ExecuteCommand(cmd).message;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 return $"Ein Fehler ist aufgetreten: \n {e.Message}";
             }
         }

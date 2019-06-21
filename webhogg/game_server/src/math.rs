@@ -101,20 +101,20 @@ impl std::cmp::PartialEq for Vec2 {
 impl std::cmp::Eq for Vec2 {}
 
 impl Vec2 {
-    pub fn distance(&self) -> f32 {
-        f32::sqrt(self.distance2())
+    pub fn norm(&self) -> f32 {
+        f32::hypot(self.x, self.y)
     }
 
-    pub fn distance2(&self) -> f32 {
-        self.scalar(self)
+    pub fn norm2(&self) -> f32 {
+        self.dot(self)
     }
 
-    pub fn scalar(&self, other: &Vec2) -> f32 {
+    pub fn dot(&self, other: &Vec2) -> f32 {
         self.x * other.x + self.y * other.y
     }
 
-    pub fn norm(&self) -> Vec2 {
-        let len = self.distance();
+    pub fn normalized(&self) -> Vec2 {
+        let len = self.norm();
         Vec2 {
             x: self.x / len,
             y: self.y / len,    
@@ -149,7 +149,7 @@ impl std::ops::Sub<Vec2> for AABox {
     type Output = Self;
     fn sub(self, other: Vec2) -> Self {
         Self {
-            pos: self.pos + other,
+            pos: self.pos - other,
             size: self.size
         }
     }
@@ -174,7 +174,7 @@ impl std::cmp::Eq for AABox {}
 pub struct RBox {
     /// origin
     pub pos: Vec2,
-    /// Vwctor1
+    /// Vector1
     pub v1: Vec2, 
     /// Vector2
     pub v2: Vec2,
@@ -182,7 +182,7 @@ pub struct RBox {
 
 impl RBox {
     pub fn new(pos: Vec2, orientation: Vec2, width: f32) -> Self {
-        let scale = width / orientation.distance();
+        let scale = width / orientation.norm();
         let orth = Vec2 {x: orientation.x / scale, y: -orientation.y / scale};
         Self {
             pos: pos,
@@ -213,8 +213,8 @@ impl std::ops::Sub<Vec2> for RBox {
     type Output = Self;
     fn sub(self, other: Vec2) -> Self {
         Self {
-            pos: self.pos + other,
-            v1: self.v1 + other,
+            pos: self.pos - other,
+            v1: self.v1,
             v2: self.v2,
         }
     }
@@ -230,7 +230,7 @@ impl std::cmp::PartialEq for RBox {
     fn eq(&self, other: &Self) -> bool {
         self.pos == other.pos
             && self.v1 == other.v1
-            && self.v1 == self.v2
+            && self.v2 == other.v2
     }
 }
 
@@ -273,7 +273,6 @@ mod tests {
         assert!(!(a > b));
     }
 
-
     #[test]
     fn test_add_vec2() {
         let a = Vec2{x: 1.0, y: 7.5};
@@ -301,25 +300,25 @@ mod tests {
     }
 
     #[test]
-    fn test_distance_vec2() {
+    fn test_norm_vec2() {
         let a = Vec2{x: 2.0, y: 2.0};
 
-        assert!(f32::abs(a.distance() - 2.0) < 1e8);
+        assert!(f32::abs(a.norm() - 2.0) < 1e8);
     }
 
     #[test]
-    fn test_distance2_vec2() {
+    fn test_norm2_vec2() {
         let a = Vec2{x: 1.0, y: 2.0};
 
-        assert!(f32::abs(a.distance2() - 5.0) < 1e8);
+        assert!(f32::abs(a.norm2() - 5.0) < 1e8);
     }
 
     #[test]
-    fn test_norm_vec2() {
+    fn test_normalized_vec2() {
         let a = Vec2{x: 2.0, y: -2.0};
         let b = Vec2{x: std::f32::consts::FRAC_1_SQRT_2, y: -std::f32::consts::FRAC_1_SQRT_2};
 
-        assert_eq!(a.norm(), b);
+        assert_eq!(a.normalized(), b);
     }
 
     #[test]

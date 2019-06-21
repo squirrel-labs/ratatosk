@@ -7,13 +7,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace Firebase.Database.Http
-{
+namespace Firebase.Database.Http {
     /// <summary>
     ///     The http client extensions for object deserializations.
     /// </summary>
-    internal static class HttpClientExtensions
-    {
+    internal static class HttpClientExtensions {
         /// <summary>
         ///     The get object collection async.
         /// </summary>
@@ -24,13 +22,11 @@ namespace Firebase.Database.Http
         /// <returns> The <see cref="Task" />. </returns>
         public static async Task<IReadOnlyCollection<FirebaseObject<T>>> GetObjectCollectionAsync<T>(
             this HttpClient client, string requestUri,
-            JsonSerializerSettings jsonSerializerSettings)
-        {
+            JsonSerializerSettings jsonSerializerSettings) {
             var responseData = string.Empty;
             var statusCode = HttpStatusCode.OK;
 
-            try
-            {
+            try {
                 var response = await client.GetAsync(requestUri).ConfigureAwait(false);
                 statusCode = response.StatusCode;
                 responseData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -44,8 +40,7 @@ namespace Firebase.Database.Http
 
                 return dictionary.Select(item => new FirebaseObject<T>(item.Key, item.Value)).ToList();
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 throw new FirebaseException(requestUri, string.Empty, responseData, statusCode, ex);
             }
         }
@@ -96,21 +91,18 @@ namespace Firebase.Database.Http
         /// <param name="data"> The json data. </param>
         /// <param name="elementType"> The type of entities the collection should contain. </param>
         /// <returns> The <see cref="Task" />.  </returns>
-        public static IEnumerable<FirebaseObject<object>> GetObjectCollection(this string data, Type elementType)
-        {
+        public static IEnumerable<FirebaseObject<object>> GetObjectCollection(this string data, Type elementType) {
             var dictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), elementType);
             IDictionary dictionary = null;
 
-            if (data.StartsWith("["))
-            {
+            if (data.StartsWith("[")) {
                 var listType = typeof(List<>).MakeGenericType(elementType);
                 var list = JsonConvert.DeserializeObject(data, listType) as IList;
                 dictionary = Activator.CreateInstance(dictionaryType) as IDictionary;
                 var index = 0;
                 foreach (var item in list) dictionary.Add(index++.ToString(), item);
             }
-            else
-            {
+            else {
                 dictionary = JsonConvert.DeserializeObject(data, dictionaryType) as IDictionary;
             }
 

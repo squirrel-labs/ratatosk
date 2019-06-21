@@ -1,7 +1,5 @@
-﻿namespace Firebase.Database.Offline
-{
-    public enum StreamingOptions
-    {
+﻿namespace Firebase.Database.Offline {
+    public enum StreamingOptions {
         /// <summary>
         ///     No realtime streaming.
         /// </summary>

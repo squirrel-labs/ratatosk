@@ -9,12 +9,9 @@ using DSALib.Auxiliary;
 using DSALib.Characters;
 using DSALib.Models.Dsa;
 
-namespace DSALib.DSA_Game.Characters
-{
-    public class Character : Being, ICharacter
-    {
-        public Character()
-        {
+namespace DSALib.DSA_Game.Characters {
+    public class Character : Being, ICharacter {
+        public Character() {
             PropTable.Add("MU", "Mut"); // routing
             PropTable.Add("KL", "Klugheit");
             PropTable.Add("IN", "Intuition");
@@ -25,20 +22,17 @@ namespace DSALib.DSA_Game.Characters
             PropTable.Add("KK", "Körperkraft");
         }
 
-        public Character(string path) : this()
-        {
+        public Character(string path) : this() {
             Load(new MemoryStream(File.ReadAllBytes(path))); // load
             Post_process(); // calculate derived values
         }
 
-        public Character(MemoryStream stream) : this()
-        {
+        public Character(MemoryStream stream) : this() {
             Load(stream); // load
             Post_process(); // calculate derived values
         }
 
-        public Character(Character c, string name, int stDv = 2) : this()
-        {
+        public Character(Character c, string name, int stDv = 2) : this() {
             Name = name;
             foreach (var i in c.Eigenschaften)
                 Eigenschaften.Add(i.Key, i.Value + (int) Math.Round(RandomMisc.Random(stDv)));
@@ -82,8 +76,7 @@ namespace DSALib.DSA_Game.Characters
             return Zauber.ProbenTest(this, zauber, erschwernis);
         }
 
-        public string TestEigenschaft(string eigenschaft, int erschwernis = 0)
-        {
+        public string TestEigenschaft(string eigenschaft, int erschwernis = 0) {
             var output = new StringBuilder();
             var prop = PropTable[eigenschaft.ToUpper()];
             var tap = Eigenschaften[prop];
@@ -115,11 +108,10 @@ namespace DSALib.DSA_Game.Characters
             return output.ToString();
         }
 
-        public string Parade(string talent, int erschwernis = 0)
-        {
+        public string Parade(string talent, int erschwernis = 0) {
             var output = new StringBuilder();
 
-            if (Kampftalente.TryMatch(out var iAttack , talent))
+            if (Kampftalente.TryMatch(out var iAttack, talent))
                 return $"{Name} kann nicht mit der Waffenart {talent} umgehen...";
 
 
@@ -136,11 +128,10 @@ namespace DSALib.DSA_Game.Characters
             return output.ToString();
         }
 
-        public string Fernkampf(string talent, int erschwernis = 0)
-        {
+        public string Fernkampf(string talent, int erschwernis = 0) {
             var output = new StringBuilder();
             var fk = Eigenschaften["fk"];
-            if (! Talente.TryMatch(out var iAttack, talent))
+            if (!Talente.TryMatch(out var iAttack, talent))
                 return $"{Name} kann nicht mit der Waffenart {talent} umgehen...";
 
             var attack = (Talent) iAttack;
@@ -157,8 +148,7 @@ namespace DSALib.DSA_Game.Characters
             return output.ToString();
         }
 
-        private void Post_process()
-        {
+        private void Post_process() {
             var LE_Wert = Eigenschaften["Lebensenergie"];
             var AE_Wert = Eigenschaften.First(s => s.Key.Contains("Astralenergie")).Value;
 
@@ -184,16 +174,13 @@ namespace DSALib.DSA_Game.Characters
         }
 
 
-        private void Load(MemoryStream stream)
-        {
+        private void Load(MemoryStream stream) {
             var reader = new XmlTextReader(stream);
-            while (reader.Read())
-            {
+            while (reader.Read()) {
                 // read until he hits keywords
                 if (reader.NodeType != XmlNodeType.Element) continue;
 
-                switch (reader.Name)
-                {
+                switch (reader.Name) {
                     case "Wesen":
                         reader.Skip();
                         break;
@@ -208,17 +195,14 @@ namespace DSALib.DSA_Game.Characters
                         break;
                     case "vt":
                         reader.Read();
-                        while (reader.Name.Equals("vorteil"))
-                        {
-                            try
-                            {
+                        while (reader.Name.Equals("vorteil")) {
+                            try {
                                 Vorteile.Add(new Vorteil(
                                     reader.GetAttribute("name"),
                                     //  Convert.ToInt32(reader.GetAttribute("value"))));
                                     reader.GetAttribute("value")));
                             }
-                            catch
-                            {
+                            catch {
                                 Vorteile.Add(new Vorteil(reader.GetAttribute("name")));
                             }
 
@@ -228,8 +212,7 @@ namespace DSALib.DSA_Game.Characters
                         break;
                     case "talentliste":
                         reader.Read();
-                        while (reader.Name.Equals("talent"))
-                        {
+                        while (reader.Name.Equals("talent")) {
                             Talente.Add(
                                 new Talent(
                                     reader.GetAttribute("name"),
@@ -241,8 +224,7 @@ namespace DSALib.DSA_Game.Characters
                         break;
                     case "zauberliste":
                         reader.Read();
-                        while (reader.Name.Equals("zauber"))
-                        {
+                        while (reader.Name.Equals("zauber")) {
                             Zauber.Add(
                                 new Zauber(
                                     reader.GetAttribute("name"),

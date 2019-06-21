@@ -1,12 +1,10 @@
 using System;
 
-namespace Firebase.Database.Query
-{
+namespace Firebase.Database.Query {
     /// <summary>
     ///     Represents a parameter in firebase query, e.g. "?data=foo".
     /// </summary>
-    public abstract class ParameterQuery : FirebaseQuery
-    {
+    public abstract class ParameterQuery : FirebaseQuery {
         private readonly Func<string> parameterFactory;
         private readonly string separator;
 
@@ -17,8 +15,7 @@ namespace Firebase.Database.Query
         /// <param name="parameterFactory"> The parameter. </param>
         /// <param name="client"> The owning client. </param>
         protected ParameterQuery(FirebaseQuery parent, Func<string> parameterFactory, FirebaseClient client)
-            : base(parent, client)
-        {
+            : base(parent, client) {
             this.parameterFactory = parameterFactory;
             separator = Parent is ChildQuery ? "?" : "&";
         }
@@ -28,8 +25,7 @@ namespace Firebase.Database.Query
         /// </summary>
         /// <param name="child"> The child. </param>
         /// <returns> The <see cref="string" />. </returns>
-        protected override string BuildUrlSegment(FirebaseQuery child)
-        {
+        protected override string BuildUrlSegment(FirebaseQuery child) {
             return $"{separator}{parameterFactory()}={BuildUrlParameter(child)}";
         }
 

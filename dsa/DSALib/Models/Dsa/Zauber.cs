@@ -1,10 +1,7 @@
-﻿namespace DSALib.Models.Dsa
-{
-    public class Zauber : Talent
-    {
+﻿namespace DSALib.Models.Dsa {
+    public class Zauber : Talent {
         public Zauber(string name, string probe, int value, char complexity = 'A', string representation = "Magier")
-            : base(name, probe, value)
-        {
+            : base(name, probe, value) {
             Complexity = complexity;
             Representation = Representation;
         }

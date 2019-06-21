@@ -3,22 +3,17 @@ using System.Linq;
 using System.Net;
 using DSALib.DSA_Game;
 using DSALib.DSA_Game.Characters;
-using DSALib;
 using DSALib.Models.Dsa;
 
-namespace DSALib.Commands
-{
-    public class FileHandler
-    {
-        public static string AddChar(ulong id, string url)
-        {
+namespace DSALib.Commands {
+    public class FileHandler {
+        public static string AddChar(ulong id, string url) {
             if (url == string.Empty) throw new ArgumentException("Es wurde keine Datei angehängt");
 
 
             if (!url.EndsWith(".xml")) throw new ArgumentException("Es wurde kein xml Held mitgeschickt");
 
-            using (var client = new WebClient())
-            {
+            using (var client = new WebClient()) {
                 client.DownloadFile(url, "helden\\" + url.Split("/").Last());
             }
 
