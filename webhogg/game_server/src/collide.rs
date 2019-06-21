@@ -1,4 +1,4 @@
-use crate::maths::{Vec2, AABox, RBox};
+use crate::math::{Vec2, AABox, RBox};
 
 pub trait Collide<Rhs> {
     fn collides(&self, other: &Rhs) -> bool;
@@ -12,7 +12,7 @@ impl Collide<Vec2> for Vec2 {
 
 impl Collide<Vec2> for AABox {
     fn collides(&self, other: &Vec2) -> bool {
-        self.pos < *other && other < &(self.pos + self.size) 
+        self.pos < *other && other < &(self.pos + self.size)
     }
 }
 
