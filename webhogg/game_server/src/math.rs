@@ -303,16 +303,16 @@ mod tests {
 
     #[test]
     fn test_norm_vec2() {
-        let a = Vec2{x: 2.0, y: 2.0};
+        let a = Vec2{x: 3.0, y: 4.0};
 
-        assert!(f32::abs(a.norm() - 2.0) < 1e8);
+        assert!(f32::abs(a.norm() - 5.0) < 1e-8);
     }
 
     #[test]
     fn test_norm2_vec2() {
         let a = Vec2{x: 1.0, y: 2.0};
 
-        assert!(f32::abs(a.norm2() - 5.0) < 1e8);
+        assert!(f32::abs(a.norm2() - 5.0) < 1e-8);
     }
 
     #[test]
