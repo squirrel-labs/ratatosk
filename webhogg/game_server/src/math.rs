@@ -122,6 +122,7 @@ impl Vec2 {
     }
 }
 
+/// axis-aligned box
 #[derive(Clone, Copy, Debug)]
 pub struct AABox {
     pub pos: Vec2,
@@ -170,6 +171,7 @@ impl std::cmp::PartialEq for AABox {
 
 impl std::cmp::Eq for AABox {}
 
+/// rotated box
 #[derive(Clone, Copy, Debug)]
 pub struct RBox {
     /// origin
