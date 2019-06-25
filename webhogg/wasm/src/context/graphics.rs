@@ -59,7 +59,7 @@ impl GraphicsContext {
         
         let sprites = vec![
             DrawSprite::new((0.0, 0.0), Matrix::identity()),
-            DrawSprite::new((0.5, 0.0), Matrix::identity()),
+            //DrawSprite::new((0.5, 0.0), Matrix::identity()),
         ];
             
         Ok(Self {
@@ -78,17 +78,22 @@ impl GraphicsContext {
         self.gl.bind_array_buffer(&self.buffer);
         self.gl.enable_vertex_attrib_array(0);
 
+        let bp = (f64::sin(self.frame_nr as f64 * 0.01) as f32,
+                  f64::cos(self.frame_nr as f64 * 0.01) as f32);
+        self.sprites[0].transform = Matrix::identity()
+            .translate(bp);
+
         for sprite in self.sprites.iter() {
             let pos = sprite.pos;
-            let size = (1.0, 1.0);
+            let transform = &sprite.transform;
 
             let loc = self.shader.get_location(&self.gl, "offset")
                 .ok_or(WasmError::WebGlUniform(format!("could not find location \"offset\" in glsl shader")))?;
             self.gl.uniform_f32v2(&loc, &[pos.0, pos.1]);
 
-            let loc = self.shader.get_location(&self.gl, "size")
-                .ok_or(WasmError::WebGlUniform(format!("could not find location \"size\" in glsl shader")))?;
-            self.gl.uniform_f32v2(&loc, &[size.0, size.1]);
+            let loc = self.shader.get_location(&self.gl, "transform")
+                .ok_or(WasmError::WebGlUniform(format!("could not find location \"transform\" in glsl shader")))?;
+            self.gl.uniform_mat3x3(&loc, &transform.raw);
 
             self.gl.vertex_attrib_f32_pointer(0, 2);
             self.gl.draw_triangle_arrays(6);

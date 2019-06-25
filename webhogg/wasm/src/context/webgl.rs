@@ -165,4 +165,8 @@ impl WebGl2 {
     pub fn uniform_f32v2(&self, location: &WebGlUniformLocation, data: &[f32]) {
         self.gl.uniform2fv_with_f32_array(Some(location), data)
     }
+
+    pub fn uniform_mat3x3(&self, location: &WebGlUniformLocation, data: &[f32; 9]) {
+        self.gl.uniform_matrix3fv_with_f32_array(Some(location), false, data)
+    }
 }
