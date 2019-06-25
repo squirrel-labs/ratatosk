@@ -57,8 +57,8 @@ impl GraphicsContext {
         //gl.unbind_vertex_array();
         
         let sprites = vec![
-            DrawSprite::new((0.0, 0.0), (0.1, 0.1)),
-            DrawSprite::new((0.5, 0.0), (0.1, 0.5)),
+            DrawSprite::new((0.0, 0.0)),
+            DrawSprite::new((0.5, 0.0)),
         ];
             
         Ok(Self {

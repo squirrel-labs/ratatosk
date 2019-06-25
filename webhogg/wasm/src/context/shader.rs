@@ -2,8 +2,8 @@ use crate::error::WasmError;
 use super::webgl;
 use super::webgl::{WebGl2, ShaderType};
 
-pub const MAIN_VERTEX_SHADER: &str = include_str!("main.vs");
-pub const MAIN_FRAGMENT_SHADER: &str = include_str!("main.fs");
+pub const MAIN_VERTEX_SHADER: &str = include_str!("shader/main.vs");
+pub const MAIN_FRAGMENT_SHADER: &str = include_str!("shader/main.fs");
 
 pub struct ShaderProgram {
     program: webgl::WebGlProgram,
