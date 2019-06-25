@@ -24,7 +24,7 @@ async function main() {
         { type: 'logic',
             source: source,
             canvas: [],
-            dt: 10000 },
+            dt: 100 },
     ];
     for (var module of modules) {
         let worker = new Worker('pkg/worker.js');

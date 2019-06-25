@@ -15,5 +15,6 @@ pub fn start_logic() {
 
 #[wasm_bindgen]
 pub fn loop_logic() {
-    debug!("logic: loopin'");
+    info!("num: {}", crate::memory::memory().num);
+    //debug!("logic: loopin'");
 }
