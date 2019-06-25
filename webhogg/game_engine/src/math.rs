@@ -1,10 +1,12 @@
+use std::ops;
+
 #[derive(Clone, Copy, Debug)]
 pub struct Vec2 {
     pub x: f32,
     pub y: f32,
 }
 
-impl std::ops::Add for Vec2 {
+impl ops::Add for Vec2 {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         Self {
@@ -14,14 +16,14 @@ impl std::ops::Add for Vec2 {
     }
 }
 
-impl std::ops::AddAssign<Vec2> for Vec2 {
+impl ops::AddAssign for Vec2 {
     fn add_assign(&mut self, other: Vec2) {
         self.x += other.x;
         self.y += other.y;
     }
 }
 
-impl std::ops::Sub for Vec2 {
+impl ops::Sub for Vec2 {
     type Output = Self;
     fn sub(self, other: Self) -> Self {
         Self {
@@ -31,14 +33,14 @@ impl std::ops::Sub for Vec2 {
     }
 }
 
-impl std::ops::SubAssign<Vec2> for Vec2 {
+impl ops::SubAssign for Vec2 {
     fn sub_assign(&mut self, other: Vec2) {
         self.x -= other.x;
         self.y -= other.y;
     }
 }
 
-impl std::ops::Neg for Vec2 {
+impl ops::Neg for Vec2 {
     type Output = Self;
     fn neg(self) -> Self {
         Self {
@@ -48,7 +50,7 @@ impl std::ops::Neg for Vec2 {
     }
 }
 
-impl std::ops::Mul<f32> for Vec2 {
+impl ops::Mul<f32> for Vec2 {
     type Output = Self;
     fn mul(self, scale: f32) -> Self {
         Self {
@@ -58,7 +60,17 @@ impl std::ops::Mul<f32> for Vec2 {
     }
 }
 
-impl std::ops::Div<f32> for Vec2 {
+impl ops::Mul for Vec2 {
+    type Output = Self;
+    fn mul(self, other: Self) -> Self {
+        Self {
+            x: self.x * other.x,
+            y: self.y * other.y,
+        }
+    }
+}
+
+impl ops::Div<f32> for Vec2 {
     type Output = Self;
     fn div(self, scale: f32) -> Self {
         Self {
@@ -68,12 +80,12 @@ impl std::ops::Div<f32> for Vec2 {
     }
 }
 
-impl std::ops::Div<Vec2> for Vec2 {
+impl ops::Div for Vec2 {
     type Output = Self;
-    fn div(self, scale: Vec2) -> Self {
+    fn div(self, other: Vec2) -> Self {
         Self {
-            x: self.x / scale.x,
-            y: self.y / scale.y,
+            x: self.x / other.x,
+            y: self.y / other.y,
         }
     }
 }
@@ -104,10 +116,10 @@ impl Vec2 {
     }
 
     pub fn norm2(&self) -> f32 {
-        self.dot(self)
+        self.dot(*self)
     }
 
-    pub fn dot(&self, other: &Vec2) -> f32 {
+    pub fn dot(&self, other: Vec2) -> f32 {
         self.x * other.x + self.y * other.y
     }
 
@@ -128,7 +140,7 @@ pub struct AABox {
     pub size: Vec2,
 }
 
-impl std::ops::Add<Vec2> for AABox {
+impl ops::Add<Vec2> for AABox {
     type Output = Self;
     fn add(self, other: Vec2) -> Self {
         Self {
@@ -138,13 +150,13 @@ impl std::ops::Add<Vec2> for AABox {
     }
 }
 
-impl std::ops::AddAssign<Vec2> for AABox {
+impl ops::AddAssign<Vec2> for AABox {
     fn add_assign(&mut self, other: Vec2) {
         self.pos += other
     }
 }
 
-impl std::ops::Sub<Vec2> for AABox {
+impl ops::Sub<Vec2> for AABox {
     type Output = Self;
     fn sub(self, other: Vec2) -> Self {
         Self {
@@ -154,7 +166,7 @@ impl std::ops::Sub<Vec2> for AABox {
     }
 }
 
-impl std::ops::SubAssign<Vec2> for AABox {
+impl ops::SubAssign<Vec2> for AABox {
     fn sub_assign(&mut self, other: Vec2) {
         self.pos -= other
     }
@@ -175,7 +187,7 @@ pub struct RBox {
     pub pos: Vec2,
     /// Vector1
     pub v1: Vec2,
-    /// Vector2
+    /// Vector2: this Vector has to always be orthogonal to v1
     pub v2: Vec2,
 }
 
@@ -194,7 +206,7 @@ impl RBox {
     }
 }
 
-impl std::ops::Add<Vec2> for RBox {
+impl ops::Add<Vec2> for RBox {
     type Output = Self;
     fn add(self, other: Vec2) -> Self {
         Self {
@@ -205,13 +217,13 @@ impl std::ops::Add<Vec2> for RBox {
     }
 }
 
-impl std::ops::AddAssign<Vec2> for RBox {
+impl ops::AddAssign<Vec2> for RBox {
     fn add_assign(&mut self, other: Vec2) {
         self.pos += other
     }
 }
 
-impl std::ops::Sub<Vec2> for RBox {
+impl ops::Sub<Vec2> for RBox {
     type Output = Self;
     fn sub(self, other: Vec2) -> Self {
         Self {
@@ -222,7 +234,7 @@ impl std::ops::Sub<Vec2> for RBox {
     }
 }
 
-impl std::ops::SubAssign<Vec2> for RBox {
+impl ops::SubAssign<Vec2> for RBox {
     fn sub_assign(&mut self, other: Vec2) {
         self.pos -= other
     }

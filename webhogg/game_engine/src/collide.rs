@@ -25,8 +25,8 @@ impl Collide<AABox> for AABox {
 
 impl Collide<Vec2> for RBox {
     fn collides(&self, other: &Vec2) -> bool {
-        let v1_diff = *other + self.v1 * (-self.v1.dot(&(*other - self.pos)) / self.v1.norm2());
-        let v2_diff = *other + self.v2 * (-self.v2.dot(&(*other - self.pos)) / self.v2.norm2());
+        let v1_diff = *other + self.v1 * (-self.v1.dot(*other - self.pos) / self.v1.norm2());
+        let v2_diff = *other + self.v2 * (-self.v2.dot(*other - self.pos) / self.v2.norm2());
 
         let v1_dist = ((v1_diff - self.pos) / self.v2).x;
         let v2_dist = ((v2_diff - self.pos) / self.v1).x;
@@ -42,10 +42,10 @@ impl Collide<AABox> for RBox {
         let other_size = other.pos + other.size;
 
         // project points onto a orthogonal line
-        let v1_diff = other.pos + self.v1 * (-self.v1.dot(&(other.pos - self.pos)) / self.v1.norm2());
-        let v2_diff = other.pos + self.v2 * (-self.v2.dot(&other.pos) / self.v2.norm2());
-        let v1_diff_size = other_size + self.v1 * (-self.v1.dot(&(other_size - self.pos)) / self.v1.norm2());
-        let v2_diff_size = other_size + self.v2 * (-self.v2.dot(&(other_size - self.pos)) / self.v2.norm2());
+        let v1_diff = other.pos + self.v1 * (-self.v1.dot(other.pos - self.pos) / self.v1.norm2());
+        let v2_diff = other.pos + self.v2 * (-self.v2.dot(other.pos) / self.v2.norm2());
+        let v1_diff_size = other_size + self.v1 * (-self.v1.dot(other_size - self.pos) / self.v1.norm2());
+        let v2_diff_size = other_size + self.v2 * (-self.v2.dot(other_size - self.pos) / self.v2.norm2());
 
         // calculate the norm
         let v1_dist = (v1_diff - self.pos) / self.v2;
