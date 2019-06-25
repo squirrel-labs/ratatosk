@@ -7,6 +7,7 @@ use super::webgl::{Color4, ShaderType, WebGl2};
 use super::shader::{MAIN_VERTEX_SHADER, MAIN_FRAGMENT_SHADER};
 use super::shader::ShaderProgram;
 use super::draw_sprite::DrawSprite;
+use super::matrix::Matrix;
 
 pub struct GraphicsContext {
     gl: WebGl2,
@@ -57,8 +58,8 @@ impl GraphicsContext {
         //gl.unbind_vertex_array();
         
         let sprites = vec![
-            DrawSprite::new((0.0, 0.0)),
-            DrawSprite::new((0.5, 0.0)),
+            DrawSprite::new((0.0, 0.0), Matrix::identity()),
+            DrawSprite::new((0.5, 0.0), Matrix::identity()),
         ];
             
         Ok(Self {
@@ -79,7 +80,7 @@ impl GraphicsContext {
 
         for sprite in self.sprites.iter() {
             let pos = sprite.pos;
-            let size = sprite.size;
+            let size = (1.0, 1.0);
 
             let loc = self.shader.get_location(&self.gl, "offset")
                 .ok_or(WasmError::WebGlUniform(format!("could not find location \"offset\" in glsl shader")))?;
