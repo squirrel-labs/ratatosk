@@ -1,4 +1,7 @@
+pub mod matrix_mul;
+pub mod matrix;
 mod shader;
+mod draw_sprite;
 mod webgl;
 pub mod graphics;
 pub mod logic;

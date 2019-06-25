@@ -6,6 +6,8 @@ use super::webgl;
 use super::webgl::{Color4, ShaderType, WebGl2};
 use super::shader::{MAIN_VERTEX_SHADER, MAIN_FRAGMENT_SHADER};
 use super::shader::ShaderProgram;
+use super::draw_sprite::DrawSprite;
+use super::matrix::Matrix;
 
 pub struct GraphicsContext {
     gl: WebGl2,
@@ -13,6 +15,7 @@ pub struct GraphicsContext {
     shader: ShaderProgram,
     vao: webgl::WebGlVertexArrayObject,
     buffer: webgl::WebGlBuffer,
+    sprites: Vec<DrawSprite>,
 }
 
 impl GraphicsContext {
@@ -51,28 +54,56 @@ impl GraphicsContext {
             1.0, 0.0,
         ]);
         gl.enable_vertex_attrib_array(0);
+        //gl.unbind_array_buffer();
+        //gl.unbind_vertex_array();
+        
+        let sprites = vec![
+            DrawSprite::new((0.0, 0.0), Matrix::identity()),
+            //DrawSprite::new((0.5, 0.0), Matrix::identity()),
+        ];
             
         Ok(Self {
             gl, frame_nr: 0,
-            shader, vao, buffer
+            shader, vao, buffer,
+            sprites,
         })
     }
 
     pub fn update(&mut self) -> Result<(), WasmError> {
-        let light = 0.5;
-        let speed = 60.0;
-
-        let a = (self.frame_nr as f32) / speed;
-        let a = f32::abs(f32::sin(a));
-        let b = f32::abs(f32::cos(a));
-        let (a, b) = (a * light, b * light);
-
         self.gl.set_viewport();
-        self.gl.clear(&Color4::new(a, light - a, b, 1.0));
+        self.gl.clear(&Color4::new(0.8, 0.1, 0.6, 1.0));
 
         self.shader.run(&self.gl);
-        self.gl.vertex_attrib_f32_pointer(0, 2);
-        self.gl.draw_triangle_arrays(6);
+        self.gl.bind_vertex_array(&self.vao);
+        self.gl.bind_array_buffer(&self.buffer);
+        self.gl.enable_vertex_attrib_array(0);
+
+        let bp = (f64::sin(self.frame_nr as f64 * 0.01) as f32,
+                  f64::cos(self.frame_nr as f64 * 0.01) as f32);
+        self.sprites[0].transform = Matrix::identity()
+            .translate(bp);
+
+        for sprite in self.sprites.iter() {
+            let pos = sprite.pos;
+            let transform = &sprite.transform;
+
+            let loc = self.shader.get_location(&self.gl, "offset")
+                .ok_or(WasmError::WebGlUniform(format!("could not find location \"offset\" in glsl shader")))?;
+            self.gl.uniform_f32v2(&loc, &[pos.0, pos.1]);
+
+            let loc = self.shader.get_location(&self.gl, "transform")
+                .ok_or(WasmError::WebGlUniform(format!("could not find location \"transform\" in glsl shader")))?;
+            self.gl.uniform_mat3x3(&loc, &transform.raw);
+
+            self.gl.vertex_attrib_f32_pointer(0, 2);
+            self.gl.draw_triangle_arrays(6);
+        }
+
+        use log::info;
+        let err = self.gl.get_error();
+        if err.is_err() {
+            info!("gl error: {}", err);
+        }
 
         self.frame_nr += 1;
 
