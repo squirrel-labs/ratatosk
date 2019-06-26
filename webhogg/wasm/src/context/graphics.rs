@@ -60,7 +60,7 @@ impl GraphicsContext {
 
     pub fn update(&mut self) -> Result<(), WasmError> {
         let light = 0.5;
-        let speed = 60.0;
+        let speed = 30.0;
 
         let a = (self.frame_nr as f32) / speed;
         let a = f32::abs(f32::sin(a));
