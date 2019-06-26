@@ -1,7 +1,8 @@
 #!/bin/bash
 
-cargo build --target wasm32-unknown-unknown --release
+cargo build --target wasm32-unknown-unknown --release --verbose
 wasm-bindgen target/wasm32-unknown-unknown/release/webhogg_wasm.wasm --out-dir bin/ --no-typescript --target no-modules --remove-producers-section --remove-name-section
 wasm-opt -Oz bin/webhogg_wasm_bg.wasm -o bin/webhogg-wasm.wasm
 rm bin/webhogg_wasm_bg.wasm
 mv bin/webhogg_wasm.js bin/webhogg-wasm.js
+python update.py

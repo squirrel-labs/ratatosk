@@ -19,7 +19,8 @@ pub fn start_graphics(canvas: web_sys::OffscreenCanvas) {
 
 #[wasm_bindgen]
 pub fn loop_graphics() {
-    crate::memory::memory().num += 1;
+    crate::memory::increase_memory_val();
+    debug!("mem2: {}", crate::memory::get_memory_ptr());
 
     context::get_graphics().update()
         .map_err(|e| error!("gaphics loop {}", e))
