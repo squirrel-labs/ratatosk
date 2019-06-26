@@ -18,9 +18,12 @@ pub fn start_graphics(canvas: web_sys::OffscreenCanvas) {
 }
 
 #[wasm_bindgen]
-pub fn loop_graphics() {
+pub fn loop_graphics(val: js_sys::SharedArrayBuffer) {
     crate::memory::increase_memory_val();
     debug!("mem2: {}", crate::memory::get_memory_ptr());
+    //info!("js value is?: undefined: {}", val.is_undefined());
+
+    //return;
 
     context::get_graphics().update()
         .map_err(|e| error!("gaphics loop {}", e))

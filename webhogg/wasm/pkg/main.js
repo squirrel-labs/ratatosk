@@ -4,7 +4,7 @@ function exit() {
     for (var worker of workers) {
         worker.terminate();
     }
-    console.clear();
+    //console.clear();
 }
 
 async function main() {
@@ -17,12 +17,12 @@ async function main() {
     source = await fetchedSource.arrayBuffer();
 
     let sharedMemory = new WebAssembly.Memory({
-        initial: 0,
-        maximum: 65536,
+        initial: 1000,
+        maximum: 1000,
         shared: true
     });
-    sharedMemory.buffer = new SharedArrayBuffer();
-    //sharedMemory = 'haah enaude';
+    sharedMemory.buffer = new SharedArrayBuffer(65000);
+    saneriu = sharedMemory;
 
     const modules = [
         { type: 'graphics',
@@ -45,6 +45,5 @@ async function main() {
         }
         workers.push(worker);
     }
-    console.log(sharedMemory.buffer);
 }
 main();

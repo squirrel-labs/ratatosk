@@ -1,4 +1,5 @@
-#![feature(link_llvm_intrinsics)]
+#![feature(custom_inner_attributes)]
+#![feature(custom_attribute)]
 
 mod logger;
 pub(crate) mod memory;

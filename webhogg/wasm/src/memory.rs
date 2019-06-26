@@ -18,18 +18,20 @@ impl SharedMemory {
 
 static mut MEMORY: SharedMemory = SharedMemory { num: 0 };
 
+#[cfg(target_arch = "wasm32")]
+fn raw_ptr() -> *mut u32 {
+    unsafe {(&mut MEMORY) as *mut SharedMemory as *mut u32}
+}
+
+
 pub fn increase_memory_val() {
-    unsafe {
-        MEMORY.incr()
-    }
+    unsafe { *raw_ptr() += 1 }
 }
 
 
 #[no_mangle]
 pub fn get_memory() -> u32 {
-    unsafe {
-        MEMORY.get()
-    }
+    unsafe { *raw_ptr() }
 }
 
 #[no_mangle]

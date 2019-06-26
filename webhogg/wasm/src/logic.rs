@@ -17,4 +17,6 @@ pub fn start_logic() {
 pub fn loop_logic() {
     debug!("mem1: {}", crate::memory::get_memory_ptr());
     debug!("val: {}", crate::memory::get_memory());
+    
+    //info!("");
 }
