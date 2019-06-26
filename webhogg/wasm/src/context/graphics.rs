@@ -71,7 +71,7 @@ impl GraphicsContext {
 
     pub fn update(&mut self) -> Result<(), WasmError> {
         self.gl.set_viewport();
-        self.gl.clear(&Color4::new(0.8, 0.1, 0.6, 1.0));
+        self.gl.clear(&Color4::new(0.6, 0.0, 0.6, 1.0));
 
         self.shader.run(&self.gl);
         self.gl.bind_vertex_array(&self.vao);
