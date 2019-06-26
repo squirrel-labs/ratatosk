@@ -1,4 +1,7 @@
+#![feature(link_llvm_intrinsics)]
+
 mod logger;
+pub(crate) mod memory;
 pub mod error;
 pub mod context;
 
