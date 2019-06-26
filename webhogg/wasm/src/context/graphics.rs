@@ -68,7 +68,7 @@ impl GraphicsContext {
         let (a, b) = (a * light, b * light);
 
         self.gl.set_viewport();
-        self.gl.clear(&Color4::new(a, light - a, b, 1.0));
+        self.gl.clear(&Color4::new(b, light - a, b, 1.0));
 
         self.shader.run(&self.gl);
         self.gl.vertex_attrib_f32_pointer(0, 2);
