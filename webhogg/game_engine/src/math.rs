@@ -1,5 +1,7 @@
 use std::ops;
 
+const EPSILON: f32 = 1e-8;
+
 #[derive(Clone, Copy, Debug)]
 pub struct Vec2 {
     pub x: f32,
@@ -104,7 +106,7 @@ impl std::cmp::PartialOrd for Vec2 {
 
 impl std::cmp::PartialEq for Vec2 {
     fn eq(&self, other: &Self) -> bool {
-        f32::abs(self.x - other.x) < 1e-8 && f32::abs(self.y - other.y) < 1e-8
+        f32::abs(self.x - other.x) < EPSILON && f32::abs(self.y - other.y) < EPSILON
     }
 }
 
