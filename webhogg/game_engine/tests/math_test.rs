@@ -96,14 +96,14 @@ fn test_greater_vec2_fail() {
 fn test_norm_vec2() {
     let a = Vec2 { x: 3.0, y: 4.0 };
 
-    assert!(f32::abs(a.norm() - 5.0) < 1e-8);
+    assert!(f32::abs(a.norm() - 5.0) < EPSILON);
 }
 
 #[test]
 fn test_norm2_vec2() {
     let a = Vec2 { x: 1.0, y: 2.0 };
 
-    assert!(f32::abs(a.norm2() - 5.0) < 1e-8);
+    assert!(f32::abs(a.norm2() - 5.0) < EPSILON);
 }
 
 #[test]
