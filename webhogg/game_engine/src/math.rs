@@ -1,6 +1,6 @@
 use std::ops;
 
-const EPSILON: f32 = 1e-8;
+pub const EPSILON: f32 = 1e-8;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Vec2 {
