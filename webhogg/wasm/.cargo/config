@@ -1,4 +1,5 @@
 [build]
 rustflags=[
-  "-C", "link-arg=--import-memory"
+  # "-C", "link-args=--no-entry --allow-undefined --strip-all --export-dynamic --import-memory --shared-memory --import-table --max-memory=1048576 --threads",
+  "-C", "link-args=--no-entry --allow-undefined --strip-all --export-dynamic --import-memory --shared-memory --max-memory=1073741824 --threads",
 ]

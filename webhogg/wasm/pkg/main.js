@@ -18,7 +18,7 @@ async function main() {
 
     let sharedMemory = new WebAssembly.Memory({
         initial: 1000,
-        maximum: 1000,
+        maximum: 1024,
         shared: true
     });
     sharedMemory.buffer = new SharedArrayBuffer(65000);

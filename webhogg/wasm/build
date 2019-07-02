@@ -1,8 +1,19 @@
 #!/bin/bash
 
-cargo build --target wasm32-unknown-unknown --release --verbose
-wasm-bindgen target/wasm32-unknown-unknown/release/webhogg_wasm.wasm --out-dir bin/ --no-typescript --target no-modules --remove-producers-section --remove-name-section
-wasm-opt -Oz bin/webhogg_wasm_bg.wasm -o bin/webhogg-wasm.wasm
-rm bin/webhogg_wasm_bg.wasm
-mv bin/webhogg_wasm.js bin/webhogg-wasm.js
-python update.py
+if cargo build --target wasm32-unknown-unknown --release --verbose; then
+  if wasm-bindgen target/wasm32-unknown-unknown/release/webhogg_wasm.wasm --out-dir bin/ --no-typescript --target no-modules --remove-producers-section --remove-name-section
+  then
+    if wasm-opt --memory-packing --remove-memory --remove-unused-brs --enable-threads -Oz bin/webhogg_wasm_bg.wasm -o bin/webhogg-wasm.wasm; then
+      python3 replace-wbg.py
+      rm bin/webhogg_wasm_bg.wasm
+      mv bin/webhogg_wasm.js bin/webhogg-wasm.js
+      echo SUCCESS
+    else
+      echo error: wasm-opt failed
+    fi
+  else
+    echo error: wasm-bindgen failed
+  fi
+else
+  echo error: cargo build failed
+fi

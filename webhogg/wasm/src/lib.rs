@@ -1,5 +1,5 @@
-#![feature(custom_inner_attributes)]
-#![feature(custom_attribute)]
+#![feature(custom_inner_attributes, custom_attribute, integer_atomics)]
+//#![cfg(any(target_feature = "atomics"))]
 
 mod logger;
 pub(crate) mod memory;

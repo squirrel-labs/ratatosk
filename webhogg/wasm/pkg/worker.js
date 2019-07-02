@@ -4,9 +4,9 @@ onmessage = function (e) {
     data = e.data;
 
     importScripts('../bin/webhogg-wasm.js');
-    wasm_bindgen.memory = data.memory;
+    console.log(data.memory);
     wasm_bindgen(data.source, data.memory).then(ctx => {
-        console.log(ctx.memory);
+        console.log('hey wasm');
         if (data.type === 'graphics') {
             wasm_bindgen.start_graphics(data.canvas);
             setInterval(function (...x) {
