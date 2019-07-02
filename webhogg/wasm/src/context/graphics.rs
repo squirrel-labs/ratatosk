@@ -70,8 +70,16 @@ impl GraphicsContext {
     }
 
     pub fn update(&mut self) -> Result<(), WasmError> {
+        let light = 0.5;
+        let speed = 30.0;
+
+        let a = (self.frame_nr as f32) / speed;
+        let a = f32::abs(f32::sin(a));
+        let b = f32::abs(f32::cos(a));
+        let (a, b) = (a * light, b * light);
+
         self.gl.set_viewport();
-        self.gl.clear(&Color4::new(0.6, 0.0, 0.6, 1.0));
+        self.gl.clear(&Color4::new(b, light - a, b, 1.0));
 
         self.shader.run(&self.gl);
         self.gl.bind_vertex_array(&self.vao);
