@@ -1,7 +1,5 @@
-﻿namespace DSALib.Characters
-{
-    public class Being : Entity
-    {
+﻿namespace DSALib.Characters {
+    public class Being : Entity {
         public int Lebenspunkte_Basis { get; set; } = 30;
 
         public int Lebenspunkte_Aktuell { get; set; } = 30;

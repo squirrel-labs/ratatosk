@@ -1,5 +1,4 @@
-﻿namespace DSALib.Commands
-{
+﻿namespace DSALib.Commands {
     /*public class Iam 
     {
 

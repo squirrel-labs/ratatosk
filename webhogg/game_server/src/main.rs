@@ -1,9 +1,6 @@
 mod group;
-mod maths;
 mod scribble_group;
 mod webhogg_group;
-mod webhogg_game;
-mod collide;
 mod lobby;
 mod server;
 mod backend_connection;

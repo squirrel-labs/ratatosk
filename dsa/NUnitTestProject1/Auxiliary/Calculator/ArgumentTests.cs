@@ -2,39 +2,29 @@ using DSALib.Auxiliary.Calculator;
 using Moq;
 using NUnit.Framework;
 
-namespace NUnitTest.Auxiliary.Calculator
-{
+namespace NUnitTest.Auxiliary.Calculator {
     [TestFixture]
-    public class ArgumentTests
-    {
-        private MockRepository mockRepository;
-
-
-
+    public class ArgumentTests {
         [SetUp]
-        public void SetUp()
-        {
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-
+        public void SetUp() {
+            mockRepository = new MockRepository(MockBehavior.Strict);
         }
 
         [TearDown]
-        public void TearDown()
-        {
-            this.mockRepository.VerifyAll();
+        public void TearDown() {
+            mockRepository.VerifyAll();
         }
 
-        private Argument CreateArgument()
-        {
+        private MockRepository mockRepository;
+
+        private Argument CreateArgument() {
             return new Argument("3");
         }
 
         [Test]
-        public void Solve_StateUnderTest_ExpectedBehavior()
-        {
+        public void Solve_StateUnderTest_ExpectedBehavior() {
             // Arrange
-            var unitUnderTest = this.CreateArgument();
+            var unitUnderTest = CreateArgument();
 
             // Act
             var result = unitUnderTest.Solve();
@@ -44,10 +34,9 @@ namespace NUnitTest.Auxiliary.Calculator
         }
 
         [Test]
-        public void ToString_StateUnderTest_ExpectedBehavior()
-        {
+        public void ToString_StateUnderTest_ExpectedBehavior() {
             // Arrange
-            var unitUnderTest = this.CreateArgument();
+            var unitUnderTest = CreateArgument();
 
             // Act
             var result = unitUnderTest.ToString();

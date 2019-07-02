@@ -1,8 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace Firebase.Database.Streaming
-{
+namespace Firebase.Database.Streaming {
     /// <summary>
     ///     When a regular <see cref="StreamReader" /> is used in a UWP app its <see cref="StreamReader.ReadLine" /> method
     ///     tends to take a long
@@ -11,8 +10,7 @@ namespace Firebase.Database.Streaming
     ///     in your UWP app. Use <see cref="FirebaseOptions" /> to inject an instance of this class into your
     ///     <see cref="FirebaseClient" />.
     /// </summary>
-    public class NonBlockingStreamReader : TextReader
-    {
+    public class NonBlockingStreamReader : TextReader {
         private const int DefaultBufferSize = 16000;
         private readonly byte[] buffer;
         private readonly int bufferSize;
@@ -21,8 +19,7 @@ namespace Firebase.Database.Streaming
 
         private string cachedData;
 
-        public NonBlockingStreamReader(Stream stream, int bufferSize = DefaultBufferSize)
-        {
+        public NonBlockingStreamReader(Stream stream, int bufferSize = DefaultBufferSize) {
             this.stream = stream;
             this.bufferSize = bufferSize;
             buffer = new byte[bufferSize];
@@ -30,12 +27,10 @@ namespace Firebase.Database.Streaming
             cachedData = string.Empty;
         }
 
-        public override string ReadLine()
-        {
+        public override string ReadLine() {
             var currentString = TryGetNewLine();
 
-            while (currentString == null)
-            {
+            while (currentString == null) {
                 var read = stream.Read(buffer, 0, bufferSize);
                 var str = Encoding.UTF8.GetString(buffer, 0, read);
 
@@ -46,12 +41,10 @@ namespace Firebase.Database.Streaming
             return currentString;
         }
 
-        private string TryGetNewLine()
-        {
+        private string TryGetNewLine() {
             var newLine = cachedData.IndexOf('\n');
 
-            if (newLine >= 0)
-            {
+            if (newLine >= 0) {
                 var r = cachedData.Substring(0, newLine + 1);
                 cachedData = cachedData.Remove(0, r.Length);
                 return r.Trim();

@@ -1,10 +1,8 @@
-﻿namespace Firebase.Database.Offline
-{
+﻿namespace Firebase.Database.Offline {
     /// <summary>
     ///     Specifies type of sync requested for given data.
     /// </summary>
-    public enum SyncOptions
-    {
+    public enum SyncOptions {
         /// <summary>
         ///     No sync needed for given data.
         /// </summary>

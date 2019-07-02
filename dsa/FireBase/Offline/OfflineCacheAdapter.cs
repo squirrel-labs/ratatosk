@@ -3,19 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Firebase.Database.Offline
-{
-    internal class OfflineCacheAdapter<TKey, T> : IDictionary<string, T>, IDictionary
-    {
+namespace Firebase.Database.Offline {
+    internal class OfflineCacheAdapter<TKey, T> : IDictionary<string, T>, IDictionary {
         private readonly IDictionary<string, OfflineEntry> database;
 
-        public OfflineCacheAdapter(IDictionary<string, OfflineEntry> database)
-        {
+        public OfflineCacheAdapter(IDictionary<string, OfflineEntry> database) {
             this.database = database;
         }
 
-        public void CopyTo(Array array, int index)
-        {
+        public void CopyTo(Array array, int index) {
             throw new NotImplementedException();
         }
 
@@ -23,12 +19,10 @@ namespace Firebase.Database.Offline
 
         public object SyncRoot { get; }
 
-        object IDictionary.this[object key]
-        {
+        object IDictionary.this[object key] {
             get => database[key.ToString()].Deserialize<T>();
 
-            set
-            {
+            set {
                 var keyString = key.ToString();
                 if (database.ContainsKey(keyString))
                     database[keyString] = new OfflineEntry(keyString, value, database[keyString].Priority,
@@ -42,25 +36,21 @@ namespace Firebase.Database.Offline
 
         ICollection IDictionary.Keys { get; }
 
-        public bool Contains(object key)
-        {
+        public bool Contains(object key) {
             return ContainsKey(key.ToString());
         }
 
-        IDictionaryEnumerator IDictionary.GetEnumerator()
-        {
+        IDictionaryEnumerator IDictionary.GetEnumerator() {
             throw new NotImplementedException();
         }
 
-        public void Remove(object key)
-        {
+        public void Remove(object key) {
             Remove(key.ToString());
         }
 
         public bool IsFixedSize => false;
 
-        public void Add(object key, object value)
-        {
+        public void Add(object key, object value) {
             Add(key.ToString(), (T) value);
         }
 
@@ -72,12 +62,10 @@ namespace Firebase.Database.Offline
 
         public ICollection<T> Values => database.Values.Select(o => o.Deserialize<T>()).ToList();
 
-        public T this[string key]
-        {
+        public T this[string key] {
             get => database[key].Deserialize<T>();
 
-            set
-            {
+            set {
                 if (database.ContainsKey(key))
                     database[key] = new OfflineEntry(key, value, database[key].Priority, database[key].SyncOptions);
                 else
@@ -85,62 +73,50 @@ namespace Firebase.Database.Offline
             }
         }
 
-        public IEnumerator<KeyValuePair<string, T>> GetEnumerator()
-        {
+        public IEnumerator<KeyValuePair<string, T>> GetEnumerator() {
             return database.Select(d => new KeyValuePair<string, T>(d.Key, d.Value.Deserialize<T>())).GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
+        IEnumerator IEnumerable.GetEnumerator() {
             return GetEnumerator();
         }
 
-        public void Add(KeyValuePair<string, T> item)
-        {
+        public void Add(KeyValuePair<string, T> item) {
             Add(item.Key, item.Value);
         }
 
-        public void Clear()
-        {
+        public void Clear() {
             database.Clear();
         }
 
-        public bool Contains(KeyValuePair<string, T> item)
-        {
+        public bool Contains(KeyValuePair<string, T> item) {
             return ContainsKey(item.Key);
         }
 
-        public void CopyTo(KeyValuePair<string, T>[] array, int arrayIndex)
-        {
+        public void CopyTo(KeyValuePair<string, T>[] array, int arrayIndex) {
             throw new NotImplementedException();
         }
 
-        public bool Remove(KeyValuePair<string, T> item)
-        {
+        public bool Remove(KeyValuePair<string, T> item) {
             return database.Remove(item.Key);
         }
 
-        public void Add(string key, T value)
-        {
+        public void Add(string key, T value) {
             database.Add(key, new OfflineEntry(key, value, 1, SyncOptions.None));
         }
 
-        public bool ContainsKey(string key)
-        {
+        public bool ContainsKey(string key) {
             return database.ContainsKey(key);
         }
 
-        public bool Remove(string key)
-        {
+        public bool Remove(string key) {
             return database.Remove(key);
         }
 
-        public bool TryGetValue(string key, out T value)
-        {
+        public bool TryGetValue(string key, out T value) {
             OfflineEntry val;
 
-            if (database.TryGetValue(key, out val))
-            {
+            if (database.TryGetValue(key, out val)) {
                 value = val.Deserialize<T>();
                 return true;
             }

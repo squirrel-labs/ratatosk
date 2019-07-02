@@ -1,7 +1,5 @@
-﻿namespace DSALib.Commands
-{
-    public enum CommandTypes
-    {
+﻿namespace DSALib.Commands {
+    public enum CommandTypes {
         Talent,
         Eigenschaft,
         Angriff,

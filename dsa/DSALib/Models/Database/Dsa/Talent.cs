@@ -1,20 +1,15 @@
 ﻿using System;
 
-namespace DSALib.Models.Database.Dsa
-{
-    public class Talent : DSALib.Models.Database.DataObject
-    {
-        public Talent()
-        {
+namespace DSALib.Models.Database.Dsa {
+    public class Talent : DataObject {
+        public Talent() {
         }
 
-        public Talent(string name)
-        {
+        public Talent(string name) {
             Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
-        public Talent(string name, string roll)
-        {
+        public Talent(string name, string roll) {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Roll = roll.Split('/');
         }

@@ -5,12 +5,10 @@ using DSACore.Auxiliary;
 using DSALib.DSA_Game.Characters;
 using DSALib.Models.Dsa;
 
-namespace DSALib.Auxiliary
-{
-    public static class TalentEnumerableExtension
-    {
-        public static string ProbenTest(this IEnumerable<Talent> List, Character c, string talentName, int erschwernis = 0)
-        {
+namespace DSALib.Auxiliary {
+    public static class TalentEnumerableExtension {
+        public static string ProbenTest(this IEnumerable<Talent> List, Character c, string talentName,
+            int erschwernis = 0) {
             var output = new StringBuilder();
             var sc = new SpellCorrect();
 
@@ -34,11 +32,9 @@ namespace DSALib.Auxiliary
             output.Append("         ");
             tap -= erschwernis;
             var gesamtErschwernis = tap;
-            if (gesamtErschwernis < 0)
-            {
+            if (gesamtErschwernis < 0) {
                 tap = 0;
-                for (var i = 0; i <= 2; i++)
-                {
+                for (var i = 0; i <= 2; i++) {
                     // foreach property, dice and tap 
                     var temp = Dice.Roll();
                     var eigenschaft = c.Eigenschaften[c.PropTable[props[i]]];
@@ -50,10 +46,8 @@ namespace DSALib.Auxiliary
 
                 if (tap >= 0) tap = 1;
             }
-            else
-            {
-                for (var i = 0; i <= 2; i++)
-                {
+            else {
+                for (var i = 0; i <= 2; i++) {
                     // foreach property, dice and tap 
                     var temp = Dice.Roll();
                     var eigenschaft = c.Eigenschaften[c.PropTable[props[i]]];

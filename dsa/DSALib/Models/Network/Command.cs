@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace DSALib.Models.Network
-{
-    public class Command
-    {
+namespace DSALib.Models.Network {
+    public class Command {
         public ulong GroupId { get; set; } = 0;
         public ulong CharId { get; set; }
         public string Name { get; set; }

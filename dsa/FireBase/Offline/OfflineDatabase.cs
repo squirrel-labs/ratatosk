@@ -5,13 +5,11 @@ using System.IO;
 using System.Linq;
 using LiteDB;
 
-namespace Firebase.Database.Offline
-{
+namespace Firebase.Database.Offline {
     /// <summary>
     ///     The offline database.
     /// </summary>
-    public class OfflineDatabase : IDictionary<string, OfflineEntry>
-    {
+    public class OfflineDatabase : IDictionary<string, OfflineEntry> {
         private readonly IDictionary<string, OfflineEntry> cache;
         private readonly LiteRepository db;
 
@@ -20,8 +18,7 @@ namespace Firebase.Database.Offline
         /// </summary>
         /// <param name="itemType"> The item type which is used to determine the database file name.  </param>
         /// <param name="filenameModifier"> Custom string which will get appended to the file name. </param>
-        public OfflineDatabase(Type itemType, string filenameModifier)
-        {
+        public OfflineDatabase(Type itemType, string filenameModifier) {
             var fullName = GetFileName(itemType.ToString());
             if (fullName.Length > 100) fullName = fullName.Substring(0, 100);
 
@@ -73,12 +70,10 @@ namespace Firebase.Database.Offline
         /// </summary>
         /// <param name="key">The key of the element to get or set.</param>
         /// <returns> The element with the specified key. </returns>
-        public OfflineEntry this[string key]
-        {
+        public OfflineEntry this[string key] {
             get => cache[key];
 
-            set
-            {
+            set {
                 cache[key] = value;
                 db.Upsert(value);
             }
@@ -88,13 +83,11 @@ namespace Firebase.Database.Offline
         ///     Returns an enumerator that iterates through the collection.
         /// </summary>
         /// <returns> An enumerator that can be used to iterate through the collection. </returns>
-        public IEnumerator<KeyValuePair<string, OfflineEntry>> GetEnumerator()
-        {
+        public IEnumerator<KeyValuePair<string, OfflineEntry>> GetEnumerator() {
             return cache.GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
+        IEnumerator IEnumerable.GetEnumerator() {
             return GetEnumerator();
         }
 
@@ -102,16 +95,14 @@ namespace Firebase.Database.Offline
         ///     Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1" />.
         /// </summary>
         /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1" />.</param>
-        public void Add(KeyValuePair<string, OfflineEntry> item)
-        {
+        public void Add(KeyValuePair<string, OfflineEntry> item) {
             Add(item.Key, item.Value);
         }
 
         /// <summary>
         ///     Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1" />.
         /// </summary>
-        public void Clear()
-        {
+        public void Clear() {
             cache.Clear();
             db.Delete<OfflineEntry>(LiteDB.Query.All());
         }
@@ -124,8 +115,7 @@ namespace Firebase.Database.Offline
         ///     True if <paramref name="item" /> is found in the <see cref="T:System.Collections.Generic.ICollection`1" />;
         ///     otherwise, false.
         /// </returns>
-        public bool Contains(KeyValuePair<string, OfflineEntry> item)
-        {
+        public bool Contains(KeyValuePair<string, OfflineEntry> item) {
             return ContainsKey(item.Key);
         }
 
@@ -139,8 +129,7 @@ namespace Firebase.Database.Offline
         ///     zero-based indexing.
         /// </param>
         /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-        public void CopyTo(KeyValuePair<string, OfflineEntry>[] array, int arrayIndex)
-        {
+        public void CopyTo(KeyValuePair<string, OfflineEntry>[] array, int arrayIndex) {
             cache.CopyTo(array, arrayIndex);
         }
 
@@ -154,8 +143,7 @@ namespace Firebase.Database.Offline
         ///     <see cref="T:System.Collections.Generic.ICollection`1" />; otherwise, false. This method also returns false if
         ///     <paramref name="item" /> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1" />.
         /// </returns>
-        public bool Remove(KeyValuePair<string, OfflineEntry> item)
-        {
+        public bool Remove(KeyValuePair<string, OfflineEntry> item) {
             return Remove(item.Key);
         }
 
@@ -168,8 +156,7 @@ namespace Firebase.Database.Offline
         ///     True if the <see cref="T:System.Collections.Generic.IDictionary`2" /> contains an element with the key;
         ///     otherwise, false.
         /// </returns>
-        public bool ContainsKey(string key)
-        {
+        public bool ContainsKey(string key) {
             return cache.ContainsKey(key);
         }
 
@@ -178,8 +165,7 @@ namespace Firebase.Database.Offline
         /// </summary>
         /// <param name="key">The object to use as the key of the element to add.</param>
         /// <param name="value">The object to use as the value of the element to add.</param>
-        public void Add(string key, OfflineEntry value)
-        {
+        public void Add(string key, OfflineEntry value) {
             cache.Add(key, value);
             db.Insert(value);
         }
@@ -192,8 +178,7 @@ namespace Firebase.Database.Offline
         ///     True if the element is successfully removed; otherwise, false.  This method also returns false if
         ///     <paramref name="key" /> was not found in the original <see cref="T:System.Collections.Generic.IDictionary`2" />.
         /// </returns>
-        public bool Remove(string key)
-        {
+        public bool Remove(string key) {
             cache.Remove(key);
             return db.Delete<OfflineEntry>(key);
         }
@@ -211,13 +196,11 @@ namespace Firebase.Database.Offline
         ///     True if the object that implements <see cref="T:System.Collections.Generic.IDictionary`2" /> contains an
         ///     element with the specified key; otherwise, false.
         /// </returns>
-        public bool TryGetValue(string key, out OfflineEntry value)
-        {
+        public bool TryGetValue(string key, out OfflineEntry value) {
             return cache.TryGetValue(key, out value);
         }
 
-        private string GetFileName(string fileName)
-        {
+        private string GetFileName(string fileName) {
             var invalidChars = new[] {'`', '[', ',', '='};
             foreach (var c in invalidChars.Concat(Path.GetInvalidFileNameChars()).Distinct())
                 fileName = fileName.Replace(c, '_');

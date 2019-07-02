@@ -1,9 +1,7 @@
 ﻿using DSALib.Characters;
 
-namespace DSALib.DSA_Game.Characters
-{
-    public class SaveChar
-    {
+namespace DSALib.DSA_Game.Characters {
+    public class SaveChar {
         public string Name { get; set; }
 
         public int Lebenspunkte_Aktuell { get; set; }
@@ -12,10 +10,8 @@ namespace DSALib.DSA_Game.Characters
 
         public int Astralpunkte_Aktuell { get; set; }
 
-        public static SaveChar FromICharacter(ICharacter c)
-        {
-            return new SaveChar
-            {
+        public static SaveChar FromICharacter(ICharacter c) {
+            return new SaveChar {
                 Astralpunkte_Aktuell = c.Astralpunkte_Aktuell,
                 Ausdauer_Aktuell = c.Ausdauer_Aktuell,
                 Lebenspunkte_Aktuell = c.Lebenspunkte_Aktuell,
@@ -25,10 +21,8 @@ namespace DSALib.DSA_Game.Characters
     }
 
 
-    public static class ICharExtension
-    {
-        public static void Update(this ICharacter c, SaveChar s)
-        {
+    public static class ICharExtension {
+        public static void Update(this ICharacter c, SaveChar s) {
             c.Astralpunkte_Aktuell = s.Astralpunkte_Aktuell;
             c.Ausdauer_Aktuell = s.Ausdauer_Aktuell;
             c.Lebenspunkte_Aktuell = s.Lebenspunkte_Aktuell;
