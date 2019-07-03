@@ -3,17 +3,17 @@ use log::*;
 use crate::*;
 
 #[wasm_bindgen]
-pub fn start_logic() -> usize {
+pub fn start_logic() {
     logger::init_logger();
     info!("logic: wasm entry-point reached");
 
-    match context::logic::LogicContext::new() {
-        Ok(ctx) => Box::into_raw(Box::new(ctx)) as usize,
+    let ctx = match context::logic::LogicContext::new() {
+        Ok(ctx) => ctx,
         Err(e) => {
             error!("logic {}", e);
             panic!()
         }
-    }
+    };
 }
 
 #[wasm_bindgen]
