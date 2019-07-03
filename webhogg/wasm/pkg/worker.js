@@ -10,17 +10,19 @@ onmessage = function (e) {
         if (data.type === 'graphics') {
             wasm_bindgen.start_graphics(data.canvas);
             setInterval(function (...x) {
-                console.log('gmem ', wasm_bindgen.memory);
+                //console.log('gmem ', wasm_bindgen.memory);
                 /*console.log('mimi graphics', WebAssembly.Module.imports(
                     wasm_bindgen.__wbindgen_wasm_module)
                 );*/
-                return wasm_bindgen.loop_graphics(...x);
+                let y = wasm_bindgen.loop_graphics(...x);
+                console.log('graphics counter: ', y);
             }, data.dt);
         } else if (data.type === 'logic') {
             wasm_bindgen.start_logic();
             setInterval(function (...x) {
-                console.log('lmem ', wasm_bindgen.memory);
-                return wasm_bindgen.loop_logic(...x);
+                //console.log('lmem ', wasm_bindgen.memory);
+                let z = wasm_bindgen.loop_logic(...x);
+                console.log('logic counter: ', z);
             }, data.dt);
         }
 

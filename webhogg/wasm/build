@@ -5,7 +5,6 @@ if cargo build --target wasm32-unknown-unknown --release --verbose; then
   then
     if wasm-opt --memory-packing --remove-memory --remove-unused-brs --enable-threads -Oz bin/webhogg_wasm_bg.wasm -o bin/webhogg-wasm.wasm; then
     #if wasm-opt --enable-threads -Oz bin/webhogg_wasm_bg.wasm -o bin/webhogg-wasm.wasm; then
-      #python3 replace-wbg.py
       rm bin/webhogg_wasm_bg.wasm
       mv bin/webhogg_wasm.js bin/webhogg-wasm.js
       echo SUCCESS

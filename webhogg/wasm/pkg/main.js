@@ -29,7 +29,7 @@ async function main() {
             source: source,
             canvas: offCanvas,
             memory: sharedMemory,
-            dt: 16 },
+            dt: 100 },
         { type: 'logic',
             source: source,
             canvas: [],
