@@ -125,7 +125,6 @@ fn test_normalized_vec2() {
     assert_eq!(a.normalized(), b);
 }
 
-
 #[test]
 fn test_add_aabox_vec2() {
     let a = Vec2 { x: 1.0, y: 7.5 };
@@ -179,7 +178,6 @@ fn test_sub_assign_aabox_vec2() {
 
     assert_eq!(aa_box, bb_box);
 }
-
 
 #[test]
 fn test_add_rbox_vec2() {
