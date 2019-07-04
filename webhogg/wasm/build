@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 cargo build --target wasm32-unknown-unknown --release --verbose
 wasm-bindgen target/wasm32-unknown-unknown/release/webhogg_wasm.wasm --out-dir bin/ --no-typescript --target no-modules --remove-producers-section --remove-name-section
