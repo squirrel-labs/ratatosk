@@ -1,3 +1,5 @@
+[![Build Status](https://jenkins.kobert.dev/job/Ratatosk/badge/icon)](https://jenkins.kobert.dev/job/Ratatosk/)
+
 # DiscoBot
 Discobot is a Plattform for Online Games. There are currently two Projects under development:
 
