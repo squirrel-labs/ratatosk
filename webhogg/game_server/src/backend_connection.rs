@@ -1,8 +1,8 @@
-use reqwest::{Response, Client, Url, UrlError, Error as ReqError};
-use std::sync::mpsc::{Sender, Receiver};
-use std::sync::mpsc;
-use crate::server::{UserId, Token};
 use crate::group::GroupId;
+use crate::server::{Token, UserId};
+use reqwest::{Client, Error as ReqError, Response, Url, UrlError};
+use std::sync::mpsc;
+use std::sync::mpsc::{Receiver, Sender};
 
 pub struct BackendConnection {
     host: String,
@@ -44,10 +44,9 @@ impl BackendConnection {
     }
 
     pub fn new(host: &str) -> Self {
-        let (req_sender, req_rec): (Sender<RequestData>, Receiver<RequestData>)
-                                    = mpsc::channel();
-        let (res_sender, res_rec): (Sender<ResponseResult>, Receiver<ResponseResult>)
-                                    = mpsc::channel();
+        let (req_sender, req_rec): (Sender<RequestData>, Receiver<RequestData>) = mpsc::channel();
+        let (res_sender, res_rec): (Sender<ResponseResult>, Receiver<ResponseResult>) =
+            mpsc::channel();
         std::thread::spawn(move || Self::run_background(req_rec, res_sender));
         BackendConnection {
             host: host.to_string(),
@@ -58,17 +57,23 @@ impl BackendConnection {
     }
 
     pub fn request(&self, location: &str) -> Result<(), UrlError> {
-        Ok(self.req_sender.send(Url::parse(&format!("{}{}", self.host, location))?).unwrap())
+        Ok(self
+            .req_sender
+            .send(Url::parse(&format!("{}{}", self.host, location))?)
+            .unwrap())
     }
 
     pub fn get_response(&self) -> ResponseResult {
         self.res_rec.recv().unwrap()
     }
-    
+
     pub fn validate_token(&mut self, token: &Token) -> TokenValidity {
         let location = format!("/api/lobby/tokens/{}", token);
-        self.request(&location).map_err(|err| BackendError::UrlError(err))?;
-        let response = self.get_response().map_err(|err| BackendError::RequestError(err))?;
+        self.request(&location)
+            .map_err(|err| BackendError::UrlError(err))?;
+        let response = self
+            .get_response()
+            .map_err(|err| BackendError::RequestError(err))?;
         if response.status().is_success() {
             // zu Testzwecken werden noch keine JSON-Daten deserialisiert
             // Dennis Server gibt ja noch nix zurück

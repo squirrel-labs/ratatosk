@@ -1,15 +1,18 @@
-use websocket::{OwnedMessage,
+use crate::backend_connection::BackendConnection;
+use crate::lobby::Lobby;
+use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
+use std::sync::{
+    mpsc,
+    mpsc::{Receiver, Sender},
+};
+use websocket::{
+    client::sync::Client,
+    receiver, sender,
+    server::{sync::AcceptResult, NoTlsAcceptor},
     stream::sync::Splittable,
     sync::Server,
-    client::sync::Client,
-    server::{NoTlsAcceptor,
-        sync::AcceptResult},
-    receiver, sender};
-use std::net::{SocketAddr, ToSocketAddrs, TcpStream};
-use std::sync::{mpsc,
-                mpsc::{Sender, Receiver}};
-use crate::lobby::Lobby;
-use crate::backend_connection::BackendConnection;
+    OwnedMessage,
+};
 
 pub type ClientReceiver = receiver::Reader<<TcpStream as Splittable>::Reader>;
 pub type ClientSender = sender::Writer<<TcpStream as Splittable>::Writer>;
@@ -57,16 +60,11 @@ impl GameClient {
     fn from_raw(client: Client<TcpStream>) -> Result<Self, ()> {
         let addr = client.peer_addr().map_err(|_| ())?;
         info!("got a client connection from: {}", addr);
-        Ok(GameClient {
-            addr,
-            client,
-        })
+        Ok(GameClient { addr, client })
     }
 
     fn require_token(&mut self) -> Option<Token> {
-        let message = self.client
-                 .recv_message()
-                 .ok()?;
+        let message = self.client.recv_message().ok()?;
         if let OwnedMessage::Text(text) = message {
             text.parse().ok()
         } else {
@@ -114,20 +112,24 @@ impl GameServer {
         if let Some(token) = token {
             let result = self.backend.validate_token(&token);
             match result {
-                Err(err) => warn!("client's token {} is not valid: '{:?}'",
-                                  token, err),
+                Err(err) => warn!("client's token {} is not valid: '{:?}'", token, err),
                 Ok(result) => {
                     debug!("client validation was successfull");
                     let user_id = result.user_id;
                     let group_id = result.group_id;
                     let group_type = result.group_type;
                     let group_name = result.group_name;
-                    debug!("add client: (id:{}, token:{}, host:{}) to \"{}\"",
-                        user_id, token, client.host_name(), group_name);
+                    debug!(
+                        "add client: (id:{}, token:{}, host:{}) to \"{}\"",
+                        user_id,
+                        token,
+                        client.host_name(),
+                        group_name
+                    );
                     //clients.lock().unwrap().insert(token, client);
-                    self.lobby.add_client(&group_type, group_id,
-                                     &group_name, user_id, client)
-                              .unwrap_or_else(|e| warn!("failed to add client: {}", e));
+                    self.lobby
+                        .add_client(&group_type, group_id, &group_name, user_id, client)
+                        .unwrap_or_else(|e| warn!("failed to add client: {}", e));
                 }
             }
         } else {
@@ -136,25 +138,25 @@ impl GameServer {
     }
 
     fn read_clients(&self) -> Receiver<ClientConnection> {
-        let (sen, rec): (Sender<ClientConnection>, Receiver<ClientConnection>)
-                     = mpsc::channel();
+        let (sen, rec): (Sender<ClientConnection>, Receiver<ClientConnection>) = mpsc::channel();
         let addr = self.addr;
-        std::thread::spawn(move || {
-            match Self::handle_requests(addr, &sen) {
-                Err(e) => sen.send(Err(e)).unwrap(),
-                _ => (),
-            }
+        std::thread::spawn(move || match Self::handle_requests(addr, &sen) {
+            Err(e) => sen.send(Err(e)).unwrap(),
+            _ => (),
         });
         rec
     }
 
-    fn handle_requests(addr: SocketAddr, sen: &Sender<ClientConnection>) -> Result<(), GameServerError> {
+    fn handle_requests(
+        addr: SocketAddr,
+        sen: &Sender<ClientConnection>,
+    ) -> Result<(), GameServerError> {
         let server = match Server::<NoTlsAcceptor>::bind(addr) {
             Ok(v) => v,
             Err(e) => {
                 error!("websocket binding error");
                 Err(GameServerError::BindError(e))?
-            },
+            }
         };
         info!("webserver is being launched");
         for req in server {
@@ -173,13 +175,11 @@ impl GameServer {
                     Err(GameServerError::InvalidProtocolError)
                 } else {
                     match req.use_protocol(PROTOCOL).accept() {
-                        Ok(client) => {
-                            match GameClient::from_raw(client) {
-                                Ok(client) => Ok(client),
-                                Err(_) => {
-                                    error!("could not create a client");
-                                    Err(GameServerError::HandshakeRequestError)
-                                }
+                        Ok(client) => match GameClient::from_raw(client) {
+                            Ok(client) => Ok(client),
+                            Err(_) => {
+                                error!("could not create a client");
+                                Err(GameServerError::HandshakeRequestError)
                             }
                         },
                         Err((_, e)) => {
@@ -188,7 +188,7 @@ impl GameServer {
                         }
                     }
                 }
-            },
+            }
             Err(_) => {
                 warn!("invalid client request");
                 Err(GameServerError::HandshakeRequestError)
