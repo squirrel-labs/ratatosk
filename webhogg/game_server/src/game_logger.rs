@@ -12,19 +12,20 @@ fn color_level(level: log::Level) -> colored::ColoredString {
 }
 
 pub fn init_logger() {
-    fern::Dispatch::new().format(|out, message, record|{
-        out.finish(format_args!(
+    fern::Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
                 "{} {} > {}",
                 color_level(record.level()),
                 record.target(),
                 message
-                )
-            )
+            ))
         })
         .level(log::LevelFilter::Debug)
         .level_for("hyper", log::LevelFilter::Off)
         .level_for("tokio_reactor", log::LevelFilter::Off)
         .level_for("reqwest", log::LevelFilter::Off)
         .chain(std::io::stdout())
-        .apply().unwrap();
+        .apply()
+        .unwrap();
 }
