@@ -133,7 +133,7 @@ impl Vec2 {
 
     /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has length 1.
     pub fn normalized(&self) -> Vec2 {
-        self / self.len()
+        *self / self.norm()
     }
 }
 
