@@ -1,6 +1,6 @@
-use wasm_bindgen::prelude::*;
-use log::*;
 use crate::*;
+use log::*;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn start_graphics(canvas: web_sys::OffscreenCanvas) {
@@ -19,7 +19,11 @@ pub fn start_graphics(canvas: web_sys::OffscreenCanvas) {
 
 #[wasm_bindgen]
 pub fn loop_graphics() {
-    context::get_graphics().update()
+    crate::memory::increase_memory_val();
+    debug!("mem2: {}", crate::memory::get_memory_ptr());
+
+    context::get_graphics()
+        .update()
         .map_err(|e| error!("gaphics loop {}", e))
         .unwrap();
 }

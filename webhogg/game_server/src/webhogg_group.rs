@@ -1,14 +1,12 @@
 use crate::group::{Group, GroupId};
-use crate::server::{UserId, GameClient,
-                    ClientSender, ClientReceiver,
-                    GameServerError};
+use crate::server::{ClientReceiver, ClientSender, GameClient, GameServerError, UserId};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
 pub struct WebhoggGroup {
     id: GroupId,
     name: String,
-    senders: Arc<Mutex<HashMap<UserId, ClientSender>>>
+    senders: Arc<Mutex<HashMap<UserId, ClientSender>>>,
 }
 
 impl Group for WebhoggGroup {
@@ -30,11 +28,11 @@ impl Group for WebhoggGroup {
 
     fn add_client(&mut self, id: UserId, client: GameClient) -> Result<(), GameServerError> {
         if self.senders.lock().unwrap().len() > 1 {
-            return Err(GameServerError::GroupError(
-                    format!("user {} was not able to join the {} group, {}",
-                            "because the client limit has been exceeded",
-                            id, self.name)));
-        } 
+            return Err(GameServerError::GroupError(format!(
+                "user {} was not able to join the {} group, {}",
+                "because the client limit has been exceeded", id, self.name
+            )));
+        }
         debug!("user {} joined the group {}:'{}'", id, self.id, self.name);
         let (sen, rec) = client.split();
         self.senders.lock().unwrap().insert(id, sen);
@@ -47,21 +45,30 @@ impl Group for WebhoggGroup {
 
 impl WebhoggGroup {
     pub fn new(id: GroupId, name: String) -> Self {
-        Self { id, name, senders: Arc::new(Mutex::new(HashMap::new())) }
+        Self {
+            id,
+            name,
+            senders: Arc::new(Mutex::new(HashMap::new())),
+        }
     }
 
-    fn broadcast_clients(self_uid: UserId, mut rec: ClientReceiver, senders_mutex: Arc<Mutex<HashMap<UserId, ClientSender>>>) {
+    fn broadcast_clients(
+        self_uid: UserId,
+        mut rec: ClientReceiver,
+        senders_mutex: Arc<Mutex<HashMap<UserId, ClientSender>>>,
+    ) {
         loop {
             let message = match rec.recv_message() {
                 Ok(x) => x,
-                _ => break
+                _ => break,
             };
             //trace!("got message: '{:?}'", message);
             let mut senders = senders_mutex.lock().unwrap();
             for (uid, sender) in senders.iter_mut() {
                 if self_uid != *uid {
-                    sender.send_message(&message)
-                        .unwrap_or_else(|_| debug!("tried to send message to {}, but failed", *uid));
+                    sender.send_message(&message).unwrap_or_else(|_| {
+                        debug!("tried to send message to {}, but failed", *uid)
+                    });
                 }
             }
         }

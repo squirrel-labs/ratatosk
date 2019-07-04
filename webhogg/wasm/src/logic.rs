@@ -1,6 +1,6 @@
-use wasm_bindgen::prelude::*;
-use log::*;
 use crate::*;
+use log::*;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn start_logic() {
@@ -9,11 +9,12 @@ pub fn start_logic() {
 
     match context::logic::LogicContext::new() {
         Ok(ctx) => context::set_logic(ctx),
-        Err(e) => error!("logic {}", e)
+        Err(e) => error!("logic {}", e),
     }
 }
 
 #[wasm_bindgen]
 pub fn loop_logic() {
-    debug!("logic: loopin'");
+    debug!("mem1: {}", crate::memory::get_memory_ptr());
+    debug!("val: {}", crate::memory::get_memory());
 }
