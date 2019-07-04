@@ -1,6 +1,6 @@
-use wasm_bindgen::prelude::*;
-use log::*;
 use crate::*;
+use log::*;
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn start_logic() {
@@ -9,7 +9,7 @@ pub fn start_logic() {
 
     match context::logic::LogicContext::new() {
         Ok(ctx) => context::set_logic(ctx),
-        Err(e) => error!("logic {}", e)
+        Err(e) => error!("logic {}", e),
     }
 }
 

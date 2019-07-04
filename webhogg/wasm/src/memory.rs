@@ -1,6 +1,6 @@
+use std::convert::TryInto;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use std::convert::TryInto;
 
 #[derive(Debug)]
 pub struct SharedMemory {
@@ -19,20 +19,15 @@ impl SharedMemory {
 static mut MEMORY: SharedMemory = SharedMemory { num: 0 };
 
 pub fn increase_memory_val() {
-    unsafe {
-        MEMORY.incr()
-    }
+    unsafe { MEMORY.incr() }
 }
-
 
 #[no_mangle]
 pub fn get_memory() -> u32 {
-    unsafe {
-        MEMORY.get()
-    }
+    unsafe { MEMORY.get() }
 }
 
 #[no_mangle]
 pub fn get_memory_ptr() -> usize {
-    (unsafe {(&mut MEMORY) as *mut SharedMemory }) as usize
+    (unsafe { (&mut MEMORY) as *mut SharedMemory }) as usize
 }

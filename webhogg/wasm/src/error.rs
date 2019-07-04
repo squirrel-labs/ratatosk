@@ -5,7 +5,7 @@ pub enum WasmError {
     WebGl2ContextCreation(String),
     Shader(String),
     WebGlBuffer(String),
-    WebGlUniform(String)
+    WebGlUniform(String),
 }
 
 impl std::fmt::Display for WasmError {
@@ -24,7 +24,9 @@ impl Error for WasmError {
         }
     }
 
-    fn source(&self) -> Option<&'static dyn Error> { None }
+    fn source(&self) -> Option<&'static dyn Error> {
+        None
+    }
 }
 
 impl WasmError {
