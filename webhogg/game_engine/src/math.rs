@@ -2,9 +2,12 @@ use std::ops;
 
 pub const EPSILON: f32 = 1e-8;
 
+/// A 2-dimensional euclidean vector.
 #[derive(Clone, Copy, Debug)]
 pub struct Vec2 {
+    /// The x coordinate.
     pub x: f32,
+    /// The y coordinate.
     pub y: f32,
 }
 
@@ -113,28 +116,28 @@ impl std::cmp::PartialEq for Vec2 {
 impl std::cmp::Eq for Vec2 {}
 
 impl Vec2 {
+    /// Returns the euclidean norm of the vector.
     pub fn norm(&self) -> f32 {
         f32::hypot(self.x, self.y)
     }
 
+    /// Returns the square of the euclidean norm of the vector.
     pub fn norm2(&self) -> f32 {
         self.dot(*self)
     }
 
+    /// Returns the dot product.
     pub fn dot(&self, other: Vec2) -> f32 {
         self.x * other.x + self.y * other.y
     }
 
+    /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has length 1.
     pub fn normalized(&self) -> Vec2 {
-        let len = self.norm();
-        Vec2 {
-            x: self.x / len,
-            y: self.y / len,
-        }
+        self / self.len()
     }
 }
 
-/// axis-aligned box
+/// An axis-aligned box.
 #[derive(Clone, Copy, Debug)]
 pub struct AABox {
     pub pos: Vec2,
@@ -182,10 +185,10 @@ impl std::cmp::PartialEq for AABox {
 
 impl std::cmp::Eq for AABox {}
 
-/// rotated box
+/// A rotated box.
 #[derive(Clone, Copy, Debug)]
 pub struct RBox {
-    /// origin
+    /// The origin.
     pub pos: Vec2,
     /// Vector1
     pub v1: Vec2,
@@ -194,12 +197,13 @@ pub struct RBox {
 }
 
 impl RBox {
+    /// Creates a new rotated box from a position, an orientation and a width.
     pub fn new(pos: Vec2, orientation: Vec2, width: f32) -> Self {
         let scale = width / orientation.norm();
         let orth = Vec2 {
-            x: orientation.x / scale,
-            y: -orientation.y / scale,
-        };
+            x: orientation.x,
+            y: -orientation.y,
+        } / scale;
         Self {
             pos: pos,
             v1: orientation,

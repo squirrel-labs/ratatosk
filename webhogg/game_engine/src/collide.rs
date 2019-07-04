@@ -1,5 +1,6 @@
 use crate::math::{Vec2, AABox, RBox};
 
+/// A trait for objects that can collide with other objects.
 pub trait Collide<Rhs> {
     fn collides(&self, other: &Rhs) -> bool;
 }
