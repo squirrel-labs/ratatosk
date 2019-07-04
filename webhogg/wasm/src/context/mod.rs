@@ -1,8 +1,10 @@
-mod shader;
 mod draw_sprite;
-mod webgl;
 pub mod graphics;
 pub mod logic;
+pub mod matrix;
+pub mod matrix_mul;
+mod shader;
+mod webgl;
 
 use graphics::GraphicsContext;
 use logic::LogicContext;

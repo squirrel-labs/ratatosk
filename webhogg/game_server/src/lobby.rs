@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::group::{Group, GroupId};
 use crate::scribble_group::ScribbleGroup;
 
-use crate::server::{UserId, GameClient, GameServerError};
+use crate::server::{GameClient, GameServerError, UserId};
 
 pub struct Lobby {
     groups: HashMap<GroupId, Box<Group>>,
@@ -19,9 +19,7 @@ impl Lobby {
 
     fn generate_group(group_type: &str, id: GroupId, name: &str) -> Option<Box<Group>> {
         match group_type {
-            "scribble" => {
-                Some(Box::new(ScribbleGroup::new(id, name.to_string())))
-            },
+            "scribble" => Some(Box::new(ScribbleGroup::new(id, name.to_string()))),
             _ => None,
         }
     }
@@ -30,12 +28,23 @@ impl Lobby {
         self.groups.insert(group.id(), group);
     }
 
-    pub fn add_client(&mut self, group_type: &str, group_id: GroupId, group_name: &str,
-                   user_id: UserId, client: GameClient) -> Result<(), GameServerError> {
+    pub fn add_client(
+        &mut self,
+        group_type: &str,
+        group_id: GroupId,
+        group_name: &str,
+        user_id: UserId,
+        client: GameClient,
+    ) -> Result<(), GameServerError> {
         if !self.groups.contains_key(&group_id) {
             let mut group = match Self::generate_group(group_type, group_id, group_name) {
-                    Some(x) => x,
-                    _ => return Err(GameServerError::GroupCreationError(format!("failed to generate '{}' group", group_type))),
+                Some(x) => x,
+                _ => {
+                    return Err(GameServerError::GroupCreationError(format!(
+                        "failed to generate '{}' group",
+                        group_type
+                    )))
+                }
             };
             group.run();
             self.groups.insert(group_id, group);
@@ -45,13 +54,15 @@ impl Lobby {
     }
 
     pub fn iter<'b>(&'b self) -> GroupIterator<'b> {
-        GroupIterator { groups: self.groups.values() }
+        GroupIterator {
+            groups: self.groups.values(),
+        }
     }
 }
 
 #[allow(dead_code)]
 pub struct GroupIterator<'a> {
-    groups: std::collections::hash_map::Values<'a, GroupId, Box<Group>>
+    groups: std::collections::hash_map::Values<'a, GroupId, Box<Group>>,
 }
 
 impl<'a> Iterator for GroupIterator<'a> {
