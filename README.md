@@ -1,6 +1,3 @@
-
-[![Build Status](https://jenkins.kobert.dev/job/Ratatosk/badge/icon)](https://jenkins.kobert.dev/job/Ratatosk/)
-
 [![Build Status](https://jenkins.kobert.dev/buildStatus/icon?job=Ratatosk)](https://jenkins.kobert.dev/job/Ratatosk/)
 
 # DiscoBot
