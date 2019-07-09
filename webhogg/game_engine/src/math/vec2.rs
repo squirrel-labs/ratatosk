@@ -11,7 +11,8 @@ pub struct Vec2 {
 
 impl ops::Add for Vec2 {
     type Output = Self;
-    fn add(self, other: Self) -> Self {
+
+    fn add(self, other: Self) -> Self::Output {
         Self {
             x: self.x + other.x,
             y: self.y + other.y,
@@ -28,7 +29,8 @@ impl ops::AddAssign for Vec2 {
 
 impl ops::Sub for Vec2 {
     type Output = Self;
-    fn sub(self, other: Self) -> Self {
+
+    fn sub(self, other: Self) -> Self::Output {
         Self {
             x: self.x - other.x,
             y: self.y - other.y,
@@ -45,7 +47,8 @@ impl ops::SubAssign for Vec2 {
 
 impl ops::Neg for Vec2 {
     type Output = Self;
-    fn neg(self) -> Self {
+
+    fn neg(self) -> Self::Output {
         Self {
             x: -self.x,
             y: -self.y,
@@ -55,7 +58,8 @@ impl ops::Neg for Vec2 {
 
 impl ops::Mul<f32> for Vec2 {
     type Output = Self;
-    fn mul(self, scale: f32) -> Self {
+
+    fn mul(self, scale: f32) -> Self::Output {
         Self {
             x: self.x * scale,
             y: self.y * scale,
@@ -65,7 +69,8 @@ impl ops::Mul<f32> for Vec2 {
 
 impl ops::Mul for Vec2 {
     type Output = Self;
-    fn mul(self, other: Self) -> Self {
+
+    fn mul(self, other: Self) -> Self::Output {
         Self {
             x: self.x * other.x,
             y: self.y * other.y,
@@ -75,7 +80,8 @@ impl ops::Mul for Vec2 {
 
 impl ops::Div<f32> for Vec2 {
     type Output = Self;
-    fn div(self, scale: f32) -> Self {
+
+    fn div(self, scale: f32) -> Self::Output {
         Self {
             x: self.x / scale,
             y: self.y / scale,
@@ -85,7 +91,8 @@ impl ops::Div<f32> for Vec2 {
 
 impl ops::Div for Vec2 {
     type Output = Self;
-    fn div(self, other: Vec2) -> Self {
+
+    fn div(self, other: Vec2) -> Self::Output {
         Self {
             x: self.x / other.x,
             y: self.y / other.y,

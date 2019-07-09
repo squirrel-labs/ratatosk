@@ -13,7 +13,8 @@ pub struct Vec3 {
 
 impl ops::Add for Vec3 {
     type Output = Self;
-    fn add(self, other: Self) -> Self {
+
+    fn add(self, other: Self) -> Self::Output {
         Self {
             x: self.x + other.x,
             y: self.y + other.y,
@@ -32,7 +33,8 @@ impl ops::AddAssign for Vec3 {
 
 impl ops::Sub for Vec3 {
     type Output = Self;
-    fn sub(self, other: Self) -> Self {
+
+    fn sub(self, other: Self) -> Self::Output {
         Self {
             x: self.x - other.x,
             y: self.y - other.y,
@@ -51,7 +53,8 @@ impl ops::SubAssign for Vec3 {
 
 impl ops::Neg for Vec3 {
     type Output = Self;
-    fn neg(self) -> Self {
+
+    fn neg(self) -> Self::Output {
         Self {
             x: -self.x,
             y: -self.y,
@@ -62,7 +65,8 @@ impl ops::Neg for Vec3 {
 
 impl ops::Mul<f32> for Vec3 {
     type Output = Self;
-    fn mul(self, scale: f32) -> Self {
+
+    fn mul(self, scale: f32) -> Self::Output {
         Self {
             x: self.x * scale,
             y: self.y * scale,
@@ -73,7 +77,8 @@ impl ops::Mul<f32> for Vec3 {
 
 impl ops::Mul for Vec3 {
     type Output = Self;
-    fn mul(self, other: Self) -> Self {
+
+    fn mul(self, other: Self) -> Self::Output {
         Self {
             x: self.x * other.x,
             y: self.y * other.y,
@@ -84,7 +89,8 @@ impl ops::Mul for Vec3 {
 
 impl ops::Div<f32> for Vec3 {
     type Output = Self;
-    fn div(self, scale: f32) -> Self {
+
+    fn div(self, scale: f32) -> Self::Output {
         Self {
             x: self.x / scale,
             y: self.y / scale,
@@ -95,24 +101,12 @@ impl ops::Div<f32> for Vec3 {
 
 impl ops::Div for Vec3 {
     type Output = Self;
-    fn div(self, other: Self) -> Self {
+
+    fn div(self, other: Self) -> Self::Output {
         Self {
             x: self.x / other.x,
             y: self.y / other.y,
             z: self.z / other.z,
-        }
-    }
-}
-
-// TODO
-impl std::cmp::PartialOrd for Vec3 {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        if self.x <= other.x && self.y <= other.y {
-            Some(std::cmp::Ordering::Less)
-        } else if self.x > other.x && self.y > other.y {
-            Some(std::cmp::Ordering::Greater)
-        } else {
-            None
         }
     }
 }
