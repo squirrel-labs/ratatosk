@@ -158,22 +158,22 @@ impl std::cmp::Eq for Vec3 {}
 
 impl Vec3 {
     /// Returns the euclidean norm of the vector.
-    pub fn norm(&self) -> f32 {
+    pub fn norm(self) -> f32 {
         f32::sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
     }
 
     /// Returns the square of the euclidean norm of the vector.
-    pub fn norm2(&self) -> f32 {
-        self.dot(*self)
+    pub fn norm2(self) -> f32 {
+        self.dot(self)
     }
 
     /// Returns the dot product.
-    pub fn dot(&self, other: Self) -> f32 {
+    pub fn dot(self, other: Self) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
     /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has length 1.
-    pub fn normalized(&self) -> Vec3 {
-        *self / self.norm()
+    pub fn normalized(self) -> Vec3 {
+        self / self.norm()
     }
 }
