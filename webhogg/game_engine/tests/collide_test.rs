@@ -1,6 +1,5 @@
 use game_engine::collide::*;
-use game_engine::math::vec2::Vec2;
-use game_engine::math::{AABox, RBox};
+use game_engine::math::{AABox, RBox, Vec2};
 
 #[test]
 fn test_collide_dot_dot() {

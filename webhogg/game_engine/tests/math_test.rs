@@ -1,6 +1,4 @@
-use game_engine::math::vec2::Vec2;
 use game_engine::math::*;
-use game_engine::math::{AABox, RBox};
 
 #[test]
 fn test_add_vec2() {
