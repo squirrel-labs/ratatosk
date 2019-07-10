@@ -1,5 +1,4 @@
-use crate::math::vec2::Vec2;
-use crate::math::{AABox, RBox};
+use crate::math::{AABox, RBox, Vec2};
 
 /// A trait for objects that can collide with other objects.
 pub trait Collide<Rhs> {
