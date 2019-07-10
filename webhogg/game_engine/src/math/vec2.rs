@@ -1,5 +1,6 @@
-use crate::math::EPSILON;
 use std::ops;
+
+use crate::math::EPSILON;
 
 /// A 2-dimensional euclidean vector.
 #[derive(Clone, Copy, Debug)]
@@ -22,7 +23,7 @@ impl ops::Add for Vec2 {
 }
 
 impl ops::AddAssign for Vec2 {
-    fn add_assign(&mut self, other: Vec2) {
+    fn add_assign(&mut self, other: Self) {
         self.x += other.x;
         self.y += other.y;
     }
@@ -40,7 +41,7 @@ impl ops::Sub for Vec2 {
 }
 
 impl ops::SubAssign for Vec2 {
-    fn sub_assign(&mut self, other: Vec2) {
+    fn sub_assign(&mut self, other: Self) {
         self.x -= other.x;
         self.y -= other.y;
     }
@@ -68,6 +69,13 @@ impl ops::Mul<f32> for Vec2 {
     }
 }
 
+impl ops::MulAssign<f32> for Vec2 {
+    fn mul_assign(&mut self, scale: f32) {
+        self.x *= scale;
+        self.y *= scale;
+    }
+}
+
 impl ops::Mul for Vec2 {
     type Output = Self;
 
@@ -78,6 +86,14 @@ impl ops::Mul for Vec2 {
         }
     }
 }
+
+impl ops::MulAssign for Vec2 {
+    fn mul_assign(&mut self, other: Self) {
+        self.x *= other.x;
+        self.y *= other.y;
+    }
+}
+
 
 impl ops::Div<f32> for Vec2 {
     type Output = Self;
@@ -90,14 +106,28 @@ impl ops::Div<f32> for Vec2 {
     }
 }
 
+impl ops::DivAssign<f32> for Vec2 {
+    fn div_assign(&mut self, scale: f32) {
+        self.x /= scale;
+        self.y /= scale;
+    }
+}
+
 impl ops::Div for Vec2 {
     type Output = Self;
 
-    fn div(self, other: Vec2) -> Self::Output {
+    fn div(self, other: Self) -> Self::Output {
         Self {
             x: self.x / other.x,
             y: self.y / other.y,
         }
+    }
+}
+
+impl ops::DivAssign for Vec2 {
+    fn div_assign(&mut self, other: Self) {
+        self.x /= other.x;
+        self.y /= other.y;
     }
 }
 
@@ -133,12 +163,12 @@ impl Vec2 {
     }
 
     /// Returns the dot product.
-    pub fn dot(&self, other: Vec2) -> f32 {
+    pub fn dot(&self, other: Self) -> f32 {
         self.x * other.x + self.y * other.y
     }
 
     /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has length 1.
-    pub fn normalized(&self) -> Vec2 {
+    pub fn normalized(&self) -> Self {
         *self / self.norm()
     }
 }

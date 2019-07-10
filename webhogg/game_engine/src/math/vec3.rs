@@ -1,5 +1,6 @@
-use crate::math::EPSILON;
 use std::ops;
+
+use crate::math::EPSILON;
 
 /// A 3-dimensional euclidean vector.
 #[derive(Clone, Copy, Debug)]
@@ -76,6 +77,14 @@ impl ops::Mul<f32> for Vec3 {
     }
 }
 
+impl ops::MulAssign<f32> for Vec3 {
+    fn mul_assign(&mut self, scale: f32) {
+        self.x *= scale;
+        self.y *= scale;
+        self.z *= scale;
+    }
+}
+
 impl ops::Mul for Vec3 {
     type Output = Self;
 
@@ -87,6 +96,15 @@ impl ops::Mul for Vec3 {
         }
     }
 }
+
+impl ops::MulAssign for Vec3 {
+    fn mul_assign(&mut self, other: Self) {
+        self.x *= other.x;
+        self.y *= other.y;
+        self.z *= other.z;
+    }
+}
+
 
 impl ops::Div<f32> for Vec3 {
     type Output = Self;
@@ -100,6 +118,14 @@ impl ops::Div<f32> for Vec3 {
     }
 }
 
+impl ops::DivAssign<f32> for Vec3 {
+    fn div_assign(&mut self, scale: f32) {
+        self.x /= scale;
+        self.y /= scale;
+        self.z /= scale;
+    }
+}
+
 impl ops::Div for Vec3 {
     type Output = Self;
 
@@ -109,6 +135,14 @@ impl ops::Div for Vec3 {
             y: self.y / other.y,
             z: self.z / other.z,
         }
+    }
+}
+
+impl ops::DivAssign for Vec3 {
+    fn div_assign(&mut self, other: Self) {
+        self.x /= other.x;
+        self.y /= other.y;
+        self.z /= other.z
     }
 }
 
@@ -134,7 +168,7 @@ impl Vec3 {
     }
 
     /// Returns the dot product.
-    pub fn dot(&self, other: Vec3) -> f32 {
+    pub fn dot(&self, other: Self) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
