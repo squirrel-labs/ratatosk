@@ -94,7 +94,6 @@ impl ops::MulAssign for Vec2 {
     }
 }
 
-
 impl ops::Div<f32> for Vec2 {
     type Output = Self;
 

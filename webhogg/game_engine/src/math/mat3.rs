@@ -43,4 +43,3 @@ impl Mat3 {
     pub fn transpose(self) -> Self {}
 }
 */
-
