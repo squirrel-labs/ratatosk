@@ -1,3 +1,4 @@
+use crate::math::EPSILON;
 use std::ops;
 
 /// A 3-dimensional euclidean vector.
@@ -113,7 +114,9 @@ impl ops::Div for Vec3 {
 
 impl std::cmp::PartialEq for Vec3 {
     fn eq(&self, other: &Self) -> bool {
-        f32::abs(self.x - other.x) < EPSILON && f32::abs(self.y - other.y) < EPSILON && f32::abs(self.z - other.z) < EPSILON
+        f32::abs(self.x - other.x) < EPSILON
+            && f32::abs(self.y - other.y) < EPSILON
+            && f32::abs(self.z - other.z) < EPSILON
     }
 }
 
@@ -122,7 +125,7 @@ impl std::cmp::Eq for Vec3 {}
 impl Vec3 {
     /// Returns the euclidean norm of the vector.
     pub fn norm(&self) -> f32 {
-        f32::sqrt(self.x * self.x, self.y * self.y, self.z * self.z)
+        f32::sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
     }
 
     /// Returns the square of the euclidean norm of the vector.
@@ -131,13 +134,12 @@ impl Vec3 {
     }
 
     /// Returns the dot product.
-    pub fn dot(&self, other: Vec2) -> f32 {
+    pub fn dot(&self, other: Vec3) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
     /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has length 1.
-    pub fn normalized(&self) -> Vec2 {
+    pub fn normalized(&self) -> Vec3 {
         *self / self.norm()
     }
 }
-

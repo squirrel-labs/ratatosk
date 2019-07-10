@@ -1,3 +1,4 @@
+use crate::math::EPSILON;
 use std::ops;
 
 /// A 2-dimensional euclidean vector.
@@ -141,4 +142,3 @@ impl Vec2 {
         *self / self.norm()
     }
 }
-

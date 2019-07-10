@@ -5,4 +5,3 @@ use std::ops;
 pub struct Mat2 {
     data: [f32; 4],
 }
-

@@ -1,8 +1,9 @@
-pub mod vec2;
-pub mod vec3;
 pub mod mat2;
 pub mod mat3;
+pub mod vec2;
+pub mod vec3;
 
+use crate::math::vec2::Vec2;
 use std::ops;
 
 pub const EPSILON: f32 = 1e-8;
