@@ -80,7 +80,7 @@ impl RBox {
             y: -orientation.y,
         } / scale;
         Self {
-            pos: pos,
+            pos,
             v1: orientation,
             v2: orth,
         }
