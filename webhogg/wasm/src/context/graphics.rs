@@ -61,7 +61,7 @@ impl GraphicsContext {
             DrawSprite::new((0.0, 0.0), Matrix::identity()),
             //DrawSprite::new((0.5, 0.0), Matrix::identity()),
         ];
-            
+
         Ok(Self {
             gl, frame_nr: 0,
             shader, vao, buffer,

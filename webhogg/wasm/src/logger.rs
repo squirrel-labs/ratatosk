@@ -4,11 +4,13 @@ use log::Log;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace=console, js_name=log)]
-    pub fn __console_log(f: &str);
+    pub fn __console_log_int(f: u32);
 
     #[wasm_bindgen(js_namespace=console, js_name=log)]
     pub fn __console_log_colored2(f: &str, c1: &str, c2: &str);
 }
+
+pub fn log_num(n: u32) { __console_log_int(n) }
 
 struct WasmLogger;
 
@@ -27,7 +29,7 @@ impl log::Log for WasmLogger {
 }
 
 fn log(rec: &log::Record) {
-    __console_log_colored2(&format!("%c{}%c {} > {}", rec.level(), rec.target(), rec.args()),
+    __console_log_colored2(&format!("{}", rec.args()),
                            &format!("color: {}", match rec.level() {
         log::Level::Trace => "violet",
         log::Level::Debug => "blue",
@@ -35,27 +37,9 @@ fn log(rec: &log::Record) {
         log::Level::Warn => "orange",
         log::Level::Error => "red"
     }), "");
-
-    /*web_sys::console::log_3(&JsValue::from_str(&format!("{}", rec.args())),
-                            &JsValue::from_str(&format!("color: {}", match rec.level() {
-        log::Level::Trace => "violet",
-        log::Level::Debug => "blue",
-        log::Level::Info => "green",
-        log::Level::Warn => "orange",
-        log::Level::Error => "red"
-    })), &JsValue::from_str(""));*/
 }
 
-//const ADDRESS: u64 = 640000;
-
-pub fn init_logger() -> Result<(), log::SetLoggerError> {
-    unsafe {
-        log::set_logger(Box::leak(Box::from_raw(640000 as *mut WasmLogger)))
-            .map(|()| log::set_max_level(log::LevelFilter::Info))
-    }
-}
-
-/*pub fn init_logger() {
+pub fn init_logger() {
     fern::Dispatch::new().format(|out, message, record|{
         out.finish(format_args!(
                 "%c{}%c {} > {}",
@@ -66,7 +50,7 @@ pub fn init_logger() -> Result<(), log::SetLoggerError> {
             )
         })
         .level(log::LevelFilter::Debug)
-        //.chain(fern::Output::call(log))
+        .chain(fern::Output::call(log))
         .chain(fern::Output::call(|r|()))
         .apply().unwrap();
-}*/
+}

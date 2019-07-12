@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use std::convert::TryInto;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SharedMemory {
     pub num: u32,
 }
@@ -16,25 +16,20 @@ impl SharedMemory {
     }
 }
 
-//static mut MEMORY: SharedMemory = SharedMemory { num: 0 };
+static mut MEMORY: Option<SharedMemory> = None;
 
-/*fn raw_ptr() -> *mut u32 {
-    //unsafe {(&mut MEMORY) as *mut SharedMemory as *mut u32}
-    "" as *mut u32
+pub fn init_mem() {
+    unsafe { MEMORY = Some(SharedMemory::default()); }
 }
 
-
-pub fn increase_memory_val() {
-    unsafe { *raw_ptr() += 1 }
+pub fn get_mem() -> u32 {
+    unsafe { MEMORY.as_mut().unwrap().num }
 }
 
-
-#[no_mangle]
-pub fn get_memory() -> u32 {
-    unsafe { *raw_ptr() }
+pub fn inc_mem() {
+    unsafe { MEMORY.as_mut().unwrap().num += 1 }
 }
 
-#[no_mangle]
-pub fn get_memory_ptr() -> usize {
-    (unsafe {(&mut MEMORY) as *mut SharedMemory }) as usize
-}*/
+pub fn set_mem(n: u32) {
+    unsafe { MEMORY.as_mut().unwrap().num = n }
+}

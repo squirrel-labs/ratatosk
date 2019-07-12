@@ -1,4 +1,5 @@
 workers = [];
+gMemory = null;
 
 function exit() {
     for (var worker of workers) {
@@ -17,12 +18,12 @@ async function main() {
     source = await fetchedSource.arrayBuffer();
 
     let sharedMemory = new WebAssembly.Memory({
-        initial: 1000,
+        initial: 24,
         maximum: 1024,
         shared: true
     });
+    gMemory = sharedMemory;
     sharedMemory.buffer = new SharedArrayBuffer(65000);
-    saneriu = sharedMemory;
 
     const modules = [
         { type: 'graphics',
