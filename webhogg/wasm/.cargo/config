@@ -1,5 +1,6 @@
 [build]
-rustflags=[
-  # "-C", "link-args=--no-entry --allow-undefined --strip-all --export-dynamic --import-memory --shared-memory --import-table --max-memory=1048576 --threads",
-  "-C", "link-args=--no-entry --allow-undefined --strip-all --export-dynamic --import-memory --shared-memory --max-memory=1073741824 --threads",
+target = "wasm32-unknown-unknown"
+rustflags = [
+  "-C",
+    "link-args=--no-entry --allow-undefined --strip-all --export-dynamic --import-memory --shared-memory --max-memory=1073741824 --threads",
 ]

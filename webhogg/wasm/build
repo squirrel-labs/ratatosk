@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if cargo build --target wasm32-unknown-unknown --release --verbose; then
+if cargo build --release --verbose; then
   if wasm-bindgen target/wasm32-unknown-unknown/release/webhogg_wasm.wasm --out-dir bin/ --no-typescript --target no-modules --remove-producers-section --remove-name-section --no-demangle
   then
     #if wasm-opt --memory-packing --remove-memory --remove-unused-brs --enable-threads -Oz bin/webhogg_wasm_bg.wasm -o bin/webhogg-wasm.wasm; then
