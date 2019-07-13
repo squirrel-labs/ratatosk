@@ -1,0 +1,36 @@
+[package]
+name = "webhogg-wasm-shared"
+version = "0.1.0"
+authors = [
+    "natrixaeria",
+    "TrueDoctor <dennis@kobert.dev>"
+]
+edition = "2018"
+description = "shared crate for WebAssembly frontend of the webhogg project"
+
+[lib]
+crate-type = ["rlib"]
+
+[profile.release]
+lto = true
+
+[dependencies]
+wasm-bindgen = "0.2.47"
+log = "0.4"
+js-sys = "0.3"
+fern = "0.5.8"
+rand = "0.3.14"
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+    "console",
+    "Window",
+    "OffscreenCanvas",
+    "WebGl2RenderingContext",
+    "WebGlShader",
+    "WebGlProgram",
+    "WebGlBuffer",
+    "WebGlVertexArrayObject",
+    "WebGlUniformLocation"
+]
