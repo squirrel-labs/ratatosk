@@ -2,6 +2,8 @@ use std::{fmt, ops};
 
 use packed_simd::{f32x4, shuffle};
 
+use crate::math_simd::Vec2;
+
 pub struct Mat2(f32x4);
 
 impl ops::Add for Mat2 {
