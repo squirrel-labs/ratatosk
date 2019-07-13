@@ -6,9 +6,9 @@ use crate::math::Vec3;
 #[derive(Clone, Copy, Debug)]
 pub struct Mat3 {
     /// The elements of the matrix.
-    /// [a, b, c
-    ///  d, e, f
-    ///  g, h, i]
+    /// [a, d, g
+    ///  b, e, h
+    ///  c, f, i]
     data: [f32; 9],
 }
 
@@ -133,17 +133,97 @@ impl ops::MulAssign<f32> for Mat3 {
         self.data[8] *= scale;
     }
 }
-/*
-impl ops::Mul<Vec3> for Mat3 {}
 
-impl ops::Mul for Mat3 {}
+impl ops::Mul<Vec3> for Mat3 {
+    type Output = Vec3;
 
-impl ops::MulAssign for Mat3 {}
+    fn mul(self, other: Vec3) -> Self::Output {
+        Vec3 {
+            x: self.data[0] * other.x + self.data[3] * other.y + self.data[6] * other.z,
+            y: self.data[1] * other.x + self.data[4] * other.y + self.data[7] * other.z,
+            z: self.data[2] * other.x + self.data[5] * other.y + self.data[8] * other.z,
+        }
+    }
+}
 
-impl ops::Div<f32> for Mat3 {}
+impl ops::Mul for Mat3 {
+    type Output = Self;
 
-impl ops::DivAssign<f32> for Mat3 {}
-*/
+    fn mul(self, other: Self) -> Self::Output {
+        Self {
+            data: [
+                self.data[0] * other.data[0]
+                    + self.data[3] * other.data[1]
+                    + self.data[6] * other.data[2],
+                self.data[1] * other.data[0]
+                    + self.data[4] * other.data[1]
+                    + self.data[7] * other.data[2],
+                self.data[2] * other.data[0]
+                    + self.data[5] * other.data[1]
+                    + self.data[8] * other.data[2],
+                self.data[0] * other.data[3]
+                    + self.data[3] * other.data[4]
+                    + self.data[6] * other.data[5],
+                self.data[1] * other.data[3]
+                    + self.data[4] * other.data[4]
+                    + self.data[7] * other.data[5],
+                self.data[2] * other.data[3]
+                    + self.data[5] * other.data[4]
+                    + self.data[8] * other.data[5],
+                self.data[0] * other.data[6]
+                    + self.data[3] * other.data[7]
+                    + self.data[6] * other.data[8],
+                self.data[1] * other.data[6]
+                    + self.data[4] * other.data[7]
+                    + self.data[7] * other.data[8],
+                self.data[2] * other.data[6]
+                    + self.data[5] * other.data[7]
+                    + self.data[8] * other.data[8],
+            ],
+        }
+    }
+}
+
+impl ops::MulAssign for Mat3 {
+    fn mul_assign(&mut self, other: Self) {
+        *self = *self * other;
+    }
+}
+
+impl ops::Div<f32> for Mat3 {
+    type Output = Self;
+
+    fn div(self, scale: f32) -> Self::Output {
+        Self {
+            data: [
+                self.data[0] / scale,
+                self.data[1] / scale,
+                self.data[2] / scale,
+                self.data[3] / scale,
+                self.data[4] / scale,
+                self.data[5] / scale,
+                self.data[6] / scale,
+                self.data[7] / scale,
+                self.data[8] / scale,
+            ],
+        }
+    }
+}
+
+impl ops::DivAssign<f32> for Mat3 {
+    fn div_assign(&mut self, scale: f32) {
+        self.data[0] /= scale;
+        self.data[1] /= scale;
+        self.data[2] /= scale;
+        self.data[3] /= scale;
+        self.data[4] /= scale;
+        self.data[5] /= scale;
+        self.data[6] /= scale;
+        self.data[7] /= scale;
+        self.data[8] /= scale;
+    }
+}
+
 impl Mat3 {
     pub fn zero() -> Self {
         Self {
