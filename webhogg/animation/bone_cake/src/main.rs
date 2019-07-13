@@ -1,3 +1,4 @@
+mod structs;
 mod textures;
 
 use std::env;
@@ -11,6 +12,10 @@ fn main() {
         );
         std::process::exit(1);
     }
-    let t = textures::load_char(args.next_back().unwrap());
-    println!("Textures loaded succesfully")
+    let mut base = args.next_back().unwrap();
+    let tex = base.split_off(base.len() - 8);
+    let t = textures::load_char(format!("{}tex.json", base));
+    let s = structs::load_char(format!("{}ske.json", base));
+    println!("Textures loaded succesfully");
+    println!("{:?}", s)
 }
