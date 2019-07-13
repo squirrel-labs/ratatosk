@@ -6,11 +6,16 @@ use packed_simd::f32x2;
 use crate::math_simd::EPSILON;
 
 #[derive(Clone, Copy)]
-pub struct Vec2(f32x2);
+pub struct Vec2(pub(super) f32x2);
 
 impl fmt::Debug for Vec2 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Vec2 {{ x: {:?}, y: {:?} }}", self.0.extract(0), self.0.extract(1))
+        write!(
+            f,
+            "Vec2 {{ x: {:?}, y: {:?} }}",
+            self.0.extract(0),
+            self.0.extract(1)
+        )
     }
 }
 
