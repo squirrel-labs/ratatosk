@@ -2,7 +2,7 @@ use std::{fmt, ops};
 
 use packed_simd::{f32x4, shuffle};
 
-use crate::math_simd::Vec2;
+use crate::math_simd::{EPSILON, Vec2};
 
 pub struct Mat2(f32x4);
 
@@ -56,13 +56,25 @@ impl ops::MulAssign<f32> for Mat2 {
     }
 }
 /*
-impl ops::Mul<Vec2> for Mat2 {}
+impl ops::Mul<Vec2> for Mat2 {
+    type Output = Vec2;
 
-impl ops::MulAssign<Vec2> for Mat2 {}
+    fn mul(self, other: Vec2) -> Self::Output {}
+}
 
-impl ops::Mul for Mat2 {}
+impl ops::MulAssign<Vec2> for Mat2 {
+    fn mul_assign(&mut self, other: Vec2) {}
+}
 
-impl ops::MulAssign for Mat2 {}
+impl ops::Mul for Mat2 {
+    type Output = Mat2;
+
+    fn mul(self, other: Self) -> Self::Output {}
+}
+
+impl ops::MulAssign for Mat2 {
+    fn mul_assign(&mut self, other: Self) {}
+}
 */
 impl ops::Div<f32> for Mat2 {
     type Output = Self;
@@ -77,6 +89,14 @@ impl ops::DivAssign<f32> for Mat2 {
         self.0 /= scale;
     }
 }
+
+impl PartialEq for Mat2 {
+    fn eq(&self, other: &Self) -> bool {
+        (self.0 - other.0).abs().lt(f32x4::splat(EPSILON)).all()
+    }
+}
+
+impl Eq for Mat2 {}
 
 impl Mat2 {
     pub fn zero() -> Self {
