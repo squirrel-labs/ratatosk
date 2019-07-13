@@ -4,6 +4,8 @@ function onwasm(ctx, desc, module) {
     } else {
         module.init(desc.canvas);
     }
+
+    setInterval(module.frame, desc.deltaTime);
 }
 
 onmessage = async function(e) {
