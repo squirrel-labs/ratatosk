@@ -136,8 +136,6 @@ impl ops::MulAssign<f32> for Mat3 {
 /*
 impl ops::Mul<Vec3> for Mat3 {}
 
-impl ops::MulAssign<Vec3> for Mat3 {}
-
 impl ops::Mul for Mat3 {}
 
 impl ops::MulAssign for Mat3 {}

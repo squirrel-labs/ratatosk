@@ -95,8 +95,6 @@ impl ops::MulAssign<f32> for Mat2 {
 /*
 impl ops::Mul<Vec2> for Mat2 {}
 
-impl ops::MulAssign<Vec2> for Mat2 {}
-
 impl ops::Mul for Mat2 {}
 
 impl ops::MulAssign for Mat2 {}
