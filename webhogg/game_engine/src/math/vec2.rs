@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::ops;
 
 use crate::math::EPSILON;
@@ -130,25 +131,27 @@ impl ops::DivAssign for Vec2 {
     }
 }
 
-impl std::cmp::PartialOrd for Vec2 {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        if self.x <= other.x && self.y <= other.y {
-            Some(std::cmp::Ordering::Less)
-        } else if self.x > other.x && self.y > other.y {
-            Some(std::cmp::Ordering::Greater)
+impl PartialOrd for Vec2 {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self == other {
+            Some(Ordering::Equal)
+        } else if self.x <= other.x && self.y <= other.y {
+            Some(Ordering::Less)
+        } else if self.x >= other.x && self.y >= other.y {
+            Some(Ordering::Greater)
         } else {
             None
         }
     }
 }
 
-impl std::cmp::PartialEq for Vec2 {
+impl PartialEq for Vec2 {
     fn eq(&self, other: &Self) -> bool {
         f32::abs(self.x - other.x) < EPSILON && f32::abs(self.y - other.y) < EPSILON
     }
 }
 
-impl std::cmp::Eq for Vec2 {}
+impl Eq for Vec2 {}
 
 impl Vec2 {
     /// Returns the euclidean norm of the vector.
