@@ -6,8 +6,8 @@ use crate::math::Vec2;
 #[derive(Clone, Copy, Debug)]
 pub struct Mat2 {
     /// The elements of the matrix.
-    /// [a, b,
-    ///  c, d]
+    /// [a, c,
+    ///  b, d]
     data: [f32; 4],
 }
 
@@ -92,13 +92,39 @@ impl ops::MulAssign<f32> for Mat2 {
         self.data[3] *= scale;
     }
 }
-/*
-impl ops::Mul<Vec2> for Mat2 {}
 
-impl ops::Mul for Mat2 {}
+impl ops::Mul<Vec2> for Mat2 {
+    type Output = Vec2;
 
-impl ops::MulAssign for Mat2 {}
-*/
+    fn mul(self, other: Vec2) -> Self::Output {
+        Vec2 {
+            x: self.data[0] * other.x + self.data[2] * other.y,
+            y: self.data[1] * other.x + self.data[3] * other.y,
+        }
+    }
+}
+
+impl ops::Mul for Mat2 {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self::Output {
+        Self {
+            data: [
+                self.data[0] * other.data[0] + self.data[2] * other.data[1],
+                self.data[1] * other.data[0] + self.data[3] * other.data[1],
+                self.data[0] * other.data[2] + self.data[2] * other.data[3],
+                self.data[1] * other.data[2] + self.data[3] * other.data[3],
+            ],
+        }
+    }
+}
+
+impl ops::MulAssign for Mat2 {
+    fn mul_assign(&mut self, other: Self) {
+        *self = *self * other;
+    }
+}
+
 impl ops::Div<f32> for Mat2 {
     type Output = Self;
 
