@@ -1,4 +1,7 @@
+#![feature(custom_attribute)]
+
+pub mod mem;
 pub mod alloc;
 pub mod wasm_log;
 
-pub const ADDR: usize = 64000;
+pub use mem::*;

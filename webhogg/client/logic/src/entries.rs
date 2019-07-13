@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 
-use webhogg_wasm_shared::wasm_log::{log, log_num};
-use webhogg_wasm_shared::ADDR;
+use webhogg_wasm_shared::wasm_log::log;
+use webhogg_wasm_shared::SHARED_ALLOCATION_AREA_START as ADDR;
 
 #[wasm_bindgen]
 pub fn init() {

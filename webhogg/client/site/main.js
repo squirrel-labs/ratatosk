@@ -44,7 +44,7 @@ function generateMemory() {
     const MiB = 16;
     const GiB = 1024 * MiB;
     const memoryDescriptor = {
-        initial: 32  * MiB,
+        initial: 64  * MiB,
         maximum: 1   * GiB,
         shared: true
     };

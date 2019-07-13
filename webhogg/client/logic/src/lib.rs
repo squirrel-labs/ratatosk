@@ -1,9 +1,9 @@
-use webhogg_wasm_shared::alloc::Allocator;
+use webhogg_wasm_shared::{
+    alloc::{Allocator, LogicAllocator},
+    get_allocator,
+};
 
 #[global_allocator]
-static ALLOCATOR: Allocator = Allocator {
-    pos: 1024,
-    mem0: 0x10000,
-};
+static ALLOCATOR: Allocator<LogicAllocator> = get_allocator!();
 
 mod entries;
