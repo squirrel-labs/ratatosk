@@ -1,7 +1,7 @@
 #!/bin/sh
 
 printf '\x1b[1mcargo fmt\x1b[m\n'
-if cargo --color always fmt; then
+if cargo fmt &> /dev/null; then
   printf '\x1b[1mcargo\x1b[m\n'
   if cargo build --color always --release; then
     printf '\x1b[1mwasm-bindgen\x1b[m\n'
@@ -25,6 +25,12 @@ if cargo --color always fmt; then
     echo error: cargo build failed
   fi
 else
-  echo error: cargo fmt failed
+  if cargo build --color always --release; then
+    cargo --color always fmt -- --color always
+    echo error: cargo fmt failed
+  else
+    echo error: cargo build failed
+  fi
 fi
 exit 1
+
