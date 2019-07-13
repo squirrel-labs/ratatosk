@@ -1,17 +1,9 @@
-use wasm_bindgen::prelude::*;
+use webhogg_wasm_shared::alloc::Allocator;
 
-use webhogg_wasm_shared::wasm_log::log;
-use webhogg_wasm_shared::ADDR;
+#[global_allocator]
+static ALLOCATOR: Allocator = Allocator {
+    pos: 1024 + 32,
+    mem0: 0x100000,
+};
 
-#[wasm_bindgen]
-pub fn init() {
-    log("graphics entry reached");
-}
-
-#[wasm_bindgen]
-pub fn frame() {
-    unsafe {
-        let addr = ADDR as *mut u32;
-        *addr += 1;
-    }
-}
+mod entries;
