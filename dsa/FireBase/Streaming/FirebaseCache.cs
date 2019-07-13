@@ -6,19 +6,16 @@ using System.Reflection;
 using Firebase.Database.Http;
 using Newtonsoft.Json;
 
-namespace Firebase.Database.Streaming
-{
+namespace Firebase.Database.Streaming {
     /// <summary>
     ///     The firebase cache.
     /// </summary>
     /// <typeparam name="T"> Type of top-level entities in the cache. </typeparam>
-    public class FirebaseCache<T> : IEnumerable<FirebaseObject<T>>
-    {
+    public class FirebaseCache<T> : IEnumerable<FirebaseObject<T>> {
         private readonly IDictionary<string, T> dictionary;
         private readonly bool isDictionaryType;
 
-        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-        {
+        private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings {
             ObjectCreationHandling = ObjectCreationHandling.Replace
         };
 
@@ -26,16 +23,14 @@ namespace Firebase.Database.Streaming
         ///     Initializes a new instance of the <see cref="FirebaseCache{T}" /> class.
         /// </summary>
         public FirebaseCache()
-            : this(new Dictionary<string, T>())
-        {
+            : this(new Dictionary<string, T>()) {
         }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="FirebaseCache{T}" /> class and populates it with existing data.
         /// </summary>
         /// <param name="existingItems"> The existing items. </param>
-        public FirebaseCache(IDictionary<string, T> existingItems)
-        {
+        public FirebaseCache(IDictionary<string, T> existingItems) {
             dictionary = existingItems;
             isDictionaryType = typeof(IDictionary).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo());
         }
@@ -46,8 +41,7 @@ namespace Firebase.Database.Streaming
         /// <param name="path"> The path of incoming data, separated by slash. </param>
         /// <param name="data"> The data in json format as returned by firebase. </param>
         /// <returns> Collection of top-level entities which were affected by the push. </returns>
-        public IEnumerable<FirebaseObject<T>> PushData(string path, string data, bool removeEmptyEntries = true)
-        {
+        public IEnumerable<FirebaseObject<T>> PushData(string path, string data, bool removeEmptyEntries = true) {
             object obj = this.dictionary;
             Action<object> primitiveObjSetter = null;
             Action objDeleter = null;
@@ -57,8 +51,7 @@ namespace Firebase.Database.Streaming
 
             // first find where we should insert the data to
             foreach (var element in pathElements)
-                if (obj is IDictionary)
-                {
+                if (obj is IDictionary) {
                     // if it's a dictionary, then it's just a matter of inserting into it / accessing existing object by key
                     var dictionary = obj as IDictionary;
                     var valueType = obj.GetType().GenericTypeArguments[1];
@@ -66,18 +59,15 @@ namespace Firebase.Database.Streaming
                     primitiveObjSetter = d => dictionary[element] = d;
                     objDeleter = () => dictionary.Remove(element);
 
-                    if (dictionary.Contains(element))
-                    {
+                    if (dictionary.Contains(element)) {
                         obj = dictionary[element];
                     }
-                    else
-                    {
+                    else {
                         dictionary[element] = CreateInstance(valueType);
                         obj = dictionary[element];
                     }
                 }
-                else
-                {
+                else {
                     // if it's not a dictionary, try to find the property of current object with the matching name
                     var objParent = obj;
                     var property = objParent
@@ -89,16 +79,14 @@ namespace Firebase.Database.Streaming
                     objDeleter = () => property.SetValue(objParent, null);
                     primitiveObjSetter = d => property.SetValue(objParent, d);
                     obj = property.GetValue(obj);
-                    if (obj == null)
-                    {
+                    if (obj == null) {
                         obj = CreateInstance(property.PropertyType);
                         property.SetValue(objParent, obj);
                     }
                 }
 
             // if data is null (=empty string) delete it
-            if (string.IsNullOrWhiteSpace(data) || data == "null")
-            {
+            if (string.IsNullOrWhiteSpace(data) || data == "null") {
                 var key = pathElements[0];
                 var target = dictionary[key];
 
@@ -109,15 +97,13 @@ namespace Firebase.Database.Streaming
             }
 
             // now insert the data
-            if (obj is IDictionary && !isDictionaryType)
-            {
+            if (obj is IDictionary && !isDictionaryType) {
                 // insert data into dictionary and return it as a collection of FirebaseObject
                 var dictionary = obj as IDictionary;
                 var valueType = obj.GetType().GenericTypeArguments[1];
                 var objectCollection = data.GetObjectCollection(valueType);
 
-                foreach (var item in objectCollection)
-                {
+                foreach (var item in objectCollection) {
                     dictionary[item.Key] = item.Object;
 
                     // top level dictionary changed
@@ -125,14 +111,12 @@ namespace Firebase.Database.Streaming
                 }
 
                 // nested dictionary changed
-                if (pathElements.Any())
-                {
+                if (pathElements.Any()) {
                     this.dictionary[pathElements[0]] = this.dictionary[pathElements[0]];
                     yield return new FirebaseObject<T>(pathElements[0], this.dictionary[pathElements[0]]);
                 }
             }
-            else
-            {
+            else {
                 // set the data on a property of the given object
                 var valueType = obj.GetType();
 
@@ -152,13 +136,11 @@ namespace Firebase.Database.Streaming
             }
         }
 
-        public bool Contains(string key)
-        {
+        public bool Contains(string key) {
             return dictionary.Keys.Contains(key);
         }
 
-        private object CreateInstance(Type type)
-        {
+        private object CreateInstance(Type type) {
             if (type == typeof(string))
                 return string.Empty;
             return Activator.CreateInstance(type);
@@ -166,13 +148,11 @@ namespace Firebase.Database.Streaming
 
         #region IEnumerable
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
+        IEnumerator IEnumerable.GetEnumerator() {
             return GetEnumerator();
         }
 
-        public IEnumerator<FirebaseObject<T>> GetEnumerator()
-        {
+        public IEnumerator<FirebaseObject<T>> GetEnumerator() {
             return dictionary.Select(p => new FirebaseObject<T>(p.Key, p.Value)).GetEnumerator();
         }
 

@@ -1,4 +1,4 @@
-use crate::server::{UserId, GameClient, GameServerError};
+use crate::server::{GameClient, GameServerError, UserId};
 
 pub type GroupId = u32;
 

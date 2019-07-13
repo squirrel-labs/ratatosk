@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DSACore.Models.Network
-{
-    public class Group
-    {
-        public Group(string name, string password)
-        {
+namespace DSACore.Models.Network {
+    public class Group {
+        public Group(string name, string password) {
             Name = name;
             Password = password;
         }
 
-        public Group(string name, int userOnline)
-        {
+        public Group(string name, int userOnline) {
             Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
@@ -22,16 +18,13 @@ namespace DSACore.Models.Network
 
         public int UserCount => Users.Count;
 
-        public SendGroup SendGroup()
-        {
+        public SendGroup SendGroup() {
             return new SendGroup(Name, UserCount);
         }
     }
 
-    public class SendGroup
-    {
-        public SendGroup(string name, int userCount)
-        {
+    public class SendGroup {
+        public SendGroup(string name, int userCount) {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             UserCount = userCount;
         }

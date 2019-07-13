@@ -1,12 +1,10 @@
 using System;
 
-namespace Firebase.Database.Query
-{
+namespace Firebase.Database.Query {
     /// <summary>
     ///     Represents an auth parameter in firebase query, e.g. "?auth=xyz".
     /// </summary>
-    public class AuthQuery : ParameterQuery
-    {
+    public class AuthQuery : ParameterQuery {
         private readonly Func<string> tokenFactory;
 
         /// <summary>
@@ -16,8 +14,7 @@ namespace Firebase.Database.Query
         /// <param name="tokenFactory"> The authentication token factory. </param>
         /// <param name="client"> The owner. </param>
         public AuthQuery(FirebaseQuery parent, Func<string> tokenFactory, FirebaseClient client) : base(parent,
-            () => client.Options.AsAccessToken ? "access_token" : "auth", client)
-        {
+            () => client.Options.AsAccessToken ? "access_token" : "auth", client) {
             this.tokenFactory = tokenFactory;
         }
 
@@ -26,8 +23,7 @@ namespace Firebase.Database.Query
         /// </summary>
         /// <param name="child"> The child of this child. </param>
         /// <returns> The <see cref="string" />. </returns>
-        protected override string BuildUrlParameter(FirebaseQuery child)
-        {
+        protected override string BuildUrlParameter(FirebaseQuery child) {
             return tokenFactory();
         }
     }

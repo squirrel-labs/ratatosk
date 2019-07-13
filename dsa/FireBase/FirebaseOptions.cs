@@ -5,12 +5,9 @@ using System.Threading.Tasks;
 using Firebase.Database.Offline;
 using Newtonsoft.Json;
 
-namespace Firebase.Database
-{
-    public class FirebaseOptions
-    {
-        public FirebaseOptions()
-        {
+namespace Firebase.Database {
+    public class FirebaseOptions {
+        public FirebaseOptions() {
             OfflineDatabaseFactory = (t, s) => new Dictionary<string, OfflineEntry>();
             SubscriptionStreamReaderFactory = s => new StreamReader(s);
             JsonSerializerSettings = new JsonSerializerSettings();

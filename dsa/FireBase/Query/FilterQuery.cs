@@ -1,13 +1,11 @@
 using System;
 using System.Globalization;
 
-namespace Firebase.Database.Query
-{
+namespace Firebase.Database.Query {
     /// <summary>
     ///     Represents a firebase filtering query, e.g. "?LimitToLast=10".
     /// </summary>
-    public class FilterQuery : ParameterQuery
-    {
+    public class FilterQuery : ParameterQuery {
         private readonly Func<bool> boolValueFactory;
         private readonly Func<double> doubleValueFactory;
         private readonly Func<string> valueFactory;
@@ -21,8 +19,7 @@ namespace Firebase.Database.Query
         /// <param name="client"> The owning client. </param>
         public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<string> valueFactory,
             FirebaseClient client)
-            : base(parent, filterFactory, client)
-        {
+            : base(parent, filterFactory, client) {
             this.valueFactory = valueFactory;
         }
 
@@ -35,8 +32,7 @@ namespace Firebase.Database.Query
         /// <param name="client"> The owning client. </param>
         public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<double> valueFactory,
             FirebaseClient client)
-            : base(parent, filterFactory, client)
-        {
+            : base(parent, filterFactory, client) {
             doubleValueFactory = valueFactory;
         }
 
@@ -49,8 +45,7 @@ namespace Firebase.Database.Query
         /// <param name="client"> The owning client. </param>
         public FilterQuery(FirebaseQuery parent, Func<string> filterFactory, Func<bool> valueFactory,
             FirebaseClient client)
-            : base(parent, filterFactory, client)
-        {
+            : base(parent, filterFactory, client) {
             boolValueFactory = valueFactory;
         }
 
@@ -59,10 +54,8 @@ namespace Firebase.Database.Query
         /// </summary>
         /// <param name="child"> The child. </param>
         /// <returns> Url parameter part of the resulting path. </returns>
-        protected override string BuildUrlParameter(FirebaseQuery child)
-        {
-            if (valueFactory != null)
-            {
+        protected override string BuildUrlParameter(FirebaseQuery child) {
+            if (valueFactory != null) {
                 if (valueFactory() == null) return "null";
                 return $"\"{valueFactory()}\"";
             }

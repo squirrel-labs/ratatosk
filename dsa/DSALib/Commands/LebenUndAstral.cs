@@ -1,14 +1,11 @@
 ﻿using System;
 using DSALib.Auxiliary;
-using DSALib.DSA_Game;
 using DSALib.Characters;
+using DSALib.DSA_Game;
 
-namespace DSALib.Commands
-{
-    public class LE
-    {
-        public static string LEAsync(ulong id, string modifier)
-        {
+namespace DSALib.Commands {
+    public class LE {
+        public static string LEAsync(ulong id, string modifier) {
             //This is the string that will be printed
             var res = "";
 
@@ -21,10 +18,8 @@ namespace DSALib.Commands
         }
     }
 
-    public class AE
-    {
-        public static string AEAsync(ulong id, string modifier)
-        {
+    public class AE {
+        public static string AEAsync(ulong id, string modifier) {
             //This is the string that will be printed
             var res = "";
 
@@ -36,10 +31,8 @@ namespace DSALib.Commands
         }
     }
 
-    public static class StatExtension
-    {
-        public static string get_LE_Text(this ICharacter c, string prop)
-        {
+    public static class StatExtension {
+        public static string get_LE_Text(this ICharacter c, string prop) {
             var res = "";
             var comp = new SpellCorrect();
             var character = c;
@@ -47,27 +40,22 @@ namespace DSALib.Commands
             res += character.Name + ":\n";
 
             //If there is actual input we process it
-            if (prop.Length > 0)
-            {
+            if (prop.Length > 0) {
                 res += "LE: ";
                 res += character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis + " -> ";
 
                 // Apply a change to current value
-                if (prop.StartsWith("+") || prop.StartsWith("-"))
-                {
+                if (prop.StartsWith("+") || prop.StartsWith("-")) {
                     //Allow overflowing the max
-                    if (prop.StartsWith("++"))
-                    {
+                    if (prop.StartsWith("++")) {
                         character.Lebenspunkte_Aktuell = character.Lebenspunkte_Aktuell +
                                                          Convert.ToInt32(prop.Substring(1, prop.Length - 1));
                     }
-                    else
-                    {
+                    else {
                         var temp = character.Lebenspunkte_Aktuell + Convert.ToInt32(prop) -
                                    character.Lebenspunkte_Basis;
                         //Stop from overflow overflow
-                        if (temp > 0 && prop.StartsWith("+"))
-                        {
+                        if (temp > 0 && prop.StartsWith("+")) {
                             character.Lebenspunkte_Aktuell =
                                 character.Lebenspunkte_Basis > character.Lebenspunkte_Aktuell
                                     ? character.Lebenspunkte_Basis
@@ -75,16 +63,14 @@ namespace DSALib.Commands
                             res += " Maximale Lebenspunkte sind erreicht ";
                         }
                         //Simply apply change
-                        else
-                        {
+                        else {
                             character.Lebenspunkte_Aktuell = character.Lebenspunkte_Aktuell + Convert.ToInt32(prop);
                         }
                     }
 
                     res += character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis;
                 }
-                else
-                {
+                else {
                     // Set to new value regardless of original
                     character.Lebenspunkte_Aktuell = Convert.ToInt32(prop);
 
@@ -92,16 +78,14 @@ namespace DSALib.Commands
                 }
             }
             //If no value is passed, the curent value is displayed
-            else
-            {
+            else {
                 res += "LE: " + character.Lebenspunkte_Aktuell + "/" + character.Lebenspunkte_Basis;
             }
 
             return res;
         }
 
-        public static string get_AE_Text(this ICharacter c, string prop)
-        {
+        public static string get_AE_Text(this ICharacter c, string prop) {
             var res = "";
             var comp = new SpellCorrect();
             var character = c;
@@ -109,27 +93,22 @@ namespace DSALib.Commands
             res += character.Name + ":\n";
 
             //If there is actual input we process it
-            if (prop.Length > 0)
-            {
+            if (prop.Length > 0) {
                 res += "AE: ";
                 res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis + " -> ";
 
                 // Apply a change to current value
-                if (prop.StartsWith("+") || prop.StartsWith("-"))
-                {
+                if (prop.StartsWith("+") || prop.StartsWith("-")) {
                     //Allow overflowing the max
-                    if (prop.StartsWith("++"))
-                    {
+                    if (prop.StartsWith("++")) {
                         character.Astralpunkte_Aktuell = character.Astralpunkte_Aktuell +
                                                          Convert.ToInt32(prop.Substring(1, prop.Length - 1));
                     }
-                    else
-                    {
+                    else {
                         var temp = character.Astralpunkte_Aktuell + Convert.ToInt32(prop) -
                                    character.Astralpunkte_Basis;
                         //Stop from overflow overflow
-                        if (temp > 0 && prop.StartsWith("+"))
-                        {
+                        if (temp > 0 && prop.StartsWith("+")) {
                             character.Astralpunkte_Aktuell =
                                 character.Astralpunkte_Basis > character.Astralpunkte_Aktuell
                                     ? character.Astralpunkte_Basis
@@ -137,14 +116,12 @@ namespace DSALib.Commands
                             res += " Maximale Astralpunkte sind erreicht ";
                         }
                         //Simply apply change
-                        else
-                        {
+                        else {
                             character.Astralpunkte_Aktuell = character.Astralpunkte_Aktuell + Convert.ToInt32(prop);
                         }
                     }
 
-                    if (character.Astralpunkte_Aktuell < 0)
-                    {
+                    if (character.Astralpunkte_Aktuell < 0) {
                         res += "Nicht genügend Astralpunkte! ";
                         character.Astralpunkte_Aktuell = 0;
                     }
@@ -152,16 +129,14 @@ namespace DSALib.Commands
                     res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis;
                 }
                 //Set to new value regardless of original
-                else
-                {
+                else {
                     character.Astralpunkte_Aktuell = Convert.ToInt32(prop);
 
                     res += character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis;
                 }
             }
             //If no value is passed, the curent value is displayed
-            else
-            {
+            else {
                 res += "AE: " + character.Astralpunkte_Aktuell + "/" + character.Astralpunkte_Basis;
             }
 

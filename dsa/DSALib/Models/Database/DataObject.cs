@@ -1,13 +1,9 @@
-﻿namespace DSALib.Models.Database
-{
-    public class DataObject : IDataObject
-    {
+﻿namespace DSALib.Models.Database {
+    public class DataObject : IDataObject {
+        public string Name { get; set; }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             return Name;
         }
-
-        public string Name { get; set; }
     }
 }

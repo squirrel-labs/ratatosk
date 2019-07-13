@@ -1,7 +1,5 @@
-﻿namespace DiscoBot.DSA_Game.Characters
-{
-    public interface ICombatant
-    {
+﻿namespace DiscoBot.DSA_Game.Characters {
+    public interface ICombatant {
         string Name { get; set; }
 
         int Lebenspunkte_Basis { get; set; }

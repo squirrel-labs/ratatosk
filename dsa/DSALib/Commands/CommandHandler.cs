@@ -1,20 +1,15 @@
 ﻿using System;
 using DSALib.Auxiliary;
 using DSALib.Auxiliary.Calculator;
-using DSALib.Commands;
 using DSALib.DSA_Game;
 using DSALib.Models.Network;
 
-namespace DSALib.Commands
-{
-    public class CommandHandler
-    {
-        public static CommandResponse ExecuteCommand(Command cmd)
-        {
+namespace DSALib.Commands {
+    public class CommandHandler {
+        public static CommandResponse ExecuteCommand(Command cmd) {
             var res = string.Empty;
             var type = ResponseType.Broadcast;
-            switch (cmd.CmdIdentifier.ToLower())
-            {
+            switch (cmd.CmdIdentifier.ToLower()) {
                 case "addChar":
                     res = FileHandler.AddChar(cmd.CharId, cmd.CmdText);
                     break;
@@ -62,11 +57,9 @@ namespace DSALib.Commands
             return new CommandResponse($"Kommando {cmd.CmdIdentifier} nicht gefunden", ResponseType.Error);
         }
 
-        private static string Proben(string name, string command, string waffe, int erschwernis = 0)
-        {
+        private static string Proben(string name, string command, string waffe, int erschwernis = 0) {
             var res = string.Empty;
-            switch (command.ToLower())
-            {
+            switch (command.ToLower()) {
                 case "f":
                 case "fern":
                 case "fernkampf":
@@ -107,12 +100,10 @@ namespace DSALib.Commands
             return res;
         }
 
-        private static string CheckCommand(string name, CommandTypes command, string waffe, int erschwernis = 0)
-        {
+        private static string CheckCommand(string name, CommandTypes command, string waffe, int erschwernis = 0) {
             var chr = Dsa.GetCharacter(0);
 
-            switch (command)
-            {
+            switch (command) {
                 case CommandTypes.Talent:
                     return chr.TestTalent(waffe, erschwernis);
                 case CommandTypes.Eigenschaft:

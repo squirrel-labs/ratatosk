@@ -1,10 +1,8 @@
-namespace Firebase.Database.Streaming
-{
+namespace Firebase.Database.Streaming {
     /// <summary>
     ///     The type of event.
     /// </summary>
-    public enum FirebaseEventType
-    {
+    public enum FirebaseEventType {
         /// <summary>
         ///     Item was inserted or updated.
         /// </summary>

@@ -1,10 +1,8 @@
-﻿namespace Firebase.Database.Offline
-{
+﻿namespace Firebase.Database.Offline {
     /// <summary>
     ///     Specifies the strategy for initial pull of server data.
     /// </summary>
-    public enum InitialPullStrategy
-    {
+    public enum InitialPullStrategy {
         /// <summary>
         ///     Don't pull anything.
         /// </summary>

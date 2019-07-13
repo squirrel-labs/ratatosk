@@ -1,20 +1,17 @@
 using System;
 
-namespace Firebase.Database.Query
-{
+namespace Firebase.Database.Query {
     /// <summary>
     ///     Query extensions providing linq like syntax for firebase server methods.
     /// </summary>
-    public static class QueryFactoryExtensions
-    {
+    public static class QueryFactoryExtensions {
         /// <summary>
         ///     Adds an auth parameter to the query.
         /// </summary>
         /// <param name="node"> The child. </param>
         /// <param name="tokenFactory"> The auth token. </param>
         /// <returns> The <see cref="AuthQuery" />. </returns>
-        internal static AuthQuery WithAuth(this FirebaseQuery node, Func<string> tokenFactory)
-        {
+        internal static AuthQuery WithAuth(this FirebaseQuery node, Func<string> tokenFactory) {
             return new AuthQuery(node, tokenFactory, node.Client);
         }
 
@@ -24,8 +21,7 @@ namespace Firebase.Database.Query
         /// <param name="node"> The child. </param>
         /// <param name="pathFactory"> The path of sub child. </param>
         /// <returns> The <see cref="ChildQuery" />. </returns>
-        public static ChildQuery Child(this ChildQuery node, Func<string> pathFactory)
-        {
+        public static ChildQuery Child(this ChildQuery node, Func<string> pathFactory) {
             return new ChildQuery(node, pathFactory, node.Client);
         }
 
@@ -37,8 +33,7 @@ namespace Firebase.Database.Query
         /// <param name="child"> The child. </param>
         /// <param name="propertyNameFactory"> The property name. </param>
         /// <returns> The <see cref="OrderQuery" />. </returns>
-        public static OrderQuery OrderBy(this ChildQuery child, Func<string> propertyNameFactory)
-        {
+        public static OrderQuery OrderBy(this ChildQuery child, Func<string> propertyNameFactory) {
             return new OrderQuery(child, propertyNameFactory, child.Client);
         }
 
@@ -49,8 +44,7 @@ namespace Firebase.Database.Query
         /// </summary>
         /// <param name="child"> The child. </param>
         /// <returns> The <see cref="OrderQuery" />. </returns>
-        public static OrderQuery OrderByKey(this ChildQuery child)
-        {
+        public static OrderQuery OrderByKey(this ChildQuery child) {
             return child.OrderBy("$key");
         }
 
@@ -61,8 +55,7 @@ namespace Firebase.Database.Query
         /// </summary>
         /// <param name="child"> The child. </param>
         /// <returns> The <see cref="OrderQuery" />. </returns>
-        public static OrderQuery OrderByValue(this ChildQuery child)
-        {
+        public static OrderQuery OrderByValue(this ChildQuery child) {
             return child.OrderBy("$value");
         }
 
@@ -73,8 +66,7 @@ namespace Firebase.Database.Query
         /// </summary>
         /// <param name="child"> The child. </param>
         /// <returns> The <see cref="OrderQuery" />. </returns>
-        public static OrderQuery OrderByPriority(this ChildQuery child)
-        {
+        public static OrderQuery OrderByPriority(this ChildQuery child) {
             return child.OrderBy("$priority");
         }
 
@@ -85,8 +77,7 @@ namespace Firebase.Database.Query
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
         /// <returns> The <see cref="FilterQuery" />. </returns>
-        public static FilterQuery StartAt(this ParameterQuery child, Func<string> valueFactory)
-        {
+        public static FilterQuery StartAt(this ParameterQuery child, Func<string> valueFactory) {
             return new FilterQuery(child, () => "startAt", valueFactory, child.Client);
         }
 
@@ -97,8 +88,7 @@ namespace Firebase.Database.Query
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
         /// <returns> The <see cref="FilterQuery" />. </returns>
-        public static FilterQuery EndAt(this ParameterQuery child, Func<string> valueFactory)
-        {
+        public static FilterQuery EndAt(this ParameterQuery child, Func<string> valueFactory) {
             return new FilterQuery(child, () => "endAt", valueFactory, child.Client);
         }
 
@@ -109,8 +99,7 @@ namespace Firebase.Database.Query
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
         /// <returns> The <see cref="FilterQuery" />. </returns>
-        public static FilterQuery EqualTo(this ParameterQuery child, Func<string> valueFactory)
-        {
+        public static FilterQuery EqualTo(this ParameterQuery child, Func<string> valueFactory) {
             return new FilterQuery(child, () => "equalTo", valueFactory, child.Client);
         }
 
@@ -121,8 +110,7 @@ namespace Firebase.Database.Query
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
         /// <returns> The <see cref="FilterQuery" />. </returns>
-        public static FilterQuery StartAt(this ParameterQuery child, Func<double> valueFactory)
-        {
+        public static FilterQuery StartAt(this ParameterQuery child, Func<double> valueFactory) {
             return new FilterQuery(child, () => "startAt", valueFactory, child.Client);
         }
 
@@ -133,8 +121,7 @@ namespace Firebase.Database.Query
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
         /// <returns> The <see cref="FilterQuery" />. </returns>
-        public static FilterQuery EndAt(this ParameterQuery child, Func<double> valueFactory)
-        {
+        public static FilterQuery EndAt(this ParameterQuery child, Func<double> valueFactory) {
             return new FilterQuery(child, () => "endAt", valueFactory, child.Client);
         }
 
@@ -145,8 +132,7 @@ namespace Firebase.Database.Query
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
         /// <returns> The <see cref="FilterQuery" />. </returns>
-        public static FilterQuery EqualTo(this ParameterQuery child, Func<double> valueFactory)
-        {
+        public static FilterQuery EqualTo(this ParameterQuery child, Func<double> valueFactory) {
             return new FilterQuery(child, () => "equalTo", valueFactory, child.Client);
         }
 
@@ -157,8 +143,7 @@ namespace Firebase.Database.Query
         /// <param name="child"> Current node. </param>
         /// <param name="valueFactory"> Value to start at. </param>
         /// <returns> The <see cref="FilterQuery" />. </returns>
-        public static FilterQuery EqualTo(this ParameterQuery child, Func<bool> valueFactory)
-        {
+        public static FilterQuery EqualTo(this ParameterQuery child, Func<bool> valueFactory) {
             return new FilterQuery(child, () => "equalTo", valueFactory, child.Client);
         }
 
@@ -168,8 +153,7 @@ namespace Firebase.Database.Query
         /// <param name="child"> Current node. </param>
         /// <param name="countFactory"> Number of elements. </param>
         /// <returns> The <see cref="FilterQuery" />. </returns>
-        public static FilterQuery LimitToFirst(this ParameterQuery child, Func<int> countFactory)
-        {
+        public static FilterQuery LimitToFirst(this ParameterQuery child, Func<int> countFactory) {
             return new FilterQuery(child, () => "limitToFirst", () => countFactory(), child.Client);
         }
 
@@ -179,8 +163,7 @@ namespace Firebase.Database.Query
         /// <param name="child"> Current node. </param>
         /// <param name="countFactory"> Number of elements. </param>
         /// <returns> The <see cref="FilterQuery" />. </returns>
-        public static FilterQuery LimitToLast(this ParameterQuery child, Func<int> countFactory)
-        {
+        public static FilterQuery LimitToLast(this ParameterQuery child, Func<int> countFactory) {
             return new FilterQuery(child, () => "limitToLast", () => countFactory(), child.Client);
         }
     }

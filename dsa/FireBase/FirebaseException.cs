@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Net;
 
-namespace Firebase.Database
-{
-    public class FirebaseException : Exception
-    {
+namespace Firebase.Database {
+    public class FirebaseException : Exception {
         public FirebaseException(string requestUrl, string requestData, string responseData, HttpStatusCode statusCode)
-            : base(GenerateExceptionMessage(requestUrl, requestData, responseData))
-        {
+            : base(GenerateExceptionMessage(requestUrl, requestData, responseData)) {
             RequestUrl = requestUrl;
             RequestData = requestData;
             ResponseData = responseData;
@@ -16,8 +13,7 @@ namespace Firebase.Database
 
         public FirebaseException(string requestUrl, string requestData, string responseData, HttpStatusCode statusCode,
             Exception innerException)
-            : base(GenerateExceptionMessage(requestUrl, requestData, responseData), innerException)
-        {
+            : base(GenerateExceptionMessage(requestUrl, requestData, responseData), innerException) {
             RequestUrl = requestUrl;
             RequestData = requestData;
             ResponseData = responseData;
@@ -44,8 +40,7 @@ namespace Firebase.Database
         /// </summary>
         public HttpStatusCode StatusCode { get; }
 
-        private static string GenerateExceptionMessage(string requestUrl, string requestData, string responseData)
-        {
+        private static string GenerateExceptionMessage(string requestUrl, string requestData, string responseData) {
             return
                 $"Exception occured while processing the request.\nUrl: {requestUrl}\nRequest Data: {requestData}\nResponse: {responseData}";
         }

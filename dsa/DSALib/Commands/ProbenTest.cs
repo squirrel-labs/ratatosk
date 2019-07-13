@@ -1,7 +1,5 @@
-﻿namespace DSALib.Commands
-{
-    public class ProbenTest
-    {
+﻿namespace DSALib.Commands {
+    public class ProbenTest {
         /*[Command("t"), Summary("Würfelt ein Talent-/Zauberprobe")]
         [Alias("T", "Talent", "talent", "versuche")]
         public Task TalentAsync([Summary("Talent oder Zaubername")] string talent, int erschwernis = 0)

@@ -2,26 +2,21 @@
 using DSALib.Auxiliary;
 using DSALib.DSA_Game.Save;
 
-namespace DSALib.Commands
-{
-    public class Help
-    {
+namespace DSALib.Commands {
+    public class Help {
         //public static List<CommandInfo> Commands { get; } = new List<CommandInfo>();
 
 
-        public static string Get_Specific_Help(string command)
-        {
+        public static string Get_Specific_Help(string command) {
             // return command specific help
             var com = Properties.CommandInfos
                 .OrderBy(x => SpellCorrect.Compare(x.Name, command.ToLower())).Last(); // get best fit command
             return com.GetDescription();
         }
 
-        public static string Get_Generic_Help()
-        {
+        public static string Get_Generic_Help() {
             var res = "";
-            foreach (var com in Properties.CommandInfos)
-            {
+            foreach (var com in Properties.CommandInfos) {
                 var first_column_width = 8;
                 res += ("!" + com.Name + ": ").AddSpaces(first_column_width) + com.Brief;
 
@@ -35,8 +30,7 @@ namespace DSALib.Commands
             return res;
         }
 
-        public static string ShowHelp(params string[] commandList)
-        {
+        public static string ShowHelp(params string[] commandList) {
             var command = "";
             if (commandList.Length > 0) command = commandList.Aggregate((s, c) => s + " " + c);
 

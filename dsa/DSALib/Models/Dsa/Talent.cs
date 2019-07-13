@@ -1,9 +1,9 @@
-﻿namespace DSALib.Models.Dsa
-{
-    public class Talent : Database.DataObject // talent objekt
+﻿using DSALib.Models.Database;
+
+namespace DSALib.Models.Dsa {
+    public class Talent : DataObject // talent objekt
     {
-        public Talent(string name, string probe, int value)
-        {
+        public Talent(string name, string probe, int value) {
             Name = name;
             Probe = probe;
             Value = value;
@@ -21,10 +21,8 @@
             return temp;
         }
 
-        public bool IstFernkampftalent()
-        {
-            switch (Name)
-            {
+        public bool IstFernkampftalent() {
+            switch (Name) {
                 case "Armbrust":
                 case "Belagerungswaffen":
                 case "Blasrohr":

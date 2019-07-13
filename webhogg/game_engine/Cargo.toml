@@ -1,0 +1,8 @@
+[package]
+name = "game_engine"
+version = "0.1.0"
+authors = ["konsumlamm <konsumlamm@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+packed_simd = "0.3.3"
