@@ -1,5 +1,7 @@
-use crate::math::{AABox, RBox, Vec2};
+use crate::boxes::{AABox, RBox};
+use crate::math::Vec2;
 
+/// A trait for objects that can collide with other objects.
 pub trait Collide<Rhs> {
     fn collides(&self, other: &Rhs) -> bool;
 }
@@ -32,7 +34,7 @@ impl Collide<Vec2> for RBox {
 
         let v1_dist = ((v1_diff - self.pos) / self.v2).x;
         let v2_dist = ((v2_diff - self.pos) / self.v1).x;
-        0.0 <= v1_dist && v2_dist <= 1.0 && 0.0 <= v2_dist && v2_dist <= 1.0
+        0.0 <= v1_dist && v1_dist <= 1.0 && 0.0 <= v2_dist && v2_dist <= 1.0
         //v1_diff < self.pos + self.v2 && self.pos < v1_diff
         //&& v2_diff < self.pos + self.v1 && self.pos < v2_diff
     }
