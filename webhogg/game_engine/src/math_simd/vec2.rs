@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::{fmt, ops};
 
 use packed_simd::f32x2;
@@ -102,6 +103,28 @@ impl ops::DivAssign for Vec2 {
         self.0 /= other.0;
     }
 }
+
+impl PartialOrd for Vec2 {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self == other {
+            Some(Ordering::Equal)
+        } else if self.0.le(other.0).all() {
+            Some(Ordering::Less)
+        } else if self.0.ge(other.0).all() {
+            Some(Ordering::Greater)
+        } else {
+            None
+        }
+    }
+}
+
+impl PartialEq for Vec2 {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
+impl Eq for Vec2 {}
 
 impl Vec2 {
     pub fn new(x: f32, y: f32) -> Self {
