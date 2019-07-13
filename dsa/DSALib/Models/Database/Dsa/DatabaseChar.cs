@@ -3,17 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using DSALib.DSA_Game.Characters;
 
-namespace DSALib.Models.Database.Dsa
-{
-    public class DatabaseChar
-    {
-        public DatabaseChar()
-        {
+namespace DSALib.Models.Database.Dsa {
+    public class DatabaseChar {
+        public DatabaseChar() {
         }
 
         public DatabaseChar(int id, string name, string rasse, List<Field> skills, List<Field> talents,
-            List<Advantage> advantages, List<CharSpell> spells, List<WeaponTalent> weaponTalents)
-        {
+            List<Advantage> advantages, List<CharSpell> spells, List<WeaponTalent> weaponTalents) {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Race = rasse ?? throw new ArgumentNullException(nameof(rasse));
@@ -41,8 +37,7 @@ namespace DSALib.Models.Database.Dsa
         public List<WeaponTalent> WeaponTalents { get; set; } = new List<WeaponTalent>();
 
 
-        public static void LoadChar(Character file, out GroupChar group, out DatabaseChar data)
-        {
+        public static void LoadChar(Character file, out GroupChar group, out DatabaseChar data) {
             group = new GroupChar();
             data = new DatabaseChar();
 

@@ -1,7 +1,5 @@
-namespace Firebase.Database.Streaming
-{
-    internal enum FirebaseServerEventType
-    {
+namespace Firebase.Database.Streaming {
+    internal enum FirebaseServerEventType {
         Put,
 
         Patch,

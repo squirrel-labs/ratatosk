@@ -4,10 +4,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Firebase.Database.Query;
 
-namespace Firebase.Database.Offline
-{
-    public static class DatabaseExtensions
-    {
+namespace Firebase.Database.Offline {
+    public static class DatabaseExtensions {
         /// <summary>
         ///     Create new instances of the <see cref="RealtimeDatabase{T}" />.
         /// </summary>
@@ -24,8 +22,7 @@ namespace Firebase.Database.Offline
         public static RealtimeDatabase<T> AsRealtimeDatabase<T>(this ChildQuery query, string filenameModifier = "",
             string elementRoot = "", StreamingOptions streamingOptions = StreamingOptions.LatestOnly,
             InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true)
-            where T : class
-        {
+            where T : class {
             return new RealtimeDatabase<T>(query, elementRoot, query.Client.Options.OfflineDatabaseFactory,
                 filenameModifier, streamingOptions, initialPullStrategy, pushChanges);
         }
@@ -49,8 +46,7 @@ namespace Firebase.Database.Offline
             StreamingOptions streamingOptions = StreamingOptions.LatestOnly,
             InitialPullStrategy initialPullStrategy = InitialPullStrategy.MissingOnly, bool pushChanges = true)
             where T : class
-            where TSetHandler : ISetHandler<T>, new()
-        {
+            where TSetHandler : ISetHandler<T>, new() {
             return new RealtimeDatabase<T>(query, elementRoot, query.Client.Options.OfflineDatabaseFactory,
                 filenameModifier, streamingOptions, initialPullStrategy, pushChanges,
                 Activator.CreateInstance<TSetHandler>());
@@ -68,8 +64,7 @@ namespace Firebase.Database.Offline
         /// </param>
         public static void Patch<T>(this RealtimeDatabase<T> db, string key, T obj, bool syncOnline = true,
             int priority = 1)
-            where T : class
-        {
+            where T : class {
             db.Set(key, obj, syncOnline ? SyncOptions.Patch : SyncOptions.None, priority);
         }
 
@@ -85,8 +80,7 @@ namespace Firebase.Database.Offline
         /// </param>
         public static void Put<T>(this RealtimeDatabase<T> db, string key, T obj, bool syncOnline = true,
             int priority = 1)
-            where T : class
-        {
+            where T : class {
             db.Set(key, obj, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
         }
 
@@ -101,8 +95,7 @@ namespace Firebase.Database.Offline
         /// </param>
         /// <returns> The generated key for this object. </returns>
         public static string Post<T>(this RealtimeDatabase<T> db, T obj, bool syncOnline = true, int priority = 1)
-            where T : class
-        {
+            where T : class {
             var key = FirebaseKeyGenerator.Next();
 
             db.Set(key, obj, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
@@ -120,8 +113,7 @@ namespace Firebase.Database.Offline
         ///     priority.
         /// </param>
         public static void Delete<T>(this RealtimeDatabase<T> db, string key, bool syncOnline = true, int priority = 1)
-            where T : class
-        {
+            where T : class {
             db.Set(key, null, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
         }
 
@@ -143,8 +135,7 @@ namespace Firebase.Database.Offline
         public static void Put<T, TProperty>(this RealtimeDatabase<T> db, string key,
             Expression<Func<T, TProperty>> propertyExpression, TProperty value, bool syncOnline = true,
             int priority = 1)
-            where T : class
-        {
+            where T : class {
             db.Set(key, propertyExpression, value, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
         }
 
@@ -166,8 +157,7 @@ namespace Firebase.Database.Offline
         public static void Patch<T, TProperty>(this RealtimeDatabase<T> db, string key,
             Expression<Func<T, TProperty>> propertyExpression, TProperty value, bool syncOnline = true,
             int priority = 1)
-            where T : class
-        {
+            where T : class {
             db.Set(key, propertyExpression, value, syncOnline ? SyncOptions.Patch : SyncOptions.None, priority);
         }
 
@@ -189,8 +179,7 @@ namespace Firebase.Database.Offline
         public static void Delete<T, TProperty>(this RealtimeDatabase<T> db, string key,
             Expression<Func<T, TProperty>> propertyExpression, bool syncOnline = true, int priority = 1)
             where T : class
-            where TProperty : class
-        {
+            where TProperty : class {
             db.Set(key, propertyExpression, null, syncOnline ? SyncOptions.Put : SyncOptions.None, priority);
         }
 
@@ -215,8 +204,7 @@ namespace Firebase.Database.Offline
             Expression<Func<T, TSelector>> propertyExpression, TProperty value, bool syncOnline = true,
             int priority = 1)
             where T : class
-            where TSelector : IDictionary<string, TProperty>
-        {
+            where TSelector : IDictionary<string, TProperty> {
             var nextKey = FirebaseKeyGenerator.Next();
             var expression = Expression.Lambda<Func<T, TProperty>>(
                 Expression.Call(propertyExpression.Body,
@@ -245,8 +233,7 @@ namespace Firebase.Database.Offline
         public static void Delete<T, TProperty>(this RealtimeDatabase<T> db, string key,
             Expression<Func<T, IDictionary<string, TProperty>>> propertyExpression, string dictionaryKey,
             bool syncOnline = true, int priority = 1)
-            where T : class
-        {
+            where T : class {
             var expression = Expression.Lambda<Func<T, TProperty>>(
                 Expression.Call(propertyExpression.Body,
                     typeof(IDictionary<string, TProperty>).GetRuntimeMethod("get_Item", new[] {typeof(string)}),

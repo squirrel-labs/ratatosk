@@ -1,12 +1,10 @@
 using System;
 
-namespace Firebase.Database.Query
-{
+namespace Firebase.Database.Query {
     /// <summary>
     ///     Represents a firebase ordering query, e.g. "?OrderBy=Foo".
     /// </summary>
-    public class OrderQuery : ParameterQuery
-    {
+    public class OrderQuery : ParameterQuery {
         private readonly Func<string> propertyNameFactory;
 
         /// <summary>
@@ -16,8 +14,7 @@ namespace Firebase.Database.Query
         /// <param name="propertyNameFactory"> The property name. </param>
         /// <param name="client"> The owning client. </param>
         public OrderQuery(ChildQuery parent, Func<string> propertyNameFactory, FirebaseClient client)
-            : base(parent, () => "orderBy", client)
-        {
+            : base(parent, () => "orderBy", client) {
             this.propertyNameFactory = propertyNameFactory;
         }
 
@@ -26,8 +23,7 @@ namespace Firebase.Database.Query
         /// </summary>
         /// <param name="child"> The child. </param>
         /// <returns> The <see cref="string" />. </returns>
-        protected override string BuildUrlParameter(FirebaseQuery child)
-        {
+        protected override string BuildUrlParameter(FirebaseQuery child) {
             return $"\"{propertyNameFactory()}\"";
         }
     }

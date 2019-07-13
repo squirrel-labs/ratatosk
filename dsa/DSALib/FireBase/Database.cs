@@ -2,56 +2,51 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DSALib.DSA_Game;
 using DSALib.DSA_Game.Characters;
 using DSALib.Models.Database.Dsa;
+using DSALib.Models.Database.Groups;
 using Firebase.Database;
 using Firebase.Database.Query;
 
-namespace DSALib.FireBase
-{
-    public static class Database
-    {
-        public static FirebaseClient Firebase;
+namespace DSALib.FireBase {
+    public static class Database {
+        private static readonly FirebaseClient Firebase;
 
-        public static Dictionary<string, DatabaseChar> Chars = new Dictionary<string, DatabaseChar>();
+        private static readonly Dictionary<string, DatabaseChar> Chars = new Dictionary<string, DatabaseChar>();
 
-        public static Dictionary<string, MeleeWeapon> MeleeList = new Dictionary<string, MeleeWeapon>();
+        private static readonly Dictionary<string, MeleeWeapon> MeleeList = new Dictionary<string, MeleeWeapon>();
 
-        public static Dictionary<string, RangedWeapon> RangedWeapons = new Dictionary<string, RangedWeapon>();
+        private static readonly Dictionary<string, RangedWeapon> RangedWeapons = new Dictionary<string, RangedWeapon>();
 
-        public static Dictionary<string, DSALib.Models.Database.Dsa.Talent> Talents = new Dictionary<string, DSALib.Models.Database.Dsa.Talent>();
+        private static readonly Dictionary<string, Talent> Talents = new Dictionary<string, Talent>();
 
-        public static Dictionary<string, GeneralSpell> Spells = new Dictionary<string, GeneralSpell>();
+        private static readonly Dictionary<string, GeneralSpell> Spells = new Dictionary<string, GeneralSpell>();
 
-        static Database()
-        {
+        static Database() {
             var auth = File.ReadAllText(Dsa.rootPath + "Token"); // your app secret
             Firebase = new FirebaseClient(
                 "https://heldenonline-4d828.firebaseio.com/",
-                new FirebaseOptions
-                {
+                new FirebaseOptions {
                     AuthTokenAsyncFactory = () => Task.FromResult(auth)
                 });
 
-            Task.Run(Initialize);
+            Task.Run((Action) Initialize);
         }
 
-        private static  void Initialize() {
+        private static void Initialize() {
             var waiting = new[] {
                 // ToDo IntializeCollection("Chars", Chars),
                 IntializeCollection("MeleeWeapons", MeleeList),
                 IntializeCollection("RangedWeapons", RangedWeapons),
                 IntializeCollection("Talents", Talents),
-                IntializeCollection("Spells", Spells),
+                IntializeCollection("Spells", Spells)
             };
             Task.WaitAll(waiting);
         }
 
-        private static async Task IntializeCollection<T>(string path, Dictionary<string, T> list)
-        {
+        private static async Task IntializeCollection<T>(string path, Dictionary<string, T> list) {
             var temp = await Firebase
                 .Child(path)
                 .OrderByKey()
@@ -60,8 +55,7 @@ namespace DSALib.FireBase
             foreach (var firebaseObject in temp) list.Add(firebaseObject.Key, firebaseObject.Object);
         }
 
-        public static async Task<int> AddChar(Character file, string group)
-        {
+        public static async Task<int> AddChar(Character file, string group) {
             DatabaseChar.LoadChar(file, out var groupChar, out var data);
 
             var lastChar = await Firebase
@@ -91,8 +85,7 @@ namespace DSALib.FireBase
             return id + 1;
         }
 
-        public static async Task RemoveChar(int id)
-        {
+        public static async Task RemoveChar(int id) {
             await Firebase
                 .Child("Groups")
                 .Child("Char" + id)
@@ -111,8 +104,7 @@ namespace DSALib.FireBase
                 .DeleteAsync();
         }
 
-        public static DatabaseChar GetChar(int id)
-        {
+        public static DatabaseChar GetChar(int id) {
             /*var chr = await firebase
                 .Child("Chars")
                 .Child("Char" + id)
@@ -121,8 +113,7 @@ namespace DSALib.FireBase
             return Chars["Char" + id];
         }
 
-        public static async Task<Inventory> GetInventory(int id)
-        {
+        public static async Task<Inventory> GetInventory(int id) {
             var inv = await Firebase
                 .Child("Inventories")
                 .Child("Inventory" + id)
@@ -130,32 +121,28 @@ namespace DSALib.FireBase
             return inv;
         }
 
-        public static async Task SetInventory(int id, Inventory inv)
-        {
+        public static async Task SetInventory(int id, Inventory inv) {
             await Firebase
                 .Child("Inventories")
                 .Child("Inventory" + id)
                 .PutAsync(inv);
         }
 
-        public static async Task AddTalent(DSALib.Models.Database.Dsa.Talent tal)
-        {
+        public static async Task AddTalent(Talent tal) {
             await Firebase
                 .Child("Talents")
                 .Child(tal.Name)
                 .PutAsync(tal);
         }
 
-        public static async Task RemoveTalent(string talent)
-        {
+        public static async Task RemoveTalent(string talent) {
             await Firebase
                 .Child("Talents")
                 .Child(talent)
                 .DeleteAsync();
         }
 
-        public static DSALib.Models.Database.Dsa.Talent GetTalent(string talent)
-        {
+        public static Talent GetTalent(string talent) {
             /*
                         return await firebase
                             .Child("Talents")
@@ -164,30 +151,26 @@ namespace DSALib.FireBase
             return Talents[talent];
         }
 
-        public static async Task AddSpell(GeneralSpell tal)
-        {
+        public static async Task AddSpell(GeneralSpell tal) {
             await Firebase
                 .Child("Spells")
                 .Child(tal.Name)
                 .PutAsync(tal);
         }
 
-        public static async Task RemoveSpell(string spell)
-        {
+        public static async Task RemoveSpell(string spell) {
             await Firebase
                 .Child("Spells")
                 .Child(spell)
                 .DeleteAsync();
         }
 
-        public static GeneralSpell GetSpell(string spell)
-        {
+        public static GeneralSpell GetSpell(string spell) {
             return Spells[spell];
         }
 
 
-        public static async Task AddWeapon(Weapon wep)
-        {
+        public static async Task AddWeapon(Weapon wep) {
             var collection = wep.GetType() == typeof(MeleeWeapon) ? "MeleeWeapons" : "RangedWeapons";
             await Firebase
                 .Child(collection)
@@ -195,8 +178,7 @@ namespace DSALib.FireBase
                 .PutAsync(wep);
         }
 
-        public static async Task RemoveWeapon(string weapon, bool ranged = false)
-        {
+        public static async Task RemoveWeapon(string weapon, bool ranged = false) {
             var collection = ranged ? "RangedWeapons" : "MeleeWeapons";
             await Firebase
                 .Child(collection)
@@ -204,8 +186,7 @@ namespace DSALib.FireBase
                 .DeleteAsync();
         }
 
-        public static async Task<Weapon> GetWeapon(string weapon, bool ranged = false)
-        {
+        public static async Task<Weapon> GetWeapon(string weapon, bool ranged = false) {
             var collection = ranged ? "RangedWeapons" : "MeleeWeapons";
             return await Firebase
                 .Child(collection)
@@ -213,12 +194,11 @@ namespace DSALib.FireBase
                 .OnceSingleAsync<Weapon>();
         }
 
-        public static async Task<List<Tuple<string, string>>> GetGroups()
-        {
+        public static async Task<List<Tuple<string, string>>> GetGroups() {
             var groups = await Firebase
                 .Child("Groups")
                 .OrderByKey()
-                .OnceAsync<DSALib.Models.Database.Groups.Group>();
+                .OnceAsync<Group>();
             var ret = new List<Tuple<string, string>>();
 
             foreach (var firebaseObject in groups)
@@ -227,22 +207,20 @@ namespace DSALib.FireBase
             return ret;
         }
 
-        public static async Task<DSALib.Models.Database.Groups.Group> GetGroup(int id)
-        {
+        public static async Task<Group> GetGroup(int id) {
             var group = await Firebase
                 .Child("Groups")
                 .Child("Group" + id)
-                .OnceSingleAsync<DSALib.Models.Database.Groups.Group>();
+                .OnceSingleAsync<Group>();
             return group;
         }
 
-        public static async Task AddGroup(DSALib.Models.Database.Groups.Group group)
-        {
+        public static async Task AddGroup(Group group) {
             var lastChar = await Firebase
                 .Child("Groups")
                 .OrderByKey()
                 .LimitToLast(1)
-                .OnceAsync<DSALib.Models.Database.Groups.Group>();
+                .OnceAsync<Group>();
             var id = group.Id = lastChar.First().Object.Id + 1;
 
             await Firebase
@@ -251,16 +229,14 @@ namespace DSALib.FireBase
                 .PutAsync(group);
         }
 
-        public static async void SetGroup(DSALib.Models.Database.Groups.Group group)
-        {
+        public static async void SetGroup(Group group) {
             await Firebase
                 .Child("Groups")
                 .Child("Group" + group.Id)
                 .PutAsync(group);
         }
 
-        public static async void DeleteGroup(int id)
-        {
+        public static async void DeleteGroup(int id) {
             await Firebase
                 .Child("Groups")
                 .Child("Group" + id)

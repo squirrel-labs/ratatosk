@@ -6,33 +6,27 @@ using System.Linq;
 using DSALib.Auxiliary;
 using Newtonsoft.Json;
 
-namespace DSALib.DSA_Game.Save
-{
-    public static class Properties
-    {
+namespace DSALib.DSA_Game.Save {
+    public static class Properties {
         public static Dictionary<string, object> objects;
 
-        static Properties()
-        {
+        static Properties() {
             objects = new Dictionary<string, object>();
             /*this.objects.Add("Sounds", new List<Sound>());
             this.objects.Add("CommandInfos", new List<CommandInfo>());*/
         }
 
-        public static List<CommandInfo> CommandInfos
-        {
+        public static List<CommandInfo> CommandInfos {
             get => objects["CommandInfo"] as List<CommandInfo>;
             set => objects["CommandInfo"] = value;
         } // use Properties.Commandinfos to access the abstract Object array
 
 
-        public static void Deserialize(string path = @"Properties")
-        {
+        public static void Deserialize(string path = @"Properties") {
             var files = Directory.GetFiles(path, "*.json");
 
             foreach (var file in files)
-                try
-                {
+                try {
                     var name = file.Split('\\').Last().Split('.')[0].Replace('-', '.');
                     var data = File.ReadAllText(file);
                     var type = Type.GetType(name);
@@ -41,19 +35,15 @@ namespace DSALib.DSA_Game.Save
                     var o = JsonConvert.DeserializeObject(data, type);
                     objects.Add(name.Split('.').Last(), o);
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     // ignored
                     Console.WriteLine($"Laden von Save-File {file} fehlgeschlagen." + e);
                 }
         }
 
-        public static void Serialize(string path = @"..\..\Properties\")
-        {
-            try
-            {
-                foreach (var o in objects)
-                {
+        public static void Serialize(string path = @"..\..\Properties\") {
+            try {
+                foreach (var o in objects) {
                     var assembly = o.Value is IList list
                         ? list[0]?.GetType().FullName
                         : o.Value.GetType().FullName;
@@ -64,8 +54,7 @@ namespace DSALib.DSA_Game.Save
                             Formatting.Indented)); // Deserialize Data and create CommandInfo Struct
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 // ignored
                 Console.WriteLine("Speichern von Save-File fehlgeschlagen." + e);
             }

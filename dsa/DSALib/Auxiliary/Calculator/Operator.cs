@@ -1,17 +1,14 @@
 ﻿using System;
 using DSALibv.Auxiliary.Calculator;
 
-namespace DSALib.Auxiliary.Calculator
-{
+namespace DSALib.Auxiliary.Calculator {
     /// <summary>
     ///     The Operator Class represents a binary operator with tow Arguments and an Operation type
     /// </summary>
-    public class Operator : ISolvable
-    {
+    public class Operator : ISolvable {
         private readonly ISolvable arg1, arg2;
 
-        public Operator(ISolvable arg1, ISolvable arg2, Ops operatorType)
-        {
+        public Operator(ISolvable arg1, ISolvable arg2, Ops operatorType) {
             this.arg1 = arg1;
             this.arg2 = arg2;
             OperatorType = operatorType;
@@ -19,11 +16,9 @@ namespace DSALib.Auxiliary.Calculator
 
         public Ops OperatorType { get; set; }
 
-        public int Solve()
-        {
+        public int Solve() {
             int result;
-            switch (OperatorType)
-            {
+            switch (OperatorType) {
                 case Ops.Dice:
                     result = Dice.Roll(arg1.Solve(), arg2.Solve());
                     break;
@@ -43,8 +38,7 @@ namespace DSALib.Auxiliary.Calculator
             return result;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             return $"({arg1} {OperatorType} {arg2})";
         }
     }

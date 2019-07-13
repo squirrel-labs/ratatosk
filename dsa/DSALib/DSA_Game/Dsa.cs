@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DSALib.Characters;
 using DSALib.DSA_Game.Characters;
 using DSALib.DSA_Game.Save;
-using DSALib;
-using DSALib.Characters;
 using DSALib.Models.Dsa;
 
-namespace DSALib.DSA_Game
-{
-    public static class Dsa
-    {
+namespace DSALib.DSA_Game {
+    public static class Dsa {
 #if DEBUG
         public const string
             rootPath = ""; //"C:\\Users\\Dennis\\Source\\Repos\\DiscoBot\\DSALib\\";//"DiscoBot\\DSALib\\";
@@ -25,23 +22,19 @@ namespace DSALib.DSA_Game
 
         public static List<Zauber> Zauber { get; set; } = new List<Zauber>();
 
-        public static Session Session
-        {
-            get
-            {
+        public static Session Session {
+            get {
                 s_session.Chars = Chars.Select(x => SaveChar.FromICharacter(x)).ToList();
                 return s_session;
             }
 
-            set
-            {
+            set {
                 s_session = value;
                 foreach (var x in value.Chars) Chars.Find(c => c.Name.Equals(x.Name)).Update(x);
             }
         }
 
-        public static void Startup()
-        {
+        public static void Startup() {
             //new .Auxiliary.Calculator.StringSolver("1d100 - (1d200 + 1) * -50000").Solve();
             /*Session = new Session();*/
             // relation.Add("Papo", "Pump aus der Gosse");
@@ -75,20 +68,17 @@ namespace DSALib.DSA_Game
             //new WeaponImporter().DownloadWeapons().Wait();
 
 
-            Session = new Session
-            {
+            Session = new Session {
                 Chars = Chars.Select(SaveChar.FromICharacter).ToList()
             };
             //Session.Save();
         }
 
-        public static ICharacter GetCharacter(ulong id)
-        {
+        public static ICharacter GetCharacter(ulong id) {
             throw new NotImplementedException();
         }
 
-        public static ICharacter GetCharacter(string name, ulong groupId)
-        {
+        public static ICharacter GetCharacter(string name, ulong groupId) {
             throw new NotImplementedException();
         }
     }

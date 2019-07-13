@@ -1,11 +1,8 @@
 ﻿using System;
 
-namespace DSALib.Models.Database.Dsa
-{
-    public class CharSpell
-    {
-        public CharSpell(string representation, int value)
-        {
+namespace DSALib.Models.Database.Dsa {
+    public class CharSpell {
+        public CharSpell(string representation, int value) {
             this.representation = representation ?? throw new ArgumentNullException(nameof(representation));
             this.value = value;
         }
