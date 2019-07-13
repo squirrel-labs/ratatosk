@@ -6,6 +6,8 @@ echo
 
 suc=1
 
+mkdir gen &> /dev/null
+
 cd graphics
 sh build |& awk '/.*/ {printf("graphics:    "); print}'
 ret="${PIPESTATUS[0]}"
