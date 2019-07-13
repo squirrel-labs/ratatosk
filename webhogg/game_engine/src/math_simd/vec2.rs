@@ -3,6 +3,8 @@ use std::{fmt, ops};
 
 use packed_simd::f32x2;
 
+use crate::math_simd::EPSILON;
+
 #[derive(Clone, Copy)]
 pub struct Vec2(f32x2);
 
@@ -120,7 +122,7 @@ impl PartialOrd for Vec2 {
 
 impl PartialEq for Vec2 {
     fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
+        (self.0 - other.0).abs().lt(f32x2::splat(EPSILON)).all()
     }
 }
 
