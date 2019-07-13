@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::ops;
 
 use crate::math::EPSILON;
@@ -142,6 +143,20 @@ impl ops::DivAssign for Vec3 {
         self.x /= other.x;
         self.y /= other.y;
         self.z /= other.z
+    }
+}
+
+impl PartialOrd for Vec3 {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self == other {
+            Some(Ordering::Equal)
+        } else if self.x <= other.x && self.y <= other.y && self.z <= other.z {
+            Some(Ordering::Less)
+        } else if self.x >= other.x && self.y >= other.y && self.z >= other.z {
+            Some(Ordering::Greater)
+        } else {
+            None
+        }
     }
 }
 
