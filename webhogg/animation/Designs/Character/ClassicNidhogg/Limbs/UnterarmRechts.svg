@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="15.028803mm"
+   height="10.028803mm"
+   viewBox="0 0 15.028803 10.028803"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="UnterarmRechts.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="-38.053358"
+     inkscape:cy="-198.93494"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1046"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-81.078265,-124.73052)">
+    <rect
+       id="rect3729-1-7-428"
+       width="5"
+       height="5"
+       x="81.092667"
+       y="129.74492"
+       style="fill:#ff7f2a;stroke:#ff7f2a;stroke-width:0.02880294;stroke-opacity:1" />
+    <rect
+       id="rect3729-1-7-03"
+       width="5"
+       height="5"
+       x="86.092667"
+       y="124.74492"
+       style="fill:#ff7f2a;stroke:#ff7f2a;stroke-width:0.02880294;stroke-opacity:1" />
+    <rect
+       id="rect3729-1-7-54"
+       width="5"
+       height="5"
+       x="91.092667"
+       y="124.74492"
+       style="fill:#ff7f2a;stroke:#ff7f2a;stroke-width:0.02880294;stroke-opacity:1" />
+    <rect
+       id="rect3729-1-7-030"
+       width="5"
+       height="5"
+       x="81.092667"
+       y="124.74492"
+       style="fill:#ff7f2a;stroke:#ff7f2a;stroke-width:0.02880294;stroke-opacity:1" />
+  </g>
+</svg>
