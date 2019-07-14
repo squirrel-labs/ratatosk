@@ -138,22 +138,27 @@ impl ops::DivAssign<f32> for Mat2 {
 }
 
 impl Mat2 {
+    /// Creates a new Mat2.
     pub fn new(a: f32, b: f32, c: f32, d: f32) -> Self {
         Self { data: [a, b, c, d] }
     }
 
+    /// Creates a new Mat2 from two Vec2.
     pub fn from_vec2(v1: Vec2, v2: Vec2) -> Self {
         Self::new(v1.x(), v1.y(), v2.x(), v2.y())
     }
 
+    /// Returns the zero matrix.
     pub fn zero() -> Self {
         Self::new(0.0, 0.0, 0.0, 0.0)
     }
 
+    /// Returns the identity matrix.
     pub fn identity() -> Self {
         Self::new(1.0, 0.0, 0.0, 1.0)
     }
 
+    /// Returns the transposed matrix.
     pub fn transpose(self) -> Self {
         Self::new(self.data[0], self.data[2], self.data[1], self.data[3])
     }

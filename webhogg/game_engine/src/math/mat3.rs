@@ -213,12 +213,14 @@ impl ops::DivAssign<f32> for Mat3 {
 }
 
 impl Mat3 {
+    /// Creates a new Mat3.
     pub fn new(a: f32, b: f32, c: f32, d: f32, e: f32, f: f32, g: f32, h: f32, i: f32) -> Self {
         Self {
             data: [a, b, c, d, e, f, g, h, i],
         }
     }
 
+    /// Creates a new Mat2 from three Vec3.
     pub fn from_vec3(v1: Vec3, v2: Vec3, v3: Vec3) -> Self {
         Self::new(
             v1.x(),
@@ -233,14 +235,17 @@ impl Mat3 {
         )
     }
 
+    /// Returns the zero matrix.
     pub fn zero() -> Self {
         Self::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     }
 
+    /// Returns the identity matrix.
     pub fn identity() -> Self {
         Self::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
     }
 
+    /// Returns the transposed matrix.
     pub fn transpose(self) -> Self {
         Self::new(
             self.data[0],
