@@ -1,7 +1,6 @@
 pub mod boxes;
 pub mod collide;
 pub mod math;
-pub mod math_simd;
 
 #[cfg(test)]
 mod tests {

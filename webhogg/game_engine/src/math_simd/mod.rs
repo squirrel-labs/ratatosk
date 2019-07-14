@@ -1,3 +1,5 @@
+// Note: this requires `packed_simd = "0.3.3"` as dependency in Cargo.toml to compile
+
 pub mod mat2;
 pub mod vec2;
 
