@@ -1,0 +1,36 @@
+#!/bin/sh
+
+printf '\x1b[1mcargo fmt\x1b[m\n'
+if cargo fmt &> /dev/null; then
+  printf '\x1b[1mcargo\x1b[m\n'
+  if cargo build --color always --release; then
+    printf '\x1b[1mwasm-bindgen\x1b[m\n'
+    rm target/wasm32-unknown-unknown/release/webhogg_wasm.wasm
+    mv target/wasm32-unknown-unknown/release/webhogg_wasm_graphics.wasm target/wasm32-unknown-unknown/release/webhogg_wasm.wasm
+    if wasm-bindgen target/wasm32-unknown-unknown/release/webhogg_wasm.wasm --out-dir bin/ --no-typescript --target no-modules --remove-producers-section --remove-name-section --no-demangle
+    then
+      printf '\x1b[1mwasm-opt\x1b[m\n'
+      if wasm-opt --memory-packing --remove-unused-brs --enable-mutable-globals --enable-threads -Oz bin/webhogg_wasm_bg.wasm -o bin/webhogg-wasm.wasm; then
+        rm bin/webhogg_wasm_bg.wasm
+        mv bin/webhogg_wasm.js bin/webhogg-wasm.js
+        echo SUCCESS
+        exit 0
+      else
+        echo error: wasm-opt failed
+      fi
+    else
+      echo error: wasm-bindgen failed
+    fi
+  else
+    echo error: cargo build failed
+  fi
+else
+  if cargo build --color always --release; then
+    cargo --color always fmt -- --color always
+    echo error: cargo fmt failed
+  else
+    echo error: cargo build failed
+  fi
+fi
+exit 1
+
