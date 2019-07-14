@@ -65,10 +65,7 @@ impl RBox {
     /// Creates a new rotated box from a position, an orientation and a width.
     pub fn new(pos: Vec2, orientation: Vec2, width: f32) -> Self {
         let scale = width / orientation.norm();
-        let orth = Vec2 {
-            x: orientation.x,
-            y: -orientation.y,
-        } / scale;
+        let orth = Vec2::new(orientation.x(), -orientation.y()) / scale;
         Self {
             pos,
             v1: orientation,

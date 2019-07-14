@@ -3,8 +3,8 @@ use game_engine::math::Vec2;
 
 #[test]
 fn test_add_aabox_vec2() {
-    let a = Vec2 { x: 1.0, y: 7.5 };
-    let b = Vec2 { x: -3.0, y: 2.5 };
+    let a = Vec2::new(1.0, 7.5);
+    let b = Vec2::new(-3.0, 2.5);
     let aa_box = AABox { pos: a, size: b };
     let bb_box = AABox {
         pos: a + b,
@@ -16,8 +16,8 @@ fn test_add_aabox_vec2() {
 
 #[test]
 fn test_add_assign_aabox_vec2() {
-    let a = Vec2 { x: 1.0, y: 7.5 };
-    let b = Vec2 { x: -3.0, y: 2.5 };
+    let a = Vec2::new(1.0, 7.5);
+    let b = Vec2::new(-3.0, 2.5);
     let mut aa_box = AABox { pos: a, size: b };
     let bb_box = AABox {
         pos: a + b,
@@ -30,8 +30,8 @@ fn test_add_assign_aabox_vec2() {
 
 #[test]
 fn test_sub_aabox_vec2() {
-    let a = Vec2 { x: 1.0, y: 7.5 };
-    let b = Vec2 { x: -3.0, y: 2.5 };
+    let a = Vec2::new(1.0, 7.5);
+    let b = Vec2::new(-3.0, 2.5);
     let aa_box = AABox { pos: a, size: b };
     let bb_box = AABox {
         pos: a - b,
@@ -43,8 +43,8 @@ fn test_sub_aabox_vec2() {
 
 #[test]
 fn test_sub_assign_aabox_vec2() {
-    let a = Vec2 { x: 1.0, y: 7.5 };
-    let b = Vec2 { x: -3.0, y: 2.5 };
+    let a = Vec2::new(1.0, 7.5);
+    let b = Vec2::new(-3.0, 2.5);
     let mut aa_box = AABox { pos: a, size: b };
     let bb_box = AABox {
         pos: a - b,
@@ -57,9 +57,9 @@ fn test_sub_assign_aabox_vec2() {
 
 #[test]
 fn test_add_rbox_vec2() {
-    let a = Vec2 { x: 1.0, y: 7.5 };
-    let b = Vec2 { x: -3.0, y: 2.5 };
-    let c = Vec2 { x: -3.0, y: 2.5 };
+    let a = Vec2::new(1.0, 7.5);
+    let b = Vec2::new(-3.0, 2.5);
+    let c = Vec2::new(-3.0, 2.5);
     let aa_box = RBox {
         pos: a,
         v1: b,
@@ -76,9 +76,9 @@ fn test_add_rbox_vec2() {
 
 #[test]
 fn test_add_assign_rbox_vec2() {
-    let a = Vec2 { x: 1.0, y: 7.5 };
-    let b = Vec2 { x: -3.0, y: 2.5 };
-    let c = Vec2 { x: -3.0, y: 2.5 };
+    let a = Vec2::new(1.0, 7.5);
+    let b = Vec2::new(-3.0, 2.5);
+    let c = Vec2::new(-3.0, 2.5);
     let mut aa_box = RBox {
         pos: a,
         v1: b,
@@ -96,9 +96,9 @@ fn test_add_assign_rbox_vec2() {
 
 #[test]
 fn test_sub_rbox_vec2() {
-    let a = Vec2 { x: 1.0, y: 7.5 };
-    let b = Vec2 { x: -3.0, y: 2.5 };
-    let c = Vec2 { x: -3.0, y: 2.5 };
+    let a = Vec2::new(1.0, 7.5);
+    let b = Vec2::new(-3.0, 2.5);
+    let c = Vec2::new(-3.0, 2.5);
     let aa_box = RBox {
         pos: a,
         v1: b,
@@ -115,9 +115,9 @@ fn test_sub_rbox_vec2() {
 
 #[test]
 fn test_sub_assign_rbox_vec2() {
-    let a = Vec2 { x: 1.0, y: 7.5 };
-    let b = Vec2 { x: -3.0, y: 2.5 };
-    let c = Vec2 { x: -3.0, y: 2.5 };
+    let a = Vec2::new(1.0, 7.5);
+    let b = Vec2::new(-3.0, 2.5);
+    let c = Vec2::new(-3.0, 2.5);
     let mut aa_box = RBox {
         pos: a,
         v1: b,

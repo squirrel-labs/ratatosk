@@ -7,19 +7,16 @@ use crate::math::EPSILON;
 #[derive(Clone, Copy, Debug)]
 pub struct Vec2 {
     /// The x coordinate.
-    pub x: f32,
+    x: f32,
     /// The y coordinate.
-    pub y: f32,
+    y: f32,
 }
 
 impl ops::Add for Vec2 {
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
-        Self {
-            x: self.x + other.x,
-            y: self.y + other.y,
-        }
+        Self::new(self.x + other.x, self.y + other.y)
     }
 }
 
@@ -34,10 +31,7 @@ impl ops::Sub for Vec2 {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self::Output {
-        Self {
-            x: self.x - other.x,
-            y: self.y - other.y,
-        }
+        Self::new(self.x - other.x, self.y - other.y)
     }
 }
 
@@ -52,10 +46,7 @@ impl ops::Neg for Vec2 {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        Self {
-            x: -self.x,
-            y: -self.y,
-        }
+        Self::new(-self.x, -self.y)
     }
 }
 
@@ -63,10 +54,7 @@ impl ops::Mul<f32> for Vec2 {
     type Output = Self;
 
     fn mul(self, scale: f32) -> Self::Output {
-        Self {
-            x: self.x * scale,
-            y: self.y * scale,
-        }
+        Self::new(self.x * scale, self.y * scale)
     }
 }
 
@@ -81,10 +69,7 @@ impl ops::Mul for Vec2 {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self::Output {
-        Self {
-            x: self.x * other.x,
-            y: self.y * other.y,
-        }
+        Self::new(self.x * other.x, self.y * other.y)
     }
 }
 
@@ -99,10 +84,7 @@ impl ops::Div<f32> for Vec2 {
     type Output = Self;
 
     fn div(self, scale: f32) -> Self::Output {
-        Self {
-            x: self.x / scale,
-            y: self.y / scale,
-        }
+        Self::new(self.x / scale, self.y / scale)
     }
 }
 
@@ -117,10 +99,7 @@ impl ops::Div for Vec2 {
     type Output = Self;
 
     fn div(self, other: Self) -> Self::Output {
-        Self {
-            x: self.x / other.x,
-            y: self.y / other.y,
-        }
+        Self::new(self.x / other.x, self.y / other.y)
     }
 }
 
@@ -154,14 +133,24 @@ impl PartialEq for Vec2 {
 impl Eq for Vec2 {}
 
 impl Vec2 {
-    /// Returns the euclidean norm of the vector.
-    pub fn norm(self) -> f32 {
-        f32::hypot(self.x, self.y)
+    /// Creates a new Vec2 from x and y coordinates.
+    pub fn new(x: f32, y: f32) -> Self {
+        Self { x, y }
     }
 
-    /// Returns the square of the euclidean norm of the vector.
-    pub fn norm2(self) -> f32 {
-        self.dot(self)
+    /// Returns the zero vector.
+    pub fn zero() -> Self {
+        Self::new(0.0, 0.0)
+    }
+
+    /// Returns the x coordinate.
+    pub fn x(self) -> f32 {
+        self.x
+    }
+
+    /// Returns the y coordinate.
+    pub fn y(self) -> f32 {
+        self.y
     }
 
     /// Returns the dot product.
@@ -169,8 +158,18 @@ impl Vec2 {
         self.x * other.x + self.y * other.y
     }
 
-    /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has length 1.
-    pub fn normalized(self) -> Self {
+    /// Returns the square of the euclidean norm of the vector.
+    pub fn norm2(self) -> f32 {
+        self.dot(self)
+    }
+
+    /// Returns the euclidean norm of the vector.
+    pub fn norm(self) -> f32 {
+        f32::hypot(self.x, self.y)
+    }
+
+    /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has norm 1.
+    pub fn normalize(self) -> Self {
         self / self.norm()
     }
 }

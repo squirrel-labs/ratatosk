@@ -16,19 +16,17 @@ impl ops::Add for Mat3 {
     type Output = Self;
 
     fn add(self, other: Self) -> Self::Output {
-        Self {
-            data: [
-                self.data[0] + other.data[0],
-                self.data[1] + other.data[1],
-                self.data[2] + other.data[2],
-                self.data[3] + other.data[3],
-                self.data[4] + other.data[4],
-                self.data[5] + other.data[5],
-                self.data[6] + other.data[6],
-                self.data[7] + other.data[7],
-                self.data[8] + other.data[8],
-            ],
-        }
+        Self::new(
+            self.data[0] + other.data[0],
+            self.data[1] + other.data[1],
+            self.data[2] + other.data[2],
+            self.data[3] + other.data[3],
+            self.data[4] + other.data[4],
+            self.data[5] + other.data[5],
+            self.data[6] + other.data[6],
+            self.data[7] + other.data[7],
+            self.data[8] + other.data[8],
+        )
     }
 }
 
@@ -50,19 +48,17 @@ impl ops::Sub for Mat3 {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self::Output {
-        Self {
-            data: [
-                self.data[0] - other.data[0],
-                self.data[1] - other.data[1],
-                self.data[2] - other.data[2],
-                self.data[3] - other.data[3],
-                self.data[4] - other.data[4],
-                self.data[5] - other.data[5],
-                self.data[6] - other.data[6],
-                self.data[7] - other.data[7],
-                self.data[8] - other.data[8],
-            ],
-        }
+        Self::new(
+            self.data[0] - other.data[0],
+            self.data[1] - other.data[1],
+            self.data[2] - other.data[2],
+            self.data[3] - other.data[3],
+            self.data[4] - other.data[4],
+            self.data[5] - other.data[5],
+            self.data[6] - other.data[6],
+            self.data[7] - other.data[7],
+            self.data[8] - other.data[8],
+        )
     }
 }
 
@@ -84,19 +80,17 @@ impl ops::Neg for Mat3 {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        Self {
-            data: [
-                -self.data[0],
-                -self.data[1],
-                -self.data[2],
-                -self.data[3],
-                -self.data[4],
-                -self.data[5],
-                -self.data[6],
-                -self.data[7],
-                -self.data[8],
-            ],
-        }
+        Self::new(
+            -self.data[0],
+            -self.data[1],
+            -self.data[2],
+            -self.data[3],
+            -self.data[4],
+            -self.data[5],
+            -self.data[6],
+            -self.data[7],
+            -self.data[8],
+        )
     }
 }
 
@@ -104,19 +98,17 @@ impl ops::Mul<f32> for Mat3 {
     type Output = Self;
 
     fn mul(self, scale: f32) -> Self::Output {
-        Self {
-            data: [
-                self.data[0] * scale,
-                self.data[1] * scale,
-                self.data[2] * scale,
-                self.data[3] * scale,
-                self.data[4] * scale,
-                self.data[5] * scale,
-                self.data[6] * scale,
-                self.data[7] * scale,
-                self.data[8] * scale,
-            ],
-        }
+        Self::new(
+            self.data[0] * scale,
+            self.data[1] * scale,
+            self.data[2] * scale,
+            self.data[3] * scale,
+            self.data[4] * scale,
+            self.data[5] * scale,
+            self.data[6] * scale,
+            self.data[7] * scale,
+            self.data[8] * scale,
+        )
     }
 }
 
@@ -138,11 +130,11 @@ impl ops::Mul<Vec3> for Mat3 {
     type Output = Vec3;
 
     fn mul(self, other: Vec3) -> Self::Output {
-        Vec3 {
-            x: self.data[0] * other.x + self.data[3] * other.y + self.data[6] * other.z,
-            y: self.data[1] * other.x + self.data[4] * other.y + self.data[7] * other.z,
-            z: self.data[2] * other.x + self.data[5] * other.y + self.data[8] * other.z,
-        }
+        Vec3::new(
+            self.data[0] * other.x() + self.data[3] * other.y() + self.data[6] * other.z(),
+            self.data[1] * other.x() + self.data[4] * other.y() + self.data[7] * other.z(),
+            self.data[2] * other.x() + self.data[5] * other.y() + self.data[8] * other.z(),
+        )
     }
 }
 
@@ -150,37 +142,35 @@ impl ops::Mul for Mat3 {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self::Output {
-        Self {
-            data: [
-                self.data[0] * other.data[0]
-                    + self.data[3] * other.data[1]
-                    + self.data[6] * other.data[2],
-                self.data[1] * other.data[0]
-                    + self.data[4] * other.data[1]
-                    + self.data[7] * other.data[2],
-                self.data[2] * other.data[0]
-                    + self.data[5] * other.data[1]
-                    + self.data[8] * other.data[2],
-                self.data[0] * other.data[3]
-                    + self.data[3] * other.data[4]
-                    + self.data[6] * other.data[5],
-                self.data[1] * other.data[3]
-                    + self.data[4] * other.data[4]
-                    + self.data[7] * other.data[5],
-                self.data[2] * other.data[3]
-                    + self.data[5] * other.data[4]
-                    + self.data[8] * other.data[5],
-                self.data[0] * other.data[6]
-                    + self.data[3] * other.data[7]
-                    + self.data[6] * other.data[8],
-                self.data[1] * other.data[6]
-                    + self.data[4] * other.data[7]
-                    + self.data[7] * other.data[8],
-                self.data[2] * other.data[6]
-                    + self.data[5] * other.data[7]
-                    + self.data[8] * other.data[8],
-            ],
-        }
+        Self::new(
+            self.data[0] * other.data[0]
+                + self.data[3] * other.data[1]
+                + self.data[6] * other.data[2],
+            self.data[1] * other.data[0]
+                + self.data[4] * other.data[1]
+                + self.data[7] * other.data[2],
+            self.data[2] * other.data[0]
+                + self.data[5] * other.data[1]
+                + self.data[8] * other.data[2],
+            self.data[0] * other.data[3]
+                + self.data[3] * other.data[4]
+                + self.data[6] * other.data[5],
+            self.data[1] * other.data[3]
+                + self.data[4] * other.data[4]
+                + self.data[7] * other.data[5],
+            self.data[2] * other.data[3]
+                + self.data[5] * other.data[4]
+                + self.data[8] * other.data[5],
+            self.data[0] * other.data[6]
+                + self.data[3] * other.data[7]
+                + self.data[6] * other.data[8],
+            self.data[1] * other.data[6]
+                + self.data[4] * other.data[7]
+                + self.data[7] * other.data[8],
+            self.data[2] * other.data[6]
+                + self.data[5] * other.data[7]
+                + self.data[8] * other.data[8],
+        )
     }
 }
 
@@ -194,19 +184,17 @@ impl ops::Div<f32> for Mat3 {
     type Output = Self;
 
     fn div(self, scale: f32) -> Self::Output {
-        Self {
-            data: [
-                self.data[0] / scale,
-                self.data[1] / scale,
-                self.data[2] / scale,
-                self.data[3] / scale,
-                self.data[4] / scale,
-                self.data[5] / scale,
-                self.data[6] / scale,
-                self.data[7] / scale,
-                self.data[8] / scale,
-            ],
-        }
+        Self::new(
+            self.data[0] / scale,
+            self.data[1] / scale,
+            self.data[2] / scale,
+            self.data[3] / scale,
+            self.data[4] / scale,
+            self.data[5] / scale,
+            self.data[6] / scale,
+            self.data[7] / scale,
+            self.data[8] / scale,
+        )
     }
 }
 
@@ -225,31 +213,45 @@ impl ops::DivAssign<f32> for Mat3 {
 }
 
 impl Mat3 {
-    pub fn zero() -> Self {
+    pub fn new(a: f32, b: f32, c: f32, d: f32, e: f32, f: f32, g: f32, h: f32, i: f32) -> Self {
         Self {
-            data: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            data: [a, b, c, d, e, f, g, h, i],
         }
+    }
+
+    pub fn from_vec3(v1: Vec3, v2: Vec3, v3: Vec3) -> Self {
+        Self::new(
+            v1.x(),
+            v1.y(),
+            v1.z(),
+            v2.x(),
+            v2.y(),
+            v2.z(),
+            v3.x(),
+            v3.y(),
+            v3.z(),
+        )
+    }
+
+    pub fn zero() -> Self {
+        Self::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     }
 
     pub fn identity() -> Self {
-        Self {
-            data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0],
-        }
+        Self::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
     }
 
     pub fn transpose(self) -> Self {
-        Self {
-            data: [
-                self.data[0],
-                self.data[3],
-                self.data[6],
-                self.data[1],
-                self.data[4],
-                self.data[7],
-                self.data[2],
-                self.data[5],
-                self.data[8],
-            ],
-        }
+        Self::new(
+            self.data[0],
+            self.data[3],
+            self.data[6],
+            self.data[1],
+            self.data[4],
+            self.data[7],
+            self.data[2],
+            self.data[5],
+            self.data[8],
+        )
     }
 }

@@ -134,26 +134,42 @@ impl PartialEq for Vec2 {
 impl Eq for Vec2 {}
 
 impl Vec2 {
+    /// Creates a new Vec2 from x and y coordinates.
     pub fn new(x: f32, y: f32) -> Self {
         Self(f32x2::new(x, y))
     }
 
+    /// Returns the zero vector.
     pub fn zero() -> Self {
         Self(f32x2::splat(0.0))
     }
 
+    /// Returns the x coordinate.
+    pub fn x(self) -> f32 {
+        self.0.extract(0)
+    }
+
+    /// Returns the y coordinate.
+    pub fn y(self) -> f32 {
+        self.0.extract(1)
+    }
+
+    /// Returns the dot product.
     pub fn dot(self, other: Self) -> f32 {
         (self.0 * other.0).sum()
     }
 
+    /// Returns the square of the euclidean norm of the vector.
     pub fn norm2(self) -> f32 {
         self.dot(self)
     }
 
+    /// Returns the euclidean norm of the vector.
     pub fn norm(self) -> f32 {
         self.norm2().sqrt()
     }
 
+    /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has norm 1.
     pub fn normalize(self) -> Self {
         self / self.norm()
     }
