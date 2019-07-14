@@ -1,0 +1,44 @@
+#!/bin/sh
+
+printf "\x1b[1;97mStart application build\n======================="
+printf "\x1b[m\n"
+echo
+
+suc=1
+
+mkdir gen &> /dev/null
+
+cd graphics
+sh build |& awk '/.*/ {printf("graphics:    "); print}'
+ret="${PIPESTATUS[0]}"
+if [ $ret -eq 0 ]; then
+    printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m graphics build \n------------------------"
+    printf "\x1b[m\n"
+else
+    printf "\x1b[1;97m\x1b[31mfailed\x1b[m\x1b[1;97m graphics build \n---------------------"
+    printf "\x1b[m\n"
+    suc=0
+fi
+echo
+cd ../logic
+sh build |& awk '/.*/ {printf("logic:       "); print}'
+ret="${PIPESTATUS[0]}"
+if [ $ret -eq 0 ]; then
+    printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m logic build \n---------------------"
+    printf "\x1b[m\n"
+else
+    printf "\x1b[1;97m\x1b[31mfailed\x1b[m\x1b[1;97m logic build \n------------------"
+    printf "\x1b[m\n"
+    suc=0
+fi
+cd ..
+
+if [ $suc -eq 1 ]; then
+    printf "\n\x1b[1m> \x1b[0;97mMove targets into \x1b[3mgen/\n\x1b[m"
+
+    cp graphics/bin/webhogg-wasm.wasm gen/graphics.wasm
+    cp graphics/bin/webhogg-wasm.js gen/graphics.js
+
+    cp logic/bin/webhogg-wasm.wasm gen/logic.wasm
+    cp logic/bin/webhogg-wasm.js gen/logic.js
+fi

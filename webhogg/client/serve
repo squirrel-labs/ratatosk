@@ -1,0 +1,7 @@
+#!/bin/sh
+
+function serve_it() {
+    python3 -m http.server --bind 0.0.0.0 8080
+}
+
+serve_it >& /dev/null &
