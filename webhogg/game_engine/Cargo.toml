@@ -5,4 +5,3 @@ authors = ["konsumlamm <konsumlamm@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-packed_simd = "0.3.3"
