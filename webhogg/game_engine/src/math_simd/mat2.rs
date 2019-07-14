@@ -4,6 +4,7 @@ use packed_simd::{f32x2, shuffle};
 
 use crate::math_simd::{Vec2, EPSILON};
 
+#[derive(Clone, Copy)]
 pub struct Mat2(f32x2, f32x2);
 
 impl ops::Add for Mat2 {
