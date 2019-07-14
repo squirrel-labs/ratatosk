@@ -1,9 +1,9 @@
-use webhogg_wasm_shared::alloc::Allocator;
+use webhogg_wasm_shared::{
+    alloc::{Allocator, GraphicsAllocator},
+    get_allocator,
+};
 
 #[global_allocator]
-static ALLOCATOR: Allocator = Allocator {
-    pos: 1024 + 32,
-    mem0: 0x100000,
-};
+static ALLOCATOR: Allocator<GraphicsAllocator> = get_allocator!();
 
 mod entries;
