@@ -158,6 +158,18 @@ impl Mat2 {
         Self::new(1.0, 0.0, 0.0, 1.0)
     }
 
+    /// Returns a matrix that rotates by `angle`.
+    pub fn rotation(angle: f32) -> Self {
+        let cos = angle.cos();
+        let sin = angle.sin();
+        Self::new(cos, sin, -sin, cos)
+    }
+
+    /// Returns a matrix that scales by `scale`.
+    pub fn scaling(scale: f32) -> Self {
+        Self::new(scale, 0.0, scale, 0.0)
+    }
+
     /// Returns the transposed matrix.
     pub fn transpose(self) -> Self {
         Self::new(self.data[0], self.data[2], self.data[1], self.data[3])
