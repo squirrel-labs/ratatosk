@@ -139,7 +139,7 @@ pub struct Armature {
 }
 
 pub fn load_char(path: String) -> Result<AnimateChar, Box<dyn Error>> {
-    println!("Loading texture file:{}", path);
+    println!("Loading texture file: {}", path);
     let file = File::open(path)?;
     let reader = BufReader::new(file);
 
