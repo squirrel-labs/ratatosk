@@ -7,4 +7,3 @@ pub struct Char {
     bones: HashMap<&str, Bone>,
     animations: HashMap<&str, Animation>,
 }
-
