@@ -9,11 +9,15 @@ pub struct AllocatorSettings {
 
 #[macro_export]
 macro_rules! get_allocator {
-    () => (Allocator { _phantom: std::marker::PhantomData })
+    () => {
+        Allocator {
+            _phantom: std::marker::PhantomData,
+        }
+    };
 }
 
 pub struct Allocator<Type: SpecificAllocator> {
-    pub _phantom: std::marker::PhantomData<Type>
+    pub _phantom: std::marker::PhantomData<Type>,
 }
 pub struct LogicAllocator;
 pub struct GraphicsAllocator;
@@ -38,8 +42,7 @@ impl SpecificAllocator for LogicAllocator {
 impl SpecificAllocator for GraphicsAllocator {
     fn settings() -> AllocatorSettings {
         AllocatorSettings {
-            allocator_addr: ALLOCATOR_AREA_START
-                + std::mem::size_of::<MutableAllocator>(),
+            allocator_addr: ALLOCATOR_AREA_START + std::mem::size_of::<MutableAllocator>(),
             allocation_start_address: GRAPHICS_ALLOCATION_AREA_START,
         }
     }
@@ -82,6 +85,5 @@ impl MutableAllocator {
     }
 
     #[allow(unused_variables)]
-    unsafe fn dealloc(&mut self, ptr: *mut u8, layout: Layout) {
-    }
+    unsafe fn dealloc(&mut self, ptr: *mut u8, layout: Layout) {}
 }
