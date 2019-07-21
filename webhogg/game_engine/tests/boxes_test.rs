@@ -1,5 +1,5 @@
-use game_engine::boxes::*;
-use game_engine::math::Vec2;
+use rask_game_engine::boxes::*;
+use rask_game_engine::math::Vec2;
 
 #[test]
 fn test_add_aabox_vec2() {

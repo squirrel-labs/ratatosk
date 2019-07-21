@@ -1,4 +1,4 @@
-use game_engine::math::*;
+use rask_game_engine::math::*;
 
 #[test]
 fn test_add_vec2() {
