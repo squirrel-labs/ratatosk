@@ -1,3 +1,6 @@
+//! This crate contains the game logic, network connections and input processing.
+//! It interacts with the graphics crate through the shared array buffer
+
 use webhogg_wasm_shared::{
     alloc::{Allocator, LogicAllocator},
     get_allocator,
@@ -6,4 +9,5 @@ use webhogg_wasm_shared::{
 #[global_allocator]
 static ALLOCATOR: Allocator<LogicAllocator> = get_allocator!();
 
-mod entries;
+pub mod entries;
+pub mod websocket;
