@@ -73,14 +73,12 @@ impl WebSocketAdapter {
     /// Returns a WebSocketError if the connention is not ready or a different error occured
     ///
     pub fn send_str(&self, message: &str) -> Result<(), ClientError> {
-        let state = self.ws.ready_state();
-        if state == 1 {
-            Ok(self.ws.send_with_str(message)?)
-        } else {
-            Err(ClientError::WebSocketError(JsValue::from(
+        Some(())
+            .filter(|()| self.ws.ready_state() == 1)
+            .ok_or(ClientError::WebSocketError(JsValue::from(
                 "Websocket is not ready",
             )))
-        }
+            .and_then(|()| self.ws.send_with_str(message).map_err(|e| e.into()))
     }
 
     fn message_callback(e: MessageEvent) {
