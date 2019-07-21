@@ -4,8 +4,10 @@ use wasm_bindgen::prelude::*;
 
 use crate::websocket::*;
 use log::{error, info};
+use webhogg_wasm_shared::shared_heap_addr;
 use webhogg_wasm_shared::wasm_log::WasmLog;
-use webhogg_wasm_shared::SHARED_ALLOCATION_AREA_START as ADDR;
+
+static mut WS: Option<WebSocketAdapter> = None;
 
 /// This function is used to initialize the gamestate, communication
 /// with the graphics worker and setup networking
@@ -18,10 +20,10 @@ pub fn init() {
         crate::ALLOCATOR.reset();
     }
     unsafe {
-        let addr = ADDR as *mut u32;
-        *addr = 0;
-        let ws = addr.offset(4 as isize) as *mut WebSocketAdapter;
-        *ws = WebSocketAdapter::new("wss://echo.websocket.org").expect("Websocket creation failed");
+        *shared_heap_addr::<u32>(0) = 0;
+        WS = Some(
+            WebSocketAdapter::new("wss://echo.websocket.org").expect("Websocket creation failed"),
+        );
     }
     info!("logic entry reached");
 }
@@ -31,10 +33,12 @@ pub fn init() {
 #[wasm_bindgen]
 pub fn frame() {
     unsafe {
-        let addr = ADDR as *mut u32;
-        //log(&format!("num: {}", *addr));
-        let ws = addr.offset(4 as isize) as *mut WebSocketAdapter;
-        if let Err(res) = (*ws).send_str(format!("num: {}", *addr).as_str()) {
+        let num = *shared_heap_addr::<u32>(0);
+        if let Err(res) = WS
+            .as_ref()
+            .unwrap()
+            .send_str(format!("num: {}", num).as_str())
+        {
             error!("websocket not ready: {}", res);
         }
     }
