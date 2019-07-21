@@ -1,5 +1,5 @@
 [package]
-name = "game_engine"
+name = "rask-game-engine"
 version = "0.1.0"
 authors = ["konsumlamm <konsumlamm@gmail.com>"]
 edition = "2018"
