@@ -22,8 +22,8 @@ pub struct Texture {
     name: String,
 }
 
-pub fn load_char(path: String) -> Result<Textures, Box<dyn Error>> {
-    println!("Loading texture file:{}", path);
+pub fn load_textures(path: String) -> Result<Textures, Box<dyn Error>> {
+    println!("Loading texture file: {}", path);
     let file = File::open(path)?;
     let reader = BufReader::new(file);
 
