@@ -77,14 +77,14 @@ impl<T: Element> DoubleBuffer<T> {
 }
 
 impl<'a, T: Element> ReaderBufferView<'a, T> {
-    pub fn get(&'a self) -> &'a T {
+    pub fn get<'b>(&'b self) -> &'b T {
         &self.ptr.buffer[self.read_pos as usize]
     }
 }
 
 impl<'a, T: Element> WriterBufferView<'a, T> {
-    pub fn set(&'a mut self, data: &T) {
-        self.ptr.buffer[self.write_pos as usize] = data.clone();
+    pub fn set(&mut self, data: T) {
+        self.ptr.buffer[self.write_pos as usize] = data;
     }
 }
 
