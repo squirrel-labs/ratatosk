@@ -25,6 +25,10 @@ rand = "0.3.14"
 version = "0.1.0"
 path = "../shared"
 
+[dependencies.rask-game-engine]
+version = "0.1.0"
+path = "../../game_engine"
+
 [dependencies.web-sys]
 version = "0.3"
 features = [
@@ -36,5 +40,8 @@ features = [
     "WebGlProgram",
     "WebGlBuffer",
     "WebGlVertexArrayObject",
-    "WebGlUniformLocation"
+    "WebGlUniformLocation",
+    "ErrorEvent",
+    "MessageEvent",
+    "WebSocket",
 ]
