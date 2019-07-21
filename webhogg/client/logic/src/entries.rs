@@ -12,7 +12,7 @@ use webhogg_wasm_shared::SHARED_ALLOCATION_AREA_START as ADDR;
 #[wasm_bindgen]
 pub fn init() {
     log::set_boxed_logger(Box::new(WasmLog::new()))
-        .map(|()| log::set_max_level(log::LevelFilter::Info))
+        .map(|()| log::set_max_level(log::LevelFilter::Debug))
         .unwrap();
     unsafe {
         crate::ALLOCATOR.reset();
