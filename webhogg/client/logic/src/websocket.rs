@@ -8,10 +8,10 @@
 //! ```
 
 //use game_engine::game::state;
+use log::{debug, error};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{ErrorEvent, MessageEvent, WebSocket};
-use webhogg_wasm_shared::console_log;
 use webhogg_wasm_shared::ClientError;
 
 pub struct WebSocketAdapter {
@@ -29,7 +29,7 @@ impl WebSocketAdapter {
     /// Returns a WebSocketError if the creation failed
     ///
     pub fn new(url: &str) -> Result<WebSocketAdapter, ClientError> {
-        console_log!("Websocket enry");
+        debug!("Websocket enry");
 
         // connect to the server
         let ws = WebSocket::new(url)?;
@@ -89,20 +89,20 @@ impl WebSocketAdapter {
             .data()
             .as_string()
             .expect("Can't convert received data to a string");
-        console_log!("message event, received data: {:?}", response);
+        debug!("message event, received data: {:?}", response);
     }
 
     fn error_callback(e: ErrorEvent) {
         // handle error
-        console_log!("error event: {:?}", e);
+        error!("error event: {:?}", e);
     }
 
     fn open_callback(cloned_ws: &WebSocket) {
         // handle open event
-        console_log!("socket opend");
+        debug!("socket opend");
         match cloned_ws.send_with_str("hallo") {
-            Ok(_) => console_log!("message delivered"),
-            Err(err) => console_log!("error sending message: {:#?}", err),
+            Ok(_) => debug!("message delivered"),
+            Err(err) => error!("error sending message: {:#?}", err),
         }
     }
 }

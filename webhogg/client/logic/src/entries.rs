@@ -3,13 +3,17 @@
 use wasm_bindgen::prelude::*;
 
 use crate::websocket::*;
-use webhogg_wasm_shared::console_log;
+use log::{error, info};
+use webhogg_wasm_shared::wasm_log::WasmLog;
 use webhogg_wasm_shared::SHARED_ALLOCATION_AREA_START as ADDR;
 
 /// This function is used to initialize the gamestate, communication
 /// with the graphics worker and setup networking
 #[wasm_bindgen]
 pub fn init() {
+    log::set_boxed_logger(Box::new(WasmLog::new()))
+        .map(|()| log::set_max_level(log::LevelFilter::Info))
+        .unwrap();
     unsafe {
         crate::ALLOCATOR.reset();
     }
@@ -19,7 +23,7 @@ pub fn init() {
         let ws = addr.offset(4 as isize) as *mut WebSocketAdapter;
         *ws = WebSocketAdapter::new("wss://echo.websocket.org").expect("Websocket creation failed");
     }
-    console_log!("logic entry reached");
+    info!("logic entry reached");
 }
 
 /// This function represents a logic tick. State changes caused by network or key events get
@@ -31,7 +35,7 @@ pub fn frame() {
         //log(&format!("num: {}", *addr));
         let ws = addr.offset(4 as isize) as *mut WebSocketAdapter;
         if let Err(res) = (*ws).send_str(format!("num: {}", *addr).as_str()) {
-            console_log!("websocket not ready: {}", res);
+            error!("websocket not ready: {}", res);
         }
     }
 }
