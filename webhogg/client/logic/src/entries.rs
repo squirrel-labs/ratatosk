@@ -14,7 +14,7 @@ static mut WS: Option<WebSocketAdapter> = None;
 #[wasm_bindgen]
 pub fn init() {
     log::set_boxed_logger(Box::new(WasmLog::new()))
-        .map(|()| log::set_max_level(log::LevelFilter::Info))
+        .map(|()| log::set_max_level(log::LevelFilter::Debug))
         .unwrap();
     unsafe {
         crate::ALLOCATOR.reset();
