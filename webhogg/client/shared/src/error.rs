@@ -26,14 +26,10 @@ pub enum ClientError {
 
 fn jsvalue_to_string(v: &JsValue) -> Option<String> {
     // try to parse JsValue as String 
-    if let Some(x) = v.as_string() {
-        return Some(x);
-    }
-
-    // try to parse JsValue as Error
-    js_sys::Reflect::get(v, &JsValue::from_str("description"))
-        .map(|x| x.as_string())
-        .unwrap_or(Some("Websocket error has no description".to_string()))
+    // on failiure try to parse JsValue as Error
+    v.as_string()
+     .or(js_sys::Reflect::get(v, &JsValue::from_str("description"))
+                         .ok().and_then(|x| x.as_string()))
 }
 
 impl std::fmt::Display for ClientError {
