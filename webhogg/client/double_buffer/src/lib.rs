@@ -45,7 +45,7 @@ impl<T: Element> DoubleBuffer<T> {
                     x = p;
                     self.set_reading_at(x);
                 };
-                Some(ReaderBufferView { ptr: self, read_pos: x })
+                Some(ReaderBufferView { ptr: self, read_pos: x - 1 })
             },
             (c, p) => panic!("invalid state ({},{}) for consumer reached", c, p),
         }
