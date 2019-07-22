@@ -8,11 +8,14 @@
 //! ```
 
 //use game_engine::game::state;
+use futures::future::*;
+use futures::*;
 use js_sys::{ArrayBuffer, Uint8Array};
 use log::{debug, error};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::{ErrorEvent, MessageEvent, WebSocket};
+use wasm_bindgen_futures::*;
+use web_sys::{ErrorEvent, MessageEvent, Response, WebSocket};
 use webhogg_wasm_shared::ClientError;
 
 pub struct WebSocketAdapter {
@@ -112,16 +115,28 @@ impl WebSocketAdapter {
                 .expect("Can't convert received data to a string");
             debug!("message event, received data: {:?}", response);
         } else {
-            let fun = js_sys::Function::new_no_args("arrayBuffer");
-            let blob = fun.call0(&(e.data())).unwrap();
-            let u8_arr: Uint8Array = e.data().into();
-            let size = u8_arr.length();
-            let mut res = vec![0; size as usize];
-            u8_arr.copy_to(&mut res[..]);
-            debug!(
-                "message event: {:#?}, len: {} data {:#?} received data: {:?}",
-                blob, size, u8_arr, res
-            );
+            //let fun = js_sys::Function::new_no_args("arrayBuffer");
+            let blob: web_sys::Blob = e.data().into(); //fun.call0(&(e.data())).unwrap();
+            let response = web_sys::Response::new_with_opt_blob(Some(&blob))
+                .and_then(|resp_value| {
+                    let resp: Response = resp_value.dyn_into().unwrap();
+                    Ok(wasm_bindgen_futures::JsFuture::from(
+                        resp.array_buffer().unwrap(),
+                    ))
+                })
+                .map(|arrbuff_value| {
+                    //let arrbuff: ArrayBuffer = arrbuff_value.dyn_into().unwrap();
+                    let res = arrbuff_value.map(|result| JsValue::from(result));
+                    debug!("hallo welt");
+                    let typebuff: js_sys::Uint8Array =
+                        js_sys::Uint8Array::new(&res.wait().unwrap());
+
+                    //typebuff.copy_to(&mut res[..]);
+                    debug!(
+                        "message event: {:#?}, len:  data  received data: {:?}",
+                        blob, typebuff
+                    );
+                });
         }
     }
 
