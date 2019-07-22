@@ -7,9 +7,23 @@ impl<T: Clone + Sized + Default + Debug> Element for T {}
 
 #[derive(Debug)]
 pub struct DoubleBuffer<T: Element> {
-    reading_at: Flag,
-    provided: Flag,
+    pub(self) reading_at: Flag,
+    pub(self) provided: Flag,
     buffer: [T; 2],
+}
+
+#[inline(never)]
+#[wasm_bindgen]
+#[no_mangle]
+pub fn atomic_read(v: *const Flag) -> Flag {
+    unsafe {*v}
+}
+
+#[inline(never)]
+#[wasm_bindgen]
+#[no_mangle]
+pub fn atomic_write(v: *mut Flag, flag: Flag) {
+    unsafe {*v = flag}
 }
 
 #[derive(Debug)]
@@ -60,28 +74,24 @@ impl<T: Element> DoubleBuffer<T> {
         WriterBufferView { ptr: self, write_pos }
     }
 
-    #[inline(never)]
-    #[no_mangle]
-    fn set_reading_at(&mut self, reading_at: Flag) {
-        self.reading_at = reading_at;
+    #[inline(always)]
+    pub extern "C" fn set_reading_at(&mut self, reading_at: Flag) {
+        atomic_write(&mut self.reading_at, reading_at)
     }
 
-    #[inline(never)]
-    #[no_mangle]
-    fn get_reading_at(&mut self) -> Flag {
-        self.reading_at
+    #[inline(always)]
+    pub extern "C" fn get_reading_at(&mut self) -> Flag {
+        atomic_read(&self.reading_at)
     }
 
-    #[inline(never)]
-    #[no_mangle]
-    fn set_provided(&mut self, provided: Flag) {
-        self.provided = provided;
+    #[inline(always)]
+    pub extern "C" fn set_provided(&mut self, provided: Flag) {
+        atomic_write(&mut self.provided, provided)
     }
 
-    #[inline(never)]
-    #[no_mangle]
-    fn get_provided(&mut self) -> Flag {
-        self.provided
+    #[inline(always)]
+    pub extern "C" fn get_provided(&mut self) -> Flag {
+        atomic_read(&self.provided)
     }
 }
 

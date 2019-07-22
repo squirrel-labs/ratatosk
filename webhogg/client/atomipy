@@ -1,0 +1,147 @@
+#!/usr/bin/env python3
+
+import os, re
+
+os.system('sh disassemble')
+
+class WasmOp:
+    def __init__(self, opcode, args):
+        self.opcode, self.args = opcode, args
+
+    def to_str(self, depth=0):
+        ind = depth * ' '
+        s = f'{ind}op: {self.opcode}\n'
+        for i in self.args:
+            s += i.to_str(depth + 2) if hasattr(i, 'to_str') else f'{ind}  {repr(i)}\n'
+        return s
+
+    def __repr__(self):
+        return self.to_str()
+
+def parse_name(expr):
+    if not expr or not expr[0].isalpha():
+        print(f'error: "{expr.split()[0]}" is not a name')
+        return None, expr
+    for i, c in enumerate(expr):
+        if not c.isalnum() and not c in '._=-':
+            return expr[:i], expr[i:].strip()
+
+def parse_global(expr):
+    if not expr.startswith('$'):
+        print(f'error: "{expr.split()[0]}" is not a global')
+        return None, expr
+    for i, c in enumerate(expr):
+        if not c.isalnum() and not c in '$_':
+            return expr[:i], expr[i:].strip()
+
+def parse_num(expr):
+    if not expr or (not expr[0].isnumeric() and not expr.startswith('-')):
+        print(f'error: "{expr.split()[0]}" is not a number')
+    m = 1
+    if expr.startswith('-'):
+        m = -1
+        expr = expr[1:]
+    for i, c in enumerate(expr):
+        if not c.isnumeric():
+            return m * int(expr[:i]), expr[i:].strip()
+    
+def parse_string(expr):
+    if not expr.startswith('"'):
+        print(f'error: "{expr}" is not a string')
+        return None, expr
+    expr = expr[1:]
+    s = bytearray()
+    temp_escape = '0'
+    escape = 0
+    for i, c in enumerate(expr):
+        if escape == 1:
+            if c == 'n':
+                s += b'\n'
+                escape = 0
+            elif c == 't':
+                s += b'\t'
+                escape = 0
+            elif c == '"':
+                s += b'"'
+                escape = 0
+            elif c == '\'':
+                s += b'\''
+                escape = 0
+            elif c == '\\':
+                s += b'\\'
+                escape = 0
+            elif c in '0123456789abcdefABCDEF':
+                temp_escape = c
+                escape = 2
+            else:
+                print(f'error: unknown escape character "{c}"')
+                return
+        elif escape == 2:
+            if c in '0123456789abcdefABCDEF':
+                s += bytes(int(temp_escape + c, 16))
+                escape = 0
+            else:
+                print(f'error: invalid escape: expected "\\ab" where a and b are a hex numbers, got "\\{temp_escape}{c}"')
+                return
+        else:
+            if c == '\\':
+                escape = 1
+            elif c == '"':
+                return s, expr[i+1:]
+            else:
+                s += c.encode('utf-8')
+    print(f'error: string reached end of expression: "{expr}')
+
+def parse_op(op):
+    op = op.strip(' \n')
+    if not op.startswith('('):
+        print('error: expecting "("')
+        return
+    op = op[1:]
+    name, args = parse_name(op)
+    ops = []
+    while not args.startswith(')'):
+        arg, args = parse_expr(args)
+        ops.append(arg)
+        args = args.lstrip(' \n')
+    return WasmOp(name, ops), args[1:]
+
+def parse_comment(expr):
+    if not expr.startswith('(;'):
+        print(f'error: expecting a comment with "(;", got "{expr}"')
+        return
+    i = expr.find(';)')
+    if i == -1:
+        print(f'error: reached end of expression while parsing "(;" comment')
+        return
+    return expr[i+2:]
+
+def parse_expr(expr):
+    expr = expr.strip(' \n')
+    if expr.startswith('(;'):
+        return parse_expr(parse_comment(expr))
+    elif expr.startswith('('):
+        return parse_op(expr)
+    elif expr.startswith('$'):
+        return parse_global(expr)
+    elif expr.startswith('"'):
+        return parse_string(expr)
+    elif expr and (expr[0].isnumeric() or expr.startswith('-')):
+        return parse_num(expr)
+    elif expr and expr[0].isalpha():
+        return parse_name(expr)
+    else:
+        print(f'error: invalid expression "{expr[:100]}"')
+        return
+
+def atomify(path):
+    f = open(path, 'r')
+    c = f.read()
+    f.close()
+
+    print(parse_expr(c)[0])
+
+#atomify('gen/graphics.wat')
+atomify('gen/logic.wat')
+
+os.system('sh assemble')

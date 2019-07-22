@@ -75,7 +75,9 @@ impl WebSocketAdapter {
     pub fn send_str(&self, message: &str) -> Result<(), ClientError> {
         match self.ws.ready_state() {
             1 => self.ws.send_with_str(message).map_err(|e| e.into()),
-            _ => Err(ClientError::WebSocketError(JsValue::from("Websocket is not ready"))),
+            _ => Err(ClientError::WebSocketError(JsValue::from(
+                "Websocket is not ready",
+            ))),
         }
     }
 
