@@ -92,13 +92,28 @@ impl WebSocketAdapter {
     ///
     pub fn send_u8_arr(&self, message: &mut [u8]) -> Result<(), ClientError> {
         //debug!("reached uint8: {:#?}", message);
-        let buffer = ArrayBuffer::new(message.len() as u32);
-        buffer.slice(((&mut *message as *mut [u8] as *const u8) as usize) as u32);
+        let view = unsafe { Uint8Array::view(message) };
+        //let buffer = ArrayBuffer::new(message.len() as u32);
+        //buffer.slice(((&mut *message as *mut [u8] as *const u8) as usize) as u32);
+
+        #[wasm_bindgen]
+        extern "C" {
+            #[wasm_bindgen(js_namespace=console, js_name=log)]
+            fn olog(v: &Uint8Array);
+        }
+        olog(&view);
+        let data_view = js_sys::DataView::new(&view.buffer(), 0, message.len());
+
         match self.ws.ready_state() {
-            1 => self
-                .ws
-                .send_with_array_buffer(&buffer)
-                .map_err(|e| e.into()),
+            1 => {
+                debug!(
+                    "{:?}",
+                    self.ws
+                        .send_with_array_buffer_view(&view.slice(0, message.len() as u32))
+                );
+                Ok(())
+            }
+            //.map_err(|e| e.into()),
             _ => Err(ClientError::WebSocketError(JsValue::from(
                 "Websocket is not ready",
             ))),
@@ -108,7 +123,8 @@ impl WebSocketAdapter {
 
     fn message_callback(e: MessageEvent) {
         // handle message
-        if e.data().is_string() {
+        let data = e.data();
+        if data.is_string() {
             let response = e
                 .data()
                 .as_string()
@@ -116,14 +132,25 @@ impl WebSocketAdapter {
             debug!("message event, received data: {:?}", response);
         } else {
             //let fun = js_sys::Function::new_no_args("arrayBuffer");
-            let blob: web_sys::Blob = e.data().into(); //fun.call0(&(e.data())).unwrap();
+            let blob: web_sys::Blob = data.into(); //fun.call0(&(e.data())).unwrap();
+                                                   // let blob = blob.slice().unwrap();
             let reader = FileReaderSync::new().unwrap();
             let buff = reader.read_as_array_buffer(&blob).unwrap();
             let u8_arr: js_sys::Uint8Array = js_sys::Uint8Array::new(&buff);
+            //let u8_arr = u8_arr.fill(3, 0, 6);
             let size = u8_arr.length();
+            //let value = js_sys::Reflect::get(u8_arr.as_ref(), &JsValue::from_f64(3.0)).unwrap();
+            //let mut res: *mut Vec<u8> = &mut vec![0u8; size as usize];
+            //let mut res: *mut [u8] = &mut [0u8; 10];
+            //res = &blob as *const web_sys::Blob as *mut [u8];
             let mut res = vec![0u8; size as usize];
-            u8_arr.copy_to(&mut res[..]);
-            debug!("{:?}", res);
+
+            u8_arr.copy_to(&mut res);
+            // let ptr = &blob as *const _;
+            // let slice: &[u8] = unsafe { std::slice::from_raw_parts(ptr as *const u8, 100) };
+            // debug!("Blob lives at: {} and contains: {:?}", ptr as u32, res);
+            debug!("arr: {:?}", res);
+            //u8_arr.copy_to(&mut res);
         }
     }
 
