@@ -15,7 +15,7 @@ use log::{debug, error};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use wasm_bindgen_futures::*;
-use web_sys::{ErrorEvent, MessageEvent, Response, WebSocket};
+use web_sys::{ErrorEvent, FileReaderSync, MessageEvent, WebSocket};
 use webhogg_wasm_shared::ClientError;
 
 pub struct WebSocketAdapter {
@@ -117,26 +117,13 @@ impl WebSocketAdapter {
         } else {
             //let fun = js_sys::Function::new_no_args("arrayBuffer");
             let blob: web_sys::Blob = e.data().into(); //fun.call0(&(e.data())).unwrap();
-            let response = web_sys::Response::new_with_opt_blob(Some(&blob))
-                .and_then(|resp_value| {
-                    let resp: Response = resp_value.dyn_into().unwrap();
-                    Ok(wasm_bindgen_futures::JsFuture::from(
-                        resp.array_buffer().unwrap(),
-                    ))
-                })
-                .map(|arrbuff_value| {
-                    //let arrbuff: ArrayBuffer = arrbuff_value.dyn_into().unwrap();
-                    let res = arrbuff_value.map(|result| JsValue::from(result));
-                    debug!("hallo welt");
-                    let typebuff: js_sys::Uint8Array =
-                        js_sys::Uint8Array::new(&res.wait().unwrap());
-
-                    //typebuff.copy_to(&mut res[..]);
-                    debug!(
-                        "message event: {:#?}, len:  data  received data: {:?}",
-                        blob, typebuff
-                    );
-                });
+            let reader = FileReaderSync::new().unwrap();
+            let buff = reader.read_as_array_buffer(&blob).unwrap();
+            let u8_arr: js_sys::Uint8Array = js_sys::Uint8Array::new(&buff);
+            let size = u8_arr.length();
+            let mut res = vec![0u8; size as usize];
+            u8_arr.copy_to(&mut res[..]);
+            debug!("{:?}", res);
         }
     }
 
