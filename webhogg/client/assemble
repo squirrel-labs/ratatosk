@@ -1,0 +1,4 @@
+#!/bin/sh
+
+wasm-as gen/graphics.wat -o gen/graphics.wasm -all -n
+wasm-as gen/logic.wat -o gen/logic.wasm -all -n
