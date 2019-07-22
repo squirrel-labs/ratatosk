@@ -8,6 +8,7 @@
 //! ```
 
 //use game_engine::game::state;
+use js_sys::{ArrayBuffer, Uint8Array};
 use log::{debug, error};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -51,11 +52,11 @@ impl WebSocketAdapter {
 
         let cloned_ws = ws.clone();
         // register the open callback
-        let onopen_callback =
-            Closure::wrap(
-                Box::new(move |_| WebSocketAdapter::open_callback(&cloned_ws))
-                    as Box<dyn FnMut(JsValue)>,
-            );
+        let onopen_callback = Closure::wrap(
+            //Box::new(WebSocketAdapter::open_callback)
+            Box::new(move |_| WebSocketAdapter::open_callback(&cloned_ws))
+                as Box<dyn FnMut(JsValue)>,
+        );
         ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
         onopen_callback.forget();
 
@@ -67,7 +68,7 @@ impl WebSocketAdapter {
         Ok(self.ws.close()?)
     }
 
-    /// Sends a `&str` as if the ws is in the ready state
+    /// Sends a `&str` if the ws is in the ready state
     ///
     /// # Errors
     /// Returns a WebSocketError if the connention is not ready or a different error occured
@@ -75,17 +76,53 @@ impl WebSocketAdapter {
     pub fn send_str(&self, message: &str) -> Result<(), ClientError> {
         match self.ws.ready_state() {
             1 => self.ws.send_with_str(message).map_err(|e| e.into()),
-            _ => Err(ClientError::WebSocketError(JsValue::from("Websocket is not ready"))),
+            _ => Err(ClientError::WebSocketError(JsValue::from(
+                "Websocket is not ready",
+            ))),
         }
     }
 
+    /// Sends a `&mut [u8]` if the ws is in the ready state
+    ///
+    /// # Errors
+    /// Returns a WebSocketError if the connention is not ready or a different error occured
+    ///
+    pub fn send_u8_arr(&self, message: &mut [u8]) -> Result<(), ClientError> {
+        //debug!("reached uint8: {:#?}", message);
+        let buffer = ArrayBuffer::new(message.len() as u32);
+        buffer.slice(((&mut *message as *mut [u8] as *const u8) as usize) as u32);
+        match self.ws.ready_state() {
+            1 => self
+                .ws
+                .send_with_array_buffer(&buffer)
+                .map_err(|e| e.into()),
+            _ => Err(ClientError::WebSocketError(JsValue::from(
+                "Websocket is not ready",
+            ))),
+        }
+    }
+    fn fool_the_compiler_and_js_and_shit() {}
+
     fn message_callback(e: MessageEvent) {
         // handle message
-        let response = e
-            .data()
-            .as_string()
-            .expect("Can't convert received data to a string");
-        debug!("message event, received data: {:?}", response);
+        if e.data().is_string() {
+            let response = e
+                .data()
+                .as_string()
+                .expect("Can't convert received data to a string");
+            debug!("message event, received data: {:?}", response);
+        } else {
+            let fun = js_sys::Function::new_no_args("arrayBuffer");
+            let blob = fun.call0(&(e.data())).unwrap();
+            let u8_arr: Uint8Array = e.data().into();
+            let size = u8_arr.length();
+            let mut res = vec![0; size as usize];
+            u8_arr.copy_to(&mut res[..]);
+            debug!(
+                "message event: {:#?}, len: {} data {:#?} received data: {:?}",
+                blob, size, u8_arr, res
+            );
+        }
     }
 
     fn error_callback(e: ErrorEvent) {

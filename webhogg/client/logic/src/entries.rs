@@ -37,7 +37,7 @@ pub fn frame() {
         if let Err(res) = WS
             .as_ref()
             .unwrap()
-            .send_str(format!("num: {}", num).as_str())
+            .send_u8_arr(format!("num: {}", num).as_bytes_mut())
         {
             error!("websocket not ready: {}", res);
         }
