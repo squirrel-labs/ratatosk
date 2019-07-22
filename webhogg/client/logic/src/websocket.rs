@@ -8,10 +8,11 @@
 //! ```
 
 //use game_engine::game::state;
+use js_sys::Uint8Array;
 use log::{debug, error};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::{ErrorEvent, MessageEvent, WebSocket};
+use web_sys::{ErrorEvent, FileReaderSync, MessageEvent, WebSocket};
 use webhogg_wasm_shared::ClientError;
 
 pub struct WebSocketAdapter {
@@ -51,11 +52,11 @@ impl WebSocketAdapter {
 
         let cloned_ws = ws.clone();
         // register the open callback
-        let onopen_callback =
-            Closure::wrap(
-                Box::new(move |_| WebSocketAdapter::open_callback(&cloned_ws))
-                    as Box<dyn FnMut(JsValue)>,
-            );
+        let onopen_callback = Closure::wrap(
+            //Box::new(WebSocketAdapter::open_callback)
+            Box::new(move |_| WebSocketAdapter::open_callback(&cloned_ws))
+                as Box<dyn FnMut(JsValue)>,
+        );
         ws.set_onopen(Some(onopen_callback.as_ref().unchecked_ref()));
         onopen_callback.forget();
 
@@ -67,7 +68,7 @@ impl WebSocketAdapter {
         Ok(self.ws.close()?)
     }
 
-    /// Sends a `&str` as if the ws is in the ready state
+    /// Sends a `&str` if the ws is in the ready state
     ///
     /// # Errors
     /// Returns a WebSocketError if the connention is not ready or a different error occured
@@ -81,13 +82,44 @@ impl WebSocketAdapter {
         }
     }
 
+    /// Sends a `&mut [u8]` if the ws is in the ready state
+    ///
+    /// # Errors
+    /// Returns a WebSocketError if the connention is not ready or a different error occured
+    ///
+    pub fn send_u8_arr(&self, message: &mut [u8]) -> Result<(), ClientError> {
+        let view = unsafe { Uint8Array::view(message) };
+
+        match self.ws.ready_state() {
+            1 => self
+                .ws
+                .send_with_array_buffer_view(&view.slice(0, message.len() as u32))
+                .map_err(|e| e.into()),
+            _ => Err(ClientError::WebSocketError(JsValue::from(
+                "Websocket is not ready",
+            ))),
+        }
+    }
+
     fn message_callback(e: MessageEvent) {
         // handle message
-        let response = e
-            .data()
-            .as_string()
-            .expect("Can't convert received data to a string");
-        debug!("message event, received data: {:?}", response);
+        let data = e.data();
+        if data.is_string() {
+            let response = data
+                .as_string()
+                .expect("Can't convert received data to a string");
+            debug!("message event, received data: {:?}", response);
+        } else {
+            let blob: web_sys::Blob = data.into();
+            let reader = FileReaderSync::new().unwrap();
+            let buff = reader.read_as_array_buffer(&blob).unwrap();
+            let u8_arr: js_sys::Uint8Array = js_sys::Uint8Array::new(&buff);
+            let size = u8_arr.length();
+            let mut res = vec![0u8; size as usize];
+
+            u8_arr.copy_to(&mut res);
+            debug!("arr: {:?}", res);
+        }
     }
 
     fn error_callback(e: ErrorEvent) {
