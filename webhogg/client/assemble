@@ -1,4 +1,4 @@
 #!/bin/sh
 
-wasm-as gen/graphics.wat -o gen/graphics.wasm -all -n
-wasm-as gen/logic.wat -o gen/logic.wasm -all -n
+wat2wasm gen/graphics.wat -o gen/graphics.wasm --enable-threads
+wat2wasm gen/logic.wat -o gen/logic.wasm --enable-threads
