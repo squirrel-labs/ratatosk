@@ -44,4 +44,6 @@ features = [
     "ErrorEvent",
     "MessageEvent",
     "WebSocket",
+    "FileReaderSync",
+    "Blob",
 ]

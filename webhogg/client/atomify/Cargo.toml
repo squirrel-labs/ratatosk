@@ -1,0 +1,7 @@
+[package]
+name = "atomify"
+version = "0.1.0"
+authors = ["natrixaeria <janng@gmx.de>"]
+edition = "2018"
+
+[dependencies]
