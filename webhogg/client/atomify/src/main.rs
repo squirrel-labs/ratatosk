@@ -1,4 +1,4 @@
-// 159
+// 54
 
 #[derive(Debug, PartialEq)]
 enum WasmExpr {
@@ -113,6 +113,7 @@ fn parse_op<'a>(expr: &'a str) -> Result<(WasmExpr, &str), String> {
     let off_expr: &'a str = &expr[1..];
     let (name, mut args): (_, &'a str) = parse_name(off_expr)?;
     let mut ops = Vec::new();
+    args = args.trim_start_matches(is_whitespace);
     while !args.starts_with(')') {
         let (arg, _args) = parse_expr(args)?;
         args = _args;
