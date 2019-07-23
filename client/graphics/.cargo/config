@@ -1,0 +1,6 @@
+[build]
+target = "wasm32-unknown-unknown"
+rustflags = [
+  "-C",
+    "link-args=--stack-first --no-entry --allow-undefined --strip-all --export-dynamic --import-memory --shared-memory --max-memory=1073741824 --threads -z stack-size=5242880",
+]

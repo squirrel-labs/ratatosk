@@ -1,0 +1,8 @@
+[package]
+name = "rask_game_engine"
+version = "0.1.0"
+authors = ["konsumlamm <konsumlamm@gmail.com>",
+            "Dennis Kobert <dennis@kobert.dev>"]
+edition = "2018"
+
+[dependencies]

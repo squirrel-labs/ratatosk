@@ -1,0 +1,11 @@
+[package]
+name = "double_buffer"
+version = "0.1.0"
+authors = ["natrixaeria"]
+edition = "2018"
+
+[lib]
+crate-type = ["rlib"]
+
+[profile.release]
+lto = true

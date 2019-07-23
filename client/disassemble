@@ -1,0 +1,6 @@
+#!/bin/sh
+
+wasm2wat --enable-threads -f --no-debug-names gen/logic.wasm -o gen/logic.wat
+wasm2wat --enable-threads -f --no-debug-names gen/graphics.wasm -o gen/graphics.wat
+#wasm-dis gen/graphics.wasm -o gen/graphics.wat
+#wasm-dis gen/logic.wasm -o gen/logic.wat
