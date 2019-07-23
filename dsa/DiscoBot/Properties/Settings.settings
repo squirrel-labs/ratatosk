@@ -1,9 +1,0 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="DiscoBot.Properties" GeneratedClassName="Settings">
-  <Profiles />
-  <Settings>
-    <Setting Name="Token" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Mjk0NTU0MDU4Nzg4NzAwMTYx.DOzDcQ.J-nCikbZdZtdrug0E8TwwV_2ITw</Value>
-    </Setting>
-  </Settings>
-</SettingsFile>
