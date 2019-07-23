@@ -38,7 +38,7 @@ fn compile_error_off(s: &str, off: usize, len: usize) -> String {
     format!("\x1b[m\n```\n{}\x1b[31;1m{}\x1b[m{}\n```", maxslice(s, 0, off), maxslice(s, off, off + len), maxslice(s, len + off, off + len + 140))
 }
 
-fn is_whitespace(c: char) -> bool { c == ' ' || c == '\n' }
+fn is_whitespace(c: char) -> bool { c == ' ' || c == '\n' || c == '\t' }
 fn is_digit(c: char) -> bool { c.is_digit(10) }
 fn is_num_minus(c: char) -> bool { is_digit(c) || c == '-' }
 fn is_alpha(c: char) -> bool { c.is_alphabetic() || c == '_' }
