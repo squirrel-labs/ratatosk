@@ -23,7 +23,7 @@ fn maxslice(s: &str) -> String {
     s[..usize::min(s.len(), 20)].to_owned()
 }
 
-fn is_whitespace(c: char) -> bool { c == ' ' || c == '\n' }
+fn is_whitespace(c: char) -> bool { c == ' ' || c == '\n' || c == '\t' }
 fn is_digit(c: char) -> bool { c.is_digit(10) }
 fn is_num_minus(c: char) -> bool { is_digit(c) || c == '-' }
 fn is_alpha(c: char) -> bool { c.is_alphabetic() || c == '_' }
@@ -109,6 +109,15 @@ fn parse_op<'a>(expr: &'a str) -> Result<(WasmExpr, &str), String> {
     } else { Err(format!("operation name \"{}\" is not valid", expr))? }
 }
 
+fn parse_line_comment(expr: &str) -> Result<&str, String> {
+    let expr = expr.trim_matches(is_whitespace);
+    if !expr.starts_with(";;") { Err(format!("\"{}\" is not a comment", expr))? }
+    if let Some(i) = expr.find("\n") {  
+        Ok(&expr[i..])
+    } else {
+        Err(format!("reached end of expression while parsing \";;\" comment"))
+    }
+}
 fn parse_comment(expr: &str) -> Result<&str, String> {
     let expr = expr.trim_matches(is_whitespace);
     if !expr.starts_with("(;") { Err(format!("\"{}\" is not a comment", expr))? }
@@ -123,6 +132,8 @@ fn parse_expr(expr: &str) -> Result<(WasmExpr, &str), String> {
     let expr = expr.trim_matches(is_whitespace);
     if expr.starts_with("(;") {
         parse_expr(parse_comment(expr)?)
+    } else if expr.starts_with(";;") {
+        parse_expr(parse_line_comment(expr)?)
     } else if expr.starts_with("(") {
         parse_op(expr)
     } else if expr.starts_with("$") {
@@ -134,7 +145,7 @@ fn parse_expr(expr: &str) -> Result<(WasmExpr, &str), String> {
     } else if expr.starts_with(is_alpha) {
         parse_name(expr)
     } else {
-        Err(format!("invalid expression {}", maxslice(&expr)))
+        Err(format!("invalid expression ´{}´", maxslice(&expr)))
     }
 }
 
