@@ -46,14 +46,14 @@ if [ $suc -eq 1 ]; then
         printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m assembling\n\x1b[m"
         printf "\x1b[m\n"
 
-        cd atomify
+        cd ../tools/atomify
         sh build |& awk '/.*/ {printf("atomify:       "); print}'
         ret="${PIPESTATUS[0]}"
         if [ $ret -eq 0 ]; then
             printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m atomify build\n\x1b[m"
-            if cargo run -q ../gen/graphics.wat; then
+            if cargo run -q ../../client/gen/graphics.wat; then
                 printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m atomify graphics\n\x1b[m"
-                if cargo run -q ../gen/logic.wat; then
+                if cargo run -q ../../client/gen/logic.wat; then
                     printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m atomify logic\n\x1b[m"
                 else
                     printf "\x1b[1;97m\x1b[31mfailed\x1b[m\x1b[1;97m atomify logic \n------------------"
@@ -67,7 +67,7 @@ if [ $suc -eq 1 ]; then
             printf "\x1b[1;97m\x1b[31mfailed\x1b[m\x1b[1;97m atomify build \n------------------"
             printf "\x1b[m\n"
         fi
-        cd ..
+        cd ../../client
     else
         printf "\x1b[1;97m\x1b[31mfailed\x1b[m\x1b[1;97m assembling \n------------------"
         printf "\x1b[m\n"

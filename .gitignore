@@ -28,3 +28,7 @@ bin/
 
 # Dolphin (?)
 .directory
+
+# cargo
+bin/
+gen/
