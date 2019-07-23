@@ -102,6 +102,10 @@ impl<'a, T: Element> ReaderBufferView<'a, T> {
 }
 
 impl<'a, T: Element> WriterBufferView<'a, T> {
+    pub fn get(&self) -> &T {
+        &self.ptr.buffer[self.write_pos as usize]
+    }
+
     pub fn set(&mut self, data: T) {
         self.ptr.buffer[self.write_pos as usize] = data;
     }
