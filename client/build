@@ -34,11 +34,42 @@ fi
 cd ..
 
 if [ $suc -eq 1 ]; then
-    printf "\n\x1b[1m> \x1b[0;97mMove targets into \x1b[3mgen/\n\x1b[m"
+    printf "\n\x1b[1m> \x1b[0;97mMove targets into \x1b[3mgen/\n\x1b[m\n"
 
     cp graphics/bin/webhogg-wasm.wasm gen/graphics.wasm
     cp graphics/bin/webhogg-wasm.js gen/graphics.js
 
     cp logic/bin/webhogg-wasm.wasm gen/logic.wasm
     cp logic/bin/webhogg-wasm.js gen/logic.js
+
+    if sh disassemble; then
+        printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m assembling\n\x1b[m"
+        printf "\x1b[m\n"
+
+        cd ../tools/atomify
+        sh build |& awk '/.*/ {printf("atomify:       "); print}'
+        ret="${PIPESTATUS[0]}"
+        if [ $ret -eq 0 ]; then
+            printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m atomify build\n\x1b[m"
+            if cargo run -q ../../client/gen/graphics.wat; then
+                printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m atomify graphics\n\x1b[m"
+                if cargo run -q ../../client/gen/logic.wat; then
+                    printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m atomify logic\n\x1b[m"
+                else
+                    printf "\x1b[1;97m\x1b[31mfailed\x1b[m\x1b[1;97m atomify logic \n------------------"
+                    printf "\x1b[m\n"
+                fi
+            else
+                printf "\x1b[1;97m\x1b[31mfailed\x1b[m\x1b[1;97m atomify graphics \n------------------"
+                printf "\x1b[m\n"
+            fi
+        else
+            printf "\x1b[1;97m\x1b[31mfailed\x1b[m\x1b[1;97m atomify build \n------------------"
+            printf "\x1b[m\n"
+        fi
+        cd ../../client
+    else
+        printf "\x1b[1;97m\x1b[31mfailed\x1b[m\x1b[1;97m assembling \n------------------"
+        printf "\x1b[m\n"
+    fi
 fi

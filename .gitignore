@@ -27,3 +27,7 @@ Cargo.lock
 
 # Dolphin (?)
 .directory
+
+# cargo
+bin/
+gen/

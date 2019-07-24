@@ -4,7 +4,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::websocket::*;
 use log::{error, info};
-use webhogg_wasm_shared::shared_heap_addr;
+use webhogg_wasm_shared::get_double_buffer;
 use webhogg_wasm_shared::wasm_log::WasmLog;
 
 static mut WS: Option<WebSocketAdapter> = None;
@@ -20,7 +20,6 @@ pub fn init() {
         crate::ALLOCATOR.reset();
     }
     unsafe {
-        *shared_heap_addr::<u32>(0) = 0;
         WS = Some(
             WebSocketAdapter::new("wss://echo.websocket.org").expect("Websocket creation failed"),
         );
@@ -33,7 +32,12 @@ pub fn init() {
 #[wasm_bindgen]
 pub fn frame() {
     unsafe {
-        let num = *shared_heap_addr::<u32>(0);
+        let num = {
+            get_double_buffer()
+                .borrow_reader()
+                .map(|r| *r.get())
+                .unwrap_or(0)
+        };
         if let Err(res) = WS
             .as_ref()
             .unwrap()
