@@ -1,19 +1,17 @@
-// 54
-
 #[derive(Debug, PartialEq)]
-enum WasmExpr {
-    WasmOp((String, Vec<WasmExpr>)),
-    WasmName(String),
-    WasmGlobal(String),
-    WasmString(String),
+enum WasmExpr<'a> {
+    WasmOp(&'a str, Vec<WasmExpr<'a>>),
+    WasmName(&'a str),
+    WasmGlobal(&'a str),
+    WasmString(&'a str),
     WasmNum(i64),
     WasmNone,
 }
 
-impl WasmExpr {
+impl<'a> WasmExpr<'a> {
     fn serialize(&self, depth: usize) -> String {
         match self {
-            WasmExpr::WasmOp((name, args)) => format!(
+            WasmExpr::WasmOp(name, args) => format!(
                 "\n{}({} {})",
                 " ".repeat(depth),
                 name,
@@ -22,8 +20,8 @@ impl WasmExpr {
                     .collect::<Vec<String>>()
                     .join(" ")
             ),
-            WasmExpr::WasmName(name) => name.clone(),
-            WasmExpr::WasmGlobal(name) => name.clone(),
+            WasmExpr::WasmName(name) => name.to_string(),
+            WasmExpr::WasmGlobal(name) => name.to_string(),
             WasmExpr::WasmString(buf) => format!("\"{}\"", buf),
             WasmExpr::WasmNum(num) => format!("{}", num),
             WasmExpr::WasmNone => "".to_owned(),
@@ -80,37 +78,31 @@ fn is_hex(c: char) -> bool {
     c.is_digit(16)
 }
 
-fn parse_name(expr: &str) -> Result<(WasmExpr, &str), String> {
+fn parse_name<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     if !expr.starts_with(is_alpha) {
         Err(format!("\"{}\" is not a name", compile_error(expr, 1)))?
     }
     for (i, c) in expr.chars().enumerate() {
         if !is_name(c) {
-            return Ok((
-                WasmExpr::WasmName(expr.chars().take(i).collect::<String>()),
-                &expr[i..],
-            ));
+            return Ok((WasmExpr::WasmName(&expr[..i]), &expr[i..]));
         }
     }
     Err("reached end of expression while parsing name".to_owned())
 }
 
-fn parse_global(expr: &str) -> Result<(WasmExpr, &str), String> {
+fn parse_global<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     if !expr.starts_with('$') {
         Err(format!("\"{}\" is not a global", compile_error(expr, 1)))?
     }
     for (i, c) in expr.chars().enumerate() {
         if !is_global(c) {
-            return Ok((
-                WasmExpr::WasmGlobal(expr.chars().take(i).collect::<String>()),
-                &expr[i..],
-            ));
+            return Ok((WasmExpr::WasmGlobal(&expr[..i]), &expr[i..]));
         }
     }
     Err("reached end of expression while parsing global".to_owned())
 }
 
-fn parse_num(mut expr: &str) -> Result<(WasmExpr, &str), String> {
+fn parse_num<'a>(mut expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     if !expr.starts_with(is_num_minus) {
         Err(format!("\"{}\" is not a number", compile_error(expr, 1)))?
     }
@@ -134,7 +126,7 @@ fn parse_num(mut expr: &str) -> Result<(WasmExpr, &str), String> {
     Err("reached end of expression while parsing number".to_owned())
 }
 
-fn parse_string<'a>(expr: &'a str) -> Result<(WasmExpr, &'a str), String> {
+fn parse_string<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     if !expr.starts_with('"') {
         Err(format!("\"{}\" is not a string", compile_error(expr, 1)))?
     }
@@ -158,14 +150,14 @@ fn parse_string<'a>(expr: &'a str) -> Result<(WasmExpr, &'a str), String> {
             if c == '\\' {
                 escape = 1;
             } else if c == '"' {
-                return Ok((WasmExpr::WasmString(expr[..i].to_owned()), &expr[i + 1..]));
+                return Ok((WasmExpr::WasmString(&expr[..i]), &expr[i + 1..]));
             }
         }
     }
     Err("reached end of expression while parsing string".to_owned())
 }
 
-fn parse_op<'a>(expr: &'a str) -> Result<(WasmExpr, &str), String> {
+fn parse_op<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     let expr = expr.trim_matches(is_whitespace);
     if !expr.starts_with('(') {
         Err(format!(
@@ -186,13 +178,13 @@ fn parse_op<'a>(expr: &'a str) -> Result<(WasmExpr, &str), String> {
         args = args.trim_start_matches(is_whitespace);
     }
     if let WasmExpr::WasmName(name) = name {
-        Ok((WasmExpr::WasmOp((name, ops)), &args[1..] as &'a str))
+        Ok((WasmExpr::WasmOp(name, ops), &args[1..] as &'a str))
     } else {
         Err(format!("operation name \"{}\" is not valid", expr))?
     }
 }
 
-fn parse_block_comment(expr: &str) -> Result<(WasmExpr, &str), String> {
+fn parse_block_comment<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     let expr = expr.trim_matches(is_whitespace);
     if !expr.starts_with("(;") {
         Err(format!(
@@ -210,7 +202,7 @@ fn parse_block_comment(expr: &str) -> Result<(WasmExpr, &str), String> {
     }
 }
 
-fn parse_line_comment(expr: &str) -> Result<(WasmExpr, &str), String> {
+fn parse_line_comment<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     let expr = expr.trim_matches(is_whitespace);
     if !expr.starts_with(";;") {
         Err(format!(
@@ -252,15 +244,21 @@ fn parse_expr(expr: &str) -> Result<(WasmExpr, &str), String> {
     }
 }
 
-fn parse_wasm(expr: String) -> Result<WasmExpr, String> {
-    parse_expr(&expr).map(|(x, _)| x)
+fn parse_wasm(expr: &str) -> Result<WasmExpr, String> {
+    parse_expr(expr).map(|(x, _)| x)
+}
+
+fn atomify(mut expr: WasmExpr) -> Result<WasmExpr, String> {
+    Ok(expr)
 }
 
 fn main() {
     if let Some(arg) = std::env::args().nth(1).as_ref() {
         let res = std::fs::read_to_string(arg)
+            .as_ref()
             .map_err(|e| format!("failed to read error ('{}'): \"{}\"", arg, e))
             .and_then(|content| parse_wasm(content))
+            .and_then(atomify)
             .map(|wasm| wasm.serialize(0))
             .and_then(|wasm| {
                 std::fs::write(arg, wasm)
