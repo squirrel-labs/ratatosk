@@ -1,0 +1,9 @@
+[workspace]
+members = [
+  "game_engine",
+  "game_server",
+  "client/graphics",
+  "client/logic",
+  "tools/atomify",
+  "tools/bone_cake",
+]
