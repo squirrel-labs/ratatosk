@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 enum WasmExpr<'a> {
     WasmOp(&'a str, Vec<WasmExpr<'a>>),
     WasmName(&'a str),
@@ -249,6 +249,72 @@ fn parse_wasm(expr: &str) -> Result<WasmExpr, String> {
 }
 
 fn atomify(mut expr: WasmExpr) -> Result<WasmExpr, String> {
+    match &mut expr {
+        WasmExpr::WasmOp("module", ref mut args) => {
+            let (mut atomic_read, mut atomic_write) = (None, None);
+            for arg in args.iter() {
+                match arg {
+                    WasmExpr::WasmOp("export", export_args) => match export_args.as_slice() {
+                        [WasmExpr::WasmString("atomic_read"), WasmExpr::WasmOp("func", fun_args)] => {
+                            if let [WasmExpr::WasmNum(fun_id)] = fun_args.as_slice() {
+                                atomic_read = Some(*fun_id)
+                            }
+                        }
+                        [WasmExpr::WasmString("atomic_write"), WasmExpr::WasmOp("func", fun_args)] => {
+                            if let [WasmExpr::WasmNum(fun_id)] = fun_args.as_slice() {
+                                atomic_write = Some(*fun_id)
+                            }
+                        }
+                        _ => (),
+                    },
+                    _ => (),
+                }
+                if let (Some(_), Some(_)) = (atomic_read, atomic_write) {
+                    break;
+                }
+            }
+            if let (Some(atomic_read), Some(atomic_write)) = (atomic_read, atomic_write) {
+                let mut function_counter = 0;
+                for ref mut arg in args.iter_mut() {
+                    match arg {
+                        WasmExpr::WasmOp("import", ref import_args) => {
+                            if let [WasmExpr::WasmString(_scope), WasmExpr::WasmString(_import_name), WasmExpr::WasmOp("func", _fun_args)] =
+                                import_args.as_slice()
+                            {
+                                function_counter += 1
+                            }
+                        }
+                        WasmExpr::WasmOp("func", ref mut fun_args) => {
+                            if function_counter == atomic_read {
+                                let op_ptr: &mut WasmExpr = match fun_args.last_mut() {
+                                    Some(v) => v,
+                                    _ => continue,
+                                };
+                                if let WasmExpr::WasmOp("i32.load8_u", op_args) = op_ptr {
+                                    *op_ptr =
+                                        WasmExpr::WasmOp("i32.atomic.load8_u", op_args.clone())
+                                }
+                            } else if function_counter == atomic_write {
+                                let op_ptr: &mut WasmExpr = match fun_args.last_mut() {
+                                    Some(v) => v,
+                                    _ => continue,
+                                };
+                                if let WasmExpr::WasmOp("i32.store8", op_args) = op_ptr {
+                                    *op_ptr = WasmExpr::WasmOp("i32.atomic.store8", op_args.clone())
+                                }
+                            }
+                            function_counter += 1;
+                        }
+                        _ => (),
+                    }
+                }
+                Ok(())
+            } else {
+                Err("expecting \"atomic_read\" and \"atomic_write\" exports".to_owned())
+            }
+        }
+        _ => Err("expecting \"module\" s-expression at top level".to_owned()),
+    }?;
     Ok(expr)
 }
 
@@ -266,8 +332,10 @@ fn main() {
             });
         if let Err(e) = res {
             eprintln!("\x1b[31;1merror:\x1b[m {}", e);
+            std::process::exit(1);
         }
     } else {
         eprintln!("error: needing one file argument");
+        std::process::exit(1);
     }
 }
