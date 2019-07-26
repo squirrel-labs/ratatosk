@@ -252,17 +252,20 @@ fn atomify(mut expr: WasmExpr) -> Result<WasmExpr, String> {
     match &mut expr {
         WasmExpr::WasmOp("module", ref mut args) => {
             let (mut atomic_read, mut atomic_write) = (None, None);
-            for arg in args.iter() {
+            let mut removable_exports = Vec::with_capacity(2);
+            for (i, arg) in args.iter().enumerate() {
                 match arg {
                     WasmExpr::WasmOp("export", export_args) => match export_args.as_slice() {
                         [WasmExpr::WasmString("atomic_read"), WasmExpr::WasmOp("func", fun_args)] => {
                             if let [WasmExpr::WasmNum(fun_id)] = fun_args.as_slice() {
-                                atomic_read = Some(*fun_id)
+                                atomic_read = Some(*fun_id);
+                                removable_exports.push(i);
                             }
                         }
                         [WasmExpr::WasmString("atomic_write"), WasmExpr::WasmOp("func", fun_args)] => {
                             if let [WasmExpr::WasmNum(fun_id)] = fun_args.as_slice() {
-                                atomic_write = Some(*fun_id)
+                                atomic_write = Some(*fun_id);
+                                removable_exports.push(i);
                             }
                         }
                         _ => (),
@@ -272,6 +275,13 @@ fn atomify(mut expr: WasmExpr) -> Result<WasmExpr, String> {
                 if let (Some(_), Some(_)) = (atomic_read, atomic_write) {
                     break;
                 }
+            }
+            removable_exports.reverse();
+            if removable_exports.len() != 2 {
+                println!("warning: could not remove exports");
+            }
+            for i in removable_exports {
+                args.remove(i);
             }
             if let (Some(atomic_read), Some(atomic_write)) = (atomic_read, atomic_write) {
                 let mut function_counter = 0;
