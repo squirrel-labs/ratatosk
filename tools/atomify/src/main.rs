@@ -78,7 +78,7 @@ fn is_hex(c: char) -> bool {
     c.is_digit(16)
 }
 
-fn parse_name<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
+fn parse_name(expr: &str) -> Result<(WasmExpr, &str), String> {
     if !expr.starts_with(is_alpha) {
         Err(format!("\"{}\" is not a name", compile_error(expr, 1)))?
     }
@@ -90,7 +90,7 @@ fn parse_name<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     Err("reached end of expression while parsing name".to_owned())
 }
 
-fn parse_global<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
+fn parse_global(expr: &str) -> Result<(WasmExpr, &str), String> {
     if !expr.starts_with('$') {
         Err(format!("\"{}\" is not a global", compile_error(expr, 1)))?
     }
@@ -102,7 +102,7 @@ fn parse_global<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     Err("reached end of expression while parsing global".to_owned())
 }
 
-fn parse_num<'a>(mut expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
+fn parse_num(mut expr: &str) -> Result<(WasmExpr, &str), String> {
     if !expr.starts_with(is_num_minus) {
         Err(format!("\"{}\" is not a number", compile_error(expr, 1)))?
     }
@@ -126,7 +126,7 @@ fn parse_num<'a>(mut expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     Err("reached end of expression while parsing number".to_owned())
 }
 
-fn parse_string<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
+fn parse_string(expr: &str) -> Result<(WasmExpr, &str), String> {
     if !expr.starts_with('"') {
         Err(format!("\"{}\" is not a string", compile_error(expr, 1)))?
     }
@@ -157,7 +157,7 @@ fn parse_string<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
     Err("reached end of expression while parsing string".to_owned())
 }
 
-fn parse_op<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
+fn parse_op(expr: &str) -> Result<(WasmExpr, &str), String> {
     let expr = expr.trim_matches(is_whitespace);
     if !expr.starts_with('(') {
         Err(format!(
@@ -165,8 +165,8 @@ fn parse_op<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
             compile_error(expr, 1)
         ))?
     }
-    let off_expr: &'a str = &expr[1..];
-    let (name, mut args): (_, &'a str) = parse_name(off_expr)?;
+    let off_expr: &str = &expr[1..];
+    let (name, mut args): (_, &str) = parse_name(off_expr)?;
     let mut ops = Vec::new();
     args = args.trim_start_matches(is_whitespace);
     while !args.starts_with(')') {
@@ -178,13 +178,13 @@ fn parse_op<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
         args = args.trim_start_matches(is_whitespace);
     }
     if let WasmExpr::WasmName(name) = name {
-        Ok((WasmExpr::WasmOp(name, ops), &args[1..] as &'a str))
+        Ok((WasmExpr::WasmOp(name, ops), &args[1..] as &str))
     } else {
         Err(format!("operation name \"{}\" is not valid", expr))?
     }
 }
 
-fn parse_block_comment<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
+fn parse_block_comment(expr: &str) -> Result<(WasmExpr, &str), String> {
     let expr = expr.trim_matches(is_whitespace);
     if !expr.starts_with("(;") {
         Err(format!(
@@ -202,7 +202,7 @@ fn parse_block_comment<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), Str
     }
 }
 
-fn parse_line_comment<'a>(expr: &'a str) -> Result<(WasmExpr<'a>, &'a str), String> {
+fn parse_line_comment(expr: &str) -> Result<(WasmExpr, &str), String> {
     let expr = expr.trim_matches(is_whitespace);
     if !expr.starts_with(";;") {
         Err(format!(
