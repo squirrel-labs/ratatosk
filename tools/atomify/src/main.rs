@@ -1,3 +1,5 @@
+use std::{env, fs, process};
+
 #[derive(Debug, PartialEq, Clone)]
 enum WasmExpr<'a> {
     Op(&'a str, Vec<WasmExpr<'a>>),
@@ -217,7 +219,7 @@ fn parse_line_comment(expr: &str) -> Result<(WasmExpr, &str), String> {
             compile_error(expr, 2)
         ));
     }
-    if let Some(i) = expr.find("\n") {
+    if let Some(i) = expr.find('\n') {
         Ok((WasmExpr::None, &expr[i..]))
     } else {
         Err(format!(
@@ -233,11 +235,11 @@ fn parse_expr(expr: &str) -> Result<(WasmExpr, &str), String> {
         parse_block_comment(expr)
     } else if expr.starts_with(";;") {
         parse_line_comment(expr)
-    } else if expr.starts_with("(") {
+    } else if expr.starts_with('(') {
         parse_op(expr)
-    } else if expr.starts_with("$") {
+    } else if expr.starts_with('$') {
         parse_global(expr)
-    } else if expr.starts_with("\"") {
+    } else if expr.starts_with('"') {
         parse_string(expr)
     } else if expr.starts_with(is_num_minus) {
         parse_num(expr)
@@ -335,23 +337,23 @@ fn atomify(mut expr: WasmExpr) -> Result<WasmExpr, String> {
 }
 
 fn main() {
-    if let Some(arg) = std::env::args().nth(1).as_ref() {
-        let res = std::fs::read_to_string(arg)
+    if let Some(arg) = env::args().nth(1).as_ref() {
+        let res = fs::read_to_string(arg)
             .as_ref()
             .map_err(|e| format!("failed to read error ('{}'): \"{}\"", arg, e))
             .and_then(|content| parse_wasm(content))
             .and_then(atomify)
             .map(|wasm| wasm.serialize(0))
             .and_then(|wasm| {
-                std::fs::write(arg, wasm)
+                fs::write(arg, wasm)
                     .map_err(|e| format!("failed to write error ('{}'): \"{}\"", arg, e))
             });
         if let Err(e) = res {
             eprintln!("\x1b[31;1merror:\x1b[m {}", e);
-            std::process::exit(1);
+            process::exit(1);
         }
     } else {
         eprintln!("error: needing one file argument");
-        std::process::exit(1);
+        process::exit(1);
     }
 }
