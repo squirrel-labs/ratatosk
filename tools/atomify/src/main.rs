@@ -1,17 +1,17 @@
 #[derive(Debug, PartialEq, Clone)]
 enum WasmExpr<'a> {
-    WasmOp(&'a str, Vec<WasmExpr<'a>>),
-    WasmName(&'a str),
-    WasmGlobal(&'a str),
-    WasmString(&'a str),
-    WasmNum(i64),
-    WasmNone,
+    Op(&'a str, Vec<WasmExpr<'a>>),
+    Name(&'a str),
+    Global(&'a str),
+    String(&'a str),
+    Num(i64),
+    None,
 }
 
 impl<'a> WasmExpr<'a> {
     fn serialize(&self, depth: usize) -> String {
         match self {
-            WasmExpr::WasmOp(name, args) => format!(
+            WasmExpr::Op(name, args) => format!(
                 "\n{}({} {})",
                 " ".repeat(depth),
                 name,
@@ -20,11 +20,11 @@ impl<'a> WasmExpr<'a> {
                     .collect::<Vec<String>>()
                     .join(" ")
             ),
-            WasmExpr::WasmName(name) => name.to_string(),
-            WasmExpr::WasmGlobal(name) => name.to_string(),
-            WasmExpr::WasmString(buf) => format!("\"{}\"", buf),
-            WasmExpr::WasmNum(num) => format!("{}", num),
-            WasmExpr::WasmNone => "".to_owned(),
+            WasmExpr::Name(name) => name.to_string(),
+            WasmExpr::Global(name) => name.to_string(),
+            WasmExpr::String(buf) => format!("\"{}\"", buf),
+            WasmExpr::Num(num) => format!("{}", num),
+            WasmExpr::None => "".to_owned(),
         }
     }
 }
@@ -56,35 +56,42 @@ fn compile_error_off(s: &str, off: usize, len: usize) -> String {
 fn is_whitespace(c: char) -> bool {
     c == ' ' || c == '\n' || c == '\t'
 }
+
 fn is_digit(c: char) -> bool {
     c.is_digit(10)
 }
+
 fn is_num_minus(c: char) -> bool {
     is_digit(c) || c == '-'
 }
+
 fn is_alpha(c: char) -> bool {
     c.is_alphabetic() || c == '_'
 }
+
 fn is_alnum(c: char) -> bool {
     is_alpha(c) || is_num_minus(c)
 }
+
 fn is_name(c: char) -> bool {
     is_alnum(c) || c == '.' || c == '='
 }
+
 fn is_global(c: char) -> bool {
     is_alpha(c) || is_digit(c) || c == '$'
 }
+
 fn is_hex(c: char) -> bool {
     c.is_digit(16)
 }
 
 fn parse_name(expr: &str) -> Result<(WasmExpr, &str), String> {
     if !expr.starts_with(is_alpha) {
-        Err(format!("\"{}\" is not a name", compile_error(expr, 1)))?
+        return Err(format!("\"{}\" is not a name", compile_error(expr, 1)));
     }
     for (i, c) in expr.chars().enumerate() {
         if !is_name(c) {
-            return Ok((WasmExpr::WasmName(&expr[..i]), &expr[i..]));
+            return Ok((WasmExpr::Name(&expr[..i]), &expr[i..]));
         }
     }
     Err("reached end of expression while parsing name".to_owned())
@@ -92,11 +99,11 @@ fn parse_name(expr: &str) -> Result<(WasmExpr, &str), String> {
 
 fn parse_global(expr: &str) -> Result<(WasmExpr, &str), String> {
     if !expr.starts_with('$') {
-        Err(format!("\"{}\" is not a global", compile_error(expr, 1)))?
+        return Err(format!("\"{}\" is not a global", compile_error(expr, 1)));
     }
     for (i, c) in expr.chars().enumerate() {
         if !is_global(c) {
-            return Ok((WasmExpr::WasmGlobal(&expr[..i]), &expr[i..]));
+            return Ok((WasmExpr::Global(&expr[..i]), &expr[i..]));
         }
     }
     Err("reached end of expression while parsing global".to_owned())
@@ -104,7 +111,7 @@ fn parse_global(expr: &str) -> Result<(WasmExpr, &str), String> {
 
 fn parse_num(mut expr: &str) -> Result<(WasmExpr, &str), String> {
     if !expr.starts_with(is_num_minus) {
-        Err(format!("\"{}\" is not a number", compile_error(expr, 1)))?
+        return Err(format!("\"{}\" is not a number", compile_error(expr, 1)));
     }
     let is_neg = expr.starts_with('-');
     if is_neg {
@@ -113,7 +120,7 @@ fn parse_num(mut expr: &str) -> Result<(WasmExpr, &str), String> {
     for (i, c) in expr.chars().enumerate() {
         if !is_digit(c) {
             return Ok((
-                WasmExpr::WasmNum(
+                WasmExpr::Num(
                     expr[..i]
                         .parse::<i64>()
                         .map(|v| if is_neg { -v } else { v })
@@ -128,7 +135,7 @@ fn parse_num(mut expr: &str) -> Result<(WasmExpr, &str), String> {
 
 fn parse_string(expr: &str) -> Result<(WasmExpr, &str), String> {
     if !expr.starts_with('"') {
-        Err(format!("\"{}\" is not a string", compile_error(expr, 1)))?
+        return Err(format!("\"{}\" is not a string", compile_error(expr, 1)));
     }
     let expr = &expr[1..];
     let mut escape = 0;
@@ -139,10 +146,10 @@ fn parse_string(expr: &str) -> Result<(WasmExpr, &str), String> {
             } else if is_hex(c) {
                 escape = 2;
             } else {
-                Err(format!(
+                return Err(format!(
                     "unknown escape character{}",
                     compile_error_off(expr, i - 1, 2)
-                ))?
+                ));
             }
         } else if escape == 2 {
             escape = 0;
@@ -150,7 +157,7 @@ fn parse_string(expr: &str) -> Result<(WasmExpr, &str), String> {
             if c == '\\' {
                 escape = 1;
             } else if c == '"' {
-                return Ok((WasmExpr::WasmString(&expr[..i]), &expr[i + 1..]));
+                return Ok((WasmExpr::String(&expr[..i]), &expr[i + 1..]));
             }
         }
     }
@@ -160,10 +167,10 @@ fn parse_string(expr: &str) -> Result<(WasmExpr, &str), String> {
 fn parse_op(expr: &str) -> Result<(WasmExpr, &str), String> {
     let expr = expr.trim_matches(is_whitespace);
     if !expr.starts_with('(') {
-        Err(format!(
+        return Err(format!(
             "\"{}\" is not an operation",
             compile_error(expr, 1)
-        ))?
+        ));
     }
     let off_expr: &str = &expr[1..];
     let (name, mut args): (_, &str) = parse_name(off_expr)?;
@@ -172,28 +179,28 @@ fn parse_op(expr: &str) -> Result<(WasmExpr, &str), String> {
     while !args.starts_with(')') {
         let (arg, _args) = parse_expr(args)?;
         args = _args;
-        if arg != WasmExpr::WasmNone {
+        if arg != WasmExpr::None {
             ops.push(arg);
         }
         args = args.trim_start_matches(is_whitespace);
     }
-    if let WasmExpr::WasmName(name) = name {
-        Ok((WasmExpr::WasmOp(name, ops), &args[1..] as &str))
+    if let WasmExpr::Name(name) = name {
+        Ok((WasmExpr::Op(name, ops), &args[1..] as &str))
     } else {
-        Err(format!("operation name \"{}\" is not valid", expr))?
+        Err(format!("operation name \"{}\" is not valid", expr))
     }
 }
 
 fn parse_block_comment(expr: &str) -> Result<(WasmExpr, &str), String> {
     let expr = expr.trim_matches(is_whitespace);
     if !expr.starts_with("(;") {
-        Err(format!(
+        return Err(format!(
             "\"{}\" is not a block comment",
             compile_error(expr, 2)
-        ))?
+        ));
     }
     if let Some(i) = expr.find(";)") {
-        Ok((WasmExpr::WasmNone, &expr[i + 2..]))
+        Ok((WasmExpr::None, &expr[i + 2..]))
     } else {
         Err(format!(
             "reached end of expression while parsing \"(;\" comment{}",
@@ -205,13 +212,13 @@ fn parse_block_comment(expr: &str) -> Result<(WasmExpr, &str), String> {
 fn parse_line_comment(expr: &str) -> Result<(WasmExpr, &str), String> {
     let expr = expr.trim_matches(is_whitespace);
     if !expr.starts_with(";;") {
-        Err(format!(
+        return Err(format!(
             "\"{}\" is not a line comment",
             compile_error(expr, 2)
-        ))?
+        ));
     }
     if let Some(i) = expr.find("\n") {
-        Ok((WasmExpr::WasmNone, &expr[i..]))
+        Ok((WasmExpr::None, &expr[i..]))
     } else {
         Err(format!(
             "reached end of expression while parsing \";;\" comment{}",
@@ -250,27 +257,26 @@ fn parse_wasm(expr: &str) -> Result<WasmExpr, String> {
 
 fn atomify(mut expr: WasmExpr) -> Result<WasmExpr, String> {
     match &mut expr {
-        WasmExpr::WasmOp("module", ref mut args) => {
+        WasmExpr::Op("module", ref mut args) => {
             let (mut atomic_read, mut atomic_write) = (None, None);
             let mut removable_exports = Vec::with_capacity(2);
             for (i, arg) in args.iter().enumerate() {
-                match arg {
-                    WasmExpr::WasmOp("export", export_args) => match export_args.as_slice() {
-                        [WasmExpr::WasmString("atomic_read"), WasmExpr::WasmOp("func", fun_args)] => {
-                            if let [WasmExpr::WasmNum(fun_id)] = fun_args.as_slice() {
+                if let WasmExpr::Op("export", export_args) = arg {
+                    match export_args.as_slice() {
+                        [WasmExpr::String("atomic_read"), WasmExpr::Op("func", fun_args)] => {
+                            if let [WasmExpr::Num(fun_id)] = fun_args.as_slice() {
                                 atomic_read = Some(*fun_id);
                                 removable_exports.push(i);
                             }
                         }
-                        [WasmExpr::WasmString("atomic_write"), WasmExpr::WasmOp("func", fun_args)] => {
-                            if let [WasmExpr::WasmNum(fun_id)] = fun_args.as_slice() {
+                        [WasmExpr::String("atomic_write"), WasmExpr::Op("func", fun_args)] => {
+                            if let [WasmExpr::Num(fun_id)] = fun_args.as_slice() {
                                 atomic_write = Some(*fun_id);
                                 removable_exports.push(i);
                             }
                         }
                         _ => (),
-                    },
-                    _ => (),
+                    }
                 }
                 if let (Some(_), Some(_)) = (atomic_read, atomic_write) {
                     break;
@@ -285,32 +291,32 @@ fn atomify(mut expr: WasmExpr) -> Result<WasmExpr, String> {
             }
             if let (Some(atomic_read), Some(atomic_write)) = (atomic_read, atomic_write) {
                 let mut function_counter = 0;
-                for ref mut arg in args.iter_mut() {
+                for arg in args.iter_mut() {
                     match arg {
-                        WasmExpr::WasmOp("import", ref import_args) => {
-                            if let [WasmExpr::WasmString(_scope), WasmExpr::WasmString(_import_name), WasmExpr::WasmOp("func", _fun_args)] =
+                        WasmExpr::Op("import", ref import_args) => {
+                            if let [WasmExpr::String(_scope), WasmExpr::String(_import_name), WasmExpr::Op("func", _fun_args)] =
                                 import_args.as_slice()
                             {
                                 function_counter += 1
                             }
                         }
-                        WasmExpr::WasmOp("func", ref mut fun_args) => {
+                        WasmExpr::Op("func", ref mut fun_args) => {
                             if function_counter == atomic_read {
                                 let op_ptr: &mut WasmExpr = match fun_args.last_mut() {
                                     Some(v) => v,
                                     _ => continue,
                                 };
-                                if let WasmExpr::WasmOp("i32.load8_u", op_args) = op_ptr {
+                                if let WasmExpr::Op("i32.load8_u", op_args) = op_ptr {
                                     *op_ptr =
-                                        WasmExpr::WasmOp("i32.atomic.load8_u", op_args.clone())
+                                        WasmExpr::Op("i32.atomic.load8_u", op_args.clone())
                                 }
                             } else if function_counter == atomic_write {
                                 let op_ptr: &mut WasmExpr = match fun_args.last_mut() {
                                     Some(v) => v,
                                     _ => continue,
                                 };
-                                if let WasmExpr::WasmOp("i32.store8", op_args) = op_ptr {
-                                    *op_ptr = WasmExpr::WasmOp("i32.atomic.store8", op_args.clone())
+                                if let WasmExpr::Op("i32.store8", op_args) = op_ptr {
+                                    *op_ptr = WasmExpr::Op("i32.atomic.store8", op_args.clone())
                                 }
                             }
                             function_counter += 1;
