@@ -6,4 +6,5 @@ use webhogg_wasm_shared::{
 #[global_allocator]
 static ALLOCATOR: Allocator<GraphicsAllocator> = get_allocator!();
 
+mod context;
 mod entries;

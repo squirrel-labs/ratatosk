@@ -21,7 +21,9 @@ use wasm_bindgen::JsValue;
 /// ```
 #[derive(Debug)]
 pub enum ClientError {
+    JsValueError(JsValue),
     WebSocketError(JsValue),
+    WebGlError(JsValue),
 }
 
 fn jsvalue_to_string(v: &JsValue) -> String {
@@ -36,15 +38,18 @@ fn jsvalue_to_string(v: &JsValue) -> String {
 impl std::fmt::Display for ClientError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ClientError::WebSocketError(e) => write!(
-                f, "{}", jsvalue_to_string(e)
-            ),
+            ClientError::JsValueError(e) |
+            ClientError::WebSocketError(e) |
+            ClientError::WebGlError(e) =>
+                write!(
+                    f, "{}", jsvalue_to_string(e)
+                ),
         }
     }
 }
 
 impl From<JsValue> for ClientError {
     fn from(error: JsValue) -> Self {
-        ClientError::WebSocketError(error)
+        ClientError::JsValueError(error)
     }
 }
