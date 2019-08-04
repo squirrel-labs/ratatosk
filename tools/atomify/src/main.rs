@@ -7,6 +7,7 @@ enum WasmExpr<'a> {
     Global(&'a str),
     String(&'a str),
     Num(i64),
+    NumHex(&'a str),
     None,
 }
 
@@ -26,6 +27,7 @@ impl<'a> WasmExpr<'a> {
             WasmExpr::Global(name) => name.to_string(),
             WasmExpr::String(buf) => format!("\"{}\"", buf),
             WasmExpr::Num(num) => format!("{}", num),
+            WasmExpr::NumHex(num) => format!("{}", num),
             WasmExpr::None => "".to_owned(),
         }
     }
@@ -65,6 +67,10 @@ fn is_digit(c: char) -> bool {
 
 fn is_num_minus(c: char) -> bool {
     is_digit(c) || c == '-'
+}
+
+fn is_hex_digit(c: char) -> bool {
+    is_num_minus(c) || c == '+' || c == 'p' || c == 'x'
 }
 
 fn is_alpha(c: char) -> bool {
@@ -111,25 +117,38 @@ fn parse_global(expr: &str) -> Result<(WasmExpr, &str), String> {
     Err("reached end of expression while parsing global".to_owned())
 }
 
-fn parse_num(mut expr: &str) -> Result<(WasmExpr, &str), String> {
+fn parse_num(expr: &str) -> Result<(WasmExpr, &str), String> {
     if !expr.starts_with(is_num_minus) {
         return Err(format!("\"{}\" is not a number", compile_error(expr, 1)));
     }
     let is_neg = expr.starts_with('-');
-    if is_neg {
-        expr = &expr[1..];
-    }
+    let mut is_hex = false;
     for (i, c) in expr.chars().enumerate() {
-        if !is_digit(c) {
-            return Ok((
-                WasmExpr::Num(
-                    expr[..i]
-                        .parse::<i64>()
-                        .map(|v| if is_neg { -v } else { v })
-                        .unwrap(),
-                ),
-                &expr[i..],
-            ));
+        match (is_hex, i, c) {
+            (_, 0, '-') => (),
+            (false, _, c) => {
+                if !is_digit(c) {
+                    if is_hex_digit(c) {
+                        is_hex = true
+                    } else {
+                        let start = if is_neg { 1 } else { 0 };
+                        return Ok((
+                            WasmExpr::Num(
+                                expr[start..i]
+                                    .parse::<i64>()
+                                    .map(|v| if is_neg { -v } else { v })
+                                    .unwrap(),
+                            ),
+                            &expr[i..],
+                        ));
+                    }
+                }
+            }
+            (true, _, c) => {
+                if !is_hex_digit(c) {
+                    return Ok((WasmExpr::NumHex(&expr[..i]), &expr[i..]));
+                }
+            }
         }
     }
     Err("reached end of expression while parsing number".to_owned())
@@ -309,8 +328,7 @@ fn atomify(mut expr: WasmExpr) -> Result<WasmExpr, String> {
                                     _ => continue,
                                 };
                                 if let WasmExpr::Op("i32.load8_u", op_args) = op_ptr {
-                                    *op_ptr =
-                                        WasmExpr::Op("i32.atomic.load8_u", op_args.clone())
+                                    *op_ptr = WasmExpr::Op("i32.atomic.load8_u", op_args.clone())
                                 }
                             } else if function_counter == atomic_write {
                                 let op_ptr: &mut WasmExpr = match fun_args.last_mut() {
