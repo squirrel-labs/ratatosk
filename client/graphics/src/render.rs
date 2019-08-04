@@ -11,6 +11,7 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
+        self.graphics.clear()?;
         Ok(())
     }
 }

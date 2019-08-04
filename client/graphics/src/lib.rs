@@ -10,3 +10,4 @@ mod context;
 mod entries;
 mod graphics;
 mod render;
+mod shader;
