@@ -1,0 +1,39 @@
+[tasks.frontend]
+command = "./client/build"
+toolchain = "nightly"
+workspace = false
+
+[tasks.server-frontend]
+script = [
+'''
+#!/usr/bin/env bash
+
+browser=$(command -v chromium 2>/dev/null)
+if [ $? -ne 0 ]; then
+  echo "Please install chromium for the frontend as it's the only browser with offscreen canvas support!"
+  exit 1
+fi
+
+top=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ $? -ne 0 ]; then
+  echo "Please run this script from the ratatosk git repository!"
+  exit 1
+fi
+cd $top/client
+
+trap 'kill -TERM "$pid" 2>/dev/null' TERM INT
+python3 -m http.server 3000 &
+pid=$!
+chromium http://localhost:3000
+
+wait $pid
+trap - TERM INT
+wait $pid
+EXIT_STATUS=$?
+'''
+]
+workspace = false
+dependencies = [ "frontend" ]
+
+[tasks.flow]
+dependencies = [ "frontend" ]

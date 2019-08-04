@@ -1,13 +1,15 @@
 #!/bin/sh
 
+top=$(git rev-parse --show-toplevel 2>/dev/null)
+
 printf '\x1b[1mcargo fmt\x1b[m\n'
 if cargo fmt &> /dev/null; then
   printf '\x1b[1mcargo\x1b[m\n'
   if cargo build --color always --release; then
     printf '\x1b[1mwasm-bindgen\x1b[m\n'
-    rm target/wasm32-unknown-unknown/release/webhogg_wasm.wasm
-    mv target/wasm32-unknown-unknown/release/webhogg_wasm_logic.wasm target/wasm32-unknown-unknown/release/webhogg_wasm.wasm
-    if wasm-bindgen target/wasm32-unknown-unknown/release/webhogg_wasm.wasm --out-dir bin/ --no-typescript --target no-modules --remove-producers-section --remove-name-section --no-demangle
+    rm $top/target/wasm32-unknown-unknown/release/webhogg_wasm.wasm
+    mv $top/target/wasm32-unknown-unknown/release/webhogg_wasm_logic.wasm $top/target/wasm32-unknown-unknown/release/webhogg_wasm.wasm
+    if wasm-bindgen $top/target/wasm32-unknown-unknown/release/webhogg_wasm.wasm --out-dir bin/ --no-typescript --target no-modules --remove-producers-section --remove-name-section --no-demangle
     then
       printf '\x1b[1mwasm-opt\x1b[m\n'
       if wasm-opt --memory-packing --remove-unused-brs --enable-mutable-globals --enable-threads -Oz bin/webhogg_wasm_bg.wasm -o bin/webhogg-wasm.wasm; then

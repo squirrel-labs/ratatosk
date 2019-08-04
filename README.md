@@ -24,6 +24,8 @@ found in Wiki.
 * [`rustup` and the Rust toolchain](https://rustup.rs/)
 * [`binaryen`](https://github.com/WebAssembly/binaryen) (at least version [84](https://github.com/WebAssembly/binaryen/releases/tag/version_84), `emscripten` is currently not used)
 * [`python3`](https://www.python.org/) for the [exemplary web server](https://github.com/TrueDoctor/ratatosk/wiki/Frontend#installation).
+* [`cargo-make`](https://github.com/sagiegurari/cargo-make) for all build scripts.
+* [`wabt`](https://github.com/WebAssembly/wabt) to introspect compiled wasm code.
 
 Optionally, all dependencies can be obtained with [Nix](https://nixos.org/nix/) by running
 [`nix-shell`](https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) in the project's root.

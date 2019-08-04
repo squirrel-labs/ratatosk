@@ -13,6 +13,8 @@ mkShell {
     cargo
     openssl
     binaryen
+    cargo-make
+    wabt
   ];
 
   shellHook = ''
