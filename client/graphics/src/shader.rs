@@ -33,6 +33,10 @@ impl Program {
             Err(ClientError::WebGlError(format!("link error: {}", info)))
         }
     }
+
+    pub fn use_program(&self, gl: &Gl2) {
+        gl.use_program(Some(&self.0))
+    }
 }
 
 struct Shader(WebGlShader);
