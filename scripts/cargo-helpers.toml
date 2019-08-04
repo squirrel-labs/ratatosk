@@ -1,0 +1,14 @@
+[env]
+BUILD_ENV = "debug"
+
+[tasks.exec-debug]
+command = "cargo"
+toolchain = "nightly"
+args = [ "${@}" ]
+workspace = false
+
+[tasks.exec-release]
+command = "cargo"
+toolchain = "nightly"
+args = [ "${@}", "--release" ]
+workspace = false

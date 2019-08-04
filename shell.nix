@@ -20,5 +20,6 @@ mkShell {
   shellHook = ''
     # ugly, I know
     export PATH="$PATH:$HOME/.cargo/bin"
+    alias make="cargo make"
   '';
 }

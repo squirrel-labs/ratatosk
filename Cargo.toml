@@ -7,3 +7,6 @@ members = [
   "tools/atomify",
   "tools/bone_cake",
 ]
+
+[profile.release]
+lto = true

@@ -43,5 +43,12 @@ rustup target add wasm32-unknown-unknown # for the frontend part
 Now you can build the project with [`cargo`](https://doc.rust-lang.org/cargo/):
 
 ```
-cargo build
+cargo make all
+```
+
+The following scripts can be used to start test servers
+
+```
+cargo make serve-frontend # for the wasm/frontend setup
+cargo make serve-backend  # for the backend/game_server
 ```
