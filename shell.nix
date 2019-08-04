@@ -1,6 +1,6 @@
 with import (fetchTarball {
-  url = https://github.com/NixOS/nixpkgs-channels/archive/c4fec1c6314c0c9c7af59bb465a17d1950ec7464.tar.gz;
-  sha256 = "1w8wjvmsap0jn4gq2gg76yphsgvl6a9v5vsnkjr0jzda1q83zw4h";
+  url = https://github.com/NixOS/nixpkgs-channels/archive/239fffc90d792b5362a20ec1a009978de7b8f91a.tar.gz;
+  sha256 = "0z0c438b5q1066x6p9qfriym5cipw8f52a456f91qzg6q1r296f8";
 }) { };
 
 mkShell {
