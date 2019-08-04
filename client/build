@@ -9,7 +9,7 @@ suc=1
 mkdir gen &> /dev/null
 
 cd graphics
-sh build |& awk '/.*/ {printf("graphics:    "); print}'
+sh build 2>&1 | awk '/.*/ {printf("graphics:    "); print}'
 ret="${PIPESTATUS[0]}"
 if [ $ret -eq 0 ]; then
     printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m graphics build \n------------------------"
@@ -21,7 +21,7 @@ else
 fi
 echo
 cd ../logic
-sh build |& awk '/.*/ {printf("logic:       "); print}'
+sh build 2>&1 | awk '/.*/ {printf("logic:       "); print}'
 ret="${PIPESTATUS[0]}"
 if [ $ret -eq 0 ]; then
     printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m logic build \n---------------------"
@@ -47,7 +47,7 @@ if [ $suc -eq 1 ]; then
         printf "\x1b[m\n"
 
         cd ../tools/atomify
-        sh build |& awk '/.*/ {printf("atomify:       "); print}'
+        sh build 2>&1 | awk '/.*/ {printf("atomify:       "); print}'
         ret="${PIPESTATUS[0]}"
         if [ $ret -eq 0 ]; then
             printf "\x1b[1;97m\x1b[92msucceeded\x1b[m\x1b[1;97m atomify build\n\x1b[m"
