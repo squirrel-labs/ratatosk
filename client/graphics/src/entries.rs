@@ -8,15 +8,17 @@ use webhogg_wasm_shared::get_double_buffer;
 use webhogg_wasm_shared::wasm_log::WasmLog;
 
 #[wasm_bindgen]
-pub fn init() {
-    log::set_boxed_logger(Box::new(WasmLog::new()))
-        .map(|()| log::set_max_level(log::LevelFilter::Debug))
-        .unwrap();
+pub fn initialise(canvas: web_sys::OffscreenCanvas) {
     unsafe {
         crate::ALLOCATOR.reset();
     }
+
+    log::set_boxed_logger(Box::new(WasmLog::new()))
+        .map(|()| log::set_max_level(log::LevelFilter::Debug))
+        .unwrap();
+
     context::set_context(
-        context::Context::new()
+        context::Context::new(canvas)
             .map_err(|e| log::error!("{}", e))
             .unwrap(),
     );

@@ -8,3 +8,5 @@ static ALLOCATOR: Allocator<GraphicsAllocator> = get_allocator!();
 
 mod context;
 mod entries;
+mod graphics;
+mod render;

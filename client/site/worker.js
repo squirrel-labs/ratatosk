@@ -1,8 +1,8 @@
 function onwasm(ctx, desc, module) {
     if (desc.canvas === undefined) {
-        module.init();
+        module.initialise();
     } else {
-        module.init(desc.canvas);
+        module.initialise(desc.canvas);
     }
 
     setInterval(module.frame, desc.deltaTime);
@@ -16,6 +16,7 @@ onmessage = async function(e) {
     source = await source;
     source = await source.arrayBuffer();
 
-    wasm_bindgen(source, desc.memory).then(ctx =>
-        onwasm(ctx, desc, wasm_bindgen));
+    wasm_bindgen(source, desc.memory).then(ctx => {
+        onwasm(ctx, desc, wasm_bindgen);
+    });
 }

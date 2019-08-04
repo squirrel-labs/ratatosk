@@ -12,13 +12,13 @@ static mut WS: Option<WebSocketAdapter> = None;
 /// This function is used to initialize the gamestate, communication
 /// with the graphics worker and setup networking
 #[wasm_bindgen]
-pub fn init() {
-    log::set_boxed_logger(Box::new(WasmLog::new()))
-        .map(|()| log::set_max_level(log::LevelFilter::Debug))
-        .unwrap();
+pub fn initialise() {
     unsafe {
         crate::ALLOCATOR.reset();
     }
+    log::set_boxed_logger(Box::new(WasmLog::new()))
+        .map(|()| log::set_max_level(log::LevelFilter::Debug))
+        .unwrap();
     unsafe {
         WS = Some(
             WebSocketAdapter::new("wss://echo.websocket.org").expect("Websocket creation failed"),
