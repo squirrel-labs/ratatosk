@@ -4,6 +4,7 @@ mod lobby;
 mod scribble_group;
 mod server;
 mod webhogg_group;
+mod error;
 
 mod game_logger;
 

@@ -2,8 +2,9 @@ use std::collections::HashMap;
 
 use crate::group::{Group, GroupId};
 use crate::scribble_group::ScribbleGroup;
+use crate::error::ServerError;
 
-use crate::server::{GameClient, GameServerError, UserId};
+use crate::server::{GameClient, UserId};
 
 pub struct Lobby {
     groups: HashMap<GroupId, Box<Group>>,
@@ -35,12 +36,12 @@ impl Lobby {
         group_name: &str,
         user_id: UserId,
         client: GameClient,
-    ) -> Result<(), GameServerError> {
+    ) -> Result<(), ServerError> {
         if !self.groups.contains_key(&group_id) {
             let mut group = match Self::generate_group(group_type, group_id, group_name) {
                 Some(x) => x,
                 _ => {
-                    return Err(GameServerError::GroupCreationError(format!(
+                    return Err(ServerError::GroupCreation(format!(
                         "failed to generate '{}' group",
                         group_type
                     )))

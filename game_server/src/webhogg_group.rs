@@ -1,5 +1,6 @@
 use crate::group::{Group, GroupId};
-use crate::server::{ClientReceiver, ClientSender, GameClient, GameServerError, UserId};
+use crate::server::{ClientReceiver, ClientSender, GameClient, UserId};
+use crate::error::ServerError;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
@@ -26,9 +27,9 @@ impl Group for WebhoggGroup {
         info!("a new group {}:'{}' runs now", self.id, self.name);
     }
 
-    fn add_client(&mut self, id: UserId, client: GameClient) -> Result<(), GameServerError> {
+    fn add_client(&mut self, id: UserId, client: GameClient) -> Result<(), ServerError> {
         if self.senders.lock().unwrap().len() > 1 {
-            return Err(GameServerError::GroupError(format!(
+            return Err(ServerError::Group(format!(
                 "user {} was not able to join the {} group, {}",
                 "because the client limit has been exceeded", id, self.name
             )));

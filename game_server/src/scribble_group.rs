@@ -1,5 +1,6 @@
 use crate::group::{Group, GroupId};
-use crate::server::{ClientReceiver, ClientSender, GameClient, GameServerError, UserId};
+use crate::server::{ClientReceiver, ClientSender, GameClient, UserId};
+use crate::error::ServerError;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
@@ -26,7 +27,7 @@ impl Group for ScribbleGroup {
         info!("a new group {}:'{}' runs now", self.id, self.name);
     }
 
-    fn add_client(&mut self, id: UserId, client: GameClient) -> Result<(), GameServerError> {
+    fn add_client(&mut self, id: UserId, client: GameClient) -> Result<(), ServerError> {
         debug!("user {} joined the group {}:'{}'", id, self.id, self.name);
         let (sen, rec) = client.split();
         self.senders.lock().unwrap().insert(id, sen);

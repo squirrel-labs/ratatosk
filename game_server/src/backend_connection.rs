@@ -1,6 +1,7 @@
 use crate::group::GroupId;
 use crate::server::{Token, UserId};
-use reqwest::{Client, Error as ReqError, Response, Url, UrlError};
+use crate::error::ServerError;
+use reqwest::{Client, Response, Url};
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
 
@@ -11,18 +12,8 @@ pub struct BackendConnection {
     max_uid: u32,
 }
 
-#[derive(Debug)]
-pub enum BackendError {
-    UrlError(UrlError),
-    RequestError(ReqError),
-    InvalidTokenFormat,
-    InvalidToken,
-    BadResponse(Response),
-}
-
-pub type TokenValidity = Result<TokenResponse, BackendError>;
 pub type RequestData = Url;
-pub type ResponseResult = Result<Response, ReqError>;
+pub type ResponseResult = Result<Response, ServerError>;
 
 pub struct TokenResponse {
     pub group_id: GroupId,
@@ -35,11 +26,10 @@ impl BackendConnection {
     fn run_background(req_rec: Receiver<RequestData>, res_sender: Sender<ResponseResult>) {
         let client = Client::new();
         loop {
-            let request_data = req_rec.recv().unwrap();
-            let location = request_data;
+            let location = req_rec.recv().unwrap();
             let request = client.get(location);
             let response = request.send();
-            res_sender.send(response).unwrap();
+            res_sender.send(response.map_err(|e| e.into())).unwrap();
         }
     }
 
@@ -56,7 +46,7 @@ impl BackendConnection {
         }
     }
 
-    pub fn request(&self, location: &str) -> Result<(), UrlError> {
+    pub fn request(&self, location: &str) -> Result<(), ServerError> {
         Ok(self
             .req_sender
             .send(Url::parse(&format!("{}{}", self.host, location))?)
@@ -67,13 +57,10 @@ impl BackendConnection {
         self.res_rec.recv().unwrap()
     }
 
-    pub fn validate_token(&mut self, token: &Token) -> TokenValidity {
+    pub fn validate_token(&mut self, token: &Token) -> Result<TokenResponse, ServerError> {
         let location = format!("/api/lobby/tokens/{}", token);
-        self.request(&location)
-            .map_err(|err| BackendError::UrlError(err))?;
-        let response = self
-            .get_response()
-            .map_err(|err| BackendError::RequestError(err))?;
+        self.request(&location)?;
+        let response = self.get_response()?;
         match response.status() {
             status if status.is_success() => {
                 // zu Testzwecken werden noch keine JSON-Daten deserialisiert
@@ -86,9 +73,9 @@ impl BackendConnection {
                     user_id: self.max_uid - 1,
                 })
             },
-            reqwest::StatusCode::NOT_FOUND => Err(BackendError::InvalidToken),
-            status if status.is_client_error() => Err(BackendError::InvalidTokenFormat),
-            _ => Err(BackendError::BadResponse(response))
+            reqwest::StatusCode::NOT_FOUND => Err(ServerError::InvalidToken),
+            status if status.is_client_error() => Err(ServerError::InvalidTokenFormat),
+            _ => Err(ServerError::BadBackendResponse(response))
         }
     }
 }

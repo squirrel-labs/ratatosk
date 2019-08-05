@@ -1,5 +1,6 @@
 use crate::backend_connection::BackendConnection;
 use crate::lobby::Lobby;
+use crate::error::ServerError;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::sync::{
     mpsc,
@@ -21,29 +22,6 @@ const PROTOCOL: &str = "tuesday";
 
 pub type Token = u32;
 pub type UserId = u32;
-
-#[derive(Debug)]
-pub enum GameServerError {
-    BindError(std::io::Error),
-    HandshakeRequestError,
-    InvalidProtocolError,
-    AcceptError(std::io::Error),
-    GroupError(String),
-    GroupCreationError(String),
-}
-
-impl std::fmt::Display for GameServerError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        match self {
-            GameServerError::BindError(e) => write!(f, "BindError: {}", e),
-            GameServerError::HandshakeRequestError => write!(f, "HandshakeRequestError"),
-            GameServerError::InvalidProtocolError => write!(f, "InvalidProtocolError"),
-            GameServerError::AcceptError(e) => write!(f, "AcceptError: {}", e),
-            GameServerError::GroupError(e) => write!(f, "GroupError: {}", e),
-            GameServerError::GroupCreationError(e) => write!(f, "GroupCreationError: {}", e),
-        }
-    }
-}
 
 pub struct GameServer {
     addr: SocketAddr,
@@ -82,7 +60,7 @@ impl GameClient {
     }
 }
 
-type ClientConnection = Result<GameClient, GameServerError>;
+type ClientConnection = Result<GameClient, ServerError>;
 
 impl GameServer {
     pub fn new<T: ToSocketAddrs>(addr: T) -> Self {
@@ -99,7 +77,7 @@ impl GameServer {
         }
     }
 
-    pub fn run(&mut self) -> Result<(), GameServerError> {
+    pub fn run(&mut self) -> Result<(), ServerError> {
         let reader = self.read_clients();
         loop {
             let connection = reader.recv().unwrap()?;
@@ -150,14 +128,9 @@ impl GameServer {
     fn handle_requests(
         addr: SocketAddr,
         sen: &Sender<ClientConnection>,
-    ) -> Result<(), GameServerError> {
-        let server = match Server::<NoTlsAcceptor>::bind(addr) {
-            Ok(v) => v,
-            Err(e) => {
-                error!("websocket binding error");
-                Err(GameServerError::BindError(e))?
-            }
-        };
+    ) -> Result<(), ServerError> {
+        let server = Server::<NoTlsAcceptor>::bind(addr)
+            .map_err(|e| ServerError::Bind(e))?;
         info!("webserver is being launched");
         for req in server {
             sen.send(Ok(Self::handle_request(req)?)).unwrap();
@@ -172,26 +145,26 @@ impl GameServer {
                 if !req.protocols().contains(&PROTOCOL.to_string()) {
                     warn!("a client tried to connect without {} protocol", PROTOCOL);
                     req.reject().unwrap();
-                    Err(GameServerError::InvalidProtocolError)
+                    Err(ServerError::InvalidProtocol)
                 } else {
                     match req.use_protocol(PROTOCOL).accept() {
                         Ok(client) => match GameClient::from_raw(client) {
                             Ok(client) => Ok(client),
                             Err(_) => {
                                 error!("could not create a client");
-                                Err(GameServerError::HandshakeRequestError)
+                                Err(ServerError::HandshakeRequest)
                             }
                         },
                         Err((_, e)) => {
                             warn!("client handshake failed");
-                            Err(GameServerError::AcceptError(e))
+                            Err(ServerError::Accept(e))
                         }
                     }
                 }
             }
             Err(_) => {
                 warn!("invalid client request");
-                Err(GameServerError::HandshakeRequestError)
+                Err(ServerError::HandshakeRequest)
             }
         }
     }
