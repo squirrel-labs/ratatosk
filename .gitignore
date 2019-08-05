@@ -23,7 +23,8 @@
 Cargo.lock
 
 # dont save that target (bad boy)
-**/*/target
+target/
+bin/
 
 # Dolphin (?)
 .directory
