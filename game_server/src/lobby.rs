@@ -1,13 +1,14 @@
 use std::collections::HashMap;
 
-use crate::group::{Group, GroupId};
-use crate::scribble_group::ScribbleGroup;
 use crate::error::ServerError;
+use crate::group::{Group, GroupId};
+use crate::rask_group::RaskGroup;
+use crate::scribble_group::ScribbleGroup;
 
 use crate::server::{GameClient, UserId};
 
 pub struct Lobby {
-    groups: HashMap<GroupId, Box<Group>>,
+    groups: HashMap<GroupId, Box<dyn Group>>,
 }
 
 #[allow(dead_code)]
@@ -18,14 +19,15 @@ impl Lobby {
         }
     }
 
-    fn generate_group(group_type: &str, id: GroupId, name: &str) -> Option<Box<Group>> {
+    fn generate_group(group_type: &str, id: GroupId, name: &str) -> Option<Box<dyn Group>> {
         match group_type {
             "scribble" => Some(Box::new(ScribbleGroup::new(id, name.to_string()))),
+            "rask" => Some(Box::new(RaskGroup::new(id, name.to_string()))),
             _ => None,
         }
     }
 
-    pub fn add_group(&mut self, group: Box<Group>) {
+    pub fn add_group(&mut self, group: Box<dyn Group>) {
         self.groups.insert(group.id(), group);
     }
 
@@ -38,15 +40,9 @@ impl Lobby {
         client: GameClient,
     ) -> Result<(), ServerError> {
         if !self.groups.contains_key(&group_id) {
-            let mut group = match Self::generate_group(group_type, group_id, group_name) {
-                Some(x) => x,
-                _ => {
-                    return Err(ServerError::GroupCreation(format!(
-                        "failed to generate '{}' group",
-                        group_type
-                    )))
-                }
-            };
+            let mut group = Self::generate_group(group_type, group_id, group_name).ok_or(
+                ServerError::GroupCreation(format!("failed to generate '{}' group", group_type)),
+            )?;
             group.run();
             self.groups.insert(group_id, group);
         }
@@ -63,11 +59,11 @@ impl Lobby {
 
 #[allow(dead_code)]
 pub struct GroupIterator<'a> {
-    groups: std::collections::hash_map::Values<'a, GroupId, Box<Group>>,
+    groups: std::collections::hash_map::Values<'a, GroupId, Box<dyn Group>>,
 }
 
 impl<'a> Iterator for GroupIterator<'a> {
-    type Item = &'a Box<Group>;
+    type Item = &'a Box<dyn Group>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.groups.next()

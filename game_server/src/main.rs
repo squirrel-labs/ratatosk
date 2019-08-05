@@ -1,10 +1,10 @@
 mod backend_connection;
+mod error;
 mod group;
 mod lobby;
+mod rask_group;
 mod scribble_group;
 mod server;
-mod webhogg_group;
-mod error;
 
 mod game_logger;
 
@@ -13,7 +13,7 @@ extern crate log;
 #[macro_use]
 extern crate clap;
 use clap::App;
-use std::error::Error;
+pub use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
     game_logger::init_logger();

@@ -1,6 +1,6 @@
 use crate::backend_connection::BackendConnection;
-use crate::lobby::Lobby;
 use crate::error::ServerError;
+use crate::lobby::Lobby;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::sync::{
     mpsc,
@@ -129,8 +129,7 @@ impl GameServer {
         addr: SocketAddr,
         sen: &Sender<ClientConnection>,
     ) -> Result<(), ServerError> {
-        let server = Server::<NoTlsAcceptor>::bind(addr)
-            .map_err(|e| ServerError::Bind(e))?;
+        let server = Server::<NoTlsAcceptor>::bind(addr).map_err(|e| ServerError::Bind(e))?;
         info!("webserver is being launched");
         for req in server {
             sen.send(Ok(Self::handle_request(req)?)).unwrap();

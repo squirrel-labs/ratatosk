@@ -9,5 +9,9 @@ pub trait Group {
 
     fn run(&mut self);
 
-    fn add_client(&mut self, id: UserId, client: GameClient) -> Result<(), crate::error::ServerError>;
+    fn add_client(
+        &mut self,
+        id: UserId,
+        client: GameClient,
+    ) -> Result<(), crate::error::ServerError>;
 }

@@ -1,6 +1,6 @@
+use crate::error::ServerError;
 use crate::group::{Group, GroupId};
 use crate::server::{ClientReceiver, ClientSender, GameClient, UserId};
-use crate::error::ServerError;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 

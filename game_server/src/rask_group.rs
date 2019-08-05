@@ -1,22 +1,22 @@
+use crate::error::ServerError;
 use crate::group::{Group, GroupId};
 use crate::server::{ClientReceiver, ClientSender, GameClient, UserId};
-use crate::error::ServerError;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
-pub struct WebhoggGroup {
+pub struct RaskGroup {
     id: GroupId,
     name: String,
     senders: Arc<Mutex<HashMap<UserId, ClientSender>>>,
 }
 
-impl Group for WebhoggGroup {
+impl Group for RaskGroup {
     fn id(&self) -> GroupId {
         self.id
     }
 
     fn group_type(&self) -> String {
-        "webhogg".to_string()
+        "rask".to_string()
     }
 
     fn name(&self) -> String {
@@ -44,7 +44,7 @@ impl Group for WebhoggGroup {
     }
 }
 
-impl WebhoggGroup {
+impl RaskGroup {
     pub fn new(id: GroupId, name: String) -> Self {
         Self {
             id,

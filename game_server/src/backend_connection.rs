@@ -1,6 +1,6 @@
+use crate::error::ServerError;
 use crate::group::GroupId;
 use crate::server::{Token, UserId};
-use crate::error::ServerError;
 use reqwest::{Client, Response, Url};
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
@@ -68,14 +68,14 @@ impl BackendConnection {
                 self.max_uid += 1;
                 Ok(TokenResponse {
                     group_id: 12,
-                    group_type: "scribble".to_string(),
-                    group_name: "Scribble".to_string(),
+                    group_type: "rask".to_string(),
+                    group_name: "rask".to_string(),
                     user_id: self.max_uid - 1,
                 })
-            },
+            }
             reqwest::StatusCode::NOT_FOUND => Err(ServerError::InvalidToken),
             status if status.is_client_error() => Err(ServerError::InvalidTokenFormat),
-            _ => Err(ServerError::BadBackendResponse(response))
+            _ => Err(ServerError::BadBackendResponse(response)),
         }
     }
 }
