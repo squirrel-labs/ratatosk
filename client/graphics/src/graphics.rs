@@ -12,11 +12,53 @@ extern "C" {
     fn _create_f32_buffer(args: &[f32]) -> js_sys::Float32Array;
 }
 
+pub enum WebGl2Error {
+    InvalidEnum,
+    InvalidValue,
+    InvalidOperation,
+    InvalidFramebufferOperation,
+    OutOfMemory,
+    UnknownError,
+}
+
+impl From<u32> for WebGl2Error {
+    fn from(v: u32) -> Self {
+        match v {
+            Gl2::INVALID_ENUM => WebGl2Error::InvalidEnum,
+            Gl2::INVALID_VALUE => WebGl2Error::InvalidValue,
+            Gl2::INVALID_OPERATION => WebGl2Error::InvalidOperation,
+            Gl2::INVALID_FRAMEBUFFER_OPERATION => WebGl2Error::InvalidFramebufferOperation,
+            Gl2::OUT_OF_MEMORY => WebGl2Error::OutOfMemory,
+            _ => WebGl2Error::UnknownError,
+        }
+    }
+}
+
+impl std::fmt::Display for WebGl2Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                WebGl2Error::InvalidEnum => "invalid enum",
+                WebGl2Error::InvalidValue => "invalid value",
+                WebGl2Error::InvalidOperation => "invalid operation",
+                WebGl2Error::InvalidFramebufferOperation => "invalid framebuffer operation",
+                WebGl2Error::OutOfMemory => "out of memory",
+                WebGl2Error::UnknownError => "unknown webgl2 error",
+            }
+        )
+    }
+}
+
 pub trait GraphicsApi: Sized {
+    type GraphicsError: std::fmt::Display;
+
     fn new(canvas: web_sys::OffscreenCanvas) -> Result<Self, ClientError>;
 
     fn clear(&self) -> Result<(), ClientError>;
     fn draw_rect(&self) -> Result<(), ClientError>;
+    fn ok(&self) -> Result<(), Self::GraphicsError>;
 }
 
 pub struct WebGl {
@@ -28,6 +70,8 @@ pub struct WebGl {
 }
 
 impl GraphicsApi for WebGl {
+    type GraphicsError = WebGl2Error;
+
     fn new(canvas: web_sys::OffscreenCanvas) -> Result<Self, ClientError> {
         let gl: Gl2 = canvas
             .get_context("webgl2")?
@@ -54,6 +98,13 @@ impl GraphicsApi for WebGl {
         })
     }
 
+    fn ok(&self) -> Result<(), Self::GraphicsError> {
+        match self.gl.get_error() {
+            Gl2::NO_ERROR => Ok(()),
+            e => Err(e.into()),
+        }
+    }
+
     fn clear(&self) -> Result<(), ClientError> {
         self.gl.clear(Gl2::COLOR_BUFFER_BIT);
         Ok(())
@@ -63,6 +114,8 @@ impl GraphicsApi for WebGl {
         self.prog.use_program(&self.gl);
         self.gl.bind_vertex_array(Some(&self.vao));
         self.gl.bind_buffer(Gl2::ARRAY_BUFFER, Some(&self.vbo));
+        self.gl
+            .vertex_attrib_pointer_with_i32(0, 2, Gl2::FLOAT, false, 0, 0);
         self.gl.draw_arrays(Gl2::TRIANGLES, 0, 6);
         Ok(())
     }

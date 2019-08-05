@@ -11,6 +11,10 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
+        match self.graphics.ok() {
+            Ok(()) => log::warn!("everything's ok"),
+            Err(e) => log::error!("err: {}", e),
+        };
         self.graphics.clear()?;
         self.graphics.draw_rect()?;
         Ok(())
