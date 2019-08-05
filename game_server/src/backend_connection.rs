@@ -74,22 +74,21 @@ impl BackendConnection {
         let response = self
             .get_response()
             .map_err(|err| BackendError::RequestError(err))?;
-        if response.status().is_success() {
-            // zu Testzwecken werden noch keine JSON-Daten deserialisiert
-            // Dennis Server gibt ja noch nix zurück
-            self.max_uid += 1;
-            Ok(TokenResponse {
-                group_id: 12,
-                group_type: "scribble".to_string(),
-                group_name: "Scribble".to_string(),
-                user_id: self.max_uid - 1,
-            })
-        } else if response.status() == reqwest::StatusCode::NOT_FOUND {
-            Err(BackendError::InvalidToken)
-        } else if response.status().is_client_error() {
-            Err(BackendError::InvalidTokenFormat)
-        } else {
-            Err(BackendError::BadResponse(response))
+        match response.status() {
+            status if status.is_success() => {
+                // zu Testzwecken werden noch keine JSON-Daten deserialisiert
+                // Dennis Server gibt ja noch nix zurück
+                self.max_uid += 1;
+                Ok(TokenResponse {
+                    group_id: 12,
+                    group_type: "scribble".to_string(),
+                    group_name: "Scribble".to_string(),
+                    user_id: self.max_uid - 1,
+                })
+            },
+            reqwest::StatusCode::NOT_FOUND => Err(BackendError::InvalidToken),
+            status if status.is_client_error() => Err(BackendError::InvalidTokenFormat),
+            _ => Err(BackendError::BadResponse(response))
         }
     }
 }
