@@ -138,7 +138,7 @@ pub struct Armature {
     canvas: Canvas,                       // `json: "canvas"`
 }
 
-pub fn load_char(path: String) -> Result<AnimateChar, Box<dyn Error>> {
+pub fn load_character(path: String) -> Result<AnimateChar, Box<dyn Error>> {
     println!("Loading texture file: {}", path);
     let file = File::open(path)?;
     let reader = BufReader::new(file);
