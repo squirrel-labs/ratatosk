@@ -139,13 +139,13 @@ impl ops::DivAssign<f32> for Mat2 {
 
 impl Mat2 {
     /// Creates a new Mat2.
-    pub fn new(a: f32, b: f32, c: f32, d: f32) -> Self {
-        Self { data: [a, b, c, d] }
+    pub fn new(a: f32, c: f32, b: f32, d: f32) -> Self {
+        Self { data: [a, c, b, d] }
     }
 
     /// Creates a new Mat2 from two Vec2.
     pub fn from_vec2(v1: Vec2, v2: Vec2) -> Self {
-        Self::new(v1.x(), v1.y(), v2.x(), v2.y())
+        Self::new(v1.x(), v2.x(), v1.y(), v2.y())
     }
 
     /// Returns the zero matrix.
@@ -162,12 +162,12 @@ impl Mat2 {
     pub fn rotation(angle: f32) -> Self {
         let cos = angle.cos();
         let sin = angle.sin();
-        Self::new(cos, sin, -sin, cos)
+        Self::new(cos, -sin, sin, cos)
     }
 
     /// Returns a matrix that scales by `scale`.
     pub fn scaling(scale: f32) -> Self {
-        Self::new(scale, 0.0, scale, 0.0)
+        Self::new(scale, 0.0, 0.0, scale)
     }
 
     /// Returns the transposed matrix.
