@@ -1,4 +1,4 @@
-# Rask [![Build Status](https://jenkins.kobert.dev/buildStatus/icon?job=Ratatosk)](https://jenkins.kobert.dev/job/Ratatosk/)  [![volkswagen status](https://auchenberg.github.io/volkswagen/volkswargen_ci.svg?v=1)](https://github.com/auchenberg/volkswagen)
+# Rask [![Build Status](https://jenkins.kobert.dev/buildStatus/icon?job=Ratatosk)](https://jenkins.kobert.dev/job/Ratatosk/) [![Test Status](https://jenkins.kobert.dev/buildStatus/icon?job=Test&subject=tests)](https://jenkins.kobert.dev/job/Test/) [![Format Status](https://jenkins.kobert.dev/buildStatus/icon?job=Format&subject=format)](https://jenkins.kobert.dev/job/Format/) 
 
 ### Motivation
 You might have heard of a game called Nidhogg. The aim of this project is to provide a similar game accessible through the web.
