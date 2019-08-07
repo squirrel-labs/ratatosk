@@ -1,6 +1,7 @@
+use rask_game_engine::math::Mat3;
 use web_sys::WebGl2RenderingContext as Gl2;
-use web_sys::WebGlProgram;
 use web_sys::WebGlShader;
+use web_sys::{WebGlProgram, WebGlUniformLocation};
 use webhogg_wasm_shared::error::ClientError;
 
 const VERTEX_SHADER: &'static str = include_str!("shader/vertex.glsl");
@@ -11,7 +12,10 @@ enum ShaderType {
     Fragment,
 }
 
-pub struct Program(WebGlProgram);
+pub struct Program {
+    id: WebGlProgram,
+    transformation: WebGlUniformLocation,
+}
 
 impl Program {
     pub fn new(gl: &Gl2) -> Result<Self, ClientError> {
@@ -25,7 +29,14 @@ impl Program {
         gl.link_program(&prog);
 
         if gl.get_program_parameter(&prog, Gl2::LINK_STATUS).as_bool() == Some(true) {
-            Ok(Self(prog))
+            Ok(Self {
+                transformation: gl.get_uniform_location(&prog, "transformation").ok_or(
+                    ClientError::WebGlError(
+                        "cannot find uniform location \"transformation\"".to_owned(),
+                    ),
+                )?,
+                id: prog,
+            })
         } else {
             let info = gl
                 .get_program_info_log(&prog)
@@ -35,7 +46,12 @@ impl Program {
     }
 
     pub fn use_program(&self, gl: &Gl2) {
-        gl.use_program(Some(&self.0))
+        gl.use_program(Some(&self.id))
+    }
+
+    pub fn upload_fransformation(&self, gl: &Gl2, mat: &Mat3) {
+        gl.use_program(Some(&self.id));
+        gl.uniform_matrix3fv_with_f32_array(Some(&self.transformation), false, mat.as_ref());
     }
 }
 

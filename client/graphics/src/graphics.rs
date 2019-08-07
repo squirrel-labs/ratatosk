@@ -112,10 +112,11 @@ impl GraphicsApi for WebGl {
 
     fn draw_rect(&self) -> Result<(), ClientError> {
         self.prog.use_program(&self.gl);
-        self.gl.bind_vertex_array(Some(&self.vao));
-        self.gl.bind_buffer(Gl2::ARRAY_BUFFER, Some(&self.vbo));
         self.gl
             .vertex_attrib_pointer_with_i32(0, 2, Gl2::FLOAT, false, 0, 0);
+        let mat = rask_game_engine::math::Mat3::scaling(0.5, 0.5);
+        let mat = mat * rask_game_engine::math::Mat3::translation(0.5, 0.0);
+        self.prog.upload_fransformation(&self.gl, &mat);
         self.gl.draw_arrays(Gl2::TRIANGLES, 0, 6);
         Ok(())
     }
