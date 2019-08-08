@@ -70,7 +70,7 @@ fn is_num_minus(c: char) -> bool {
 }
 
 fn is_hex_digit(c: char) -> bool {
-    is_num_minus(c) || c == '.' || c == '+' || c == 'p' || c == 'x'
+    is_hex(c) || c == '-' || c == '.' || c == '+' || c == 'p' || c == 'x'
 }
 
 fn is_alpha(c: char) -> bool {

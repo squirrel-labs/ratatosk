@@ -1,4 +1,5 @@
 use crate::shader::Program;
+use rask_game_engine::math::Mat3;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::WebGl2RenderingContext as Gl2;
@@ -56,8 +57,8 @@ pub trait GraphicsApi: Sized {
 
     fn new(canvas: web_sys::OffscreenCanvas) -> Result<Self, ClientError>;
 
-    fn clear(&self) -> Result<(), ClientError>;
-    fn draw_rect(&self) -> Result<(), ClientError>;
+    fn clear(&self, color: &[f32; 3]) -> Result<(), ClientError>;
+    fn draw_rect(&self, mat: &Mat3) -> Result<(), ClientError>;
     fn ok(&self) -> Result<(), Self::GraphicsError>;
 }
 
@@ -84,10 +85,12 @@ impl GraphicsApi for WebGl {
                 "getContext returns invalid data type, webgl2 doesn't seem to be supported"
                     .to_owned(),
             ))?;
-        gl.clear_color(0.8, 0.2, 0.7, 1.0);
 
         let (vao, vbo) = Self::create_vao(&gl)?;
         let prog = Self::create_program(&gl)?;
+
+        prog.use_program(&gl);
+        gl.vertex_attrib_pointer_with_i32(0, 2, Gl2::FLOAT, false, 0, 0);
 
         Ok(WebGl {
             canvas,
@@ -105,17 +108,13 @@ impl GraphicsApi for WebGl {
         }
     }
 
-    fn clear(&self) -> Result<(), ClientError> {
+    fn clear(&self, color: &[f32; 3]) -> Result<(), ClientError> {
+        self.gl.clear_color(color[0], color[1], color[2], 1.0);
         self.gl.clear(Gl2::COLOR_BUFFER_BIT);
         Ok(())
     }
 
-    fn draw_rect(&self) -> Result<(), ClientError> {
-        self.prog.use_program(&self.gl);
-        self.gl
-            .vertex_attrib_pointer_with_i32(0, 2, Gl2::FLOAT, false, 0, 0);
-        let mat = rask_game_engine::math::Mat3::scaling(0.5, 0.5);
-        let mat = mat * rask_game_engine::math::Mat3::translation(0.5, 0.0);
+    fn draw_rect(&self, mat: &Mat3) -> Result<(), ClientError> {
         self.prog.upload_fransformation(&self.gl, &mat);
         self.gl.draw_arrays(Gl2::TRIANGLES, 0, 6);
         Ok(())
