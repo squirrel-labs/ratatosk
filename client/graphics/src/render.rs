@@ -20,9 +20,13 @@ impl<T: GraphicsApi> Render<T> {
             .ok()
             .map_err(|e| ClientError::WebGlError(format!("WebGl2 error: {}", e)))?;
         self.graphics.clear(&[0.8, 0.05, 0.55])?;
-        let w = f32::sin((self.frame_nr as f32) * 0.01) * 0.5;
-        let h = f32::cos((self.frame_nr as f32) * 0.01) * 0.5;
-        self.graphics.draw_rect(&Mat3::scaling(w, h))?;
+        let w = f32::sin((self.frame_nr as f32) * 0.02) * 0.8;
+        let h = f32::cos((self.frame_nr as f32) * 0.02) * 0.8;
+        let mat = Mat3::identity()
+            * Mat3::translation(w, h)
+            * Mat3::scaling(0.2, 0.2)
+            * Mat3::rotation((self.frame_nr as f32) * 0.04);
+        self.graphics.draw_rect(&mat)?;
         self.frame_nr += 1;
         Ok(())
     }
