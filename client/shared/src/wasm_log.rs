@@ -18,7 +18,9 @@ extern "C" {
 pub struct WasmLog();
 
 impl WasmLog {
-    pub fn new() -> Self { WasmLog() }
+    pub fn new() -> Self {
+        WasmLog()
+    }
 }
 
 impl log::Log for WasmLog {
@@ -27,8 +29,7 @@ impl log::Log for WasmLog {
     }
 
     fn log(&self, record: &log::Record) {
-        let (log, name, color): (fn(&str, &str, &str), &str, &str) =
-                         match record.level() {
+        let (log, name, color): (fn(&str, &str, &str), &str, &str) = match record.level() {
             log::Level::Trace => (_log_debug, "trace", "color:plum;"),
             log::Level::Debug => (_log_debug, "debug", "color:indigo;"),
             log::Level::Info => (_log_info, "info", "color:forestgreen;"),

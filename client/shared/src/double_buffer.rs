@@ -16,14 +16,14 @@ pub struct DoubleBuffer<T: Element> {
 #[wasm_bindgen]
 #[no_mangle]
 pub fn atomic_read(v: *const Flag) -> Flag {
-    unsafe {*v}
+    unsafe { *v }
 }
 
 #[inline(never)]
 #[wasm_bindgen]
 #[no_mangle]
 pub fn atomic_write(v: *mut Flag, flag: Flag) {
-    unsafe {*v = flag}
+    unsafe { *v = flag }
 }
 
 #[derive(Debug)]
@@ -43,10 +43,8 @@ impl<T: Element> DoubleBuffer<T> {
         DoubleBuffer {
             reading_at: 0,
             provided: 0,
-            buffer: [
-                T::default(),
-                T::default()
-            ]}
+            buffer: [T::default(), T::default()],
+        }
     }
 
     pub fn borrow_reader<'a>(&'a mut self) -> Option<ReaderBufferView<'a, T>> {
@@ -58,9 +56,12 @@ impl<T: Element> DoubleBuffer<T> {
                 while x != p {
                     x = p;
                     self.set_reading_at(x);
-                };
-                Some(ReaderBufferView { ptr: self, read_pos: x - 1 })
-            },
+                }
+                Some(ReaderBufferView {
+                    ptr: self,
+                    read_pos: x - 1,
+                })
+            }
             (c, p) => panic!("invalid state ({},{}) for consumer reached", c, p),
         }
     }
@@ -69,9 +70,19 @@ impl<T: Element> DoubleBuffer<T> {
         let write_pos = match (self.get_reading_at(), self.get_provided()) {
             (0, 0) => 0,
             (0, y) => 2 - y,
-            (y, x) => if x == y { 2 - y } else { self.set_provided(y); y - 1 },
+            (y, x) => {
+                if x == y {
+                    2 - y
+                } else {
+                    self.set_provided(y);
+                    y - 1
+                }
+            }
         };
-        WriterBufferView { ptr: self, write_pos }
+        WriterBufferView {
+            ptr: self,
+            write_pos,
+        }
     }
 
     #[inline(always)]
