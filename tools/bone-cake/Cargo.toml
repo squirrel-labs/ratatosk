@@ -1,5 +1,5 @@
 [package]
-name = "bone_cake"
+name = "bone-cake"
 version = "0.1.0"
 authors = ["Dennis Kobert <d-kobert@web.de>"]
 edition = "2018"
