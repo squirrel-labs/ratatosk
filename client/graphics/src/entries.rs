@@ -27,9 +27,6 @@ pub fn initialise(canvas: web_sys::OffscreenCanvas) {
 
 #[wasm_bindgen]
 pub fn frame() {
-    let mut writer = get_double_buffer().borrow_writer();
-    writer.set(writer.get() + 1);
-
     context::context_mut()
         .render()
         .map_err(|e| log::error!("{}", e))

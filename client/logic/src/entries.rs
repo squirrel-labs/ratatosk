@@ -7,8 +7,6 @@ use log::{error, info};
 use webhogg_wasm_shared::get_double_buffer;
 use webhogg_wasm_shared::wasm_log::WasmLog;
 
-static mut WS: Option<WebSocketAdapter> = None;
-
 /// This function is used to initialize the gamestate, communication
 /// with the graphics worker and setup networking
 #[wasm_bindgen]
@@ -19,32 +17,10 @@ pub fn initialise() {
     log::set_boxed_logger(Box::new(WasmLog::new()))
         .map(|()| log::set_max_level(log::LevelFilter::Debug))
         .unwrap();
-    unsafe {
-        WS = Some(
-            WebSocketAdapter::new("wss://echo.websocket.org").expect("Websocket creation failed"),
-        );
-    }
     info!("logic entry reached");
 }
 
 /// This function represents a logic tick. State changes caused by network or key events get
 /// accumulated over a period of time and processed here
 #[wasm_bindgen]
-pub fn frame() {
-    unsafe {
-        let num = {
-            get_double_buffer()
-                .borrow_reader()
-                .map(|r| *r.get())
-                .unwrap_or(0)
-        };
-        if let Err(res) = WS
-            .as_ref()
-            .unwrap()
-            //.send_u8_arr(format!("num: {}", num).as_bytes_mut())
-            .send_str(format!("num: {}", num).as_str())
-        {
-            error!("websocket not ready: {}", res);
-        }
-    }
-}
+pub fn frame() {}

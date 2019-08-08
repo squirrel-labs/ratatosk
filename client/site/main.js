@@ -17,7 +17,7 @@ function spawnModule(type, memory, canvas) {
         module.canvas = canvas;
         module.jsSourceLocation = '../gen/graphics.js';
         module.wasmSourceLocation = '../gen/graphics.wasm';
-        module.deltaTime = 100;
+        module.deltaTime = 10;
     } else if (type === 'logic') {
         module.jsSourceLocation = '../gen/logic.js';
         module.wasmSourceLocation = '../gen/logic.wasm';

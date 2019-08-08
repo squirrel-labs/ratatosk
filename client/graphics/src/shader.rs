@@ -51,7 +51,7 @@ impl Program {
 
     pub fn upload_fransformation(&self, gl: &Gl2, mat: &Mat3) {
         gl.use_program(Some(&self.id));
-        gl.uniform_matrix3fv_with_f32_array(Some(&self.transformation), false, mat.as_ref());
+        gl.uniform_matrix3fv_with_f32_array(Some(&self.transformation), true, mat.as_ref());
     }
 }
 
