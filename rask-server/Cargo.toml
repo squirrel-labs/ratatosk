@@ -1,5 +1,5 @@
 [package]
-name = "game-server"
+name = "rask-server"
 version = "0.1.0"
 authors = ["natrixaeria", "truedoctor"]
 edition = "2018"
