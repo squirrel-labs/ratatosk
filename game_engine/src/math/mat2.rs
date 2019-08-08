@@ -59,7 +59,7 @@ impl ops::Neg for Mat2 {
     type Output = Self;
 
     fn neg(self) -> Self::Output {
-        Self::new(-self.data[0], -self.data[1], -self.data[2], -self.data[3])
+        Self::new(-self.data[0], -self.data[2], -self.data[1], -self.data[3])
     }
 }
 
@@ -69,8 +69,8 @@ impl ops::Mul<f32> for Mat2 {
     fn mul(self, scale: f32) -> Self::Output {
         Self::new(
             self.data[0] * scale,
-            self.data[1] * scale,
             self.data[2] * scale,
+            self.data[1] * scale,
             self.data[3] * scale,
         )
     }
@@ -79,8 +79,8 @@ impl ops::Mul<f32> for Mat2 {
 impl ops::MulAssign<f32> for Mat2 {
     fn mul_assign(&mut self, scale: f32) {
         self.data[0] *= scale;
-        self.data[1] *= scale;
         self.data[2] *= scale;
+        self.data[1] *= scale;
         self.data[3] *= scale;
     }
 }
@@ -102,8 +102,8 @@ impl ops::Mul for Mat2 {
     fn mul(self, other: Self) -> Self::Output {
         Self::new(
             self.data[0] * other.data[0] + self.data[2] * other.data[1],
-            self.data[1] * other.data[0] + self.data[3] * other.data[1],
             self.data[0] * other.data[2] + self.data[2] * other.data[3],
+            self.data[1] * other.data[0] + self.data[3] * other.data[1],
             self.data[1] * other.data[2] + self.data[3] * other.data[3],
         )
     }
@@ -121,8 +121,8 @@ impl ops::Div<f32> for Mat2 {
     fn div(self, scale: f32) -> Self::Output {
         Self::new(
             self.data[0] / scale,
-            self.data[1] / scale,
             self.data[2] / scale,
+            self.data[1] / scale,
             self.data[3] / scale,
         )
     }
@@ -131,8 +131,8 @@ impl ops::Div<f32> for Mat2 {
 impl ops::DivAssign<f32> for Mat2 {
     fn div_assign(&mut self, scale: f32) {
         self.data[0] /= scale;
-        self.data[1] /= scale;
         self.data[2] /= scale;
+        self.data[1] /= scale;
         self.data[3] /= scale;
     }
 }
@@ -140,15 +140,15 @@ impl ops::DivAssign<f32> for Mat2 {
 impl Mat2 {
     /// Creates a new Mat2
     /// of the form:
-    /// [a, c,
-    ///  b, d]
-    pub fn new(a: f32, c: f32, b: f32, d: f32) -> Self {
+    /// (a b)
+    /// (c d)
+    pub fn new(a: f32, b: f32, c: f32, d: f32) -> Self {
         Self { data: [a, c, b, d] }
     }
 
     /// Creates a new Mat2 from two collum Vec2
     pub fn from_vec2(v1: Vec2, v2: Vec2) -> Self {
-        Self::new(v1.x(), v2.x(), v1.y(), v2.y())
+        Self::new(v1.x(), v1.y(), v2.x(), v2.y())
     }
 
     /// Returns the zero matrix.
@@ -165,16 +165,16 @@ impl Mat2 {
     pub fn rotation(angle: f32) -> Self {
         let cos = angle.cos();
         let sin = angle.sin();
-        Self::new(cos, -sin, sin, cos)
+        Self::new(cos, sin, -sin, cos)
     }
 
-    /// Returns a matrix that scales by `scale`.
-    pub fn scaling(scale: f32) -> Self {
-        Self::new(scale, 0.0, 0.0, scale)
+    /// Returns a matrix that scales by `scale_x and scale_y`.
+    pub fn scaling(scale_x: f32, scale_y: f32) -> Self {
+        Self::new(scale_x, 0.0, 0.0, scale_y)
     }
 
     /// Returns the transposed matrix.
     pub fn transpose(self) -> Self {
-        Self::new(self.data[0], self.data[2], self.data[1], self.data[3])
+        Self::new(self.data[0], self.data[1], self.data[2], self.data[3])
     }
 }
