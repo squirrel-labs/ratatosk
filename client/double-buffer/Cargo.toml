@@ -1,5 +1,5 @@
 [package]
-name = "double_buffer"
+name = "double-buffer"
 version = "0.1.0"
 authors = ["natrixaeria"]
 edition = "2018"
