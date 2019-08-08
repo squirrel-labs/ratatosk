@@ -6,9 +6,10 @@ dependencies = [ "tools", "backend", "frontend" ]
 workspace = false
 
 [tasks.frontend]
-command = "./client/build"
 workspace = false
 dependencies = [ "atomify" ]
+command = "cargo"
+args = [ "make", "--cwd", "client/", "--makefile", "Makefile.toml", "all" ]
 
 [tasks.tools]
 workspace = false
@@ -31,7 +32,8 @@ args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask_game_engine" ]
 
 [tasks.atomify]
 workspace = false
-command = "./tools/atomify/build"
+command = "cargo"
+args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "atomify" ]
 
 [tasks.bone_cake]
 workspace = false
@@ -49,3 +51,15 @@ dependencies = [ "frontend" ]
 workspace = false
 command = "cargo"
 args = [ "make", "exec-${BUILD_ENV}", "--", "run", "-p", "game-server" ]
+
+# upstream `ci-flow` task appears to have problems with wasm
+[tasks.ci-flow]
+workspace = false
+dependencies = [ "clean", "all", "check-format", "test" ]
+
+# watcher
+[tasks.watch]
+workspace = false
+watch = true
+command = "cargo"
+args = [ "build", "-p ${@}" ]
