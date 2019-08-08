@@ -17,8 +17,8 @@ impl ops::Add for Mat2 {
     fn add(self, other: Self) -> Self::Output {
         Self::new(
             self.data[0] + other.data[0],
-            self.data[1] + other.data[1],
             self.data[2] + other.data[2],
+            self.data[1] + other.data[1],
             self.data[3] + other.data[3],
         )
     }
@@ -39,8 +39,8 @@ impl ops::Sub for Mat2 {
     fn sub(self, other: Self) -> Self::Output {
         Self::new(
             self.data[0] - other.data[0],
-            self.data[1] - other.data[1],
             self.data[2] - other.data[2],
+            self.data[1] - other.data[1],
             self.data[3] - other.data[3],
         )
     }
@@ -146,9 +146,9 @@ impl Mat2 {
         Self { data: [a, c, b, d] }
     }
 
-    /// Creates a new Mat2 from two collum Vec2
+    /// Creates a new Mat2 from two collumn Vec2
     pub fn from_vec2(v1: Vec2, v2: Vec2) -> Self {
-        Self::new(v1.x(), v1.y(), v2.x(), v2.y())
+        Self::new(v1.x(), v2.x(), v1.y(), v2.y())
     }
 
     /// Returns the zero matrix.
@@ -165,7 +165,7 @@ impl Mat2 {
     pub fn rotation(angle: f32) -> Self {
         let cos = angle.cos();
         let sin = angle.sin();
-        Self::new(cos, sin, -sin, cos)
+        Self::new(cos, -sin, sin, cos)
     }
 
     /// Returns a matrix that scales by `scale_x and scale_y`.

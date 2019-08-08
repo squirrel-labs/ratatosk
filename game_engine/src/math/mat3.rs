@@ -18,13 +18,13 @@ impl ops::Add for Mat3 {
     fn add(self, other: Self) -> Self::Output {
         Self::new(
             self.data[0] + other.data[0],
-            self.data[1] + other.data[1],
-            self.data[2] + other.data[2],
             self.data[3] + other.data[3],
-            self.data[4] + other.data[4],
-            self.data[5] + other.data[5],
             self.data[6] + other.data[6],
+            self.data[1] + other.data[1],
+            self.data[4] + other.data[4],
             self.data[7] + other.data[7],
+            self.data[2] + other.data[2],
+            self.data[5] + other.data[5],
             self.data[8] + other.data[8],
         )
     }
@@ -33,13 +33,13 @@ impl ops::Add for Mat3 {
 impl ops::AddAssign for Mat3 {
     fn add_assign(&mut self, other: Self) {
         self.data[0] += other.data[0];
-        self.data[1] += other.data[1];
-        self.data[2] += other.data[2];
-        self.data[3] += other.data[3];
-        self.data[4] += other.data[4];
-        self.data[5] += other.data[5];
         self.data[6] += other.data[6];
+        self.data[3] += other.data[3];
+        self.data[1] += other.data[1];
+        self.data[4] += other.data[4];
         self.data[7] += other.data[7];
+        self.data[2] += other.data[2];
+        self.data[5] += other.data[5];
         self.data[8] += other.data[8];
     }
 }
@@ -50,13 +50,13 @@ impl ops::Sub for Mat3 {
     fn sub(self, other: Self) -> Self::Output {
         Self::new(
             self.data[0] - other.data[0],
-            self.data[1] - other.data[1],
-            self.data[2] - other.data[2],
             self.data[3] - other.data[3],
-            self.data[4] - other.data[4],
-            self.data[5] - other.data[5],
             self.data[6] - other.data[6],
+            self.data[1] - other.data[1],
+            self.data[4] - other.data[4],
             self.data[7] - other.data[7],
+            self.data[2] - other.data[2],
+            self.data[5] - other.data[5],
             self.data[8] - other.data[8],
         )
     }
@@ -82,13 +82,13 @@ impl ops::Neg for Mat3 {
     fn neg(self) -> Self::Output {
         Self::new(
             -self.data[0],
-            -self.data[1],
-            -self.data[2],
             -self.data[3],
-            -self.data[4],
-            -self.data[5],
             -self.data[6],
+            -self.data[1],
+            -self.data[4],
             -self.data[7],
+            -self.data[2],
+            -self.data[5],
             -self.data[8],
         )
     }
@@ -100,13 +100,13 @@ impl ops::Mul<f32> for Mat3 {
     fn mul(self, scale: f32) -> Self::Output {
         Self::new(
             self.data[0] * scale,
-            self.data[1] * scale,
-            self.data[2] * scale,
             self.data[3] * scale,
-            self.data[4] * scale,
-            self.data[5] * scale,
             self.data[6] * scale,
+            self.data[1] * scale,
+            self.data[4] * scale,
             self.data[7] * scale,
+            self.data[2] * scale,
+            self.data[5] * scale,
             self.data[8] * scale,
         )
     }
@@ -115,13 +115,13 @@ impl ops::Mul<f32> for Mat3 {
 impl ops::MulAssign<f32> for Mat3 {
     fn mul_assign(&mut self, scale: f32) {
         self.data[0] *= scale;
-        self.data[1] *= scale;
-        self.data[2] *= scale;
         self.data[3] *= scale;
-        self.data[4] *= scale;
-        self.data[5] *= scale;
         self.data[6] *= scale;
+        self.data[1] *= scale;
+        self.data[4] *= scale;
         self.data[7] *= scale;
+        self.data[2] *= scale;
+        self.data[5] *= scale;
         self.data[8] *= scale;
     }
 }
@@ -173,8 +173,7 @@ impl ops::Mul for Mat3 {
         let m22 = a(3,1) * b(1,2);
         let m23 = a(3,3) * b(3,3);
 
-        Self {
-            data: [
+        Self::new(
                 m6 + m14 + m19,
                 m1 + m4 + m5 + m6 + m12 + m14 + m15,
                 m6 + m7 + m9 + m10 + m14 + m16 + m18,
@@ -184,8 +183,7 @@ impl ops::Mul for Mat3 {
                 m6 + m7 + m8 + m11 + m12 + m13 + m14,
                 m12 + m13 + m14 + m15 + m22,
                 m6 + m7 + m8 + m9 + m23
-            ],
-        }
+        )
     }
 }
 
@@ -201,13 +199,13 @@ impl ops::Div<f32> for Mat3 {
     fn div(self, scale: f32) -> Self::Output {
         Self::new(
             self.data[0] / scale,
-            self.data[1] / scale,
-            self.data[2] / scale,
             self.data[3] / scale,
-            self.data[4] / scale,
-            self.data[5] / scale,
             self.data[6] / scale,
+            self.data[1] / scale,
+            self.data[4] / scale,
             self.data[7] / scale,
+            self.data[2] / scale,
+            self.data[5] / scale,
             self.data[8] / scale,
         )
     }
@@ -216,13 +214,13 @@ impl ops::Div<f32> for Mat3 {
 impl ops::DivAssign<f32> for Mat3 {
     fn div_assign(&mut self, scale: f32) {
         self.data[0] /= scale;
-        self.data[1] /= scale;
-        self.data[2] /= scale;
         self.data[3] /= scale;
-        self.data[4] /= scale;
-        self.data[5] /= scale;
         self.data[6] /= scale;
+        self.data[1] /= scale;
+        self.data[4] /= scale;
         self.data[7] /= scale;
+        self.data[2] /= scale;
+        self.data[5] /= scale;
         self.data[8] /= scale;
     }
 }
@@ -235,17 +233,17 @@ impl Mat3 {
         }
     }
 
-    /// Creates a new Mat2 from three Vec3.
+    /// Creates a new Mat3 from three Vec3.
     pub fn from_vec3(v1: Vec3, v2: Vec3, v3: Vec3) -> Self {
         Self::new(
             v1.x(),
-            v1.y(),
-            v1.z(),
             v2.x(),
-            v2.y(),
-            v2.z(),
             v3.x(),
+            v1.y(),
+            v2.y(),
             v3.y(),
+            v1.z(),
+            v2.z(),
             v3.z(),
         )
     }
@@ -267,14 +265,14 @@ impl Mat3 {
         Self::new(cos, -sin, 0.0, sin, cos, 0.0, 0.0, 0.0, 1.0)
     }
 
-    /// Returns a matrix that scales by `scale`.
+    /// Returns a matrix that scales by `sx and sy`.
     pub fn scaling(sx: f32, sy: f32) -> Self {
         Self::new(sx, 0.0, 0.0, 0.0, sy, 0.0, 0.0, 0.0, 1.0)
     }
 
     /// Returns a matrix that translates by (`x`, `y`).
     pub fn translation(x: f32, y: f32) -> Self {
-        Self::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, x, y, 1.0)
+        Self::new(1.0, 0.0, x, 0.0, 1.0, y, 0.0, 0.0, 1.0)
     }
 
     /// Returns the transposed matrix.
@@ -288,7 +286,7 @@ impl Mat3 {
             self.data[5],
             self.data[6],
             self.data[7],
-            self.data[8],
+            self.data[8]
         )
     }
 }
