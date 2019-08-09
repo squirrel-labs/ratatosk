@@ -13,32 +13,32 @@ args = [ "make", "--cwd", "client/", "--makefile", "Makefile.toml", "all" ]
 
 [tasks.tools]
 workspace = false
-dependencies = [ "atomify", "bone_cake" ]
+dependencies = [ "atomify", "bone-cake" ]
 
 [tasks.backend]
 workspace = false
-dependencies = [ "game-engine", "game-server" ]
+dependencies = [ "rask-engine", "rask-server" ]
 
 # package builds
-[tasks.game-server]
+[tasks.rask-server]
 workspace = false
 command = "cargo"
-args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "game-server" ]
+args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask-server" ]
 
-[tasks.game-engine]
+[tasks.rask-engine]
 workspace = false
 command = "cargo"
-args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask_game_engine" ]
+args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask-engine" ]
 
 [tasks.atomify]
 workspace = false
 command = "cargo"
 args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "atomify" ]
 
-[tasks.bone_cake]
+[tasks.bone-cake]
 workspace = false
 command = "cargo"
-args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "bone_cake" ]
+args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "bone-cake" ]
 
 # dev tools
 [tasks.serve-frontend]
@@ -50,7 +50,7 @@ dependencies = [ "frontend" ]
 [tasks.serve-backend]
 workspace = false
 command = "cargo"
-args = [ "make", "exec-${BUILD_ENV}", "--", "run", "-p", "game-server" ]
+args = [ "make", "exec-${BUILD_ENV}", "--", "run", "-p", "rask-server" ]
 
 [tasks.cleanup]
 workspace = false

@@ -1,11 +1,11 @@
 [workspace]
 members = [
-  "game_engine",
-  "game_server",
+  "rask-engine",
+  "rask-server",
   "client/graphics",
   "client/logic",
   "tools/atomify",
-  "tools/bone_cake",
+  "tools/bone-cake",
 ]
 
 [profile.release]
