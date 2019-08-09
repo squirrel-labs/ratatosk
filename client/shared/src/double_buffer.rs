@@ -5,12 +5,15 @@ type Flag = u8;
 
 impl<T: Clone + Sized + Default + Debug> Element for T {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct DoubleBuffer<T: Element> {
     pub(self) reading_at: Flag,
     pub(self) provided: Flag,
     buffer: [T; 2],
 }
+
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+#[allow(unused_attributes)]
 
 #[inline(never)]
 #[wasm_bindgen]
@@ -19,6 +22,8 @@ pub fn atomic_read(v: *const Flag) -> Flag {
     unsafe { *v }
 }
 
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+#[allow(unused_attributes)]
 #[inline(never)]
 #[wasm_bindgen]
 #[no_mangle]
@@ -47,7 +52,7 @@ impl<T: Element> DoubleBuffer<T> {
         }
     }
 
-    pub fn borrow_reader<'a>(&'a mut self) -> Option<ReaderBufferView<'a, T>> {
+    pub fn borrow_reader(&mut self) -> Option<ReaderBufferView<T>> {
         match (self.get_reading_at(), self.get_provided()) {
             (0, 0) => None,
             (0, p) => {
@@ -66,7 +71,7 @@ impl<T: Element> DoubleBuffer<T> {
         }
     }
 
-    pub fn borrow_writer<'a>(&'a mut self) -> WriterBufferView<'a, T> {
+    pub fn borrow_writer(&mut self) -> WriterBufferView<T> {
         let write_pos = match (self.get_reading_at(), self.get_provided()) {
             (0, 0) => 0,
             (0, y) => 2 - y,

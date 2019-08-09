@@ -15,6 +15,7 @@ extern "C" {
     fn _log_error(msg: &str, color1: &str, color2: &str);
 }
 
+#[derive(Default)]
 pub struct WasmLog();
 
 impl WasmLog {
