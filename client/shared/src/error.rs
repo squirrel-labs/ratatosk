@@ -41,11 +41,9 @@ fn jsvalue_to_string(v: &JsValue) -> String {
 impl std::fmt::Display for ClientError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ClientError::JsValueError(e) |
-            ClientError::WebSocketError(e) =>
-                write!(
-                    f, "{}", jsvalue_to_string(e)
-                ),
+            ClientError::JsValueError(e) | ClientError::WebSocketError(e) => {
+                write!(f, "{}", jsvalue_to_string(e))
+            }
             ClientError::WebGlError(e) => write!(f, "{}", e),
         }
     }
