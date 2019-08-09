@@ -1,4 +1,4 @@
-use rask_game_engine::math::Mat3;
+use rask_engine::math::Mat3;
 use web_sys::WebGl2RenderingContext as Gl2;
 use web_sys::WebGlShader;
 use web_sys::{WebGlProgram, WebGlUniformLocation};

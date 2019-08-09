@@ -1,4 +1,4 @@
-use rask_game_engine::math::*;
+use rask_engine::math::*;
 
 fn mat1() -> Mat3 {
     Mat3::new(0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0)

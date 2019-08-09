@@ -1,5 +1,5 @@
 use crate::shader::Program;
-use rask_game_engine::math::Mat3;
+use rask_engine::math::Mat3;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::WebGl2RenderingContext as Gl2;
