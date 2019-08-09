@@ -10,6 +10,6 @@ pub unsafe fn shared_heap_addr<T>(off: usize) -> *mut T {
     (SHARED_ALLOCATION_AREA_START + off) as *mut T
 }
 
-pub fn get_double_buffer() -> &'static mut DoubleBuffer<u32> {
+pub fn get_double_buffer() -> &'static mut DoubleBuffer<crate::state::State> {
     unsafe { &mut *shared_heap_addr(0) }
 }

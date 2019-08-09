@@ -3,7 +3,7 @@ use rask_game_engine::math;
 pub type AnimationId = u32;
 pub type FrameId = u32;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Sprite {
     pos: math::Vec2,
     animation_id: AnimationId,
@@ -21,9 +21,21 @@ impl Default for Sprite {
 }
 
 pub struct Animation {
-    frames: Vec<Sprite>
+    frames: Vec<Frame>
+}
+
+impl Animation {
+    pub fn new(frames: Vec<Frame>) -> Self {
+        Self { frames }
+    }
 }
 
 pub struct Frame {
     transformations: Vec<math::Mat3>,
+}
+
+impl Frame {
+    pub fn new(transformations: Vec<math::Mat3>) -> Self {
+        Self { transformations }
+    }
 }

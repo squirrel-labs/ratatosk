@@ -12,4 +12,5 @@ use webhogg_wasm_shared::{
 static ALLOCATOR: Allocator<LogicAllocator> = get_allocator!();
 
 pub mod entries;
+pub mod game_context;
 pub mod websocket;
