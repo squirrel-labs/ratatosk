@@ -52,10 +52,17 @@ workspace = false
 command = "cargo"
 args = [ "make", "exec-${BUILD_ENV}", "--", "run", "-p", "game-server" ]
 
+[tasks.cleanup]
+workspace = false
+dependencies = [ "clean" ]
+script = [
+  "rm -r $(git rev-parse --show-toplevel 2>/dev/null)/client/gen 2>/dev/null || true"
+]
+
 # upstream `ci-flow` task appears to have problems with wasm
 [tasks.ci-flow]
 workspace = false
-dependencies = [ "clean", "all", "check-format", "test" ]
+dependencies = [ "cleanup", "all", "check-format", "test" ]
 
 # watcher
 [tasks.watch]
@@ -63,3 +70,8 @@ workspace = false
 watch = true
 command = "cargo"
 args = [ "build", "-p ${@}" ]
+
+# testierung
+[tasks.test]
+workspace = false
+env = { CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--all --exclude webhogg-wasm-logic --exclude webhogg-wasm-graphics" }
