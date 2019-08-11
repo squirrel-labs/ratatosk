@@ -14,7 +14,6 @@ pub struct DoubleBuffer<T: Element> {
 
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
 #[allow(unused_attributes)]
-
 #[inline(never)]
 #[wasm_bindgen]
 #[no_mangle]
