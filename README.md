@@ -35,10 +35,13 @@ Optionally, all dependencies can be obtained with [Nix](https://nixos.org/nix/) 
 First of all, you need to install the `nightly` toolchain using rustup:
 
 ```
-rustup install nightly
-rustup default nightly
+rustup install nightly-2019-08-07
+rustup default nightly-2019-08-07
 rustup target add wasm32-unknown-unknown # for the frontend part
 ```
+
+Please note that we explicitly pin the nightly channel to a certain date to ensure that
+each developer uses the same toolchain which helps reproducing compiler issues on multiple setups.
 
 Now you can build the project with [`cargo`](https://doc.rust-lang.org/cargo/):
 
