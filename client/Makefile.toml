@@ -26,7 +26,17 @@ script = [
 workspace = false
 command = "cargo"
 condition = { env_set = [ "STACK_SIZE" ] }
-env = { "RUSTFLAGS" = "-Clink-arg=--stack-first -Clink-arg=--no-entry -Clink-arg=--allow-undefined -Clink-arg=--strip-all -Clink-arg=--export-dynamic -Clink-arg=--import-memory -Clink-arg=--shared-memory -Clink-arg=--max-memory=1073741824 -Clink-arg=--threads -Clink-arg=--no-check-features -Clink-arg=-zstack-size=${STACK_SIZE}" }
+env = { "RUSTFLAGS" = { script = [
+'''
+#!/usr/bin/env bash
+baseFlags="-Clink-arg=--stack-first -Clink-arg=--no-entry -Clink-arg=--allow-undefined -Clink-arg=--strip-all -Clink-arg=--export-dynamic -Clink-arg=--import-memory -Clink-arg=--shared-memory -Clink-arg=--max-memory=1073741824 -Clink-arg=--threads -Clink-arg=-zstack-size=${STACK_SIZE}"
+
+if [[ "$(rustup show | grep rustc | awk '{ print $2 }')" =~ "1.38.0" ]]; then
+  baseFlags="$baseFlags -Clink-args=--no-check-features"
+fi
+echo $baseFlags
+'''
+]}}
 args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "webhogg-${@}", "--target", "wasm32-unknown-unknown" ]
 
 [tasks.wasm]
