@@ -24,7 +24,10 @@ Cargo.lock
 
 # dont save that target (bad boy)
 target/
-bin/
 
 # Dolphin (?)
 .directory
+
+# cargo
+bin/
+gen/

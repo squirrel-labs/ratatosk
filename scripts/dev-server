@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+browsers="${1:-chromium google-chrome}"
+for i in $browsers; do
+  browser=$(command -v "$i" 2>/dev/null)
+  if [ $? -eq 0 ]; then
+    break
+  fi
+done
+
+if [ -z "$browser" ]; then
+  echo "Cannot find browsers of options ($browsers) in PATH. Please ensure that chromium/google-chrome are installed and available or add a different browser as \$1 if you 'know' what you're doing."
+  exit 1
+fi
+
+top=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ $? -ne 0 ]; then
+  echo "Please run this script from the ratatosk git repository!"
+  exit 1
+fi
+cd $top/client
+
+trap 'kill -TERM "$pid" 2>/dev/null' TERM INT
+python3 -m http.server 3000 &
+pid=$!
+"$browser" http://localhost:3000
+
+wait $pid
+trap - TERM INT
+wait $pid
+EXIT_STATUS=$?
