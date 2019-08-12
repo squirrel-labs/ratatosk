@@ -26,6 +26,8 @@ found in Wiki.
 * [`python3`](https://www.python.org/) for the [exemplary web server](https://github.com/TrueDoctor/ratatosk/wiki/Frontend#installation).
 * [`cargo-make`](https://github.com/sagiegurari/cargo-make) for all build scripts.
 * [`wabt`](https://github.com/WebAssembly/wabt) to introspect compiled wasm code.
+* [`pkg-config`](https://www.freedesktop.org/wiki/Software/pkg-config/) to find additional libraries.
+* [`libopenssl`](https://www.archlinux.org/packages/core/x86_64/openssl/)
 
 Optionally, all dependencies can be obtained with [Nix](https://nixos.org/nix/) by running
 [`nix-shell`](https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) in the project's root.
