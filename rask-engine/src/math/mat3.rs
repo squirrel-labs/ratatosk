@@ -228,7 +228,11 @@ impl ops::DivAssign<f32> for Mat3 {
 }
 
 impl Mat3 {
-    /// Creates a new Mat3.
+    /// Creates a new Mat3
+    /// of the form:
+    /// (a b c)
+    /// (d e f)
+    /// (g h i)
     pub fn new(a: f32, b: f32, c: f32, d: f32, e: f32, f: f32, g: f32, h: f32, i: f32) -> Self {
         Self {
             data: [a, d, g, b, e, h, c, f, i],
