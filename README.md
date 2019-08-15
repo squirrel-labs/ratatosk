@@ -26,6 +26,8 @@ found in Wiki.
 * [`python3`](https://www.python.org/) for the [exemplary web server](https://github.com/TrueDoctor/ratatosk/wiki/Frontend#installation).
 * [`cargo-make`](https://github.com/sagiegurari/cargo-make) for all build scripts.
 * [`wabt`](https://github.com/WebAssembly/wabt) to introspect compiled wasm code.
+* [`pkg-config`](https://www.freedesktop.org/wiki/Software/pkg-config/) to find additional libraries.
+* [`libopenssl`](https://www.archlinux.org/packages/core/x86_64/openssl/)
 
 Optionally, all dependencies can be obtained with [Nix](https://nixos.org/nix/) by running
 [`nix-shell`](https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html) in the project's root.
@@ -35,10 +37,13 @@ Optionally, all dependencies can be obtained with [Nix](https://nixos.org/nix/) 
 First of all, you need to install the `nightly` toolchain using rustup:
 
 ```
-rustup install nightly
-rustup default nightly
+rustup install nightly-2019-08-07
+rustup default nightly-2019-08-07
 rustup target add wasm32-unknown-unknown # for the frontend part
 ```
+
+Please note that we explicitly pin the nightly channel to a certain date to ensure that
+each developer uses the same toolchain which helps reproducing compiler issues on multiple setups.
 
 Now you can build the project with [`cargo`](https://doc.rust-lang.org/cargo/):
 
