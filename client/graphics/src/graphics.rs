@@ -115,7 +115,7 @@ impl GraphicsApi for WebGl {
     }
 
     fn draw_rect(&self, mat: &Mat3) -> Result<(), ClientError> {
-        self.prog.upload_fransformation(&self.gl, &mat);
+        self.prog.upload_fransformation(&self.gl, mat);
         self.gl.draw_arrays(Gl2::TRIANGLES, 0, 6);
         Ok(())
     }

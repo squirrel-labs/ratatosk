@@ -12,6 +12,7 @@ enum ShaderType {
     Fragment,
 }
 
+#[derive(Debug)]
 pub struct Program {
     id: WebGlProgram,
     transformation: WebGlUniformLocation,
@@ -28,12 +29,15 @@ impl Program {
         fs.attach(&gl, &prog);
         gl.link_program(&prog);
 
+        const TRANSFORMATION: &str = "transformation";
+
         if gl.get_program_parameter(&prog, Gl2::LINK_STATUS).as_bool() == Some(true) {
             Ok(Self {
-                transformation: gl.get_uniform_location(&prog, "transformation").ok_or(
-                    ClientError::WebGlError(
-                        "cannot find uniform location \"transformation\"".to_owned(),
-                    ),
+                transformation: gl.get_uniform_location(&prog, TRANSFORMATION).ok_or(
+                    ClientError::WebGlError(format!(
+                        "cannot find uniform location \"{}\"",
+                        TRANSFORMATION
+                    )),
                 )?,
                 id: prog,
             })
@@ -50,8 +54,12 @@ impl Program {
     }
 
     pub fn upload_fransformation(&self, gl: &Gl2, mat: &Mat3) {
-        gl.use_program(Some(&self.id));
-        gl.uniform_matrix3fv_with_f32_array(Some(&self.transformation), true, mat.as_ref());
+        self.use_program(gl);
+        gl.uniform_matrix3fv_with_f32_array(
+            Some(&self.transformation),
+            false,
+            &mat.as_ref().clone(),
+        );
     }
 }
 

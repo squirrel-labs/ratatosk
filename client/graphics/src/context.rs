@@ -19,7 +19,7 @@ impl Context {
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
-        self.render.render()
+        self.render.render(&self.animations)
     }
 }
 

@@ -24,6 +24,7 @@ pub enum ClientError {
     JsValueError(JsValue),
     WebSocketError(JsValue),
     WebGlError(String),
+    ResourceError(String),
 }
 
 fn jsvalue_to_string(v: &JsValue) -> String {
@@ -43,6 +44,7 @@ impl std::fmt::Display for ClientError {
                 write!(
                     f, "{}", jsvalue_to_string(e)
                 ),
+            ClientError::ResourceError(e) |
             ClientError::WebGlError(e) => write!(f, "{}", e),
         }
     }

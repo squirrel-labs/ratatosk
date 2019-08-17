@@ -20,6 +20,12 @@ impl Default for Sprite {
     }
 }
 
+impl Sprite {
+    pub fn get_frame<'a>(&self, animations: &'a [Animation]) -> Option<&'a Frame> {
+        animations.get(self.animation_id as usize)?.frames.get(self.frame_id as usize)
+    }
+}
+
 pub struct Animation {
     frames: Vec<Frame>
 }
@@ -32,6 +38,12 @@ impl Animation {
 
 pub struct Frame {
     transformations: Vec<math::Mat3>,
+}
+
+impl Frame {
+    pub fn transformations(&self) -> &[math::Mat3] {
+        &self.transformations
+    }
 }
 
 impl Frame {
