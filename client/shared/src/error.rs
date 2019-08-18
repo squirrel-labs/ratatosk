@@ -28,12 +28,15 @@ pub enum ClientError {
 }
 
 fn jsvalue_to_string(v: &JsValue) -> String {
-    // try to parse JsValue as String 
+    // try to parse JsValue as String
     // on failiure try to parse JsValue as Error
     v.as_string()
-     .or_else(|| js_sys::Reflect::get(v, &JsValue::from_str("description"))
-                         .ok().and_then(|x| x.as_string()))
-     .unwrap_or_else(|| format!("error: {:?}", v))
+        .or_else(|| {
+            js_sys::Reflect::get(v, &JsValue::from_str("description"))
+                .ok()
+                .and_then(|x| x.as_string())
+        })
+        .unwrap_or_else(|| format!("error: {:?}", v))
 }
 
 impl std::fmt::Display for ClientError {

@@ -3,16 +3,13 @@ name = "webhogg-wasm-logic"
 version = "0.1.0"
 authors = [
     "natrixaeria",
-    "TrueDoctor <dennis@kobert.dev>"
+    "TrueDoctor <dennis@kobert.dev>",
 ]
 edition = "2018"
 description = "logic worker for WebAssembly frontend of the webhogg project"
 
 [lib]
 crate-type = ["cdylib"]
-
-[profile.release]
-lto = true
 
 [dependencies]
 wasm-bindgen = "0.2.47"
@@ -25,9 +22,9 @@ rand = "0.3.14"
 version = "0.1.0"
 path = "../shared"
 
-[dependencies.rask_game_engine]
+[dependencies.rask-engine]
 version = "0.1.0"
-path = "../../game_engine"
+path = "../../rask-engine"
 
 [dependencies.web-sys]
 version = "0.3"

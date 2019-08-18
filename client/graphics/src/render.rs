@@ -1,5 +1,5 @@
 use crate::graphics::GraphicsApi;
-use rask_game_engine::math::Mat3;
+use rask_engine::math::Mat3;
 use webhogg_wasm_shared::error::ClientError;
 use webhogg_wasm_shared::get_double_buffer;
 use webhogg_wasm_shared::sprite::{Animation, Frame, Sprite};

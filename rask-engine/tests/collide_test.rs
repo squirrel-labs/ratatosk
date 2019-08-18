@@ -1,6 +1,6 @@
-use rask_game_engine::boxes::{AABox, RBox};
-use rask_game_engine::collide::*;
-use rask_game_engine::math::Vec2;
+use rask_engine::boxes::{AABox, RBox};
+use rask_engine::collide::*;
+use rask_engine::math::Vec2;
 
 #[test]
 fn test_collide_dot_dot() {

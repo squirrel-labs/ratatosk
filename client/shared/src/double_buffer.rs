@@ -5,25 +5,29 @@ type Flag = u8;
 
 impl<T: Clone + Sized + Default + Debug> Element for T {}
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct DoubleBuffer<T: Element> {
     pub(self) reading_at: Flag,
     pub(self) provided: Flag,
     buffer: [T; 2],
 }
 
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+#[allow(unused_attributes)]
 #[inline(never)]
 #[wasm_bindgen]
 #[no_mangle]
 pub fn atomic_read(v: *const Flag) -> Flag {
-    unsafe {*v}
+    unsafe { *v }
 }
 
+#[allow(clippy::not_unsafe_ptr_arg_deref)]
+#[allow(unused_attributes)]
 #[inline(never)]
 #[wasm_bindgen]
 #[no_mangle]
 pub fn atomic_write(v: *mut Flag, flag: Flag) {
-    unsafe {*v = flag}
+    unsafe { *v = flag }
 }
 
 #[derive(Debug)]
@@ -43,13 +47,11 @@ impl<T: Element> DoubleBuffer<T> {
         DoubleBuffer {
             reading_at: 0,
             provided: 0,
-            buffer: [
-                T::default(),
-                T::default()
-            ]}
+            buffer: [T::default(), T::default()],
+        }
     }
 
-    pub fn borrow_reader<'a>(&'a mut self) -> Option<ReaderBufferView<'a, T>> {
+    pub fn borrow_reader(&mut self) -> Option<ReaderBufferView<T>> {
         match (self.get_reading_at(), self.get_provided()) {
             (0, 0) => None,
             (0, p) => {
@@ -58,20 +60,33 @@ impl<T: Element> DoubleBuffer<T> {
                 while x != p {
                     x = p;
                     self.set_reading_at(x);
-                };
-                Some(ReaderBufferView { ptr: self, read_pos: x - 1 })
-            },
+                }
+                Some(ReaderBufferView {
+                    ptr: self,
+                    read_pos: x - 1,
+                })
+            }
             (c, p) => panic!("invalid state ({},{}) for consumer reached", c, p),
         }
     }
 
-    pub fn borrow_writer<'a>(&'a mut self) -> WriterBufferView<'a, T> {
+    pub fn borrow_writer(&mut self) -> WriterBufferView<T> {
         let write_pos = match (self.get_reading_at(), self.get_provided()) {
             (0, 0) => 0,
             (0, y) => 2 - y,
-            (y, x) => if x == y { 2 - y } else { self.set_provided(y); y - 1 },
+            (y, x) => {
+                if x == y {
+                    2 - y
+                } else {
+                    self.set_provided(y);
+                    y - 1
+                }
+            }
         };
-        WriterBufferView { ptr: self, write_pos }
+        WriterBufferView {
+            ptr: self,
+            write_pos,
+        }
     }
 
     #[inline(always)]

@@ -1,7 +1,7 @@
-pub const ALLOCATOR_AREA_START: usize = 0x00000400;
-pub const SHARED_ALLOCATION_AREA_START: usize = 0x00100000;
-pub const LOGIC_ALLOCATION_AREA_START: usize = 0x00200000;
-pub const GRAPHICS_ALLOCATION_AREA_START: usize = 0x00300000;
+pub const ALLOCATOR_AREA_START: usize = 0x0000_0400;
+pub const SHARED_ALLOCATION_AREA_START: usize = 0x0010_0000;
+pub const LOGIC_ALLOCATION_AREA_START: usize = 0x0020_0000;
+pub const GRAPHICS_ALLOCATION_AREA_START: usize = 0x0030_0000;
 
 use crate::double_buffer::DoubleBuffer;
 
