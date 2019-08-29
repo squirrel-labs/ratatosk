@@ -9,7 +9,7 @@ use wasm_bindgen::JsValue;
 ///
 /// ```should_panic
 /// use wasm_bindgen::JsValue;
-/// use webhogg_wasm_shared::error::ClientError;
+/// use rask_wasm_shared::error::ClientError;
 ///
 /// # fn main() -> Result<(), ClientError> {
 /// let err: Result<(), JsValue> = Err(JsValue::from_str("test error"));

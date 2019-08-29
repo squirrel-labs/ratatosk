@@ -4,9 +4,9 @@ use wasm_bindgen::prelude::*;
 
 use crate::websocket::*;
 use log::{error, info};
-use webhogg_wasm_shared::get_double_buffer;
-use webhogg_wasm_shared::state::State;
-use webhogg_wasm_shared::wasm_log::WasmLog;
+use rask_wasm_shared::get_double_buffer;
+use rask_wasm_shared::state::State;
+use rask_wasm_shared::wasm_log::WasmLog;
 
 /// This function is used to initialize the gamestate, communication
 /// with the graphics worker and setup networking

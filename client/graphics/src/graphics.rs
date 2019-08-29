@@ -1,11 +1,11 @@
 use crate::shader::Program;
 use rask_engine::math::Mat3;
+use rask_wasm_shared::error::ClientError;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::WebGl2RenderingContext as Gl2;
 use web_sys::WebGlBuffer;
 use web_sys::WebGlVertexArrayObject as Vao;
-use webhogg_wasm_shared::error::ClientError;
 
 #[wasm_bindgen]
 extern "C" {

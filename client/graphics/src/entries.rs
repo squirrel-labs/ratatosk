@@ -4,8 +4,8 @@ use wasm_bindgen::prelude::*;
 
 use crate::context;
 use log::info;
-use webhogg_wasm_shared::get_double_buffer;
-use webhogg_wasm_shared::wasm_log::WasmLog;
+use rask_wasm_shared::get_double_buffer;
+use rask_wasm_shared::wasm_log::WasmLog;
 
 #[wasm_bindgen]
 pub fn initialise(canvas: web_sys::OffscreenCanvas) {

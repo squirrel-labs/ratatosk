@@ -1,7 +1,7 @@
-use webhogg_wasm_shared::error::ClientError;
-use webhogg_wasm_shared::get_double_buffer;
-use webhogg_wasm_shared::sprite::Sprite;
-use webhogg_wasm_shared::state::State;
+use rask_wasm_shared::error::ClientError;
+use rask_wasm_shared::get_double_buffer;
+use rask_wasm_shared::sprite::Sprite;
+use rask_wasm_shared::state::State;
 
 pub struct GameContext {
     state: State,

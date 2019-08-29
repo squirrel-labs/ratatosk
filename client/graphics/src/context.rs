@@ -1,7 +1,7 @@
 use crate::graphics::WebGl;
 use crate::render::Render;
-use webhogg_wasm_shared::error::ClientError;
-use webhogg_wasm_shared::sprite::{Animation, Frame};
+use rask_wasm_shared::error::ClientError;
+use rask_wasm_shared::sprite::{Animation, Frame};
 
 pub struct Context {
     render: Render<WebGl>,
@@ -13,7 +13,7 @@ impl Context {
         Render::new(canvas).map(|render| Self {
             render,
             animations: vec![Animation::new(vec![Frame::new(vec![
-                rask_game_engine::math::Mat3::identity(),
+                rask_engine::math::Mat3::identity(),
             ])])],
         })
     }

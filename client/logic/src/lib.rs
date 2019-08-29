@@ -3,7 +3,7 @@
 
 #![feature(async_await)]
 
-use webhogg_wasm_shared::{
+use rask_wasm_shared::{
     alloc::{Allocator, LogicAllocator},
     get_allocator,
 };

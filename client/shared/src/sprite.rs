@@ -1,4 +1,4 @@
-use rask_game_engine::math;
+use rask_engine::math;
 
 pub type AnimationId = u32;
 pub type FrameId = u32;

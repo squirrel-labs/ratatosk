@@ -1,8 +1,8 @@
 use rask_engine::math::Mat3;
+use rask_wasm_shared::error::ClientError;
 use web_sys::WebGl2RenderingContext as Gl2;
 use web_sys::WebGlShader;
 use web_sys::{WebGlProgram, WebGlUniformLocation};
-use webhogg_wasm_shared::error::ClientError;
 
 const VERTEX_SHADER: &str = include_str!("shader/vertex.glsl");
 const FRAGMENT_SHADER: &str = include_str!("shader/fragment.glsl");
