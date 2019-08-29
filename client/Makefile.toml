@@ -4,6 +4,11 @@ extend = "../scripts/cargo-helpers.toml"
 workspace = false
 dependencies = [ "logic", "graphics" ]
 
+[tasks.format]
+workspace = false
+command = "cargo"
+args = [ "fmt", "--all" ]
+
 [tasks.logic]
 workspace = false
 env = { STACK_SIZE = "134217728" }
