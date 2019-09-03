@@ -1,6 +1,7 @@
 mod backend_connection;
 mod error;
 mod group;
+mod websocket;
 
 mod game_logger;
 
@@ -20,7 +21,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let addr = matches.value_of("address").unwrap_or("127.0.0.1");
     let port = matches.value_of("port").unwrap_or("5001");
 
-    let addr = (addr, port);
     info!("create game server on {:?}", addr);
+    let ws_server = websocket::Server::run(addr, port);
+    ws_server.unwrap().join();
+    //TODO fix unwrap
     Ok(())
 }

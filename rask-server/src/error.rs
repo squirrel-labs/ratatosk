@@ -8,6 +8,7 @@ pub enum ServerError {
     Accept(std::io::Error),
     Group(String),
     GroupCreation(String),
+    WebsocketCreation(std::io::Error),
 
     Url(UrlError),
     BackendRequest(ReqError),
@@ -26,6 +27,7 @@ impl std::fmt::Display for ServerError {
             ServerError::Accept(e) => write!(f, "AcceptError: {}", e),
             ServerError::Group(e) => write!(f, "GroupError: {}", e),
             ServerError::GroupCreation(e) => write!(f, "GroupCreationError: {}", e),
+            ServerError::WebsocketCreation(e) => write!(f, "WebsocketCreationError: {}", e),
 
             ServerError::Url(e) => write!(f, "UrlError: {}", e),
             ServerError::BackendRequest(e) => write!(f, "BackendRequest: {}", e),
