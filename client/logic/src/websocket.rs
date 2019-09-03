@@ -27,13 +27,13 @@ impl WebSocketAdapter {
     /// ```
     ///
     /// # Errors
-    /// Returns a WebSocketError if the creation failed
+    /// Returns a JsValueError if the creation failed
     ///
     pub fn new(url: &str) -> Result<WebSocketAdapter, ClientError> {
         debug!("Websocket enry");
 
         // connect to the server
-        let ws = WebSocket::new_with_str(url, "tuesday")?;
+        let ws = WebSocket::new(url, "tuesday").map_err(ClientError::WebSocketError)?;
         //let ws = WebSocket::new_with_str(url, "tuesday")?;
 
         // register the message callback
