@@ -33,7 +33,7 @@ impl WebSocketAdapter {
         debug!("Websocket enry");
 
         // connect to the server
-        let ws = WebSocket::new(url)?;
+        let ws = WebSocket::new_with_str(url, "tuesday")?;
         //let ws = WebSocket::new_with_str(url, "tuesday")?;
 
         // register the message callback

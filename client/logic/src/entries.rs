@@ -21,9 +21,7 @@ pub fn init() {
     }
     unsafe {
         *shared_heap_addr::<u32>(0) = 0;
-        WS = Some(
-            WebSocketAdapter::new("wss://echo.websocket.org").expect("Websocket creation failed"),
-        );
+        WS = Some(WebSocketAdapter::new("ws://localhost:5001").expect("Websocket creation failed"));
     }
     info!("logic entry reached");
 }
