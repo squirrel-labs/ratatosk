@@ -1,6 +1,7 @@
 mod backend_connection;
 mod error;
 mod group;
+mod lobby;
 mod websocket;
 
 mod game_logger;
