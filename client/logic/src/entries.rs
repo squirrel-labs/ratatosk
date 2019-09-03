@@ -14,14 +14,9 @@ pub fn initialise() {
     unsafe {
         crate::ALLOCATOR.reset();
     }
-    unsafe {
-        *shared_heap_addr::<u32>(0) = 0;
-        WS = Some(WebSocketAdapter::new("ws://localhost:5001").expect("Websocket creation failed"));
-    }
     log::set_boxed_logger(Box::new(WasmLog::new()))
         .map(|()| log::set_max_level(log::LevelFilter::Debug))
         .unwrap();
->>>>>>> origin/dev
     info!("logic entry reached");
 }
 
