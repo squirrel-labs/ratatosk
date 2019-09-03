@@ -80,8 +80,12 @@ impl GameServer {
     pub fn run(&mut self) -> Result<(), ServerError> {
         let reader = self.read_clients();
         loop {
-            let connection = reader.recv().unwrap()?;
-            self.add_client(connection);
+            if let Ok(connection) = reader.recv() {
+                match connection {
+                    Ok(connection) => self.add_client(connection),
+                    Err(connection) => warn!("{}", connection)
+                }
+            }
         }
     }
 
