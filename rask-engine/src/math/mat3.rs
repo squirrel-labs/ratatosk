@@ -5,10 +5,10 @@ use crate::math::Vec3;
 /// A 3x3 matrix.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Mat3 {
-    /// The elements of the matrix.
-    /// [a, d, g
-    ///  b, e, h
-    ///  c, f, i]
+    // The elements of the matrix.
+    // (a d g)
+    // (b e h)
+    // (c f i)
     data: [f32; 9],
 }
 

@@ -1,3 +1,5 @@
+//! This crate is a game engine library providing many needed functions.
+
 pub mod boxes;
 pub mod collide;
 pub mod math;

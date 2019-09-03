@@ -1,3 +1,6 @@
+//! This module provides basic mathematical types and functions used in the game.
+//! This includes 2- and 3-dimensional vectors as well as 2x2 and 3x3 matrices.
+
 pub mod mat2;
 pub mod mat3;
 pub mod vec2;

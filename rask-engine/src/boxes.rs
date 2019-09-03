@@ -1,3 +1,5 @@
+//! The boxes module exposes AABox (axis-aligned box) and RBox (rotated box).
+
 use std::ops;
 
 use crate::math::Vec2;

@@ -6,11 +6,11 @@ use crate::math::EPSILON;
 /// A 3-dimensional euclidean vector.
 #[derive(Clone, Copy, Debug)]
 pub struct Vec3 {
-    /// The x coordinate.
+    // The x coordinate.
     x: f32,
-    /// The y coordinate.
+    // The y coordinate.
     y: f32,
-    /// The z coordinate.
+    // The z coordinate.
     z: f32,
 }
 
