@@ -3,7 +3,7 @@ use std::ops;
 
 use crate::math::EPSILON;
 
-/// A 3-dimensional euclidean vector.
+/// A 3-dimensional euclidean vector with f32 elements.
 #[derive(Clone, Copy, Debug)]
 pub struct Vec3 {
     // The x coordinate.

@@ -2,7 +2,7 @@ use std::ops;
 
 use crate::math::Vec3;
 
-/// A 3x3 matrix.
+/// A 3x3 matrix with f32 elements.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Mat3 {
     // The elements of the matrix.
