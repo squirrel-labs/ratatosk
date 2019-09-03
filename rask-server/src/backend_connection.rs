@@ -1,6 +1,5 @@
 use crate::error::ServerError;
 use crate::group::GroupId;
-use crate::server::{Token, UserId};
 use reqwest::{Client, Response, Url};
 use std::sync::mpsc;
 use std::sync::mpsc::{Receiver, Sender};
@@ -19,7 +18,7 @@ pub struct TokenResponse {
     pub group_id: GroupId,
     pub group_type: String,
     pub group_name: String,
-    pub user_id: UserId,
+    pub user_id: u32,
 }
 
 impl BackendConnection {
@@ -57,7 +56,7 @@ impl BackendConnection {
         self.res_rec.recv().unwrap()
     }
 
-    pub fn validate_token(&mut self, token: &Token) -> Result<TokenResponse, ServerError> {
+    pub fn validate_token(&mut self, token: &u32) -> Result<TokenResponse, ServerError> {
         let location = format!("/api/lobby/tokens/{}", token);
         self.request(&location)?;
         let response = self.get_response()?;

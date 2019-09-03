@@ -1,5 +1,3 @@
-use crate::server::{GameClient, UserId};
-
 pub type GroupId = u32;
 
 pub trait Group {
@@ -11,7 +9,5 @@ pub trait Group {
 
     fn add_client(
         &mut self,
-        id: UserId,
-        client: GameClient,
     ) -> Result<(), crate::error::ServerError>;
 }

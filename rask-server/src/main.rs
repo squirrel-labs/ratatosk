@@ -1,10 +1,6 @@
 mod backend_connection;
 mod error;
 mod group;
-mod lobby;
-mod rask_group;
-mod scribble_group;
-mod server;
 
 mod game_logger;
 
@@ -22,11 +18,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let matches = App::from_yaml(yaml).get_matches();
 
     let addr = matches.value_of("address").unwrap_or("127.0.0.1");
-    let port = matches.value_of("port").unwrap_or("5001").parse()?;
+    let port = matches.value_of("port").unwrap_or("5001");
 
     let addr = (addr, port);
     info!("create game server on {:?}", addr);
-    let mut gameserver = server::GameServer::new(addr);
-    gameserver.run().unwrap();
     Ok(())
 }
