@@ -1,80 +1,39 @@
 use crate::error::ServerError;
 use crate::group::GroupId;
-use reqwest::{Client, Response, Url};
-use std::sync::mpsc;
-use std::sync::mpsc::{Receiver, Sender};
+use std::collections::HashMap;
 
-pub struct BackendConnection {
-    host: String,
-    req_sender: Sender<RequestData>,
-    res_rec: Receiver<ResponseResult>,
-    max_uid: u32,
-}
-
-pub type RequestData = Url;
-pub type ResponseResult = Result<Response, ServerError>;
+const API_ENDPOINT: &str = "https://games.kobert.dev/api/";
 
 pub struct TokenResponse {
-    pub group_id: GroupId,
-    pub group_type: String,
-    pub group_name: String,
-    pub user_id: u32,
+    pub group_id: GroupId,  //Id
+    pub group_type: String, //Type
+    pub user_name: String,  //Name
 }
 
-impl BackendConnection {
-    fn run_background(req_rec: Receiver<RequestData>, res_sender: Sender<ResponseResult>) {
-        let client = Client::new();
-        loop {
-            let location = req_rec.recv().unwrap();
-            let request = client.get(location);
-            let response = request.send();
-            res_sender.send(response.map_err(|e| e.into())).unwrap();
-        }
+pub fn request(location: &str) -> String {
+    match reqwest::get(location) {
+        Ok(mut res) => res.text().unwrap(),
+        Err(err) => format!("{}", err),
     }
+}
 
-    pub fn new(host: &str) -> Self {
-        let (req_sender, req_rec): (Sender<RequestData>, Receiver<RequestData>) = mpsc::channel();
-        let (res_sender, res_rec): (Sender<ResponseResult>, Receiver<ResponseResult>) =
-            mpsc::channel();
-        std::thread::spawn(move || Self::run_background(req_rec, res_sender));
-        BackendConnection {
-            host: host.to_string(),
-            req_sender,
-            res_rec,
-            max_uid: 420,
-        }
+pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
+    let res: HashMap<String, String> =
+        match reqwest::get(format!("{}tokens/{}", API_ENDPOINT, token).as_str()) {
+            Ok(mut res) => res.json()?,
+            Err(_) => return Err(ServerError::InvalidToken),
+        };
+    let to_find = ["Id", "Type", "Name"];
+    if !to_find.iter().all(|x| res.contains_key(&x.to_string())) {
+        return Err(ServerError::InvalidTokenFormat);
     }
-
-    pub fn request(&self, location: &str) -> Result<(), ServerError> {
-        Ok(self
-            .req_sender
-            .send(Url::parse(&format!("{}{}", self.host, location))?)
-            .unwrap())
-    }
-
-    pub fn get_response(&self) -> ResponseResult {
-        self.res_rec.recv().unwrap()
-    }
-
-    pub fn validate_token(&mut self, token: &u32) -> Result<TokenResponse, ServerError> {
-        let location = format!("/api/lobby/tokens/{}", token);
-        self.request(&location)?;
-        let response = self.get_response()?;
-        match response.status() {
-            status if status.is_success() => {
-                // zu Testzwecken werden noch keine JSON-Daten deserialisiert
-                // Dennis Server gibt ja noch nix zurück
-                self.max_uid += 1;
-                Ok(TokenResponse {
-                    group_id: 12,
-                    group_type: "rask".to_string(),
-                    group_name: "rask".to_string(),
-                    user_id: self.max_uid - 1,
-                })
-            }
-            reqwest::StatusCode::NOT_FOUND => Err(ServerError::InvalidToken),
-            status if status.is_client_error() => Err(ServerError::InvalidTokenFormat),
-            _ => Err(ServerError::BadBackendResponse(response)),
-        }
+    if let Ok(id) = (*res.get("Id").unwrap()).parse() {
+        return Ok(TokenResponse {
+            group_id: id,
+            group_type: res.get("Type").unwrap().to_string(),
+            user_name: res.get("Name").unwrap().to_string(),
+        });
+    } else {
+        return Err(ServerError::InvalidTokenFormat);
     }
 }

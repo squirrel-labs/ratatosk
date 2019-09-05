@@ -7,7 +7,5 @@ pub trait Group {
 
     fn run(&mut self);
 
-    fn add_client(
-        &mut self,
-    ) -> Result<(), crate::error::ServerError>;
+    fn add_client(&mut self) -> Result<(), crate::error::ServerError>;
 }

@@ -9,14 +9,16 @@ impl<T> Connection<T> {
     fn new() -> (Self, Self) {
         let (tx1, rx1) = channel();
         let (tx2, rx2) = channel();
-        (Self {
-            sender: tx1,
-            receiver: rx2,
-        },
-        Self {
-            sender: tx2,
-            receiver: rx1,
-        })
+        (
+            Self {
+                sender: tx1,
+                receiver: rx2,
+            },
+            Self {
+                sender: tx2,
+                receiver: rx1,
+            },
+        )
     }
 }
 
@@ -31,7 +33,9 @@ struct Listener {
 impl Listener {
     /// Creates a new Listener with no lobbys.
     pub fn new() -> Self {
-        Self { connections: Vec::new() }
+        Self {
+            connections: Vec::new(),
+        }
     }
 
     /// Creates a new Lobby that is listened to by the Listener.
