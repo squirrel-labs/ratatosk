@@ -57,7 +57,7 @@ impl Program {
         self.use_program(gl);
         gl.uniform_matrix3fv_with_f32_array(
             Some(&self.transformation),
-            false,
+            true,
             &mat.as_ref().clone(),
         );
     }

@@ -13,6 +13,10 @@ impl State {
         &self.sprites[..self.sprite_len]
     }
 
+    pub fn sprites_mut(&mut self) -> &mut [Sprite] {
+        &mut self.sprites[..self.sprite_len]
+    }
+
     pub fn append_sprite(&mut self, sprite: &Sprite) {
         if self.sprite_len < MAX_SPRITES {
             self.sprites[self.sprite_len] = *sprite;
