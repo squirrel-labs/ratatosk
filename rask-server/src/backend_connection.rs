@@ -1,6 +1,5 @@
 use crate::error::ServerError;
 use crate::group::GroupId;
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 const API_ENDPOINT: &str = "https://games.kobert.dev/";
@@ -18,7 +17,7 @@ pub struct TokenResponse {
     #[serde(rename = "type")]
     pub group_type: String, //Type
     #[serde(rename = "name")]
-    pub user_name: String,  //Name
+    pub group_name: String,  //Name
 }
 
 pub fn request(location: &str) -> String {

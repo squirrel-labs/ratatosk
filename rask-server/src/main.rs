@@ -2,7 +2,7 @@ mod backend_connection;
 mod error;
 mod group;
 mod lobby;
-mod websocket;
+mod server;
 
 mod game_logger;
 
@@ -26,7 +26,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // start server
     info!("create game server on {:?}", addr);
-    let ws_server = websocket::Server::run(addr, port);
+    let ws_server = server::Server::run(addr, port);
     ws_server.unwrap().join();
     //TODO fix unwrap
     Ok(())

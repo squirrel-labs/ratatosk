@@ -1,7 +1,10 @@
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
+use std::sync::mpsc;
+use std::collections::HashMap;
 use crate::backend_connection::*;
+use crate::group::*;
 
 use ws::{listen, CloseCode, Handler, Handshake, Message, Request, Response, Result, Sender};
 
@@ -9,16 +12,18 @@ use crate::error::ServerError;
 
 const PROTOCOL: &str = "tuesday";
 // WebSocket connection handler for the server connection
-pub struct Server {
+pub struct Server<'a> {
     ws: Sender,
-    count: Arc<Mutex<u32>>,
+    group: mpsc::Sender<&'a [u8]>,
+    groups: Arc<Mutex<HashMap<u32, Group<'a>>>>,
 }
 
-impl Handler for Server {
+impl Handler for Server<'_> {
     // called when the socket connection is created
     fn on_open(&mut self, _: Handshake) -> Result<()> {
         // keep track of the number of Clients -> could be a vec of lobbys as well
-        Ok((*self.count.lock().unwrap()) += 1)
+        //Ok((*self.groups.lock().unwrap()) += 1)
+        Ok(())
     }
 
     // low-level handling of requests
@@ -49,20 +54,22 @@ impl Handler for Server {
     fn on_close(&mut self, _: CloseCode, _: &str) {
         //self.ws.shutdown().unwrap()
         //The connection is going down, so we need to decrement the count
-        (*self.count.lock().unwrap()) -= 1
+        //(*self.count.lock().unwrap()) -= 1
     }
 }
 
-impl Server {
-    pub fn run(address: &str, port: &str) -> core::result::Result<JoinHandle<()>, ServerError> {
-        let count = Arc::new(Mutex::new(0));
+impl Server<'_> {
+    pub fn run<'a>(address: &str, port: &str) -> core::result::Result<JoinHandle<()>, ServerError> {
+        let count = Arc::new(Mutex::new(HashMap<u32, Group<'a>>));
+        let (sender, _) = mpsc::channel();
         let url = format!("{}:{}", address, port);
         thread::Builder::new()
             .name("server".to_owned())
             .spawn(move || {
                 listen(url, |out| Server {
                     ws: out,
-                    count: count.clone(),
+                    group: sender,
+                    groups: count,
                 })
                 .unwrap()
             })
