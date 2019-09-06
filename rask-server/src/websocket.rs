@@ -1,6 +1,7 @@
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
+use crate::backend_connection::*;
 
 use ws::{listen, CloseCode, Handler, Handshake, Message, Request, Response, Result, Sender};
 
@@ -24,7 +25,13 @@ impl Handler for Server {
     fn on_request(&mut self, req: &Request) -> Result<Response> {
         let res = handshake(req);
         match res {
-            (res, Ok(token)) => {info!("recived tokn: {}", token); Ok(res)},
+            (res, Ok(token)) => {
+                info!("recived token: {}", token);
+                match crate::backend_connection::verify_token(token) {
+                    Ok(response) => {handle_token(response); Ok(res)},
+                    Err(e) => Ok(fail_response(res, format!("{}", e).as_str())),
+                }
+            },
             (res, Err(err)) => {
                 warn!("Client {:?}: {:?}", req.client_addr(), err);
                 Ok(res)
@@ -77,7 +84,7 @@ fn handshake(req: &Request) -> (Response, core::result::Result<i32, ServerError>
         let token = protocols.iter().find(|&&pro| pro.starts_with("Token-"));
         match token {
             Some(token) => {
-                let (_, token) = token.split_at(5);
+                let (_, token) = token.split_at(6);
                 if let Ok(token) = token.parse::<i32>() {
                     return (res, Ok(token)) 
                 } else {
@@ -98,3 +105,5 @@ fn fail_response(mut res: Response, reason: &str) -> Response  {
     warn!("{}", reason);
     res
 }
+
+fn handle_token(response: TokenResponse) {}

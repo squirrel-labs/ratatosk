@@ -2,7 +2,7 @@ use crate::error::ServerError;
 use crate::group::GroupId;
 use std::collections::HashMap;
 
-const API_ENDPOINT: &str = "https://games.kobert.dev/api/";
+const API_ENDPOINT: &str = "https://games.kobert.dev/";
 
 pub struct TokenResponse {
     pub group_id: GroupId,  //Id
@@ -19,7 +19,7 @@ pub fn request(location: &str) -> String {
 
 pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
     let res: HashMap<String, String> =
-        match reqwest::get(format!("{}tokens/{}", API_ENDPOINT, token).as_str()) {
+        match reqwest::get(format!("{}api/lobby/tokens/{}", API_ENDPOINT, token).as_str()) {
             Ok(mut res) => res.json()?,
             Err(_) => return Err(ServerError::InvalidToken),
         };
