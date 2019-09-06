@@ -4,6 +4,9 @@ use rask_wasm_shared::get_double_buffer;
 use rask_wasm_shared::sprite::*;
 use rask_wasm_shared::state::State;
 
+const IMAGE1_DATA: &[u8] = include_bytes!("../../res/kuh.png");
+//const IMAGE1_DATA: &[u8] = include_bytes!("../../res/empty.png");
+
 pub struct GameContext {
     state: State,
     tick_nr: u64,
@@ -26,12 +29,26 @@ impl GameContext {
     pub fn tick(&mut self) -> Result<(), ClientError> {
         if self.state.sprites().is_empty() {
             self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, 0.0), 0, 0)
+                &Sprite::new(math::Vec2::new(0.0, 0.0), 3, 0, 0)
             );
             self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, 0.0), 1, 0)
+                &Sprite::new(math::Vec2::new(0.0, 0.0), 2, 0, 0)
             );
-            *rask_wasm_shared::mem::shared_heap().animations_mut() = vec![
+            self.state.append_sprite(
+                &Sprite::new(math::Vec2::new(0.0, 0.0), 0, 0, 0)
+            );
+            self.state.append_sprite(
+                &Sprite::new(math::Vec2::new(0.0, 0.0), 1, 0, 0)
+            );
+            self.state.append_sprite(
+                &Sprite::new(math::Vec2::new(0.0, -0.1), 0, 0, 0)
+            );
+            self.state.append_sprite(
+                &Sprite::new(math::Vec2::new(-0.1, 0.1), 1, 0, 0)
+            );
+
+            let shared_heap = rask_wasm_shared::mem::shared_heap();
+            *shared_heap.animations_mut() = vec![
                 Animation::new(vec![
                     Frame::new(vec![
                         rask_engine::math::Mat3::translation(0.5, 0.0) *
@@ -52,7 +69,20 @@ impl GameContext {
                         rask_engine::math::Mat3::scaling(0.3, 0.1)
                     ]),
                 ]),
+                Animation::new(vec![
+                    Frame::new(vec![
+                        rask_engine::math::Mat3::identity()
+                    ])
+                ]),
+                Animation::new(vec![
+                    Frame::new(vec![
+                        rask_engine::math::Mat3::scaling(16.0 / 9.0, 1.0)
+                    ])
+                ]),
             ];
+
+            *shared_heap.textures_mut() = Some(vec![rask_wasm_shared::texture::Texture::from_png_stream(IMAGE1_DATA)?]);
+            shared_heap.set_texture_notify();
         }
 
         let animations = rask_wasm_shared::mem::shared_heap().animations();
@@ -80,4 +110,4 @@ pub fn context_mut() -> &'static mut GameContext {
 
 /* pub fn context() -> &'static Context {
     unsafe { CONTEXT.as_ref().unwrap() }
-} */
+}*/

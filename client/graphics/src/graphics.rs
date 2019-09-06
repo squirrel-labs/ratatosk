@@ -1,6 +1,10 @@
 use crate::shader::Program;
+use rask_engine::math;
 use rask_engine::math::Mat3;
 use rask_wasm_shared::error::ClientError;
+use rask_wasm_shared::state::State;
+use rask_wasm_shared::texture::{Texture, ColorType};
+use rask_wasm_shared::sprite::TextureId;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::WebGl2RenderingContext as Gl2;
@@ -11,8 +15,11 @@ use web_sys::WebGlVertexArrayObject as Vao;
 extern "C" {
     #[wasm_bindgen(js_namespace=Float32Array, js_name=of, variadic)]
     fn _create_f32_buffer(args: &[f32]) -> js_sys::Float32Array;
+    #[wasm_bindgen(js_namespace=Uint8Array, js_name=of, variadic)]
+    fn _create_u8_buffer(args: &[u8]) -> js_sys::Uint8Array;
 }
 
+#[derive(Debug)]
 pub enum WebGl2Error {
     InvalidEnum,
     InvalidValue,
@@ -58,7 +65,9 @@ pub trait GraphicsApi: Sized {
     fn new(canvas: web_sys::OffscreenCanvas) -> Result<Self, ClientError>;
 
     fn clear(&self, color: &[f32; 3]) -> Result<(), ClientError>;
-    fn draw_rect(&self, mat: &Mat3) -> Result<(), ClientError>;
+    fn draw_rect(&self, pos: &math::Vec2, mat: &Mat3, tex: u32) -> Result<(), ClientError>;
+    fn upload_texture(&mut self, texture: &mut Texture, n: u32) -> Result<(), ClientError>;
+    fn resize_texture_pool(&mut self, n: u32) -> Result<(), ClientError>;
     fn ok(&self) -> Result<(), Self::GraphicsError>;
 }
 
@@ -68,6 +77,7 @@ pub struct WebGl {
     vbo: WebGlBuffer,
     prog: Program,
     canvas: web_sys::OffscreenCanvas,
+    texture_handles: Vec<Option<WebGlApiTexture>>,
 }
 
 impl GraphicsApi for WebGl {
@@ -98,7 +108,37 @@ impl GraphicsApi for WebGl {
             vao,
             prog,
             vbo,
+            texture_handles: vec![],
         })
+    }
+
+    fn upload_texture(&mut self, texture: &mut Texture, n: u32) -> Result<(), ClientError> {
+        let handle = WebGlApiTexture::new(&self.gl)?;
+        self.gl.active_texture(Gl2::TEXTURE0);
+        handle.bind(&self.gl);
+        if let ColorType::RGB(_) = texture.colortype() {
+            // TODO: copy RGB buffer to RGBA
+            return Err(ClientError::ResourceError(format!("RGB not yet implemented")));
+        }
+        let (internalformat, format) = Self::colorformat(texture.colortype())?;
+        let (w, h) = texture.dimension();
+        self.gl.tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
+            Gl2::TEXTURE_2D, 0, internalformat, w as i32, h as i32, 0, format, Gl2::UNSIGNED_BYTE, 
+            Some(&texture.raw()))?;
+        self.gl.tex_parameteri(Gl2::TEXTURE_2D, Gl2::TEXTURE_WRAP_S, Gl2::CLAMP_TO_EDGE as i32);
+        self.gl.tex_parameteri(Gl2::TEXTURE_2D, Gl2::TEXTURE_WRAP_T, Gl2::CLAMP_TO_EDGE as i32);
+        self.gl.tex_parameteri(Gl2::TEXTURE_2D, Gl2::TEXTURE_MIN_FILTER, Gl2::NEAREST as i32);
+        self.gl.tex_parameteri(Gl2::TEXTURE_2D, Gl2::TEXTURE_MAG_FILTER, Gl2::NEAREST as i32);
+        self.texture_handles[n as usize] = Some(handle);
+        Ok(())
+    }
+
+    fn resize_texture_pool(&mut self, n: u32) -> Result<(), ClientError> {
+        let n = n as usize;
+        if self.texture_handles.len() < n {
+            self.texture_handles.resize(n, None)
+        }
+        Ok(())
     }
 
     fn ok(&self) -> Result<(), Self::GraphicsError> {
@@ -114,8 +154,11 @@ impl GraphicsApi for WebGl {
         Ok(())
     }
 
-    fn draw_rect(&self, mat: &Mat3) -> Result<(), ClientError> {
+    fn draw_rect(&self, pos: &math::Vec2, mat: &Mat3, tex: TextureId) -> Result<(), ClientError> {
         self.prog.upload_fransformation(&self.gl, mat);
+        self.bind_texture(tex);
+        self.prog.upload_texture_id(&self.gl, 0);
+        self.gl.vertex_attrib2fv_with_f32_array(0, &[pos.x(), pos.y()]);
         self.gl.draw_arrays(Gl2::TRIANGLES, 0, 6);
         Ok(())
     }
@@ -142,6 +185,15 @@ impl WebGl {
         Ok((vao, vbo))
     }
 
+    fn bind_texture(&self, tex: TextureId) -> Result<(), ClientError> {
+        Ok(self.texture_handles
+            .get(tex as usize)
+            .ok_or_else(|| ClientError::ResourceError(format!("texture #{} is out of bounds", tex)))?
+            .as_ref()
+            .ok_or_else(|| ClientError::ResourceError(format!("could not get texture #{}", tex)))?
+            .bind(&self.gl))
+    }
+
     fn create_program(gl: &Gl2) -> Result<Program, ClientError> {
         Program::new(gl)
     }
@@ -153,5 +205,31 @@ impl WebGl {
             Gl2::STATIC_DRAW,
         );
         Ok(())
+    }
+
+    fn colorformat(format: ColorType) -> Result<(i32, u32), ClientError> {
+        match format {
+            ColorType::RGB(8) => Ok((Gl2::RGB8 as i32, Gl2::RGB)),
+            ColorType::RGB(16) => Ok((Gl2::RGB16UI as i32, Gl2::RGB)),
+
+            ColorType::RGBA(8) => Ok((Gl2::RGBA8 as i32, Gl2::RGBA)),
+            ColorType::RGBA(16) => Ok((Gl2::RGBA16UI as i32, Gl2::RGBA)),
+            ColorType::RGBA(32) => Ok((Gl2::RGBA32UI as i32, Gl2::RGBA)),
+            _ => Err(ClientError::WebGlError(format!("invalid color format")))
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct WebGlApiTexture(web_sys::WebGlTexture);
+
+impl WebGlApiTexture {
+    pub fn new(gl: &Gl2) -> Result<Self, ClientError> {
+        Ok(Self(gl.create_texture()
+            .ok_or(ClientError::WebGlError(format!("could not create a texture handle")))?))
+    }
+
+    pub fn bind(&self, gl: &Gl2) {
+        gl.bind_texture(Gl2::TEXTURE_2D, Some(&self.0));
     }
 }

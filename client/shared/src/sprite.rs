@@ -2,12 +2,14 @@ use rask_engine::math;
 
 pub type AnimationId = u32;
 pub type FrameId = u32;
+pub type TextureId = u32;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Sprite {
     pub pos: math::Vec2,
     pub animation_id: AnimationId,
     pub frame_id: FrameId,
+    pub tex_id: TextureId,
 }
 
 impl Default for Sprite {
@@ -15,7 +17,8 @@ impl Default for Sprite {
         Self {
             pos: math::Vec2::new(0.0, 0.0),
             animation_id: 0,
-            frame_id: 0
+            frame_id: 0,
+            tex_id: 0,
         }
     }
 }
@@ -29,9 +32,9 @@ impl Sprite {
         self.get_animation(animations)?.frames.get(self.frame_id as usize)
     }
 
-    pub fn new(pos: math::Vec2, animation_id: AnimationId, frame_id: FrameId) -> Self {
-        Sprite {
-            pos, animation_id, frame_id
+    pub fn new(pos: math::Vec2, animation_id: AnimationId, frame_id: FrameId, tex_id: TextureId) -> Self {
+        Self {
+            pos, animation_id, frame_id, tex_id
         }
     }
 

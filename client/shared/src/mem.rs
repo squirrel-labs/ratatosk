@@ -1,7 +1,8 @@
 use crate::state::State;
 type Buffer = crate::double_buffer::DoubleBuffer<State>;
 
-use crate::sprite::*;
+use crate::{sprite::*,
+            texture::*};
 
 pub const GRAPHIC_STACK_SIZE: usize = 0x0010_0000;
 pub const ALLOCATOR_AREA_START: usize = GRAPHIC_STACK_SIZE;
@@ -15,22 +16,39 @@ pub fn get_double_buffer() -> &'static mut Buffer {
 }
 
 pub struct SharedHeap {
-    notify: bool,
     last_addr: u32,
     animations: Vec<Animation>,
+    texture_notify: bool,
+    textures: Option<Vec<Texture>>,
 }
 
 impl SharedHeap {
-    pub fn is_notify(&self) -> bool {
-        self.notify
-    }
-
     pub fn animations_mut(&mut self) -> &mut Vec<Animation> {
         &mut self.animations
     }
 
     pub fn animations(&self) -> &Vec<Animation> {
         &self.animations
+    }
+
+    pub fn unset_texture_notify(&mut self) {
+        self.texture_notify = false
+    }
+
+    pub fn set_texture_notify(&mut self) {
+        self.texture_notify = true
+    }
+
+    pub fn get_texture_notify(&mut self) -> bool {
+        self.texture_notify
+    }
+
+    pub fn textures_mut(&mut self) -> &mut Option<Vec<Texture>> {
+        &mut self.textures
+    }
+
+    pub fn textures(&self) -> &Option<Vec<Texture>> {
+        &self.textures
     }
 }
 

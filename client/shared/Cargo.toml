@@ -17,6 +17,7 @@ log = "0.4"
 js-sys = "=0.3.25"
 fern = "0.5.8"
 rand = "0.3.14"
+image = "0.22"
 
 [dependencies.rask-engine]
 version = "0.1.0"
@@ -26,12 +27,14 @@ path = "../../rask-engine"
 version = "=0.3.25"
 features = [
     "console",
+    "ImageData",
     "Window",
     "OffscreenCanvas",
     "WebGl2RenderingContext",
     "WebGlShader",
     "WebGlProgram",
     "WebGlBuffer",
+    "WebGlTexture",
     "WebGlVertexArrayObject",
     "WebGlUniformLocation"
 ]

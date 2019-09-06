@@ -7,6 +7,7 @@ pub mod mem;
 pub mod wasm_log;
 pub mod sprite;
 pub mod state;
+pub mod texture;
 
 pub use error::*;
 pub use mem::*;

@@ -16,9 +16,18 @@ enum ShaderType {
 pub struct Program {
     id: WebGlProgram,
     transformation: WebGlUniformLocation,
+    texture: WebGlUniformLocation,
 }
 
 impl Program {
+    fn get_uniform_location(gl: &Gl2, prog: &WebGlProgram, name: &str) -> Result<WebGlUniformLocation, ClientError> {
+        gl.get_uniform_location(&prog, name).ok_or(
+            ClientError::WebGlError(format!(
+                "cannot find uniform location \"{}\"",
+                name
+            )))
+    }
+
     pub fn new(gl: &Gl2) -> Result<Self, ClientError> {
         let prog = gl.create_program().ok_or(ClientError::WebGlError(
             "cannot create a webgl shader program".to_owned(),
@@ -30,15 +39,12 @@ impl Program {
         gl.link_program(&prog);
 
         const TRANSFORMATION: &str = "transformation";
+        const TEXTURE: &str = "g_texture";
 
         if gl.get_program_parameter(&prog, Gl2::LINK_STATUS).as_bool() == Some(true) {
             Ok(Self {
-                transformation: gl.get_uniform_location(&prog, TRANSFORMATION).ok_or(
-                    ClientError::WebGlError(format!(
-                        "cannot find uniform location \"{}\"",
-                        TRANSFORMATION
-                    )),
-                )?,
+                transformation: Self::get_uniform_location(&gl, &prog, TRANSFORMATION)?,
+                texture: Self::get_uniform_location(&gl, &prog, TEXTURE)?,
                 id: prog,
             })
         } else {
@@ -59,7 +65,15 @@ impl Program {
             Some(&self.transformation),
             true,
             &mat.as_ref().clone(),
-        );
+        )
+    }
+
+    pub fn upload_texture_id(&self, gl: &Gl2, id: i32) {
+        self.use_program(gl);
+        gl.uniform1i(
+            Some(&self.texture),
+            id
+        )
     }
 }
 
