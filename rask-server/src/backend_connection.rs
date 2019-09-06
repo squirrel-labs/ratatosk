@@ -1,12 +1,23 @@
 use crate::error::ServerError;
 use crate::group::GroupId;
 use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
 
 const API_ENDPOINT: &str = "https://games.kobert.dev/";
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TokenResponse {
+    #[serde(rename = "hasPassword")]
+    pub password: bool,  
+    #[serde(rename = "maxUsers")]
+    pub user_max: u32,  
+    #[serde(rename = "userCount")]
+    pub user_count: u32,  
+    #[serde(rename = "id")]
     pub group_id: GroupId,  //Id
+    #[serde(rename = "type")]
     pub group_type: String, //Type
+    #[serde(rename = "name")]
     pub user_name: String,  //Name
 }
 
@@ -18,22 +29,10 @@ pub fn request(location: &str) -> String {
 }
 
 pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
-    let res: HashMap<String, String> =
+    let res: Result<TokenResponse, reqwest::Error> =
         match reqwest::get(format!("{}api/lobby/tokens/{}", API_ENDPOINT, token).as_str()) {
-            Ok(mut res) => res.json()?,
+            Ok(mut res) => res.json(),
             Err(_) => return Err(ServerError::InvalidToken),
         };
-    let to_find = ["Id", "Type", "Name"];
-    if !to_find.iter().all(|x| res.contains_key(&x.to_string())) {
-        return Err(ServerError::InvalidTokenFormat);
-    }
-    if let Ok(id) = (*res.get("Id").unwrap()).parse() {
-        return Ok(TokenResponse {
-            group_id: id,
-            group_type: res.get("Type").unwrap().to_string(),
-            user_name: res.get("Name").unwrap().to_string(),
-        });
-    } else {
-        return Err(ServerError::InvalidTokenFormat);
-    }
+    res.map_err(|e| {warn!("{}", e); ServerError::InvalidTokenFormat})
 }

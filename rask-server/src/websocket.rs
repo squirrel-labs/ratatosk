@@ -28,7 +28,7 @@ impl Handler for Server {
             (res, Ok(token)) => {
                 info!("recived token: {}", token);
                 match crate::backend_connection::verify_token(token) {
-                    Ok(response) => {handle_token(response); Ok(res)},
+                    Ok(response) => {self.handle_token(response); Ok(res)},
                     Err(e) => Ok(fail_response(res, format!("{}", e).as_str())),
                 }
             },
@@ -68,6 +68,10 @@ impl Server {
             })
             .map_err(|e| ServerError::WebsocketCreation(e))
     }
+
+    fn handle_token(&mut self, response: TokenResponse) {
+        self.ws.send(format!("{:?})", response));
+    }
 }
 
 fn handshake(req: &Request) -> (Response, core::result::Result<i32, ServerError>) {
@@ -106,4 +110,3 @@ fn fail_response(mut res: Response, reason: &str) -> Response  {
     res
 }
 
-fn handle_token(response: TokenResponse) {}
