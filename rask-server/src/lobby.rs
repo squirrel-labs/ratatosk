@@ -10,14 +10,16 @@ impl<T> Connection<T> {
     pub fn new() -> (Self, Self) {
         let (tx1, rx1) = mpsc::channel();
         let (tx2, rx2) = mpsc::channel();
-        (Self {
-            sender: tx1,
-            receiver: rx2,
-        },
-        Self {
-            sender: tx2,
-            receiver: rx1,
-        })
+        (
+            Self {
+                sender: tx1,
+                receiver: rx2,
+            },
+            Self {
+                sender: tx2,
+                receiver: rx1,
+            },
+        )
     }
 
     pub fn send(&self, t: T) -> Result<(), mpsc::SendError<T>> {
