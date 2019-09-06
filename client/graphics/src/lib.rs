@@ -1,10 +1,13 @@
+#![feature(allocator_api)]
+
 use rask_wasm_shared::{
-    alloc::{Allocator, GraphicsAllocator},
-    get_allocator,
+    alloc::{SimpleAllocator, Allocator, settings::Graphics},
+    create_allocator,
+    wee_alloc
 };
 
 #[global_allocator]
-static ALLOCATOR: Allocator<GraphicsAllocator> = get_allocator!();
+static ALLOCATOR: Allocator<SimpleAllocator, Graphics> = create_allocator!();
 
 mod context;
 mod entries;

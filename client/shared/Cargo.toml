@@ -38,3 +38,7 @@ features = [
     "WebGlVertexArrayObject",
     "WebGlUniformLocation"
 ]
+
+[dependencies.wee_alloc]
+version = "=0.4.5"
+features = ["size_classes", "static_array_backend", "nightly"]

@@ -158,7 +158,7 @@ impl GraphicsApi for WebGl {
         self.prog.upload_fransformation(&self.gl, mat);
         self.bind_texture(tex);
         self.prog.upload_texture_id(&self.gl, 0);
-        self.gl.vertex_attrib2fv_with_f32_array(0, &[pos.x(), pos.y()]);
+        self.gl.vertex_attrib2fv_with_f32_array(1, &[pos.x(), pos.y()]);
         self.gl.draw_arrays(Gl2::TRIANGLES, 0, 6);
         Ok(())
     }

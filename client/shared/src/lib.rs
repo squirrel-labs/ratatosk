@@ -1,4 +1,5 @@
 #![feature(custom_attribute)]
+#![feature(allocator_api)]
 
 pub mod alloc;
 pub mod double_buffer;
@@ -11,3 +12,5 @@ pub mod texture;
 
 pub use error::*;
 pub use mem::*;
+
+pub use wee_alloc;

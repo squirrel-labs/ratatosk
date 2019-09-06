@@ -5,6 +5,7 @@ use rask_wasm_shared::sprite::*;
 use rask_wasm_shared::state::State;
 
 const IMAGE1_DATA: &[u8] = include_bytes!("../../res/kuh.png");
+const IMAGE2_DATA: &[u8] = include_bytes!("../../res/mensch.png");
 //const IMAGE1_DATA: &[u8] = include_bytes!("../../res/empty.png");
 
 pub struct GameContext {
@@ -35,16 +36,16 @@ impl GameContext {
                 &Sprite::new(math::Vec2::new(0.0, 0.0), 2, 0, 0)
             );
             self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, 0.0), 0, 0, 0)
+                &Sprite::new(math::Vec2::new(0.0, 0.0), 0, 0, 1)
             );
             self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, 0.0), 1, 0, 0)
+                &Sprite::new(math::Vec2::new(0.0, 0.0), 1, 0, 1)
             );
             self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, -0.1), 0, 0, 0)
+                &Sprite::new(math::Vec2::new(0.0, -0.1), 0, 0, 1)
             );
             self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(-0.1, 0.1), 1, 0, 0)
+                &Sprite::new(math::Vec2::new(-0.1, 0.1), 1, 0, 1)
             );
 
             let shared_heap = rask_wasm_shared::mem::shared_heap();
@@ -81,7 +82,10 @@ impl GameContext {
                 ]),
             ];
 
-            *shared_heap.textures_mut() = Some(vec![rask_wasm_shared::texture::Texture::from_png_stream(IMAGE1_DATA)?]);
+            *shared_heap.textures_mut() = Some(vec![
+               rask_wasm_shared::texture::Texture::from_png_stream(IMAGE1_DATA)?,
+               rask_wasm_shared::texture::Texture::from_png_stream(IMAGE2_DATA)?,
+            ]);
             shared_heap.set_texture_notify();
         }
 
