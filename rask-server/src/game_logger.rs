@@ -1,13 +1,14 @@
 use colored::*;
+use log::{Level, LevelFilter};
 
-fn color_level(level: log::Level) -> colored::ColoredString {
+fn color_level(level: Level) -> colored::ColoredString {
     let text = format!("{: <8}", level);
     match level {
-        log::Level::Error => text.red().bold(),
-        log::Level::Warn => text.yellow(),
-        log::Level::Info => text.green(),
-        log::Level::Debug => text.cyan(),
-        log::Level::Trace => text.magenta(),
+        Level::Error => text.red().bold(),
+        Level::Warn => text.yellow(),
+        Level::Info => text.green(),
+        Level::Debug => text.cyan(),
+        Level::Trace => text.magenta(),
     }
 }
 
@@ -21,10 +22,10 @@ pub fn init_logger() {
                 message
             ))
         })
-        .level(log::LevelFilter::Debug)
-        .level_for("hyper", log::LevelFilter::Off)
-        .level_for("tokio_reactor", log::LevelFilter::Off)
-        .level_for("reqwest", log::LevelFilter::Off)
+        .level(LevelFilter::Debug)
+        .level_for("hyper", LevelFilter::Off)
+        .level_for("tokio_reactor", LevelFilter::Off)
+        .level_for("reqwest", LevelFilter::Off)
         .chain(std::io::stdout())
         .apply()
         .unwrap();

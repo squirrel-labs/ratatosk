@@ -1,74 +1,70 @@
-use std::collections::HashMap;
+use std::sync::mpsc;
+use std::time::Duration;
 
-use crate::group::{Group, GroupId};
-use crate::scribble_group::ScribbleGroup;
+pub struct Connection<T> {
+    sender: mpsc::Sender<T>,
+    receiver: mpsc::Receiver<T>,
+}
 
-use crate::server::{GameClient, GameServerError, UserId};
+impl<T> Connection<T> {
+    pub fn new() -> (Self, Self) {
+        let (tx1, rx1) = mpsc::channel();
+        let (tx2, rx2) = mpsc::channel();
+        (Self {
+            sender: tx1,
+            receiver: rx2,
+        },
+        Self {
+            sender: tx2,
+            receiver: rx1,
+        })
+    }
+
+    pub fn send(&self, t: T) -> Result<(), mpsc::SendError<T>> {
+        self.sender.send(t)
+    }
+
+    pub fn try_recv(&self) -> Result<T, mpsc::TryRecvError> {
+        self.receiver.try_recv()
+    }
+
+    pub fn recv(&self) -> Result<T, mpsc::RecvError> {
+        self.receiver.recv()
+    }
+
+    pub fn recv_timeout(&self, timeout: Duration) -> Result<T, mpsc::RecvTimeoutError> {
+        self.receiver.recv_timeout(timeout)
+    }
+
+    pub fn iter(&self) -> mpsc::Iter<T> {
+        self.receiver.iter()
+    }
+
+    pub fn try_iter(&self) -> mpsc::TryIter<T> {
+        self.receiver.try_iter()
+    }
+}
 
 pub struct Lobby {
-    groups: HashMap<GroupId, Box<Group>>,
+    connection: Connection<String>,
 }
 
-#[allow(dead_code)]
-impl Lobby {
+pub struct Listener {
+    connections: Vec<Connection<String>>,
+}
+
+impl Listener {
+    /// Creates a new Listener with no lobbys.
     pub fn new() -> Self {
         Self {
-            groups: HashMap::new(),
+            connections: Vec::new(),
         }
     }
 
-    fn generate_group(group_type: &str, id: GroupId, name: &str) -> Option<Box<Group>> {
-        match group_type {
-            "scribble" => Some(Box::new(ScribbleGroup::new(id, name.to_string()))),
-            _ => None,
-        }
-    }
-
-    pub fn add_group(&mut self, group: Box<Group>) {
-        self.groups.insert(group.id(), group);
-    }
-
-    pub fn add_client(
-        &mut self,
-        group_type: &str,
-        group_id: GroupId,
-        group_name: &str,
-        user_id: UserId,
-        client: GameClient,
-    ) -> Result<(), GameServerError> {
-        if !self.groups.contains_key(&group_id) {
-            let mut group = match Self::generate_group(group_type, group_id, group_name) {
-                Some(x) => x,
-                _ => {
-                    return Err(GameServerError::GroupCreationError(format!(
-                        "failed to generate '{}' group",
-                        group_type
-                    )))
-                }
-            };
-            group.run();
-            self.groups.insert(group_id, group);
-        }
-        let group = self.groups.get_mut(&group_id).unwrap();
-        group.add_client(user_id, client)
-    }
-
-    pub fn iter<'b>(&'b self) -> GroupIterator<'b> {
-        GroupIterator {
-            groups: self.groups.values(),
-        }
-    }
-}
-
-#[allow(dead_code)]
-pub struct GroupIterator<'a> {
-    groups: std::collections::hash_map::Values<'a, GroupId, Box<Group>>,
-}
-
-impl<'a> Iterator for GroupIterator<'a> {
-    type Item = &'a Box<Group>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.groups.next()
+    /// Creates a new Lobby that is listened to by the Listener.
+    pub fn new_lobby(&mut self) -> Lobby {
+        let (c1, c2) = Connection::new();
+        self.connections.push(c1);
+        Lobby { connection: c2 }
     }
 }
