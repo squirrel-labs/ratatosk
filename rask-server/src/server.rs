@@ -1,10 +1,10 @@
+use crate::backend_connection::*;
+use crate::group::*;
+use std::collections::HashMap;
+use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
-use std::sync::mpsc;
-use std::collections::HashMap;
-use crate::backend_connection::*;
-use crate::group::*;
 
 use ws::{listen, CloseCode, Handler, Handshake, Message, Request, Response, Result, Sender};
 
@@ -12,13 +12,13 @@ use crate::error::ServerError;
 
 const PROTOCOL: &str = "tuesday";
 // WebSocket connection handler for the server connection
-pub struct Server<'a> {
+pub struct Server {
     ws: Sender,
-    group: mpsc::Sender<&'a [u8]>,
-    groups: Arc<Mutex<HashMap<u32, Group<'a>>>>,
+    group: mpsc::Sender<Box<[u8]>>,
+    groups: Arc<Mutex<HashMap<u32, Group>>>,
 }
 
-impl Handler for Server<'_> {
+impl Handler for Server {
     // called when the socket connection is created
     fn on_open(&mut self, _: Handshake) -> Result<()> {
         // keep track of the number of Clients -> could be a vec of lobbys as well
@@ -33,10 +33,13 @@ impl Handler for Server<'_> {
             (res, Ok(token)) => {
                 info!("recived token: {}", token);
                 match crate::backend_connection::verify_token(token) {
-                    Ok(response) => {self.handle_token(response); Ok(res)},
+                    Ok(response) => {
+                        self.handle_token(response);
+                        Ok(res)
+                    }
                     Err(e) => Ok(fail_response(res, format!("{}", e).as_str())),
                 }
-            },
+            }
             (res, Err(err)) => {
                 warn!("Client {:?}: {:?}", req.client_addr(), err);
                 Ok(res)
@@ -58,9 +61,9 @@ impl Handler for Server<'_> {
     }
 }
 
-impl Server<'_> {
-    pub fn run<'a>(address: &str, port: &str) -> core::result::Result<JoinHandle<()>, ServerError> {
-        let count = Arc::new(Mutex::new(HashMap<u32, Group<'a>>));
+impl Server {
+    pub fn run(address: &str, port: &str) -> core::result::Result<JoinHandle<()>, ServerError> {
+        let count = Arc::new(Mutex::new(HashMap::new()));
         let (sender, _) = mpsc::channel();
         let url = format!("{}:{}", address, port);
         thread::Builder::new()
@@ -68,8 +71,8 @@ impl Server<'_> {
             .spawn(move || {
                 listen(url, |out| Server {
                     ws: out,
-                    group: sender,
-                    groups: count,
+                    group: sender.clone(),
+                    groups: count.clone(),
                 })
                 .unwrap()
             })
@@ -86,34 +89,51 @@ fn handshake(req: &Request) -> (Response, core::result::Result<i32, ServerError>
     // TODO fix 2 unwraps
     // Reject Clients that do not support the
     if let Ok(protocols) = req.protocols() {
-        if protocols.iter().find(|&&pro| pro.contains(PROTOCOL)).is_some(){
+        if protocols
+            .iter()
+            .find(|&&pro| pro.contains(PROTOCOL))
+            .is_some()
+        {
             res.set_protocol(PROTOCOL)
         } else {
-            return (fail_response(res, format!("does not support the {} protocol", PROTOCOL).as_str()),
-            Err(ServerError::InvalidProtocol));
+            return (
+                fail_response(
+                    res,
+                    format!("does not support the {} protocol", PROTOCOL).as_str(),
+                ),
+                Err(ServerError::InvalidProtocol),
+            );
         }
         let token = protocols.iter().find(|&&pro| pro.starts_with("Token-"));
         match token {
             Some(token) => {
                 let (_, token) = token.split_at(6);
                 if let Ok(token) = token.parse::<i32>() {
-                    return (res, Ok(token)) 
+                    return (res, Ok(token));
                 } else {
-                    return (fail_response(res, "token is no valid i32"), Err(ServerError::InvalidTokenFormat));
+                    return (
+                        fail_response(res, "token is no valid i32"),
+                        Err(ServerError::InvalidTokenFormat),
+                    );
                 }
             }
             None => {
-                return (fail_response(res, "no token in protocols"), Err(ServerError::InvalidToken)); 
+                return (
+                    fail_response(res, "no token in protocols"),
+                    Err(ServerError::InvalidToken),
+                );
             }
         }
     } else {
-        return (fail_response(res, "failed to retrive protocols"), Err(ServerError::InvalidProtocol));
+        return (
+            fail_response(res, "failed to retrive protocols"),
+            Err(ServerError::InvalidProtocol),
+        );
     }
 }
 
-fn fail_response(mut res: Response, reason: &str) -> Response  {
+fn fail_response(mut res: Response, reason: &str) -> Response {
     res.set_status(400);
     warn!("{}", reason);
     res
 }
-

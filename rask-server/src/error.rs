@@ -1,4 +1,4 @@
-use reqwest::{Error as ReqError};
+use reqwest::Error as ReqError;
 
 #[derive(Debug)]
 pub enum ServerError {
@@ -26,7 +26,6 @@ impl std::fmt::Display for ServerError {
         }
     }
 }
-
 
 impl From<ReqError> for ServerError {
     fn from(e: ReqError) -> Self {

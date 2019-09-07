@@ -1,23 +1,24 @@
 use crate::error::ServerError;
 use crate::group::GroupId;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 const API_ENDPOINT: &str = "https://games.kobert.dev/";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenResponse {
     #[serde(rename = "hasPassword")]
-    pub password: bool,  
+    pub password: bool,
     #[serde(rename = "maxUsers")]
-    pub user_max: u32,  
+    pub user_max: u32,
     #[serde(rename = "userCount")]
-    pub user_count: u32,  
+    pub user_count: u32,
     #[serde(rename = "id")]
-    pub group_id: GroupId,  //Id
+    pub group_id: GroupId, // Id
     #[serde(rename = "type")]
-    pub group_type: String, //Type
+    pub group_type: String, // Type
     #[serde(rename = "name")]
-    pub group_name: String,  //Name
+    pub group_name: String, //Name
 }
 
 pub fn request(location: &str) -> String {
@@ -33,5 +34,8 @@ pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
             Ok(mut res) => res.json(),
             Err(_) => return Err(ServerError::InvalidToken),
         };
-    res.map_err(|e| {warn!("{}", e); ServerError::InvalidTokenFormat})
+    res.map_err(|e| {
+        warn!("{}", e);
+        ServerError::InvalidTokenFormat
+    })
 }

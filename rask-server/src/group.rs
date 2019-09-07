@@ -1,41 +1,53 @@
-use ws::Sender;
-use std::convert::TryInto;
-use std::sync::mpsc;
 use crate::backend_connection::TokenResponse;
 use crate::error::ServerError;
+use std::convert::TryInto;
+use std::sync::mpsc;
+use ws::Sender;
 
 pub type GroupId = u32;
 
 pub trait Game {
-    fn run(group: &Group);
+    fn run(&self, group: &Group);
 }
 
-pub struct Group<'a> {
+pub struct RaskGame; // {}
+
+impl Game for RaskGame {
+    fn run(&self, group: &Group) {}
+}
+
+pub struct Group {
     pub clients: Vec<Sender>,
-    pub receiver: mpsc::Receiver<&'a [u8]>,
-    sender: mpsc::Sender<&'a [u8]>,
+    pub receiver: mpsc::Receiver<Box<[u8]>>,
+    sender: mpsc::Sender<Box<[u8]>>,
     id: GroupId,
     group_type: String,
     name: String,
     capacity: u32,
 }
 
-impl Group<'_> {
+impl Group {
     pub fn id(&self) -> GroupId {
         self.id
     }
 
     pub fn group_type(&self) -> String {
-        self.group_type   
+        self.group_type.clone()
     }
 
     pub fn name(&self) -> String {
-        self.name   
+        self.name.clone()
     }
 
-    pub fn add_client(&mut self, client: Sender) -> Result<mpsc::Sender<&[u8]>, crate::error::ServerError> {
+    pub fn add_client(
+        &mut self,
+        client: Sender,
+    ) -> Result<mpsc::Sender<Box<[u8]>>, crate::error::ServerError> {
         if self.clients.len() >= self.capacity.try_into().unwrap() {
-            return Err(ServerError::Group(format!("User limit for {} exceeded", self.id)));
+            return Err(ServerError::Group(format!(
+                "User limit for {} exceeded",
+                self.id
+            )));
         }
         self.clients.push(client);
         Ok(self.sender.clone())
@@ -47,10 +59,10 @@ impl Group<'_> {
         }
     }
 
-    pub fn new<U: Game>(response: TokenResponse, game: U) -> Self {
+    pub fn new(response: TokenResponse) -> Self {
         let (sender, receiver) = mpsc::channel();
         let group = Self {
-            clients:  Vec::new(),
+            clients: Vec::new(),
             sender,
             receiver,
             id: response.group_id,
@@ -58,9 +70,8 @@ impl Group<'_> {
             name: response.group_name,
             capacity: response.user_max,
         };
-        U::run(&group);
+        let U = RaskGame;
+        U.run(&group);
         group
     }
 }
-
-
