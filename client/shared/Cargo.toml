@@ -1,12 +1,12 @@
 [package]
-name = "webhogg-wasm-shared"
+name = "rask-wasm-shared"
 version = "0.1.0"
 authors = [
     "natrixaeria",
     "TrueDoctor <dennis@kobert.dev>"
 ]
 edition = "2018"
-description = "shared crate for WebAssembly frontend of the webhogg project"
+description = "shared crate for WebAssembly frontend of the rask project"
 
 [lib]
 crate-type = ["rlib"]
@@ -17,17 +17,28 @@ log = "0.4"
 js-sys = "=0.3.25"
 fern = "0.5.8"
 rand = "0.3.14"
+image = "0.22"
+
+[dependencies.rask-engine]
+version = "0.1.0"
+path = "../../rask-engine"
 
 [dependencies.web-sys]
 version = "=0.3.25"
 features = [
     "console",
+    "ImageData",
     "Window",
     "OffscreenCanvas",
     "WebGl2RenderingContext",
     "WebGlShader",
     "WebGlProgram",
     "WebGlBuffer",
+    "WebGlTexture",
     "WebGlVertexArrayObject",
     "WebGlUniformLocation"
 ]
+
+[dependencies.wee_alloc]
+version = "=0.4.5"
+features = ["size_classes", "static_array_backend", "nightly"]

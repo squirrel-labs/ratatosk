@@ -6,7 +6,7 @@ dependencies = [ "logic", "graphics" ]
 
 [tasks.logic]
 workspace = false
-env = { STACK_SIZE = "4194304" }
+env = { STACK_SIZE = "134217728" }
 script = [
   "cargo make crate-build wasm-logic",
   "cargo make wasm logic",
@@ -15,7 +15,7 @@ script = [
 
 [tasks.graphics]
 workspace = false
-env = { STACK_SIZE = "5242880" }
+env = { STACK_SIZE = "4194304" }
 script = [
   "cargo make crate-build wasm-graphics",
   "cargo make wasm graphics",
@@ -30,14 +30,13 @@ env = { "RUSTFLAGS" = { script = [
 '''
 #!/usr/bin/env bash
 baseFlags="-Clink-arg=--stack-first -Clink-arg=--no-entry -Clink-arg=--allow-undefined -Clink-arg=--strip-all -Clink-arg=--export-dynamic -Clink-arg=--import-memory -Clink-arg=--shared-memory -Clink-arg=--max-memory=1073741824 -Clink-arg=--threads -Clink-arg=-zstack-size=${STACK_SIZE}"
-
 if [[ "$(rustup show | grep rustc | awk '{ print $2 }')" =~ "1.38.0" ]]; then
   baseFlags="$baseFlags -Clink-args=--no-check-features"
 fi
 echo $baseFlags
 '''
 ]}}
-args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "webhogg-${@}", "--target", "wasm32-unknown-unknown" ]
+args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask-${@}", "--target", "wasm32-unknown-unknown" ]
 
 [tasks.wasm]
 workspace = false
@@ -49,18 +48,18 @@ if [ $? -ne 0 ]; then
   echo "Not in a git repo!"
   exit 1
 fi
-file=$top/target/wasm32-unknown-unknown/${BUILD_ENV}/webhogg_wasm_${@}.wasm
+file=$top/target/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm_${@}.wasm
 wasm-bindgen $file --out-dir $top/client/gen \
   --no-typescript \
   --target no-modules \
   --remove-producers-section \
   --remove-name-section \
   --no-demangle
-wasm-opt $top/client/gen/webhogg_wasm_${@}_bg.wasm \
+wasm-opt $top/client/gen/rask_wasm_${@}_bg.wasm \
   --memory-packing --remove-unused-brs --enable-mutable-globals --enable-threads -Oz \
   -o $top/client/gen/${@}.wasm
-rm $top/client/gen/webhogg_wasm_${@}_bg.wasm
-mv $top/client/gen/webhogg_wasm_${@}.js $top/client/gen/${@}.js
+rm $top/client/gen/rask_wasm_${@}_bg.wasm
+mv $top/client/gen/rask_wasm_${@}.js $top/client/gen/${@}.js
 '''
 ]
 

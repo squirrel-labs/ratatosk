@@ -1,6 +1,7 @@
 use crate::graphics::WebGl;
 use crate::render::Render;
-use webhogg_wasm_shared::error::ClientError;
+use rask_wasm_shared::error::ClientError;
+use rask_wasm_shared::sprite::{Animation, Frame};
 
 pub struct Context {
     render: Render<WebGl>,
@@ -8,11 +9,13 @@ pub struct Context {
 
 impl Context {
     pub fn new(canvas: web_sys::OffscreenCanvas) -> Result<Self, ClientError> {
-        Render::new(canvas).map(|render| Self { render })
+        Render::new(canvas).map(|render| Self {
+            render,
+        })
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
-        self.render.render()
+        self.render.render(rask_wasm_shared::mem::shared_heap().animations())
     }
 }
 

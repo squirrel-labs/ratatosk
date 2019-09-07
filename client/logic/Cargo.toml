@@ -1,12 +1,12 @@
 [package]
-name = "webhogg-wasm-logic"
+name = "rask-wasm-logic"
 version = "0.1.0"
 authors = [
     "natrixaeria",
     "TrueDoctor <dennis@kobert.dev>",
 ]
 edition = "2018"
-description = "logic worker for WebAssembly frontend of the webhogg project"
+description = "logic worker for WebAssembly frontend of the rask project"
 
 [lib]
 crate-type = ["cdylib"]
@@ -18,7 +18,7 @@ js-sys = "=0.3.25"
 fern = "0.5.8"
 rand = "0.3.14"
 
-[dependencies.webhogg-wasm-shared]
+[dependencies.rask-wasm-shared]
 version = "0.1.0"
 path = "../shared"
 
