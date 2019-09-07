@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use rask_game_engine::math::Vec2;
+use rask_engine::math::Vec2;
 
 pub struct Character<'a> {
     root: Bone,
