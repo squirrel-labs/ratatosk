@@ -13,7 +13,7 @@ use log::{debug, error};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{ErrorEvent, FileReaderSync, MessageEvent, WebSocket};
-use webhogg_wasm_shared::ClientError;
+use rask_wasm_shared::ClientError;
 
 pub struct WebSocketAdapter {
     ws: WebSocket,
@@ -27,13 +27,13 @@ impl WebSocketAdapter {
     /// ```
     ///
     /// # Errors
-    /// Returns a WebSocketError if the creation failed
+    /// Returns a JsValueError if the creation failed
     ///
     pub fn new(url: &str) -> Result<WebSocketAdapter, ClientError> {
         debug!("Websocket enry");
 
         // connect to the server
-        let ws = WebSocket::new(url)?;
+        let ws = WebSocket::new(url).map_err(ClientError::WebSocketError)?;
         //let ws = WebSocket::new_with_str(url, "tuesday")?;
 
         // register the message callback

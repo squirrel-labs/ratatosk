@@ -1,9 +1,57 @@
-pub const ALLOCATOR_AREA_START: usize = 0x00000400;
-pub const SHARED_ALLOCATION_AREA_START: usize = 0x00100000;
-pub const LOGIC_ALLOCATION_AREA_START: usize = 0x00200000;
-pub const GRAPHICS_ALLOCATION_AREA_START: usize = 0x00300000;
+use crate::state::State;
+type Buffer = crate::double_buffer::DoubleBuffer<State>;
 
-/// Get the address at the heap with a given offset in bytes
-pub fn shared_heap_addr<T>(off: usize) -> *mut T {
-    (SHARED_ALLOCATION_AREA_START + off) as *mut T
+use crate::{sprite::*,
+            texture::*};
+
+pub const GRAPHIC_STACK_SIZE: usize = 0x0010_0000;
+pub const ALLOCATOR_AREA_START: usize = GRAPHIC_STACK_SIZE;
+pub const SHARED_BUFFER_AREA_START: usize = ALLOCATOR_AREA_START + 0x0010_0000;
+pub const LOGIC_ALLOCATION_AREA_START: usize = SHARED_BUFFER_AREA_START + std::mem::size_of::<Buffer>();
+pub const GRAPHICS_ALLOCATION_AREA_START: usize = LOGIC_ALLOCATION_AREA_START + 0x0010_0000;
+pub const SHARED_ALLOCATION_AREA_START: usize = GRAPHICS_ALLOCATION_AREA_START + 0x0010_0000;
+
+pub fn get_double_buffer() -> &'static mut Buffer {
+    unsafe { &mut *(SHARED_BUFFER_AREA_START as *mut Buffer) }
+}
+
+pub struct SharedHeap {
+    last_addr: u32,
+    animations: Vec<Animation>,
+    texture_notify: bool,
+    textures: Option<Vec<Texture>>,
+}
+
+impl SharedHeap {
+    pub fn animations_mut(&mut self) -> &mut Vec<Animation> {
+        &mut self.animations
+    }
+
+    pub fn animations(&self) -> &Vec<Animation> {
+        &self.animations
+    }
+
+    pub fn unset_texture_notify(&mut self) {
+        self.texture_notify = false
+    }
+
+    pub fn set_texture_notify(&mut self) {
+        self.texture_notify = true
+    }
+
+    pub fn get_texture_notify(&mut self) -> bool {
+        self.texture_notify
+    }
+
+    pub fn textures_mut(&mut self) -> &mut Option<Vec<Texture>> {
+        &mut self.textures
+    }
+
+    pub fn textures(&self) -> &Option<Vec<Texture>> {
+        &self.textures
+    }
+}
+
+pub fn shared_heap() -> &'static mut SharedHeap {
+    unsafe { &mut *(SHARED_ALLOCATION_AREA_START as *mut SharedHeap) }
 }

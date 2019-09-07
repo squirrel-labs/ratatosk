@@ -3,7 +3,7 @@
 
 #![feature(async_await)]
 
-use webhogg_wasm_shared::{
+use rask_wasm_shared::{
     alloc::{Allocator, LogicAllocator},
     get_allocator,
 };
@@ -12,4 +12,5 @@ use webhogg_wasm_shared::{
 static ALLOCATOR: Allocator<LogicAllocator> = get_allocator!();
 
 pub mod entries;
+pub mod game_context;
 pub mod websocket;

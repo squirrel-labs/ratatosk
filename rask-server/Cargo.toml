@@ -1,0 +1,17 @@
+[package]
+name = "rask-server"
+version = "0.1.0"
+authors = ["natrixaeria", "truedoctor"]
+edition = "2018"
+description = "A general game server for connections to web clients. Currently (on the way to) deploying a skribbl.io like game."
+
+[dependencies]
+clap = {version = "2.33", features = ["yaml"]}
+log = "0.4"
+fern = "0.5.8"
+colored = "1.8"
+reqwest = "0.9"
+
+[dependencies.ws]
+version = "*"
+features = ["ssl"]
