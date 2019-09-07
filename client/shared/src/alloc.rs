@@ -165,16 +165,24 @@ impl MutableAlloc for SimpleAllocator {
     unsafe fn dealloc(&mut self, ptr: *mut u8, layout: Layout) {}
 }
 
-pub struct Allocator<M, S: AllocSettings>(pub std::marker::PhantomData<M>, pub std::marker::PhantomData<S>);
+pub trait Initial<T> {
+    fn init() -> T {
+        unsafe {std::mem::zeroed()}
+    }
+}
 
-impl<M: Sized + 'static, S: AllocSettings> Allocator<M, S> {
+pub struct NaiveInitial;
+impl<T> Initial<T> for NaiveInitial {}
 
+pub struct Allocator<M, S: AllocSettings, I: Initial<M>>(pub std::marker::PhantomData<M>, pub std::marker::PhantomData<S>, pub std::marker::PhantomData<I>);
+
+impl<M: Sized + 'static, S: AllocSettings, I: Initial<M>> Allocator<M, S, I> {
     fn allocator() -> &'static mut M {
         unsafe { &mut *(S::allocator_addr::<M>() as *mut M) }
     }
 
     pub fn reset(&self) {
-        *Self::allocator() = unsafe {std::mem::zeroed()}
+        *Self::allocator() = I::init();
     }
 }
 
@@ -182,16 +190,17 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace=console, js_name=log)]
-    fn lognum(n: usize);
+    fn lognum(l: usize, n: usize);
 }
 
-fn logptr(ptr: *mut u8) -> *mut u8 {
-    lognum(ptr as usize); ptr
+fn logptr(num: usize, ptr: *mut u8) -> *mut u8 {
+    //lognum(num, ptr as usize);
+    ptr
 }
 
-unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings> GlobalAlloc for Allocator<M, S> {
+unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> GlobalAlloc for Allocator<M, S, I> {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        logptr(Self::allocator().alloc(layout).offset(S::allocation_start_address::<M>()))
+        logptr(layout.size(), Self::allocator().alloc(layout).offset(S::allocation_start_address::<M>()))
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
@@ -211,7 +220,14 @@ impl<A: GlobalAlloc> MutableAlloc for A {
 
 #[macro_export]
 macro_rules! create_allocator {
-    () => {
-        Allocator(std::marker::PhantomData, std::marker::PhantomData)
+    ($name:ident,$method:ty,$setting:ty,$v:expr) => {
+        struct __Initial;
+        impl Initial<$method> for __Initial { fn init() -> $method { $v } }
+        #[global_allocator]
+        static $name: Allocator<$method, $setting, __Initial> = Allocator(std::marker::PhantomData, std::marker::PhantomData, std::marker::PhantomData);
     };
+    ($name:ident,$method:ty,$setting:ty) => {
+        #[global_allocator]
+        static $name: Allocator<$method, $setting, NaiveInitial> = Allocator(std::marker::PhantomData, std::marker::PhantomData, std::marker::PhantomData);
+    }
 }

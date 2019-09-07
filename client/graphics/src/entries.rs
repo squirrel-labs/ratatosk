@@ -16,13 +16,13 @@ pub fn initialise(canvas: web_sys::OffscreenCanvas) {
     log::set_boxed_logger(Box::new(WasmLog::new()))
         .map(|()| log::set_max_level(log::LevelFilter::Debug))
         .unwrap();
+    info!("graphics entry reached");
 
     context::set_context(
         context::Context::new(canvas)
             .map_err(|e| log::error!("{}", e))
             .unwrap(),
     );
-    info!("graphics entry reached");
 }
 
 #[wasm_bindgen]

@@ -6,7 +6,7 @@ dependencies = [ "logic", "graphics" ]
 
 [tasks.logic]
 workspace = false
-env = { STACK_SIZE = "1048576" }
+env = { STACK_SIZE = "134217728" }
 script = [
   "cargo make crate-build wasm-logic",
   "cargo make wasm logic",
@@ -15,7 +15,7 @@ script = [
 
 [tasks.graphics]
 workspace = false
-env = { STACK_SIZE = "8912896" }
+env = { STACK_SIZE = "4194304" }
 script = [
   "cargo make crate-build wasm-graphics",
   "cargo make wasm graphics",

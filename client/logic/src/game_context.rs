@@ -36,38 +36,36 @@ impl GameContext {
                 &Sprite::new(math::Vec2::new(0.0, 0.0), 2, 0, 0)
             );
             self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, 0.0), 0, 0, 1)
+                &Sprite::new(math::Vec2::new(0.3, 0.3), 0, 0, 1)
             );
             self.state.append_sprite(
                 &Sprite::new(math::Vec2::new(0.0, 0.0), 1, 0, 1)
             );
             self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, -0.1), 0, 0, 1)
+                &Sprite::new(math::Vec2::new(0.0, -0.6), 0, 0, 1)
             );
             self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(-0.1, 0.1), 1, 0, 1)
+                &Sprite::new(math::Vec2::new(-0.6, 0.6), 1, 0, 1)
             );
 
             let shared_heap = rask_wasm_shared::mem::shared_heap();
             *shared_heap.animations_mut() = vec![
                 Animation::new(vec![
                     Frame::new(vec![
-                        rask_engine::math::Mat3::translation(0.5, 0.0) *
-                        rask_engine::math::Mat3::scaling(0.2, 0.2)
+                        rask_engine::math::Mat3::scaling(0.4, 0.4)
                     ]),
                     Frame::new(vec![
+                        rask_engine::math::Mat3::scaling(0.4, 0.4) *
                         rask_engine::math::Mat3::translation(0.5, 0.0) *
-                        rask_engine::math::Mat3::scaling(0.1, 0.3)
+                        rask_engine::math::Mat3::rotation(6.0)
                     ]),
                 ]),
                 Animation::new(vec![
                     Frame::new(vec![
-                        rask_engine::math::Mat3::translation(-0.5, 0.0) *
-                        rask_engine::math::Mat3::scaling(0.2, 0.2)
+                        rask_engine::math::Mat3::scaling(0.4, 0.4)
                     ]),
                     Frame::new(vec![
-                        rask_engine::math::Mat3::translation(-0.5, 0.0) *
-                        rask_engine::math::Mat3::scaling(0.3, 0.1)
+                        rask_engine::math::Mat3::scaling(0.6, 0.2)
                     ]),
                 ]),
                 Animation::new(vec![

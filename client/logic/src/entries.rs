@@ -18,6 +18,7 @@ pub fn initialise() {
     log::set_boxed_logger(Box::new(WasmLog::new()))
         .map(|()| log::set_max_level(log::LevelFilter::Debug))
         .unwrap();
+    info!("logic entry reached");
     {
         let mut writer = get_double_buffer().borrow_writer();
         writer.set(State::default());
@@ -27,7 +28,6 @@ pub fn initialise() {
             .map_err(|e| log::error!("{}", e))
             .unwrap(),
     );
-    info!("logic entry reached");
 }
 
 /// This function represents a logic tick. State changes caused by network or key events get
