@@ -1,5 +1,6 @@
 use crate::backend_connection::*;
 use crate::group::*;
+use crate::group::{GroupId, Message as GroupMessage};
 use std::collections::HashMap;
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
@@ -14,15 +15,18 @@ const PROTOCOL: &str = "tuesday";
 // WebSocket connection handler for the server connection
 pub struct Server {
     ws: Sender,
-    group: mpsc::Sender<Box<[u8]>>,
+    group: mpsc::Sender<GroupMessage>,
     groups: Arc<Mutex<HashMap<u32, Group>>>,
+    ip: String,
+    id: GroupId,
 }
 
 impl Handler for Server {
     // called when the socket connection is created
-    fn on_open(&mut self, _: Handshake) -> Result<()> {
-        // keep track of the number of Clients -> could be a vec of lobbys as well
-        //Ok((*self.groups.lock().unwrap()) += 1)
+    fn on_open(&mut self, handshake: Handshake) -> Result<()> {
+        if let Ok(Some(ip)) = handshake.remote_addr() {
+            self.ip = ip;
+        }
         Ok(())
     }
 
@@ -30,34 +34,39 @@ impl Handler for Server {
     fn on_request(&mut self, req: &Request) -> Result<Response> {
         let res = handshake(req);
         match res {
-            (res, Ok(token)) => {
+            (mut res, Ok(token)) => {
                 info!("recived token: {}", token);
                 match crate::backend_connection::verify_token(token) {
                     Ok(response) => {
-                        self.handle_token(response);
+                        if let Err(e) = self.handle_token(response) {
+                            res = fail_response(res, format!("{}", e).as_str());
+                        }
                         Ok(res)
                     }
                     Err(e) => Ok(fail_response(res, format!("{}", e).as_str())),
                 }
             }
-            (res, Err(err)) => {
-                warn!("Client {:?}: {:?}", req.client_addr(), err);
-                Ok(res)
-            }
+            (res, Err(err)) => Ok(fail_response(
+                res,
+                format!("Client {:?}: {:?}", req.client_addr(), err).as_str(),
+            )),
         }
     }
 
     fn on_message(&mut self, msg: Message) -> Result<()> {
         info!("Server got message '{}'. ", msg);
 
-        // echo it back
-        self.ws.send(format!("{} +1", msg))
+        self.group
+            .send((self.ip.clone(), Content::data(Box::new(msg.into_data()))));
+        Ok(())
     }
 
     fn on_close(&mut self, _: CloseCode, _: &str) {
-        //self.ws.shutdown().unwrap()
-        //The connection is going down, so we need to decrement the count
-        //(*self.count.lock().unwrap()) -= 1
+        if let Ok(mut guard) = self.groups.lock() {
+            if let Some(mut group) = guard.get_mut(&self.id) {
+                group.remove_client(&self.ws);
+            }
+        }
     }
 }
 
@@ -73,21 +82,50 @@ impl Server {
                     ws: out,
                     group: sender.clone(),
                     groups: count.clone(),
+                    ip: "No ip".to_owned(),
+                    id: 0,
                 })
                 .unwrap()
             })
             .map_err(|e| ServerError::WebsocketCreation(e))
     }
 
-    fn handle_token(&mut self, response: TokenResponse) {
+    fn handle_token(&mut self, response: TokenResponse) -> core::result::Result<(), ServerError> {
         self.ws.send(format!("{:?})", response));
+        match self.groups.lock() {
+            Ok(mut guard) => {
+                self.id = response.group_id;
+                let group_type = response.group_type.clone();
+                if !guard.contains_key(&response.group_id) {
+                    if let Ok(group) = Group::new(response) {
+                        guard.insert(group.id(), group);
+                    } else {
+                        let err = format!(
+                            "The client requestet a game that is not implemented: {}",
+                            group_type
+                        );
+                        return Err(ServerError::GroupCreation(err));
+                        //self.ws.close_with_reason(CloseCode::Unsupported, err);
+                    };
+                }
+
+                let group = guard.get_mut(&self.id).unwrap();
+                group.add_client(self.ws.clone());
+            }
+            Err(e) => {
+                return Err(ServerError::Group(format!(
+                    "cold not add client {:?}  to group {}: {}",
+                    self.ws, response.group_id, e
+                )));
+                //self.ws.close(CloseCode::Error);
+            }
+        }
+        Ok(())
     }
 }
 
 fn handshake(req: &Request) -> (Response, core::result::Result<i32, ServerError>) {
     let mut res = Response::from_request(req).unwrap();
-    // TODO fix 2 unwraps
-    // Reject Clients that do not support the
     if let Ok(protocols) = req.protocols() {
         if protocols
             .iter()
@@ -120,7 +158,10 @@ fn handshake(req: &Request) -> (Response, core::result::Result<i32, ServerError>
             None => {
                 return (
                     fail_response(res, "no token in protocols"),
-                    Err(ServerError::InvalidToken),
+                    Err(ServerError::InvalidToken(
+                        "No Token was passed as a Protocol in the Sec-WebSocket-Protocol Header"
+                            .to_string(),
+                    )),
                 );
             }
         }
@@ -134,6 +175,7 @@ fn handshake(req: &Request) -> (Response, core::result::Result<i32, ServerError>
 
 fn fail_response(mut res: Response, reason: &str) -> Response {
     res.set_status(400);
+    res.set_reason(reason);
     warn!("{}", reason);
     res
 }

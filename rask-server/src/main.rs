@@ -1,5 +1,6 @@
 mod backend_connection;
 mod error;
+mod games;
 mod group;
 mod lobby;
 mod server;
