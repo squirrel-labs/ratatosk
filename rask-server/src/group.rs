@@ -66,7 +66,8 @@ impl Group {
             name: response.group_name,
             capacity: response.user_max,
         };
-        let game = match group.name() {
+        info!("Creating Group{} ({}) with game {}", group.id(), group.name(), group.group_type());
+        let game = match group.group_type() {
             "rask" => RaskGame::new(&group),
             name => {
                 return Err(ServerError::GroupCreation(format!(
