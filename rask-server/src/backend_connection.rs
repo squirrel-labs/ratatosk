@@ -34,7 +34,7 @@ pub fn request(location: &str) -> Option<String> {
 pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
     let mut res = match reqwest::get(format!("{}api/lobby/tokens/{}", API_ENDPOINT, token).as_str())
     {
-        Ok(mut res) => res,
+        Ok(res) => res,
         Err(e) => return Err(ServerError::BackendRequest(e)),
     };
     let token_res: Result<TokenResponse, reqwest::Error> = res.json();

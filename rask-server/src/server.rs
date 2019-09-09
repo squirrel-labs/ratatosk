@@ -1,6 +1,5 @@
 use crate::backend_connection::*;
-use crate::group::*;
-use crate::group::{GroupId, Message as GroupMessage};
+use crate::group::{Group, GroupId, Message as GroupMessage};
 use std::collections::HashMap;
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
@@ -56,15 +55,28 @@ impl Handler for Server {
     fn on_message(&mut self, msg: Message) -> Result<()> {
         info!("Server got message '{}'. ", msg);
 
-        self.group
-            .send((self.ip.clone(), Content::data(Box::new(msg.into_data()))));
+        if let Err(err) = self.group.send(GroupMessage::Data((
+            self.ip.clone(),
+            Box::new(msg.into_data()),
+        ))) {
+            error!("failed to deliver internal message {}", err);
+            if let Err(e) = self.ws.send(format!("failed to deliver message {}", err)) {
+                error!("failed to send message to client {}", e);
+            }
+        }
+
         Ok(())
     }
 
     fn on_close(&mut self, _: CloseCode, _: &str) {
         if let Ok(mut guard) = self.groups.lock() {
-            if let Some(mut group) = guard.get_mut(&self.id) {
-                group.remove_client(&self.ws);
+            if let Some(group) = guard.get_mut(&self.id) {
+                if group.remove_client(&self.ws).is_err() {
+                    warn!("failed to remove Client from Game");
+                }
+                if group.clients.len() == 0 {
+                    guard.remove(&self.id);
+                }
             }
         }
     }
@@ -91,7 +103,6 @@ impl Server {
     }
 
     fn handle_token(&mut self, response: TokenResponse) -> core::result::Result<(), ServerError> {
-        self.ws.send(format!("{:?})", response));
         match self.groups.lock() {
             Ok(mut guard) => {
                 self.id = response.group_id;
@@ -110,7 +121,7 @@ impl Server {
                 }
 
                 let group = guard.get_mut(&self.id).unwrap();
-                group.add_client(self.ws.clone());
+                group.add_client(self.ws.clone())?;
             }
             Err(e) => {
                 return Err(ServerError::Group(format!(
