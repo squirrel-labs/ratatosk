@@ -59,7 +59,7 @@ impl RaskGame {
 
     fn get_messages(&mut self) -> Vec<Message> {
         let (mut data, control): (Vec<Message>, Vec<Message>) =
-            self.group.receiver.try_iter().partition(|x| x.is_data());
+            self.group.receiver.try_iter().partition(Message::is_data);
         control.iter().for_each(|x| match x {
             Message::Park => {
                 data = Vec::new();
