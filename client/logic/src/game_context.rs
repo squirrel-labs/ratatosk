@@ -70,12 +70,12 @@ impl GameContext {
                 ]),
                 Animation::new(vec![
                     Frame::new(vec![
-                        rask_engine::math::Mat3::identity()
+                        rask_engine::math::Mat3::scaling(9.0 / 16.0, 1.0)
                     ])
                 ]),
                 Animation::new(vec![
                     Frame::new(vec![
-                        rask_engine::math::Mat3::scaling(16.0 / 9.0, 1.0)
+                        rask_engine::math::Mat3::identity()
                     ])
                 ]),
             ];

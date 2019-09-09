@@ -14,7 +14,8 @@ pub struct Render<T> {
 
 impl<T: GraphicsApi> Render<T> {
     pub fn new(canvas: web_sys::OffscreenCanvas) -> Result<Self, ClientError> {
-        T::new(canvas).map(|api| Self {
+        let factor = rask_engine::math::vec2::Vec2::new(0.08, 0.08);
+        T::new(canvas, factor).map(|api| Self {
             graphics: api,
             texture_count: 0,
             frame_nr: 0,
@@ -29,11 +30,11 @@ impl<T: GraphicsApi> Render<T> {
             rask_wasm_shared::mem::shared_heap().unset_texture_notify();
             self.update_textures()?;
         }
-        self.graphics.clear(&[0.8, 0.05, 0.55])?;
+        self.graphics.start_frame(&[0.8, 0.05, 0.55])?;
         if self.draw_sprites(animations)? {
             self.frame_nr += 1;
         }
-        Ok(())
+        self.graphics.end_frame()
     }
 
     pub fn update_textures(&mut self) -> Result<(), ClientError> {
