@@ -118,7 +118,7 @@ pub mod settings {
             LOGIC_ALLOCATION_AREA_START as isize
         }
     }
-    
+
     impl AllocSettings for Graphics {
         fn allocator_addr<T: Sized>() -> usize {
             ALLOCATOR_AREA_START + std::mem::size_of::<T>()
@@ -167,14 +167,18 @@ impl MutableAlloc for SimpleAllocator {
 
 pub trait Initial<T> {
     fn init() -> T {
-        unsafe {std::mem::zeroed()}
+        unsafe { std::mem::zeroed() }
     }
 }
 
 pub struct NaiveInitial;
 impl<T> Initial<T> for NaiveInitial {}
 
-pub struct Allocator<M, S: AllocSettings, I: Initial<M>>(pub std::marker::PhantomData<M>, pub std::marker::PhantomData<S>, pub std::marker::PhantomData<I>);
+pub struct Allocator<M, S: AllocSettings, I: Initial<M>>(
+    pub std::marker::PhantomData<M>,
+    pub std::marker::PhantomData<S>,
+    pub std::marker::PhantomData<I>,
+);
 
 impl<M: Sized + 'static, S: AllocSettings, I: Initial<M>> Allocator<M, S, I> {
     fn allocator() -> &'static mut M {
@@ -198,9 +202,16 @@ fn logptr(num: usize, ptr: *mut u8) -> *mut u8 {
     ptr
 }
 
-unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> GlobalAlloc for Allocator<M, S, I> {
+unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> GlobalAlloc
+    for Allocator<M, S, I>
+{
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        logptr(layout.size(), Self::allocator().alloc(layout).offset(S::allocation_start_address::<M>()))
+        logptr(
+            layout.size(),
+            Self::allocator()
+                .alloc(layout)
+                .offset(S::allocation_start_address::<M>()),
+        )
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
@@ -222,12 +233,24 @@ impl<A: GlobalAlloc> MutableAlloc for A {
 macro_rules! create_allocator {
     ($name:ident,$method:ty,$setting:ty,$v:expr) => {
         struct __Initial;
-        impl Initial<$method> for __Initial { fn init() -> $method { $v } }
+        impl Initial<$method> for __Initial {
+            fn init() -> $method {
+                $v
+            }
+        }
         #[global_allocator]
-        static $name: Allocator<$method, $setting, __Initial> = Allocator(std::marker::PhantomData, std::marker::PhantomData, std::marker::PhantomData);
+        static $name: Allocator<$method, $setting, __Initial> = Allocator(
+            std::marker::PhantomData,
+            std::marker::PhantomData,
+            std::marker::PhantomData,
+        );
     };
     ($name:ident,$method:ty,$setting:ty) => {
         #[global_allocator]
-        static $name: Allocator<$method, $setting, NaiveInitial> = Allocator(std::marker::PhantomData, std::marker::PhantomData, std::marker::PhantomData);
-    }
+        static $name: Allocator<$method, $setting, NaiveInitial> = Allocator(
+            std::marker::PhantomData,
+            std::marker::PhantomData,
+            std::marker::PhantomData,
+        );
+    };
 }

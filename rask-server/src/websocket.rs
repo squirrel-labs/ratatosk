@@ -1,7 +1,7 @@
+use crate::backend_connection::*;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
-use crate::backend_connection::*;
 
 use ws::{listen, CloseCode, Handler, Handshake, Message, Request, Response, Result, Sender};
 
@@ -28,10 +28,13 @@ impl Handler for Server {
             (res, Ok(token)) => {
                 info!("recived token: {}", token);
                 match crate::backend_connection::verify_token(token) {
-                    Ok(response) => {handle_token(response); Ok(res)},
+                    Ok(response) => {
+                        handle_token(response);
+                        Ok(res)
+                    }
                     Err(e) => Ok(fail_response(res, format!("{}", e).as_str())),
                 }
-            },
+            }
             (res, Err(err)) => {
                 warn!("Client {:?}: {:?}", req.client_addr(), err);
                 Ok(res)
@@ -75,32 +78,50 @@ fn handshake(req: &Request) -> (Response, core::result::Result<i32, ServerError>
     // TODO fix 2 unwraps
     // Reject Clients that do not support the
     if let Ok(protocols) = req.protocols() {
-        if protocols.iter().find(|&&pro| pro.contains(PROTOCOL)).is_some(){
+        if protocols
+            .iter()
+            .find(|&&pro| pro.contains(PROTOCOL))
+            .is_some()
+        {
             res.set_protocol(PROTOCOL)
         } else {
-            return (fail_response(res, format!("does not support the {} protocol", PROTOCOL).as_str()),
-            Err(ServerError::InvalidProtocol));
+            return (
+                fail_response(
+                    res,
+                    format!("does not support the {} protocol", PROTOCOL).as_str(),
+                ),
+                Err(ServerError::InvalidProtocol),
+            );
         }
         let token = protocols.iter().find(|&&pro| pro.starts_with("Token-"));
         match token {
             Some(token) => {
                 let (_, token) = token.split_at(6);
                 if let Ok(token) = token.parse::<i32>() {
-                    return (res, Ok(token)) 
+                    return (res, Ok(token));
                 } else {
-                    return (fail_response(res, "token is no valid i32"), Err(ServerError::InvalidTokenFormat));
+                    return (
+                        fail_response(res, "token is no valid i32"),
+                        Err(ServerError::InvalidTokenFormat),
+                    );
                 }
             }
             None => {
-                return (fail_response(res, "no token in protocols"), Err(ServerError::InvalidToken)); 
+                return (
+                    fail_response(res, "no token in protocols"),
+                    Err(ServerError::InvalidToken),
+                );
             }
         }
     } else {
-        return (fail_response(res, "failed to retrive protocols"), Err(ServerError::InvalidProtocol));
+        return (
+            fail_response(res, "failed to retrive protocols"),
+            Err(ServerError::InvalidProtocol),
+        );
     }
 }
 
-fn fail_response(mut res: Response, reason: &str) -> Response  {
+fn fail_response(mut res: Response, reason: &str) -> Response {
     res.set_status(400);
     warn!("{}", reason);
     res

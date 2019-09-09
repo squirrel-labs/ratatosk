@@ -5,7 +5,7 @@ const MAX_SPRITES: usize = 64;
 #[derive(Clone, Copy)]
 pub struct State {
     sprite_len: usize,
-    sprites: [Sprite; MAX_SPRITES]
+    sprites: [Sprite; MAX_SPRITES],
 }
 
 impl State {
@@ -29,7 +29,7 @@ impl Default for State {
     fn default() -> Self {
         Self {
             sprite_len: 0,
-            sprites: [Sprite::default(); MAX_SPRITES]
+            sprites: [Sprite::default(); MAX_SPRITES],
         }
     }
 }

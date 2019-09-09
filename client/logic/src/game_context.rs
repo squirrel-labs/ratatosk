@@ -17,7 +17,7 @@ impl GameContext {
     pub fn new() -> Result<Self, ClientError> {
         Ok(Self {
             state: State::default(),
-            tick_nr: 0
+            tick_nr: 0,
         })
     }
 
@@ -29,60 +29,43 @@ impl GameContext {
 
     pub fn tick(&mut self) -> Result<(), ClientError> {
         if self.state.sprites().is_empty() {
-            self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, 0.0), 3, 0, 0)
-            );
-            self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, 0.0), 2, 0, 0)
-            );
-            self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.3, 0.3), 0, 0, 1)
-            );
-            self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, 0.0), 1, 0, 1)
-            );
-            self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(0.0, -0.6), 0, 0, 1)
-            );
-            self.state.append_sprite(
-                &Sprite::new(math::Vec2::new(-0.6, 0.6), 1, 0, 1)
-            );
+            self.state
+                .append_sprite(&Sprite::new(math::Vec2::new(0.0, 0.0), 3, 0, 0));
+            self.state
+                .append_sprite(&Sprite::new(math::Vec2::new(0.0, 0.0), 2, 0, 0));
+            self.state
+                .append_sprite(&Sprite::new(math::Vec2::new(0.3, 0.3), 0, 0, 1));
+            self.state
+                .append_sprite(&Sprite::new(math::Vec2::new(0.0, 0.0), 1, 0, 1));
+            self.state
+                .append_sprite(&Sprite::new(math::Vec2::new(0.0, -0.6), 0, 0, 1));
+            self.state
+                .append_sprite(&Sprite::new(math::Vec2::new(-0.6, 0.6), 1, 0, 1));
 
             let shared_heap = rask_wasm_shared::mem::shared_heap();
             *shared_heap.animations_mut() = vec![
                 Animation::new(vec![
+                    Frame::new(vec![rask_engine::math::Mat3::scaling(0.4, 0.4)]),
                     Frame::new(vec![
                         rask_engine::math::Mat3::scaling(0.4, 0.4)
-                    ]),
-                    Frame::new(vec![
-                        rask_engine::math::Mat3::scaling(0.4, 0.4) *
-                        rask_engine::math::Mat3::translation(0.5, 0.0) *
-                        rask_engine::math::Mat3::rotation(6.0)
+                            * rask_engine::math::Mat3::translation(0.5, 0.0)
+                            * rask_engine::math::Mat3::rotation(6.0),
                     ]),
                 ]),
                 Animation::new(vec![
-                    Frame::new(vec![
-                        rask_engine::math::Mat3::scaling(0.4, 0.4)
-                    ]),
-                    Frame::new(vec![
-                        rask_engine::math::Mat3::scaling(0.6, 0.2)
-                    ]),
+                    Frame::new(vec![rask_engine::math::Mat3::scaling(0.4, 0.4)]),
+                    Frame::new(vec![rask_engine::math::Mat3::scaling(0.6, 0.2)]),
                 ]),
-                Animation::new(vec![
-                    Frame::new(vec![
-                        rask_engine::math::Mat3::scaling(9.0 / 16.0, 1.0)
-                    ])
-                ]),
-                Animation::new(vec![
-                    Frame::new(vec![
-                        rask_engine::math::Mat3::identity()
-                    ])
-                ]),
+                Animation::new(vec![Frame::new(vec![rask_engine::math::Mat3::scaling(
+                    9.0 / 16.0,
+                    1.0,
+                )])]),
+                Animation::new(vec![Frame::new(vec![rask_engine::math::Mat3::identity()])]),
             ];
 
             *shared_heap.textures_mut() = Some(vec![
-               rask_wasm_shared::texture::Texture::from_png_stream(IMAGE1_DATA)?,
-               rask_wasm_shared::texture::Texture::from_png_stream(IMAGE2_DATA)?,
+                rask_wasm_shared::texture::Texture::from_png_stream(IMAGE1_DATA)?,
+                rask_wasm_shared::texture::Texture::from_png_stream(IMAGE2_DATA)?,
             ]);
             shared_heap.set_texture_notify();
         }
@@ -90,7 +73,8 @@ impl GameContext {
         let animations = rask_wasm_shared::mem::shared_heap().animations();
         for sprite in self.state.sprites_mut().iter_mut() {
             if (self.tick_nr % 10) == 9 {
-                sprite.next_frame(animations)
+                sprite
+                    .next_frame(animations)
                     .ok_or(ClientError::ResourceError(format!("invalid animation id")))?;
             }
         }

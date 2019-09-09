@@ -3,8 +3,8 @@ use rask_engine::math::Mat3;
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
 use rask_wasm_shared::sprite::{Animation, Frame, Sprite};
-use rask_wasm_shared::texture::Texture;
 use rask_wasm_shared::state::State;
+use rask_wasm_shared::texture::Texture;
 
 pub struct Render<T> {
     graphics: T,
@@ -42,7 +42,11 @@ impl<T: GraphicsApi> Render<T> {
             let n = textures.len() as u32;
             self.graphics.resize_texture_pool(n);
             if n > self.texture_count {
-                for (i, texture) in textures.iter_mut().skip(self.texture_count as usize).enumerate() {
+                for (i, texture) in textures
+                    .iter_mut()
+                    .skip(self.texture_count as usize)
+                    .enumerate()
+                {
                     self.graphics.upload_texture(texture, i as u32)?
                 }
             }
@@ -73,7 +77,8 @@ impl<T: GraphicsApi> Render<T> {
                 "could not get animation frame".to_owned(),
             ))?;
         for transformation in frame.transformations().iter() {
-            self.graphics.draw_rect(&sprite.pos, transformation, sprite.tex_id)?;
+            self.graphics
+                .draw_rect(&sprite.pos, transformation, sprite.tex_id)?;
         }
         Ok(())
     }
