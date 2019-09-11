@@ -55,9 +55,11 @@ impl RaskGame {
             //self.users.iter().foreach(|u| u.sender.send(b));
             let _messages = self.get_messages();
         }
+        info!("thread kiled itself");
     }
 
     fn get_messages(&mut self) -> Vec<Message> {
+        //  info!("reciver {:#?} is still aive", self.group.receiver);
         let (mut data, control): (Vec<Message>, Vec<Message>) =
             self.group.receiver.try_iter().partition(Message::is_data);
         control.iter().for_each(|x| match x {

@@ -20,6 +20,8 @@ pub struct TokenResponse {
     pub group_type: String,
     #[serde(rename = "name")]
     pub group_name: String,
+    #[serde(rename = "username")]
+    pub user_name: String,
 }
 
 /// Make a plaintext get request to API_ENDPOINT/{location}

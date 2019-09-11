@@ -11,7 +11,7 @@ pub type GroupId = u32;
 
 pub struct Group {
     pub clients: Vec<Sender>,
-    sender: mpsc::Sender<Message>,
+    pub sender: mpsc::Sender<Message>,
     id: GroupId,
     group_type: String,
     name: String,

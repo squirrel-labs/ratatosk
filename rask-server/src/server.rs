@@ -109,6 +109,7 @@ impl Server {
                 let group_type = response.group_type.clone();
                 if !guard.contains_key(&response.group_id) {
                     if let Ok(group) = Group::new(response) {
+                        self.group = group.sender.clone();
                         guard.insert(group.id(), group);
                     } else {
                         let err = format!(
