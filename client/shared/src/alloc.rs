@@ -185,33 +185,18 @@ impl<M: Sized + 'static, S: AllocSettings, I: Initial<M>> Allocator<M, S, I> {
         unsafe { &mut *(S::allocator_addr::<M>() as *mut M) }
     }
 
-    pub fn reset(&self) {
+    pub unsafe fn reset(&self) {
         *Self::allocator() = I::init();
     }
-}
-
-use wasm_bindgen::prelude::*;
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace=console, js_name=log)]
-    fn lognum(l: usize, n: usize);
-}
-
-fn logptr(num: usize, ptr: *mut u8) -> *mut u8 {
-    //lognum(num, ptr as usize);
-    ptr
 }
 
 unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> GlobalAlloc
     for Allocator<M, S, I>
 {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        logptr(
-            layout.size(),
-            Self::allocator()
-                .alloc(layout)
-                .offset(S::allocation_start_address::<M>()),
-        )
+        Self::allocator()
+             .alloc(layout)
+             .offset(S::allocation_start_address::<M>())
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
