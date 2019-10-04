@@ -50,14 +50,4 @@ impl From<SendError<group::Message>> for ServerError {
     }
 }
 
-impl std::error::Error for ServerError {
-    fn description(&self) -> &str {
-        "ServerError"
-    }
-    fn cause(&self) -> Option<&dyn std::error::Error> {
-        None
-    }
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        None
-    }
-}
+impl std::error::Error for ServerError {}
