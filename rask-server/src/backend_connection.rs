@@ -35,16 +35,13 @@ pub fn request(location: &str) -> Option<String> {
 
 /// Verify the token validity
 pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
-    let mut res = match reqwest::get(format!("{}api/lobby/tokens/{}", API_ENDPOINT, token).as_str())
-    {
-        Ok(res) => res,
-        Err(e) => return Err(ServerError::BackendRequest(e)),
-    };
-    let token_res: Result<TokenResponse, reqwest::Error> = res.json();
+    let mut res = reqwest::get(&format!("{}api/lobby/tokens/{}", API_ENDPOINT, token))
+        .map_err(|e| ServerError::BackendRequest(e))?;
+    let token_res: Result<TokenResponse, _> = res.json();
     token_res.map_err(|e| {
         warn!("{}", e);
         ServerError::InvalidToken(format!(
-            "The Backend Response did not contain valid group Information: {:?}",
+            "The Backend Response did not contain valid group information: {:?}",
             res.text()
         ))
     })
