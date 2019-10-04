@@ -2,12 +2,12 @@ use std::ops;
 
 use crate::math::Vec2;
 
-/// A 2x2 matrix.
+/// A 2x2 matrix with f32 elements.
 #[derive(Clone, Copy, Debug)]
 pub struct Mat2 {
     // The elements of the matrix.
-    // [a, c,
-    //  b, d]
+    // (a c)
+    // (b d)
     data: [f32; 4],
 }
 
