@@ -12,7 +12,7 @@ use crate::error::ServerError;
 
 const PROTOCOL: &str = "tuesday";
 // WebSocket connection handler for the server connection
-pub struct Server {
+pub struct Socket {
     ws: Sender,
     group: mpsc::Sender<GroupMessage>,
     groups: Arc<Mutex<HashMap<u32, Group>>>,
@@ -20,7 +20,26 @@ pub struct Server {
     id: GroupId,
 }
 
-impl Handler for Server {
+pub fn run(address: &str, port: &str) -> core::result::Result<JoinHandle<()>, ServerError> {
+    let count = Arc::new(Mutex::new(HashMap::new()));
+    let (sender, _) = mpsc::channel();
+    let url = format!("{}:{}", address, port);
+    thread::Builder::new()
+        .name("server".to_owned())
+        .spawn(move || {
+            listen(url, |out| Socket {
+                ws: out,
+                group: sender.clone(),
+                groups: count.clone(),
+                ip: "No ip".to_owned(),
+                id: 0,
+            })
+            .unwrap()
+        })
+        .map_err(|e| ServerError::WebsocketCreation(e))
+}
+
+impl Handler for Socket {
     // called when the socket connection is created
     fn on_open(&mut self, handshake: Handshake) -> Result<()> {
         if let Ok(Some(ip)) = handshake.remote_addr() {
@@ -53,7 +72,7 @@ impl Handler for Server {
     }
 
     fn on_message(&mut self, msg: Message) -> Result<()> {
-        info!("Server got message '{}'. ", msg);
+        info!("Socket got message '{}'. ", msg);
 
         if let Err(err) = self.group.send(GroupMessage::Data((
             self.ip.clone(),
@@ -82,26 +101,7 @@ impl Handler for Server {
     }
 }
 
-impl Server {
-    pub fn run(address: &str, port: &str) -> core::result::Result<JoinHandle<()>, ServerError> {
-        let count = Arc::new(Mutex::new(HashMap::new()));
-        let (sender, _) = mpsc::channel();
-        let url = format!("{}:{}", address, port);
-        thread::Builder::new()
-            .name("server".to_owned())
-            .spawn(move || {
-                listen(url, |out| Server {
-                    ws: out,
-                    group: sender.clone(),
-                    groups: count.clone(),
-                    ip: "No ip".to_owned(),
-                    id: 0,
-                })
-                .unwrap()
-            })
-            .map_err(|e| ServerError::WebsocketCreation(e))
-    }
-
+impl Socket {
     fn handle_token(&mut self, response: TokenResponse) -> core::result::Result<(), ServerError> {
         match self.groups.lock() {
             Ok(mut guard) => {

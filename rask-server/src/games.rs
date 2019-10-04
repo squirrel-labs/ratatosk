@@ -68,9 +68,9 @@ impl RaskGame {
                 thread::park();
             }
             Message::Kill => self.will_to_live = false,
-            Message::Add(user) => self.users.push((*user).clone()),
+            Message::Add(user) => self.users.push(user.clone()),
             Message::Remove(sender) => {
-                if let Some(pos) = self.users.iter().position(|x| x.sender == *sender) {
+                if let Some(pos) = self.users.iter().position(|x| x.sender == sender) {
                     self.users.swap_remove(pos);
                 }
             }

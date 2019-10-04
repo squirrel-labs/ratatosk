@@ -26,7 +26,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // start server
     info!("create game server on {:?}", addr);
-    let ws_server = server::Server::run(addr, port);
-    let _ = ws_server?.join();
-    Ok(())
+    let ws_server = server::run(addr, port)?;
+    Ok(ws_server.join().unwrap())
 }
