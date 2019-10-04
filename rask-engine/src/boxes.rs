@@ -1,3 +1,6 @@
+//! The boxes module exposes AABox (axis-aligned box) and RBox (rotated box).
+//! These are used to model objects.
+
 use std::ops;
 
 use crate::math::Vec2;
