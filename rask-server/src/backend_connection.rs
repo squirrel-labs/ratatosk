@@ -26,10 +26,11 @@ pub struct TokenResponse {
 
 /// Make a plaintext get request to API_ENDPOINT/{location}
 pub fn request(location: &str) -> Option<String> {
-    match reqwest::get(format!("{}{}", API_ENDPOINT, location).as_str()) {
-        Ok(mut res) => Some(res.text().unwrap()),
-        Err(_) => None,
-    }
+    let uri = &format!("{}{}", API_ENDPOINT, location);
+    reqwest::get(uri)
+        .and_then(|mut res| res.text())
+        .map_err(|err| log::warn!("request on \"{}\" failed: {}", uri, err))
+        .ok()
 }
 
 /// Verify the token validity
