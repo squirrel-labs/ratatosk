@@ -2,8 +2,6 @@
 
 use wasm_bindgen::prelude::*;
 
-use crate::websocket::*;
-use log::{error, info};
 use rask_wasm_shared::get_double_buffer;
 use rask_wasm_shared::state::State;
 use rask_wasm_shared::wasm_log::WasmLog;
@@ -18,7 +16,7 @@ pub fn initialise() {
     log::set_boxed_logger(Box::new(WasmLog::new()))
         .map(|()| log::set_max_level(log::LevelFilter::Debug))
         .unwrap();
-    info!("logic entry reached");
+    log::info!("logic entry reached");
     {
         let mut writer = get_double_buffer().borrow_writer();
         writer.set(State::default());

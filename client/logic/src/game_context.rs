@@ -93,7 +93,3 @@ pub fn set_context(context: GameContext) {
 pub fn context_mut() -> &'static mut GameContext {
     unsafe { GAME_CONTEXT.as_mut().unwrap() }
 }
-
-/* pub fn context() -> &'static Context {
-    unsafe { CONTEXT.as_ref().unwrap() }
-}*/
