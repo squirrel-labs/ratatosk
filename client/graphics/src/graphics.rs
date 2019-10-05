@@ -83,6 +83,10 @@ struct GlFramebuffer {
     tex: WebGlApiTexture,
 }
 
+fn set_param(gl: &Gl2, key: u32, value: u32) {
+    gl.tex_parameteri(Gl2::TEXTURE_2D, key, value as i32);
+}
+
 impl GlFramebuffer {
     fn new(gl: &Gl2, w: u32, h: u32) -> Result<Self, ClientError> {
         let (w, h) = (w as i32, h as i32);
@@ -100,26 +104,10 @@ impl GlFramebuffer {
             None,
         )?;
 
-        gl.tex_parameteri(
-            Gl2::TEXTURE_2D,
-            Gl2::TEXTURE_MIN_FILTER,
-            Gl2::NEAREST as i32,
-        );
-        gl.tex_parameteri(
-            Gl2::TEXTURE_2D,
-            Gl2::TEXTURE_MAG_FILTER,
-            Gl2::NEAREST as i32,
-        );
-        gl.tex_parameteri(
-            Gl2::TEXTURE_2D,
-            Gl2::TEXTURE_WRAP_S,
-            Gl2::CLAMP_TO_EDGE as i32,
-        );
-        gl.tex_parameteri(
-            Gl2::TEXTURE_2D,
-            Gl2::TEXTURE_WRAP_T,
-            Gl2::CLAMP_TO_EDGE as i32,
-        );
+        set_param(gl, Gl2::TEXTURE_MIN_FILTER, Gl2::NEAREST);
+        set_param(gl, Gl2::TEXTURE_MAG_FILTER, Gl2::NEAREST);
+        set_param(gl, Gl2::TEXTURE_WRAP_S, Gl2::CLAMP_TO_EDGE);
+        set_param(gl, Gl2::TEXTURE_WRAP_T, Gl2::CLAMP_TO_EDGE);
 
         let fb = gl
             .create_framebuffer()
@@ -244,26 +232,12 @@ impl GraphicsApi for WebGl {
                 Gl2::UNSIGNED_BYTE,
                 Some(&texture.raw()),
             )?;
-        self.gl.tex_parameteri(
-            Gl2::TEXTURE_2D,
-            Gl2::TEXTURE_WRAP_S,
-            Gl2::CLAMP_TO_EDGE as i32,
-        );
-        self.gl.tex_parameteri(
-            Gl2::TEXTURE_2D,
-            Gl2::TEXTURE_WRAP_T,
-            Gl2::CLAMP_TO_EDGE as i32,
-        );
-        self.gl.tex_parameteri(
-            Gl2::TEXTURE_2D,
-            Gl2::TEXTURE_MIN_FILTER,
-            Gl2::NEAREST as i32,
-        );
-        self.gl.tex_parameteri(
-            Gl2::TEXTURE_2D,
-            Gl2::TEXTURE_MAG_FILTER,
-            Gl2::NEAREST as i32,
-        );
+
+        set_param(&self.gl, Gl2::TEXTURE_MIN_FILTER, Gl2::NEAREST);
+        set_param(&self.gl, Gl2::TEXTURE_MAG_FILTER, Gl2::NEAREST);
+        set_param(&self.gl, Gl2::TEXTURE_WRAP_S, Gl2::CLAMP_TO_EDGE);
+        set_param(&self.gl, Gl2::TEXTURE_WRAP_T, Gl2::CLAMP_TO_EDGE);
+
         self.texture_handles[n as usize] = Some(handle);
         Ok(())
     }
