@@ -3,12 +3,12 @@ use std::ops;
 
 use crate::math::EPSILON;
 
-/// A 2-dimensional euclidean vector.
+/// A 2-dimensional euclidean vector with f32 elements.
 #[derive(Clone, Copy, Debug)]
 pub struct Vec2 {
-    /// The x coordinate.
+    // The x coordinate.
     x: f32,
-    /// The y coordinate.
+    // The y coordinate.
     y: f32,
 }
 
