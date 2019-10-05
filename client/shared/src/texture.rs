@@ -1,5 +1,5 @@
-use image::{png::PNGDecoder, ImageDecoder};
 use crate::error::ClientError;
+use image::{png::PNGDecoder, ImageDecoder};
 
 use std::convert::TryInto;
 
@@ -7,7 +7,8 @@ pub use image::ColorType;
 
 pub struct Texture {
     raw_data: Vec<u8>,
-    w: u32, h: u32,
+    w: u32,
+    h: u32,
     colortype: ColorType,
 }
 
@@ -28,7 +29,9 @@ impl Texture {
 
         Ok(Self {
             raw_data: bytes,
-            w, h, colortype,
+            w,
+            h,
+            colortype,
         })
     }
 

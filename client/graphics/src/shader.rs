@@ -20,9 +20,13 @@ pub struct Program {
 }
 
 impl Program {
-    fn get_uniform_location(gl: &Gl2, prog: &WebGlProgram, name: &str) -> Result<WebGlUniformLocation, ClientError> {
-        gl.get_uniform_location(&prog, name).ok_or(
-            ClientError::WebGlError(format!(
+    fn get_uniform_location(
+        gl: &Gl2,
+        prog: &WebGlProgram,
+        name: &str,
+    ) -> Result<WebGlUniformLocation, ClientError> {
+        gl.get_uniform_location(&prog, name)
+            .ok_or(ClientError::WebGlError(format!(
                 "cannot find uniform location \"{}\"",
                 name
             )))
@@ -61,19 +65,12 @@ impl Program {
 
     pub fn upload_fransformation(&self, gl: &Gl2, mat: &Mat3) {
         self.use_program(gl);
-        gl.uniform_matrix3fv_with_f32_array(
-            Some(&self.transformation),
-            true,
-            &mat.as_ref().clone(),
-        )
+        gl.uniform_matrix3fv_with_f32_array(Some(&self.transformation), true, &mat.as_ref().clone())
     }
 
     pub fn upload_texture_id(&self, gl: &Gl2, id: i32) {
         self.use_program(gl);
-        gl.uniform1i(
-            Some(&self.texture),
-            id
-        )
+        gl.uniform1i(Some(&self.texture), id)
     }
 }
 

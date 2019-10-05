@@ -37,5 +37,7 @@ features = [
     "WebGlProgram",
     "WebGlBuffer",
     "WebGlVertexArrayObject",
-    "WebGlUniformLocation"
+    "WebGlUniformLocation",
+    "WebGlFramebuffer",
+    "WebGlRenderbuffer"
 ]
