@@ -1,198 +1,174 @@
-use crate::backend_connection::BackendConnection;
-use crate::lobby::Lobby;
-use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
-use std::sync::{
-    mpsc,
-    mpsc::{Receiver, Sender},
-};
-use websocket::{
-    client::sync::Client,
-    receiver, sender,
-    server::{sync::AcceptResult, NoTlsAcceptor},
-    stream::sync::Splittable,
-    sync::Server,
-    OwnedMessage,
-};
+use crate::backend_connection::*;
+use crate::group::{Group, GroupId, Message as GroupMessage};
+use std::collections::HashMap;
+use std::sync::mpsc;
+use std::sync::{Arc, Mutex};
+use std::thread;
+use std::thread::JoinHandle;
 
-pub type ClientReceiver = receiver::Reader<<TcpStream as Splittable>::Reader>;
-pub type ClientSender = sender::Writer<<TcpStream as Splittable>::Writer>;
+use ws::{listen, CloseCode, Handler, Handshake, Message, Request, Response, Sender};
+
+use crate::error::ServerError;
 
 const PROTOCOL: &str = "tuesday";
-
-pub type Token = u32;
-pub type UserId = u32;
-
-#[derive(Debug)]
-pub enum GameServerError {
-    BindError(std::io::Error),
-    HandshakeRequestError,
-    InvalidProtocolError,
-    AcceptError(std::io::Error),
-    GroupError(String),
-    GroupCreationError(String),
+// WebSocket connection handler for the server connection
+pub struct Socket {
+    ws: Sender,
+    group: mpsc::Sender<GroupMessage>,
+    groups: Arc<Mutex<HashMap<u32, Group>>>,
+    ip: String,
+    id: GroupId,
 }
 
-impl std::fmt::Display for GameServerError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        match self {
-            GameServerError::BindError(e) => write!(f, "BindError: {}", e),
-            GameServerError::HandshakeRequestError => write!(f, "HandshakeRequestError"),
-            GameServerError::InvalidProtocolError => write!(f, "InvalidProtocolError"),
-            GameServerError::AcceptError(e) => write!(f, "AcceptError: {}", e),
-            GameServerError::GroupError(e) => write!(f, "GroupError: {}", e),
-            GameServerError::GroupCreationError(e) => write!(f, "GroupCreationError: {}", e),
-        }
-    }
+pub fn run(address: &str, port: &str) -> Result<JoinHandle<()>, ServerError> {
+    let count = Arc::new(Mutex::new(HashMap::new()));
+    let (sender, _) = mpsc::channel();
+    let url = format!("{}:{}", address, port);
+    thread::Builder::new()
+        .name("server".to_owned())
+        .spawn(move || {
+            listen(url, |out| Socket {
+                ws: out,
+                group: sender.clone(),
+                groups: count.clone(),
+                ip: "No ip".to_owned(),
+                id: 0,
+            })
+            .unwrap()
+        })
+        .map_err(|e| ServerError::WebsocketCreation(e))
 }
 
-pub struct GameServer {
-    addr: SocketAddr,
-    lobby: Lobby,
-    backend: BackendConnection,
-}
-
-pub struct GameClient {
-    addr: SocketAddr,
-    client: Client<TcpStream>,
-}
-
-impl GameClient {
-    fn from_raw(client: Client<TcpStream>) -> Result<Self, ()> {
-        let addr = client.peer_addr().map_err(|_| ())?;
-        info!("got a client connection from: {}", addr);
-        Ok(GameClient { addr, client })
-    }
-
-    fn require_token(&mut self) -> Option<Token> {
-        let message = self.client.recv_message().ok()?;
-        if let OwnedMessage::Text(text) = message {
-            text.parse().ok()
-        } else {
-            None
+impl Handler for Socket {
+    // called when the socket connection is created
+    fn on_open(&mut self, handshake: Handshake) -> ws::Result<()> {
+        if let Ok(Some(ip)) = handshake.remote_addr() {
+            self.ip = ip;
         }
-    }
-
-    fn host_name(&self) -> SocketAddr {
-        self.addr
-    }
-
-    pub fn split(self) -> (ClientSender, ClientReceiver) {
-        let (rec, sen) = self.client.split().unwrap();
-        (sen, rec)
-    }
-}
-
-type ClientConnection = Result<GameClient, GameServerError>;
-
-impl GameServer {
-    pub fn new<T: ToSocketAddrs>(addr: T) -> Self {
-        let addr = addr.to_socket_addrs().unwrap().next().unwrap();
-        debug!("ws address: {}", addr);
-        info!("create lobby");
-        let lobby = Lobby::new();
-        let backend = BackendConnection::new("https://kobert.dev");
-        info!("got a C# backend connection");
-        GameServer {
-            addr,
-            lobby: lobby,
-            backend: backend,
-        }
-    }
-
-    pub fn run(&mut self) -> Result<(), GameServerError> {
-        let reader = self.read_clients();
-        loop {
-            let connection = reader.recv().unwrap()?;
-            self.add_client(connection);
-        }
-    }
-
-    fn add_client(&mut self, mut client: GameClient) {
-        let token = client.require_token();
-        if let Some(token) = token {
-            let result = self.backend.validate_token(&token);
-            match result {
-                Err(err) => warn!("client's token {} is not valid: '{:?}'", token, err),
-                Ok(result) => {
-                    debug!("client validation was successfull");
-                    let user_id = result.user_id;
-                    let group_id = result.group_id;
-                    let group_type = result.group_type;
-                    let group_name = result.group_name;
-                    debug!(
-                        "add client: (id:{}, token:{}, host:{}) to \"{}\"",
-                        user_id,
-                        token,
-                        client.host_name(),
-                        group_name
-                    );
-                    //clients.lock().unwrap().insert(token, client);
-                    self.lobby
-                        .add_client(&group_type, group_id, &group_name, user_id, client)
-                        .unwrap_or_else(|e| warn!("failed to add client: {}", e));
-                }
-            }
-        } else {
-            warn!("client sent invalid token");
-        }
-    }
-
-    fn read_clients(&self) -> Receiver<ClientConnection> {
-        let (sen, rec): (Sender<ClientConnection>, Receiver<ClientConnection>) = mpsc::channel();
-        let addr = self.addr;
-        std::thread::spawn(move || match Self::handle_requests(addr, &sen) {
-            Err(e) => sen.send(Err(e)).unwrap(),
-            _ => (),
-        });
-        rec
-    }
-
-    fn handle_requests(
-        addr: SocketAddr,
-        sen: &Sender<ClientConnection>,
-    ) -> Result<(), GameServerError> {
-        let server = match Server::<NoTlsAcceptor>::bind(addr) {
-            Ok(v) => v,
-            Err(e) => {
-                error!("websocket binding error");
-                Err(GameServerError::BindError(e))?
-            }
-        };
-        info!("webserver is being launched");
-        for req in server {
-            sen.send(Ok(Self::handle_request(req)?)).unwrap();
-        }
-        info!("webserver is being shut down");
         Ok(())
     }
 
-    fn handle_request(req: AcceptResult<TcpStream>) -> ClientConnection {
-        match req {
-            Ok(req) => {
-                if !req.protocols().contains(&PROTOCOL.to_string()) {
-                    warn!("a client tried to connect without {} protocol", PROTOCOL);
-                    req.reject().unwrap();
-                    Err(GameServerError::InvalidProtocolError)
-                } else {
-                    match req.use_protocol(PROTOCOL).accept() {
-                        Ok(client) => match GameClient::from_raw(client) {
-                            Ok(client) => Ok(client),
-                            Err(_) => {
-                                error!("could not create a client");
-                                Err(GameServerError::HandshakeRequestError)
-                            }
-                        },
-                        Err((_, e)) => {
-                            warn!("client handshake failed");
-                            Err(GameServerError::AcceptError(e))
-                        }
-                    }
+    // low-level handling of requests
+    fn on_request(&mut self, req: &Request) -> ws::Result<Response> {
+        let (res, token) = handshake(req);
+        Ok(match token
+            .and_then(|token| {
+                info!("recived token: {}", token);
+                crate::backend_connection::verify_token(token)
+            })
+            .and_then(move |response| self.handle_token(response)) {
+                Ok(()) => res,
+                Err(err) => fail_response(
+                    res,
+                    format!("Client {:?}: {:?}", req.client_addr(), err).as_str(),
+                )
+        })
+    }
+
+    fn on_message(&mut self, msg: Message) -> ws::Result<()> {
+        info!("Socket got message '{}'. ", msg);
+
+        self.group.send(GroupMessage::Data((
+            self.ip.clone(),
+            Box::new(msg.into_data())
+            ))).unwrap_or_else(|err| {
+                let err = format!("failed to deliver internal message {}", err);
+                error!("{}", err);
+                self.ws.close_with_reason(CloseCode::Error, err)
+                    .unwrap_or_else(|e| error!("failed to send message to client {}", e));
+        });
+
+        Ok(())
+    }
+
+    fn on_close(&mut self, _: CloseCode, _: &str) {
+        if let Ok(mut guard) = self.groups.lock() {
+            if let Some(group) = guard.get_mut(&self.id) {
+                if group.remove_client(&self.ws).is_err() {
+                    warn!("failed to remove Client from Game");
                 }
-            }
-            Err(_) => {
-                warn!("invalid client request");
-                Err(GameServerError::HandshakeRequestError)
+                if group.clients.len() == 0 {
+                    guard.remove(&self.id);
+                }
             }
         }
     }
+}
+
+impl Socket {
+    fn handle_token(&mut self, response: TokenResponse) -> Result<(), ServerError> {
+        match self.groups.lock() {
+            Ok(mut guard) => {
+                self.id = response.group_id;
+                let group_type = response.group_type.clone();
+                if !guard.contains_key(&response.group_id) {
+                    let group = Group::new(response)?;
+                    self.group = group.sender.clone();
+                    guard.insert(group.id(), group);
+                }
+
+                // panics if any thread paniced while using the mutex
+                let group = &mut self.group;
+                guard.get_mut(&self.id).unwrap()
+                    .add_client(self.ws.clone())
+                    .map(|s| *group = s)
+            }
+            Err(e) => {
+                Err(ServerError::Group(format!(
+                    "cold not add client {:?}  to group {}: {}",
+                    self.ws, response.group_id, e
+                )))
+            }
+        }
+    }
+}
+
+fn handshake(req: &Request) -> (Response, Result<i32, ServerError>) {
+    let mut res = Response::from_request(req).unwrap();
+    if let Ok(protocols) = req.protocols() {
+        if protocols.iter().any(|pro| pro.contains(PROTOCOL)) {
+            res.set_protocol(PROTOCOL)
+        } else {
+            return (
+                fail_response(
+                    res,
+                    format!("does not support the {} protocol", PROTOCOL).as_str(),
+                ),
+                Err(ServerError::InvalidProtocol),
+            );
+        }
+        let token = protocols.iter().find(|pro| pro.starts_with("Token-"));
+        match token {
+            Some(token) => {
+                let (_, token) = token.split_at(6);
+                if let Ok(token) = token.parse::<i32>() {
+                    (res, Ok(token))
+                } else {
+                    (
+                        fail_response(res, "token is no valid i32"),
+                        Err(ServerError::InvalidTokenFormat),
+                    )
+                }
+            }
+            None => (
+                fail_response(res, "no token in protocols"),
+                Err(ServerError::InvalidToken(
+                    "No Token was passed as a Protocol in the Sec-WebSocket-Protocol Header"
+                        .to_string(),
+                )),
+            ),
+        }
+    } else {
+        (
+            fail_response(res, "failed to retrive protocols"),
+            Err(ServerError::InvalidProtocol),
+        )
+    }
+}
+
+fn fail_response(mut res: Response, reason: &str) -> Response {
+    res.set_status(400);
+    res.set_reason(reason);
+    warn!("{}", reason);
+    res
 }

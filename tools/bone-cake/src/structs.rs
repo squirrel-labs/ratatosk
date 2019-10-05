@@ -4,141 +4,123 @@ use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug, Deserialize)]
 pub struct AnimateChar {
-    frameRate: u8,
-    name: String,
-    version: String,
-    compatibleVersion: String,
-    armature: Vec<Armature>,
+    #[serde(rename = "frameRate")]
+    pub frame_rate: Option<i64>,
+    pub name: Option<String>,
+    pub version: Option<String>,
+    #[serde(rename = "compatibleVersion")]
+    pub compatible_version: Option<String>,
+    pub armature: Option<Vec<Armature>>,
 }
 
-#[derive(Deserialize, Debug, Default)]
-#[serde(default)]
-pub struct AABB {
-    x: f32,
-    y: f32,
-    width: f32,
-    height: f32,
-}
-
-#[derive(Deserialize, Debug)]
-#[serde(default)]
-pub struct Transform {
-    x: f32,
-    y: f32,
-    skx: f32,
-    sky: f32,
-}
-
-impl Default for Transform {
-    fn default() -> Transform {
-        Transform {
-            skx: 1.0,
-            sky: 1.0,
-            x: 0.0,
-            y: 0.0,
-        }
-    }
-}
-
-#[derive(Deserialize, Debug, Default)]
-#[serde(default)]
-pub struct Parent {
-    name: String,
-    parent: String,
-}
-
-#[derive(Deserialize, Debug, Default)]
-#[serde(default)]
-pub struct Bone {
-    name: String,
-    parent: String,
-    transform: Transform,
-    length: f32,
-}
-
-#[derive(Deserialize, Debug, Default)]
-#[serde(default)]
-pub struct Slot {
-    displayIndex: i32,     // `json: "displayIndex,omitempty"`
-    name: String,          // `json: "name"`
-    parent: String,        // `json: "parent"`
-    display: Vec<Display>, // `json: "display"`
-}
-
-#[derive(Deserialize, Debug)]
-pub struct Display {
-    name: String, //`json: "name"`
-}
-
-#[derive(Deserialize, Debug)]
-pub struct Skin {
-    slot: Vec<Slot>, //`json: "slot"`
-}
-
-#[derive(Deserialize, Debug, Default)]
-#[serde(default)]
-pub struct TranslateFrame {
-    tweenEasing: i32, // `json: "tweenEasing,omitempty"`
-    y: f32,           // `json: "y,omitempty"`
-    x: f32,           // `json: "y,omitempty"`
-    duration: i32,    // `json: "duration,omitempty"`
-}
-
-#[derive(Deserialize, Debug, Default)]
-#[serde(default)]
-pub struct RotateFrame {
-    tweenEasing: i32, // `json: "tweenEasing,omitempty"`
-    rotate: f32,      // `json: "rotate,omitempty"`
-    duration: i32,    // `json: "duration,omitempty"`
-}
-
-#[derive(Deserialize, Debug, Default)]
-#[serde(default)]
-pub struct BoneMov {
-    name: String,                        // `json: "name"`
-    translateFrame: Vec<TranslateFrame>, // `json: "translateFrame,omitempty"`
-    rotateFrame: Vec<RotateFrame>,       // `json: "rotateFrame,omitempty"`
-}
-
-#[derive(Deserialize, Debug)]
-pub struct Animation {
-    duration: i32,      // `json: "duration"`
-    playTimes: i32,     // `json: "playTimes"`
-    name: String,       // `json: "name"`
-    bone: Vec<BoneMov>, // `json: "bone"`
-}
-
-#[derive(Deserialize, Debug)]
-pub struct DefaultActions {
-    gotoAndPlay: String, // `json: "gotoAndPlay"`
-}
-
-#[derive(Deserialize, Debug)]
-pub struct Canvas {
-    x: i32,      // `json: "x"`
-    y: i32,      // `json: "y"`
-    width: i32,  // `json: "width"`
-    height: i32, // `json: "height"`
-}
-
-#[derive(Deserialize, Debug)]
+#[derive(Debug, Deserialize)]
 pub struct Armature {
     #[serde(rename = "type")]
-    type_name: String, // `json: "type"`
-    frameRate: i32,                      // `json: "frameRate"`
-    name: String,                        // `json: "name"`
-    aabb: AABB,                          // `json: "aabb"`
-    bone: Vec<Bone>,                     // `json: "bone"`
-    slot: Vec<Slot>,                     // `json: "slot"`
-    skin: Vec<Skin>,                     // `json: "skin"`
-    animation: Vec<Animation>,           // `json: "animation"`
-    defaultActions: Vec<DefaultActions>, // `json: "defaultActions"`
-    canvas: Canvas,                      // `json: "canvas"`
+    pub armature_type: Option<String>,
+    #[serde(rename = "frameRate")]
+    pub frame_rate: Option<i64>,
+    pub name: Option<String>,
+    pub aabb: Option<Aabb>,
+    pub bone: Option<Vec<ArmatureBone>>,
+    pub slot: Option<Vec<ArmatureSlot>>,
+    pub skin: Option<Vec<Skin>>,
+    pub animation: Option<Vec<Animation>>,
+    #[serde(rename = "defaultActions")]
+    pub default_actions: Option<Vec<DefaultAction>>,
 }
 
-pub fn load_char(path: String) -> Result<AnimateChar, Box<dyn Error>> {
+#[derive(Debug, Deserialize)]
+pub struct Aabb {
+    pub x: Option<f64>,
+    pub y: Option<f64>,
+    pub width: Option<f64>,
+    pub height: Option<f64>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Animation {
+    pub duration: Option<i64>,
+    #[serde(rename = "playTimes")]
+    pub play_times: Option<i64>,
+    pub name: Option<String>,
+    pub bone: Option<Vec<AnimationBone>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AnimationBone {
+    pub name: Option<String>,
+    #[serde(rename = "translateFrame")]
+    pub translate_frame: Option<Vec<TranslateFrame>>,
+    #[serde(rename = "rotateFrame")]
+    pub rotate_frame: Option<Vec<RotateFrame>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct RotateFrame {
+    pub duration: Option<i64>,
+    #[serde(rename = "tweenEasing")]
+    pub tween_easing: Option<i64>,
+    pub rotate: Option<f64>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TranslateFrame {
+    #[serde(rename = "tweenEasing")]
+    pub tween_easing: Option<i64>,
+    pub y: Option<f64>,
+    pub duration: Option<i64>,
+    pub x: Option<f64>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ArmatureBone {
+    pub name: Option<String>,
+    pub transform: Option<Transform>,
+    pub parent: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Transform {
+    pub x: Option<f64>,
+    pub y: Option<f64>,
+    #[serde(rename = "skX")]
+    pub sk_x: Option<f64>,
+    #[serde(rename = "skY")]
+    pub sk_y: Option<f64>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct DefaultAction {
+    #[serde(rename = "gotoAndPlay")]
+    pub goto_and_play: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Skin {
+    pub slot: Option<Vec<SkinSlot>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SkinSlot {
+    pub name: Option<String>,
+    pub display: Option<Vec<Display>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Display {
+    pub name: Option<String>,
+    pub transform: Option<Transform>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ArmatureSlot {
+    pub name: Option<String>,
+    pub parent: Option<String>,
+}
+
+pub fn load_character(path: String) -> Result<AnimateChar, Box<dyn Error>> {
     println!("Loading texture file: {}", path);
     let file = File::open(path)?;
     let reader = BufReader::new(file);

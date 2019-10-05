@@ -12,6 +12,8 @@
         <div id='cons'>connected</div><br>
         <button onclick='test_connection()'>Launch</button><br>
         <span>Server address: </span><input id='addr'></input>
+        <span>Protocols: </span><input id='prots'></input>
+        
         <div align='right'><span>Message</span><input id='msg'></input> <button onclick='send_text()'>Send</button></div>
         <div id='chat' style='background: rgb(20, 20, 20); padding-left: 20px; margin: 40px' />
     </body>
@@ -20,10 +22,15 @@ function get_addr() {
     return document.getElementById('addr').value;
 }
 
+function get_prots() {
+    let prots = document.getElementById('prots').value;
+    return ['tuesday'].concat(prots.split(','))
+}
+
 function test_connection() {
     let a = 'ws://' + get_addr();
     add_text('create a new connection at "' + a + '"');
-    ws = new WebSocket(a, 'tuesday');
+    ws = new WebSocket(a, get_prots());
     ws.addEventListener('open', function (event) {
         add_text('connection established');
         toggle_connected(true);

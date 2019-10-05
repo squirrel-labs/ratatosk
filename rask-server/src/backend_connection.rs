@@ -1,95 +1,48 @@
+use crate::error::ServerError;
 use crate::group::GroupId;
-use crate::server::{Token, UserId};
-use reqwest::{Client, Error as ReqError, Response, Url, UrlError};
-use std::sync::mpsc;
-use std::sync::mpsc::{Receiver, Sender};
+use serde::{Deserialize, Serialize};
 
-pub struct BackendConnection {
-    host: String,
-    req_sender: Sender<RequestData>,
-    res_rec: Receiver<ResponseResult>,
-    max_uid: u32,
-}
+const API_ENDPOINT: &str = "https://games.kobert.dev/";
 
-#[derive(Debug)]
-pub enum BackendError {
-    UrlError(UrlError),
-    RequestError(ReqError),
-    InvalidTokenFormat,
-    InvalidToken,
-    BadResponse(Response),
-}
-
-pub type TokenValidity = Result<TokenResponse, BackendError>;
-pub type RequestData = Url;
-pub type ResponseResult = Result<Response, ReqError>;
-
+/// The group information send as response to
+/// a token request.
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TokenResponse {
+    #[serde(rename = "hasPassword")]
+    pub password: bool,
+    #[serde(rename = "maxUsers")]
+    pub user_max: u32,
+    #[serde(rename = "userCount")]
+    pub user_count: u32,
+    #[serde(rename = "id")]
     pub group_id: GroupId,
+    #[serde(rename = "type")]
     pub group_type: String,
+    #[serde(rename = "name")]
     pub group_name: String,
-    pub user_id: UserId,
+    #[serde(rename = "username")]
+    pub user_name: String,
 }
 
-impl BackendConnection {
-    fn run_background(req_rec: Receiver<RequestData>, res_sender: Sender<ResponseResult>) {
-        let client = Client::new();
-        loop {
-            let request_data = req_rec.recv().unwrap();
-            let location = request_data;
-            let request = client.get(location);
-            let response = request.send();
-            res_sender.send(response).unwrap();
-        }
-    }
+/// Make a plaintext get request to API_ENDPOINT/{location}
+pub fn request(location: &str) -> Option<String> {
+    let uri = &format!("{}{}", API_ENDPOINT, location);
+    reqwest::get(uri)
+        .and_then(|mut res| res.text())
+        .map_err(|err| log::warn!("request on \"{}\" failed: {}", uri, err))
+        .ok()
+}
 
-    pub fn new(host: &str) -> Self {
-        let (req_sender, req_rec): (Sender<RequestData>, Receiver<RequestData>) = mpsc::channel();
-        let (res_sender, res_rec): (Sender<ResponseResult>, Receiver<ResponseResult>) =
-            mpsc::channel();
-        std::thread::spawn(move || Self::run_background(req_rec, res_sender));
-        BackendConnection {
-            host: host.to_string(),
-            req_sender,
-            res_rec,
-            max_uid: 420,
-        }
-    }
-
-    pub fn request(&self, location: &str) -> Result<(), UrlError> {
-        Ok(self
-            .req_sender
-            .send(Url::parse(&format!("{}{}", self.host, location))?)
-            .unwrap())
-    }
-
-    pub fn get_response(&self) -> ResponseResult {
-        self.res_rec.recv().unwrap()
-    }
-
-    pub fn validate_token(&mut self, token: &Token) -> TokenValidity {
-        let location = format!("/api/lobby/tokens/{}", token);
-        self.request(&location)
-            .map_err(|err| BackendError::UrlError(err))?;
-        let response = self
-            .get_response()
-            .map_err(|err| BackendError::RequestError(err))?;
-        if response.status().is_success() {
-            // zu Testzwecken werden noch keine JSON-Daten deserialisiert
-            // Dennis Server gibt ja noch nix zurück
-            self.max_uid += 1;
-            Ok(TokenResponse {
-                group_id: 12,
-                group_type: "scribble".to_string(),
-                group_name: "Scribble".to_string(),
-                user_id: self.max_uid - 1,
-            })
-        } else if response.status() == reqwest::StatusCode::NOT_FOUND {
-            Err(BackendError::InvalidToken)
-        } else if response.status().is_client_error() {
-            Err(BackendError::InvalidTokenFormat)
-        } else {
-            Err(BackendError::BadResponse(response))
-        }
-    }
+/// Verify the token validity
+pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
+    let mut res = reqwest::get(&format!("{}api/lobby/tokens/{}", API_ENDPOINT, token))
+        .map_err(|e| ServerError::BackendRequest(e))?;
+    let token_res: Result<TokenResponse, _> = res.json();
+    token_res.map_err(|e| {
+        warn!("{}", e);
+        ServerError::InvalidToken(format!(
+            "The Backend Response did not contain valid group information: {:?}",
+            res.text()
+        ))
+    })
 }

@@ -4,8 +4,8 @@ use wasm_bindgen::prelude::*;
 
 use crate::context;
 use log::info;
-use webhogg_wasm_shared::get_double_buffer;
-use webhogg_wasm_shared::wasm_log::WasmLog;
+use rask_wasm_shared::get_double_buffer;
+use rask_wasm_shared::wasm_log::WasmLog;
 
 #[wasm_bindgen]
 pub fn initialise(canvas: web_sys::OffscreenCanvas) {
@@ -16,13 +16,13 @@ pub fn initialise(canvas: web_sys::OffscreenCanvas) {
     log::set_boxed_logger(Box::new(WasmLog::new()))
         .map(|()| log::set_max_level(log::LevelFilter::Debug))
         .unwrap();
+    info!("graphics entry reached");
 
     context::set_context(
         context::Context::new(canvas)
             .map_err(|e| log::error!("{}", e))
             .unwrap(),
     );
-    info!("graphics entry reached");
 }
 
 #[wasm_bindgen]

@@ -9,7 +9,7 @@ use wasm_bindgen::JsValue;
 ///
 /// ```should_panic
 /// use wasm_bindgen::JsValue;
-/// use webhogg_wasm_shared::error::ClientError;
+/// use rask_wasm_shared::error::ClientError;
 ///
 /// # fn main() -> Result<(), ClientError> {
 /// let err: Result<(), JsValue> = Err(JsValue::from_str("test error"));
@@ -24,6 +24,7 @@ pub enum ClientError {
     JsValueError(JsValue),
     WebSocketError(JsValue),
     WebGlError(String),
+    ResourceError(String),
 }
 
 fn jsvalue_to_string(v: &JsValue) -> String {
@@ -44,7 +45,7 @@ impl std::fmt::Display for ClientError {
             ClientError::JsValueError(e) | ClientError::WebSocketError(e) => {
                 write!(f, "{}", jsvalue_to_string(e))
             }
-            ClientError::WebGlError(e) => write!(f, "{}", e),
+            ClientError::ResourceError(e) | ClientError::WebGlError(e) => write!(f, "{}", e),
         }
     }
 }

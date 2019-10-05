@@ -1,26 +1,29 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Textures {
-    name: String,
-    width: f32,
-    height: f32,
-    imagePath: String,
-    SubTexture: Vec<Texture>,
+    pub width: i64,
+    #[serde(rename = "SubTexture")]
+    pub sub_textures: Vec<SubTexture>,
+    pub height: i64,
+    pub name: String,
+    #[serde(rename = "imagePath")]
+    pub image_path: String,
 }
 
-#[derive(Deserialize, Debug)]
-pub struct Texture {
-    x: f32,
-    y: f32,
-    width: f32,
-    height: f32,
-    name: String,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SubTexture {
+    pub width: i64,
+    pub y: i64,
+    pub height: i64,
+    pub name: String,
+    pub x: i64,
 }
+
 
 pub fn load_textures(path: String) -> Result<Textures, Box<dyn Error>> {
     println!("Loading texture file: {}", path);

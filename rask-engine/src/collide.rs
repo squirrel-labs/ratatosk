@@ -1,3 +1,6 @@
+//! The collide module provides the Collide trait for objects that can collide along with several
+//! implementations for various types.
+
 use crate::boxes::{AABox, RBox};
 use crate::math::Vec2;
 

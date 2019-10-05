@@ -10,10 +10,10 @@
 //use game_engine::game::state;
 use js_sys::Uint8Array;
 use log::{debug, error};
+use rask_wasm_shared::ClientError;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{ErrorEvent, FileReaderSync, MessageEvent, WebSocket};
-use webhogg_wasm_shared::ClientError;
 
 pub struct WebSocketAdapter {
     ws: WebSocket,
