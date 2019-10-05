@@ -1,39 +1,48 @@
 use crate::error::ServerError;
 use crate::group::GroupId;
-use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
 
 const API_ENDPOINT: &str = "https://games.kobert.dev/";
 
+/// The group information send as response to
+/// a token request.
+#[derive(Debug, Serialize, Deserialize)]
 pub struct TokenResponse {
-    pub group_id: GroupId,  //Id
-    pub group_type: String, //Type
-    pub user_name: String,  //Name
+    #[serde(rename = "hasPassword")]
+    pub password: bool,
+    #[serde(rename = "maxUsers")]
+    pub user_max: u32,
+    #[serde(rename = "userCount")]
+    pub user_count: u32,
+    #[serde(rename = "id")]
+    pub group_id: GroupId,
+    #[serde(rename = "type")]
+    pub group_type: String,
+    #[serde(rename = "name")]
+    pub group_name: String,
+    #[serde(rename = "username")]
+    pub user_name: String,
 }
 
-pub fn request(location: &str) -> String {
-    match reqwest::get(location) {
-        Ok(mut res) => res.text().unwrap(),
-        Err(err) => format!("{}", err),
-    }
+/// Make a plaintext get request to API_ENDPOINT/{location}
+pub fn request(location: &str) -> Option<String> {
+    let uri = &format!("{}{}", API_ENDPOINT, location);
+    reqwest::get(uri)
+        .and_then(|mut res| res.text())
+        .map_err(|err| log::warn!("request on \"{}\" failed: {}", uri, err))
+        .ok()
 }
 
+/// Verify the token validity
 pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
-    let res: HashMap<String, String> =
-        match reqwest::get(format!("{}api/lobby/tokens/{}", API_ENDPOINT, token).as_str()) {
-            Ok(mut res) => res.json()?,
-            Err(_) => return Err(ServerError::InvalidToken),
-        };
-    let to_find = ["Id", "Type", "Name"];
-    if !to_find.iter().all(|x| res.contains_key(&x.to_string())) {
-        return Err(ServerError::InvalidTokenFormat);
-    }
-    if let Ok(id) = (*res.get("Id").unwrap()).parse() {
-        return Ok(TokenResponse {
-            group_id: id,
-            group_type: res.get("Type").unwrap().to_string(),
-            user_name: res.get("Name").unwrap().to_string(),
-        });
-    } else {
-        return Err(ServerError::InvalidTokenFormat);
-    }
+    let mut res = reqwest::get(&format!("{}api/lobby/tokens/{}", API_ENDPOINT, token))
+        .map_err(|e| ServerError::BackendRequest(e))?;
+    let token_res: Result<TokenResponse, _> = res.json();
+    token_res.map_err(|e| {
+        warn!("{}", e);
+        ServerError::InvalidToken(format!(
+            "The Backend Response did not contain valid group information: {:?}",
+            res.text()
+        ))
+    })
 }

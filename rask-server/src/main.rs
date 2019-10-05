@@ -1,8 +1,8 @@
 mod backend_connection;
 mod error;
+mod games;
 mod group;
-mod lobby;
-mod websocket;
+mod server;
 
 mod game_logger;
 
@@ -13,7 +13,7 @@ extern crate clap;
 use clap::App;
 pub use std::error::Error;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), error::ServerError> {
     game_logger::init_logger();
 
     // load args
@@ -26,8 +26,5 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // start server
     info!("create game server on {:?}", addr);
-    let ws_server = websocket::Server::run(addr, port);
-    ws_server.unwrap().join();
-    //TODO fix unwrap
-    Ok(())
+    server::run(addr, port).map(|s| s.join().unwrap())
 }
