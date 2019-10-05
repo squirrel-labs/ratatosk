@@ -195,8 +195,8 @@ unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> 
 {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         Self::allocator()
-             .alloc(layout)
-             .offset(S::allocation_start_address::<M>())
+            .alloc(layout)
+            .offset(S::allocation_start_address::<M>())
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
