@@ -9,6 +9,7 @@ use ws::Sender;
 
 pub type GroupId = u32;
 
+/// capacity is never allowed to be above usize::MAX
 pub struct Group {
     pub clients: Vec<Sender>,
     pub sender: mpsc::Sender<Message>,
@@ -57,11 +58,11 @@ impl Group {
     }
 
     pub fn group_type(&self) -> &str {
-        self.group_type.as_str()
+        &self.group_type
     }
 
     pub fn name(&self) -> &str {
-        self.name.as_str()
+        &self.name
     }
 
     pub fn park(self) -> Result<(), ServerError> {
@@ -73,29 +74,31 @@ impl Group {
     }
 
     pub fn add_client(&mut self, client: Sender) -> Result<mpsc::Sender<Message>, ServerError> {
-        if self.clients.len() >= self.capacity.try_into().unwrap() {
-            return Err(ServerError::Group(format!(
+        if self.clients.len() >= self.capacity as usize {
+            Err(ServerError::Group(format!(
                 "User limit for {} exceeded",
                 self.id
-            )));
+            )))
+        } else {
+            self.clients.push(client.clone());
+            self
+                .sender
+                .send(Message::Add(games::User::new("None".to_owned(), client)))
+                .map_err(Into::into).map(|()| self.sender.clone())
         }
-        self.clients.push(client.clone());
-        let _ = self
-            .sender
-            .send(Message::Add(games::User::new("None".to_owned(), client)))?;
-        Ok(self.sender.clone())
     }
 
     pub fn remove_client(&mut self, client: &Sender) -> Result<(), ServerError> {
         if let Some(pos) = self.clients.iter().position(|x| *x == *client) {
             self.clients.swap_remove(pos);
         }
-        Ok(self.sender.send(Message::Remove(client.clone()))?)
+        self.sender.send(Message::Remove(client.clone())).map_err(Into::into)
     }
 
     pub fn new(response: TokenResponse) -> Result<Self, ServerError> {
         let (sender, receiver) = mpsc::channel();
         let (id, name, group_type) = (response.group_id, response.group_name, response.group_type);
+        let capacity = response.user_max.try_into().unwrap_or(std::usize::MAX) as u32;
         info!(
             "Creating Group{} ({}) with game {}",
             id, name, group_type
@@ -104,7 +107,7 @@ impl Group {
         let send_group = SendGroup {
             receiver,
             id, name: name.clone(), group_type: group_type.clone(),
-            capacity: response.user_max
+            capacity
         };
 
         let game = match group_type.as_str() {
@@ -118,7 +121,7 @@ impl Group {
         Ok(Self {
             clients: Vec::new(),
             sender, id: id, group_type, name,
-            capacity: response.user_max,
+            capacity,
             game_thread: game.run()?,
         })
     }
