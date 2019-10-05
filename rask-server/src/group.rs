@@ -81,10 +81,10 @@ impl Group {
             )))
         } else {
             self.clients.push(client.clone());
-            self
-                .sender
+            self.sender
                 .send(Message::Add(games::User::new("None".to_owned(), client)))
-                .map_err(Into::into).map(|()| self.sender.clone())
+                .map_err(Into::into)
+                .map(|()| self.sender.clone())
         }
     }
 
@@ -92,35 +92,39 @@ impl Group {
         if let Some(pos) = self.clients.iter().position(|x| *x == *client) {
             self.clients.swap_remove(pos);
         }
-        self.sender.send(Message::Remove(client.clone())).map_err(Into::into)
+        self.sender
+            .send(Message::Remove(client.clone()))
+            .map_err(Into::into)
     }
 
     pub fn new(response: TokenResponse) -> Result<Self, ServerError> {
         let (sender, receiver) = mpsc::channel();
         let (id, name, group_type) = (response.group_id, response.group_name, response.group_type);
         let capacity = response.user_max.try_into().unwrap_or(std::usize::MAX) as u32;
-        info!(
-            "Creating Group{} ({}) with game {}",
-            id, name, group_type
-        );
+        info!("Creating Group{} ({}) with game {}", id, name, group_type);
 
         let send_group = SendGroup {
             receiver,
-            id, name: name.clone(), group_type: group_type.clone(),
-            capacity
+            id,
+            name: name.clone(),
+            group_type: group_type.clone(),
+            capacity,
         };
 
         let game = match group_type.as_str() {
             "rask" => RaskGame::new(send_group),
             name => Err(ServerError::GroupCreation(format!(
-                    "The game type {} is not implemented",
-                    name
-                )))?
+                "The game type {} is not implemented",
+                name
+            )))?,
         };
 
         Ok(Self {
             clients: Vec::new(),
-            sender, id: id, group_type, name,
+            sender,
+            id: id,
+            group_type,
+            name,
             capacity,
             game_thread: game.run()?,
         })

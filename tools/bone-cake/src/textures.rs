@@ -24,7 +24,6 @@ pub struct SubTexture {
     pub x: i64,
 }
 
-
 pub fn load_textures(path: String) -> Result<Textures, Box<dyn Error>> {
     println!("Loading texture file: {}", path);
     let file = File::open(path)?;

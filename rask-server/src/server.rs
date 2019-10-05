@@ -51,32 +51,38 @@ impl Handler for Socket {
     // low-level handling of requests
     fn on_request(&mut self, req: &Request) -> ws::Result<Response> {
         let (res, token) = handshake(req);
-        Ok(match token
-            .and_then(|token| {
-                info!("recived token: {}", token);
-                crate::backend_connection::verify_token(token)
-            })
-            .and_then(move |response| self.handle_token(response)) {
+        Ok(
+            match token
+                .and_then(|token| {
+                    info!("recived token: {}", token);
+                    crate::backend_connection::verify_token(token)
+                })
+                .and_then(move |response| self.handle_token(response))
+            {
                 Ok(()) => res,
                 Err(err) => fail_response(
                     res,
                     format!("Client {:?}: {:?}", req.client_addr(), err).as_str(),
-                )
-        })
+                ),
+            },
+        )
     }
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
         info!("Socket got message '{}'. ", msg);
 
-        self.group.send(GroupMessage::Data((
-            self.ip.clone(),
-            Box::new(msg.into_data())
-            ))).unwrap_or_else(|err| {
+        self.group
+            .send(GroupMessage::Data((
+                self.ip.clone(),
+                Box::new(msg.into_data()),
+            )))
+            .unwrap_or_else(|err| {
                 let err = format!("failed to deliver internal message {}", err);
                 error!("{}", err);
-                self.ws.close_with_reason(CloseCode::Error, err)
+                self.ws
+                    .close_with_reason(CloseCode::Error, err)
                     .unwrap_or_else(|e| error!("failed to send message to client {}", e));
-        });
+            });
 
         Ok(())
     }
@@ -109,16 +115,16 @@ impl Socket {
 
                 // panics if any thread paniced while using the mutex
                 let group = &mut self.group;
-                guard.get_mut(&self.id).unwrap()
+                guard
+                    .get_mut(&self.id)
+                    .unwrap()
                     .add_client(self.ws.clone())
                     .map(|s| *group = s)
             }
-            Err(e) => {
-                Err(ServerError::Group(format!(
-                    "cold not add client {:?}  to group {}: {}",
-                    self.ws, response.group_id, e
-                )))
-            }
+            Err(e) => Err(ServerError::Group(format!(
+                "cold not add client {:?}  to group {}: {}",
+                self.ws, response.group_id, e
+            ))),
         }
     }
 }
