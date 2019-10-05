@@ -13,7 +13,7 @@ extern crate clap;
 use clap::App;
 pub use std::error::Error;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<(), error::ServerError> {
     game_logger::init_logger();
 
     // load args
@@ -26,6 +26,5 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     // start server
     info!("create game server on {:?}", addr);
-    let ws_server = server::run(addr, port)?;
-    Ok(ws_server.join().unwrap())
+    server::run(addr, port).map(|s| s.join().unwrap())
 }

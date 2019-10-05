@@ -16,11 +16,10 @@ pub struct Group {
     group_type: String,
     name: String,
     capacity: u32,
-    game: Option<JoinHandle<()>>,
+    game_thread: JoinHandle<()>,
 }
 
 pub struct SendGroup {
-    pub clients: Vec<Sender>,
     pub receiver: mpsc::Receiver<Message>,
     pub id: GroupId,
     pub group_type: String,
@@ -29,6 +28,7 @@ pub struct SendGroup {
 }
 
 pub enum Message {
+    // TODO: flatten tuple
     Data((String, Box<Vec<u8>>)),
     Park,
     Kill,
@@ -48,10 +48,6 @@ impl Message {
 impl Drop for Group {
     fn drop(&mut self) {
         self.sender.send(Message::Kill).unwrap();
-        if let Some(game) = self.game.take() {
-            let _ = game.join();
-            info!("dropping group");
-        }
     }
 }
 
@@ -73,10 +69,7 @@ impl Group {
     }
 
     pub fn unpark(&mut self) {
-        if let Some(game) = self.game.take() {
-            game.thread().unpark();
-            self.game = Some(game);
-        }
+        self.game_thread.thread().unpark();
     }
 
     pub fn add_client(&mut self, client: Sender) -> Result<mpsc::Sender<Message>, ServerError> {
@@ -100,51 +93,33 @@ impl Group {
         Ok(self.sender.send(Message::Remove(client.clone()))?)
     }
 
-    fn to_send_group(&self, receiver: mpsc::Receiver<Message>) -> SendGroup {
-        SendGroup {
-            clients: self.clients.clone(),
-            receiver,
-            id: self.id,
-            group_type: self.group_type.to_owned(),
-            name: self.name.to_owned(),
-            capacity: self.capacity.to_owned(),
-        }
-    }
-
     pub fn new(response: TokenResponse) -> Result<Self, ServerError> {
         let (sender, receiver) = mpsc::channel();
-        let mut group = Self {
-            clients: Vec::new(),
-            sender,
-            id: response.group_id,
-            group_type: response.group_type,
-            name: response.group_name,
-            capacity: response.user_max,
-            game: None,
-        };
+        let (id, name, group_type) = (response.group_id, response.group_name, response.group_type);
         info!(
             "Creating Group{} ({}) with game {}",
-            group.id(),
-            group.name(),
-            group.group_type()
+            id, name, group_type
         );
 
-        let game = match group.group_type() {
-            "rask" => RaskGame::new(group.to_send_group(receiver)),
-            name => {
-                return Err(ServerError::GroupCreation(format!(
+        let send_group = SendGroup {
+            receiver,
+            id, name: name.clone(), group_type: group_type.clone(),
+            capacity: response.user_max
+        };
+
+        let game = match group_type.as_str() {
+            "rask" => RaskGame::new(send_group),
+            name => Err(ServerError::GroupCreation(format!(
                     "The game type {} is not implemented",
                     name
-                )))
-            }
+                )))?
         };
-        match game.run() {
-            Ok(handle) => group.game = Some(handle),
-            Err(e) => {
-                error!("Os failed to spwan thread. {}", e);
-                return Err(e);
-            }
-        }
-        Ok(group)
+
+        Ok(Self {
+            clients: Vec::new(),
+            sender, id: id, group_type, name,
+            capacity: response.user_max,
+            game_thread: game.run()?,
+        })
     }
 }
