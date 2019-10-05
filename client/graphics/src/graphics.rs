@@ -233,10 +233,10 @@ impl GraphicsApi for WebGl {
                 Some(&texture.raw()),
             )?;
 
-        set_param(&self.gl, Gl2::TEXTURE_WRAP_S, Gl2::CLAMP_TO_EDGE);
-        set_param(&self.gl, Gl2::TEXTURE_WRAP_T, Gl2::CLAMP_TO_EDGE);
         set_param(&self.gl, Gl2::TEXTURE_MIN_FILTER, Gl2::NEAREST);
         set_param(&self.gl, Gl2::TEXTURE_MAG_FILTER, Gl2::NEAREST);
+        set_param(&self.gl, Gl2::TEXTURE_WRAP_S, Gl2::CLAMP_TO_EDGE);
+        set_param(&self.gl, Gl2::TEXTURE_WRAP_T, Gl2::CLAMP_TO_EDGE);
 
         self.texture_handles[n as usize] = Some(handle);
         Ok(())
