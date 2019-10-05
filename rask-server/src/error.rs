@@ -32,6 +32,7 @@ impl std::fmt::Display for ServerError {
         }
     }
 }
+
 impl From<Box<dyn std::error::Error>> for ServerError {
     fn from(e: Box<dyn std::error::Error>) -> Self {
         ServerError::StdErr(e)

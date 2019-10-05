@@ -5,12 +5,16 @@
 #![feature(allocator_api)]
 
 use rask_wasm_shared::{
-    alloc::{SimpleAllocator, Allocator, Initial, NaiveInitial, settings::Logic},
-    create_allocator,
-    wee_alloc
+    alloc::{settings::Logic, Allocator, Initial, NaiveInitial, SimpleAllocator},
+    create_allocator, wee_alloc,
 };
 
-create_allocator!(ALLOCATOR, wee_alloc::WeeAlloc<'static>, Logic, wee_alloc::WeeAlloc::INIT);
+create_allocator!(
+    ALLOCATOR,
+    wee_alloc::WeeAlloc<'static>,
+    Logic,
+    wee_alloc::WeeAlloc::INIT
+);
 //create_allocator!(ALLOCATOR, SimpleAllocator, Logic);
 
 pub mod entries;

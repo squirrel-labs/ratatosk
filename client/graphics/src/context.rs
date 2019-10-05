@@ -9,13 +9,12 @@ pub struct Context {
 
 impl Context {
     pub fn new(canvas: web_sys::OffscreenCanvas) -> Result<Self, ClientError> {
-        Render::new(canvas).map(|render| Self {
-            render,
-        })
+        Render::new(canvas).map(|render| Self { render })
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
-        self.render.render(rask_wasm_shared::mem::shared_heap().animations())
+        self.render
+            .render(rask_wasm_shared::mem::shared_heap().animations())
     }
 }
 

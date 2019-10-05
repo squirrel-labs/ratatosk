@@ -29,12 +29,22 @@ impl Sprite {
     }
 
     pub fn get_frame<'a>(&self, animations: &'a [Animation]) -> Option<&'a Frame> {
-        self.get_animation(animations)?.frames.get(self.frame_id as usize)
+        self.get_animation(animations)?
+            .frames
+            .get(self.frame_id as usize)
     }
 
-    pub fn new(pos: math::Vec2, animation_id: AnimationId, frame_id: FrameId, tex_id: TextureId) -> Self {
+    pub fn new(
+        pos: math::Vec2,
+        animation_id: AnimationId,
+        frame_id: FrameId,
+        tex_id: TextureId,
+    ) -> Self {
         Self {
-            pos, animation_id, frame_id, tex_id
+            pos,
+            animation_id,
+            frame_id,
+            tex_id,
         }
     }
 
@@ -58,7 +68,7 @@ impl Animation {
         match self.frames.len() as u32 {
             0 => 0,
             len if len - 1 <= frame_id => (frame_id + 1) % len,
-            _ => frame_id + 1
+            _ => frame_id + 1,
         }
     }
 }

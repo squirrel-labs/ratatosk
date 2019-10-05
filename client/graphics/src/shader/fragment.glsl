@@ -8,6 +8,8 @@ in vec2 tex_pos;
 uniform mediump sampler2D g_texture;
 
 void main() {
-    color = texture(g_texture, tex_pos);
+    vec2 tp = tex_pos;
+    // tp.y = 1.0 - tp.y;
+    color = texture(g_texture, tp);
     if (color.a == 0.0) discard;
 }
