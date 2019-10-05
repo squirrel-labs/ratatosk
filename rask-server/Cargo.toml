@@ -11,6 +11,7 @@ log = "0.4"
 fern = "0.5.8"
 colored = "1.8"
 reqwest = "0.9"
+serde = "1.0"
 
 [dependencies.ws]
 version = "*"
