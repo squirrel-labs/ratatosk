@@ -12,9 +12,9 @@ description = "shared crate for WebAssembly frontend of the rask project"
 crate-type = ["rlib"]
 
 [dependencies]
-wasm-bindgen = "0.2.48"
+wasm-bindgen = "0.2.51"
 log = "0.4"
-js-sys = "=0.3.25"
+js-sys = "=0.3.28"
 fern = "0.5.8"
 rand = "0.3.14"
 image = "0.22"
@@ -24,7 +24,7 @@ version = "0.1.0"
 path = "../../rask-engine"
 
 [dependencies.web-sys]
-version = "=0.3.25"
+version = "=0.3.28"
 features = [
     "console",
     "ImageData",
