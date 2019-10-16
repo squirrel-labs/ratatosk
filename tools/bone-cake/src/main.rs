@@ -4,8 +4,8 @@ mod textures;
 use std::fs::File;
 use std::io::BufReader;
 
-use std::env;
 use spine::skeleton::Skeleton;
+use std::env;
 
 fn usage() {
     eprintln!("Usage: bone_cake [Name_tex.json]");
@@ -28,7 +28,9 @@ fn main() {
     let skins = skeleton.get_skins_names();
     let animations = skeleton.get_animations_names();
 
-    let animation = skeleton.get_animated_skin("default", Some("standing")).unwrap();
+    let animation = skeleton
+        .get_animated_skin("default", Some("standing"))
+        .unwrap();
 
     for frame in animation.run(0.16) {
         for sprite in frame {
