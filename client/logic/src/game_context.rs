@@ -4,9 +4,10 @@ use rask_wasm_shared::get_double_buffer;
 use rask_wasm_shared::sprite::*;
 use rask_wasm_shared::state::State;
 
-const IMAGE1_DATA: &[u8] = include_bytes!("../../res/kuh.png");
-const IMAGE2_DATA: &[u8] = include_bytes!("../../res/mensch.png");
-//const IMAGE1_DATA: &[u8] = include_bytes!("../../res/empty.png");
+//const IMAGE1_DATA: &[u8] = include_bytes!("../../res/kuh.png");
+//const IMAGE2_DATA: &[u8] = include_bytes!("../../res/mensch.png");
+const IMAGE2_DATA: &[u8] = include_bytes!("../../res/thief.png");
+const IMAGE1_DATA: &[u8] = include_bytes!("../../res/empty.png");
 
 pub struct GameContext {
     state: State,

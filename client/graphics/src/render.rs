@@ -14,7 +14,7 @@ pub struct Render<T> {
 
 impl<T: GraphicsApi> Render<T> {
     pub fn new(canvas: web_sys::OffscreenCanvas) -> Result<Self, ClientError> {
-        let factor = rask_engine::math::vec2::Vec2::new(0.08, 0.08);
+        let factor = rask_engine::math::vec2::Vec2::new(0.2, 0.2);
         T::new(canvas, factor).map(|api| Self {
             graphics: api,
             texture_count: 0,

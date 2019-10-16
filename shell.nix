@@ -1,6 +1,6 @@
 with import (fetchTarball {
-  url = https://github.com/NixOS/nixpkgs-channels/archive/4557b9f1f50aa813ae673fe6fcd30ca872968947.tar.gz;
-  sha256 = "0cam48cn042axcik9vqxsqjc2hwyb2grjbjxacsn4w0y1zk6k6l2";
+  url = https://github.com/NixOS/nixpkgs/archive/f0057b6924dadb89a837010b22ba63097534ff0e.tar.gz;
+  sha256 = "19sx328s0x3wrc4j7isw8alxask9nw7ds2n6x7s6bi0675sh8jcp";
 }) { };
 
 mkShell {
@@ -12,14 +12,14 @@ mkShell {
     rustc
     cargo
     openssl
-    binaryen
     cargo-make
     wabt
+    binaryen
+    wasm-bindgen-cli
   ];
 
   shellHook = ''
     # ugly, I know
     export PATH="$PATH:$HOME/.cargo/bin"
-    alias make="cargo make"
   '';
 }
