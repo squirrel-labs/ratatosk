@@ -3,12 +3,12 @@ BUILD_ENV = "debug"
 
 [tasks.exec-debug]
 command = "cargo"
-toolchain = "nightly"
+toolchain = "nightly-2019-10-15"
 args = [ "${@}" ]
 workspace = false
 
 [tasks.exec-release]
 command = "cargo"
-toolchain = "nightly"
+toolchain = "nightly-2019-10-15"
 args = [ "${@}", "--release" ]
 workspace = false

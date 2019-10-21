@@ -22,7 +22,7 @@ found in Wiki.
 ### Prerequisites
 
 * [`rustup` and the Rust toolchain](https://rustup.rs/)
-* [`binaryen`](https://github.com/WebAssembly/binaryen) (at least version [84](https://github.com/WebAssembly/binaryen/releases/tag/version_84), `emscripten` is currently not used)
+* [`binaryen`](https://github.com/WebAssembly/binaryen) (at least version [89](https://github.com/WebAssembly/binaryen/releases/tag/version_89), `emscripten` is currently not used)
 * [`python3`](https://www.python.org/) for the [exemplary web server](https://github.com/TrueDoctor/ratatosk/wiki/Frontend#installation).
 * [`cargo-make`](https://github.com/sagiegurari/cargo-make) for all build scripts.
 * [`wabt`](https://github.com/WebAssembly/wabt) to introspect compiled wasm code.
@@ -37,8 +37,8 @@ Optionally, all dependencies can be obtained with [Nix](https://nixos.org/nix/) 
 First of all, you need to install the `nightly` toolchain using rustup:
 
 ```
-rustup install nightly-2019-08-07
-rustup default nightly-2019-08-07
+rustup install nightly-2019-10-15
+rustup default nightly-2019-10-15
 rustup target add wasm32-unknown-unknown # for the frontend part
 ```
 
