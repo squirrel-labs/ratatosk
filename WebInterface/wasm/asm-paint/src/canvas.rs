@@ -25,18 +25,10 @@ impl Canvas {
     }
 
     pub fn init(&mut self) -> Result<(), ()> {
-        debug!("create program");
-        self.shaders.create_program(&self.ctx)
-            .map_err(|e| error!("webgl2 create program: {}", e))?;
-        debug!("create vertex shader");
-        self.shaders.create_vertex_shader(&self.ctx)
-            .map_err(|e| error!("webgl2 create vertex shader: {}", e))?;
-        debug!("create fragment shader");
-        self.shaders.create_fragment_shader(&self.ctx)
-            .map_err(|e| error!("webgl2 create fragment shader: {}", e))?;
-        debug!("compile shader program");
-        self.shaders.compile(&self.ctx)
-            .map_err(|e| error!("webgl2 shader: {}", e))
+        self.shaders.init(&self.ctx).map_err(|_|())?;
+        self.ctx.clear_color(1.0, 0.2, 1.0, 1.0);
+        self.ctx.clear(WebGl2RenderingContext::COLOR_BUFFER_BIT);
+        Ok(())
     }
 }
 

@@ -18,16 +18,18 @@ void main() {
 
 pub struct Shaders {
     program: Option<WebGlProgram>,
+    pos_loc: i32,
 }
 
 impl Shaders {
     pub fn new() -> Self {
         Self {
             program: None,
+            pos_loc: -1
         }
     }
 
-    pub fn create_program(&mut self, ctx: &WebGl2RenderingContext) -> Result<(), String> {
+    fn create_program(&mut self, ctx: &WebGl2RenderingContext) -> Result<(), String> {
         self.program = Some(ctx.create_program().ok_or("could not create program id")?);
         Ok(())
     }
@@ -48,15 +50,15 @@ impl Shaders {
         }
     }
 
-    pub fn create_vertex_shader(&mut self, ctx: &WebGl2RenderingContext) -> Result<(), String> {
+    fn create_vertex_shader(&mut self, ctx: &WebGl2RenderingContext) -> Result<(), String> {
         self.create_shader(ctx, WebGl2RenderingContext::VERTEX_SHADER, VERTEX_SHADER)
     }
 
-    pub fn create_fragment_shader(&mut self, ctx: &WebGl2RenderingContext) -> Result<(), String> {
+    fn create_fragment_shader(&mut self, ctx: &WebGl2RenderingContext) -> Result<(), String> {
         self.create_shader(ctx, WebGl2RenderingContext::FRAGMENT_SHADER, FRAGMENT_SHADER)
     }
 
-    pub fn compile(&mut self, ctx: &WebGl2RenderingContext) -> Result<(), String> {
+    fn compile(&mut self, ctx: &WebGl2RenderingContext) -> Result<(), String> {
         let program = self.program.as_ref().ok_or("could not find created program")?;
         ctx.link_program(program);
         let status = ctx.get_program_parameter(program, WebGl2RenderingContext::LINK_STATUS);
@@ -65,6 +67,26 @@ impl Shaders {
         } else {
             Err(format!("\n{}", ctx.get_program_info_log(program).unwrap_or_default()))
         }
+    }
+
+    pub fn init(&mut self, ctx: &WebGl2RenderingContext) -> Result<(), String> {
+        debug!("create program");
+        self.create_program(ctx)
+            .map_err(|e| { error!("webgl2 create program: {}", e); e})?;
+        debug!("create vertex shader");
+        self.create_vertex_shader(ctx)
+            .map_err(|e| { error!("webgl2 create vertex shader: {}", e); e})?;
+        debug!("create fragment shader");
+        self.create_fragment_shader(ctx)
+            .map_err(|e| { error!("webgl2 create fragment shader: {}", e); e})?;
+        debug!("compile shader program");
+        self.compile(ctx)
+            .map_err(|e| { error!("webgl2 shader: {}", e); e})?;
+        let program = self.program.as_ref().ok_or("could not find created program")?;
+        self.pos_loc = ctx.get_attrib_location(program, "pos");
+        trace!("got attrib location 'pos'({})", self.pos_loc);
+        info!("initialised shader program");
+        Ok(())
     }
 
     pub fn remove(&mut self, ctx: &WebGl2RenderingContext) {
