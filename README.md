@@ -37,8 +37,8 @@ Optionally, all dependencies can be obtained with [Nix](https://nixos.org/nix/) 
 First of all, you need to install the `nightly` toolchain using rustup:
 
 ```
-rustup install nightly-2019-10-15
-rustup default nightly-2019-10-15
+rustup install nightly-2020-02-06
+rustup default nightly-2020-02-06
 rustup target add wasm32-unknown-unknown # for the frontend part
 ```
 
