@@ -1,4 +1,4 @@
-# Rask [![Build Status](https://jenkins.kobert.dev/buildStatus/icon?job=Ratatosk)](https://jenkins.kobert.dev/job/Ratatosk/) [![Test Status](https://jenkins.kobert.dev/buildStatus/icon?job=Test&subject=tests)](https://jenkins.kobert.dev/job/Test/) [![Format Status](https://jenkins.kobert.dev/buildStatus/icon?job=Format&subject=format)](https://jenkins.kobert.dev/job/Format/) 
+# Rask [![Build Status](https://jenkins.kobert.dev/buildStatus/icon?job=Ratatosk)](https://jenkins.kobert.dev/job/Ratatosk/) [![Test Status](https://jenkins.kobert.dev/buildStatus/icon?job=Test&subject=tests)](https://jenkins.kobert.dev/job/Test/) [![Format Status](https://jenkins.kobert.dev/buildStatus/icon?job=Format&subject=format)](https://jenkins.kobert.dev/job/Format/) [![Build Status](https://ci.kobert.dev/api/badges/TrueDoctor/ratatosk/status.svg)](https://ci.kobert.dev/TrueDoctor/ratatosk)
 
 ## Motivation
 
