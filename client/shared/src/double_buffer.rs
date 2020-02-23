@@ -15,7 +15,6 @@ pub struct DoubleBuffer<T: Element> {
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
 #[allow(unused_attributes)]
 #[inline(never)]
-#[wasm_bindgen]
 #[no_mangle]
 pub fn atomic_read(v: *const Flag) -> Flag {
     unsafe { *v }
@@ -24,7 +23,6 @@ pub fn atomic_read(v: *const Flag) -> Flag {
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
 #[allow(unused_attributes)]
 #[inline(never)]
-#[wasm_bindgen]
 #[no_mangle]
 pub fn atomic_write(v: *mut Flag, flag: Flag) {
     unsafe { *v = flag }
