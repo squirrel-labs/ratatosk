@@ -1,5 +1,5 @@
 use crate::error::ClientError;
-use image::{png::PNGDecoder, ImageDecoder};
+use image::{png::PngDecoder, ImageDecoder};
 
 use std::convert::TryInto;
 
@@ -14,17 +14,18 @@ pub struct Texture {
 
 impl Texture {
     pub fn from_png_stream<R: std::io::Read>(r: R) -> Result<Self, ClientError> {
-        let decoder = PNGDecoder::new(r)
+        let decoder = PngDecoder::new(r)
             .map_err(|e| ClientError::ResourceError(format!("png image reading error: {}", e)))?;
 
         let (w, h) = decoder.dimensions();
         let e = |_| ClientError::ResourceError(format!("invalid image resolution"));
         let (w, h) = (w.try_into().map_err(e)?, h.try_into().map_err(e)?);
 
-        let colortype = decoder.colortype();
+        let colortype = decoder.color_type();
 
-        let bytes = decoder
-            .read_image()
+        let mut bytes = vec![0; w as usize * h as usize * colortype.bytes_per_pixel() as usize];
+        decoder
+            .read_image(&mut bytes)
             .map_err(|e| ClientError::ResourceError(format!("png image decoding error: {}", e)))?;
 
         Ok(Self {

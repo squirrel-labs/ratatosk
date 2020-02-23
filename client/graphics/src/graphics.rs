@@ -212,7 +212,7 @@ impl GraphicsApi for WebGl {
         let handle = WebGlApiTexture::new(&self.gl)?;
         self.gl.active_texture(Gl2::TEXTURE0);
         handle.bind(&self.gl);
-        if let ColorType::RGB(_) = texture.colortype() {
+        if let ColorType::Rgb8 = texture.colortype() {
             // TODO: copy RGB buffer to RGBA
             return Err(ClientError::ResourceError(format!(
                 "RGB not yet implemented"
@@ -330,12 +330,13 @@ impl WebGl {
 
     fn colorformat(format: ColorType) -> Result<(i32, u32), ClientError> {
         match format {
-            ColorType::RGB(8) => Ok((Gl2::RGB8 as i32, Gl2::RGB)),
-            ColorType::RGB(16) => Ok((Gl2::RGB16UI as i32, Gl2::RGB)),
+            ColorType::Rgb8 => Ok((Gl2::RGB8 as i32, Gl2::RGB)),
+            ColorType::Rgb16 => Ok((Gl2::RGB16UI as i32, Gl2::RGB)),
 
-            ColorType::RGBA(8) => Ok((Gl2::RGBA8 as i32, Gl2::RGBA)),
-            ColorType::RGBA(16) => Ok((Gl2::RGBA16UI as i32, Gl2::RGBA)),
-            ColorType::RGBA(32) => Ok((Gl2::RGBA32UI as i32, Gl2::RGBA)),
+            ColorType::Rgba8 => Ok((Gl2::RGBA8 as i32, Gl2::RGBA)),
+            ColorType::Rgba16 => Ok((Gl2::RGBA16UI as i32, Gl2::RGBA)),
+            // currently unsupported:
+            //   ColorType::Rgba32 => Ok((Gl2::RGBA32UI as i32, Gl2::RGBA)),
             _ => Err(ClientError::WebGlError(format!("invalid color format"))),
         }
     }
