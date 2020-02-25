@@ -12,21 +12,6 @@ pub struct DoubleBuffer<T: Element> {
     buffer: [T; 2],
 }
 
-/*#[allow(clippy::not_unsafe_ptr_arg_deref)]
-#[allow(unused_attributes)]
-#[inline(never)]
-#[no_mangle]
-pub fn atomic_read(v: *const Flag) -> Flag {
-    unsafe { *v }
-}
-
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
-#[allow(unused_attributes)]
-#[inline(never)]
-#[no_mangle]
-pub fn atomic_write(v: *mut Flag, flag: Flag) {
-    unsafe { *v = flag }
-}*/
 pub unsafe fn atomic_read(v: *const Flag) -> Flag {
     (*(v as *const core::sync::atomic::AtomicU8))
         .load(core::sync::atomic::Ordering::SeqCst)
