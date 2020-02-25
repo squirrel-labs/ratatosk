@@ -4,7 +4,6 @@ members = [
   "rask-server",
   "client/graphics",
   "client/logic",
-  "tools/atomify",
   "tools/bone-cake",
 ]
 
