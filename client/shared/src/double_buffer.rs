@@ -12,7 +12,7 @@ pub struct DoubleBuffer<T: Element> {
     buffer: [T; 2],
 }
 
-#[allow(clippy::not_unsafe_ptr_arg_deref)]
+/*#[allow(clippy::not_unsafe_ptr_arg_deref)]
 #[allow(unused_attributes)]
 #[inline(never)]
 #[no_mangle]
@@ -26,6 +26,15 @@ pub fn atomic_read(v: *const Flag) -> Flag {
 #[no_mangle]
 pub fn atomic_write(v: *mut Flag, flag: Flag) {
     unsafe { *v = flag }
+}*/
+pub unsafe fn atomic_read(v: *const Flag) -> Flag {
+    (*(v as *const core::sync::atomic::AtomicU8))
+        .load(core::sync::atomic::Ordering::SeqCst)
+}
+
+pub unsafe fn atomic_write(v: *mut Flag, flag: Flag) {
+    (*(v as *mut core::sync::atomic::AtomicU8))
+        .store(flag, core::sync::atomic::Ordering::SeqCst)
 }
 
 #[derive(Debug)]
@@ -89,22 +98,22 @@ impl<T: Element> DoubleBuffer<T> {
 
     #[inline(always)]
     pub extern "C" fn set_reading_at(&mut self, reading_at: Flag) {
-        atomic_write(&mut self.reading_at, reading_at)
+        unsafe { atomic_write(&mut self.reading_at, reading_at) }
     }
 
     #[inline(always)]
     pub extern "C" fn get_reading_at(&mut self) -> Flag {
-        atomic_read(&self.reading_at)
+        unsafe { atomic_read(&self.reading_at) }
     }
 
     #[inline(always)]
     pub extern "C" fn set_provided(&mut self, provided: Flag) {
-        atomic_write(&mut self.provided, provided)
+        unsafe { atomic_write(&mut self.provided, provided) }
     }
 
     #[inline(always)]
     pub extern "C" fn get_provided(&mut self) -> Flag {
-        atomic_read(&self.provided)
+        unsafe { atomic_read(&self.provided) }
     }
 }
 

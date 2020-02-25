@@ -64,7 +64,7 @@ if [ $? -ne 0 ]; then
   echo "Not in a git repo!"
   exit 1
 fi
-wasm2wat --enable-threads -f --no-debug-names gen/${@}.wasm -o gen/${@}.wat --enable-bulk-memory
-cargo run -p atomify gen/${@}.wat
+# wasm2wat --enable-threads -f --no-debug-names gen/${@}.wasm -o gen/${@}.wat --enable-bulk-memory
+# cargo run -p atomify gen/${@}.wat
 '''
 ]
