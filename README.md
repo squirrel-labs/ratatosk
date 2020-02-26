@@ -1,6 +1,4 @@
-# Rask [![Build Status](https://ci.kobert.dev/api/badges/squirrel-labs/ratatosk/status.svg)](https://ci.kobert.dev/squirrel-labs/ratatosk) [![Test Status](https://jenkins.kobert.dev/buildStatus/icon?job=Test&subject=tests)](https://jenkins.kobert.dev/job/Test/) [![Format Status](https://jenkins.kobert.dev/buildStatus/icon?job=Format&subject=format)](https://jenkins.kobert.dev/job/Format/) 
-
-## Motivation
+# Rask [![Build Status](https://ci.kobert.dev/api/badges/squirrel-labs/ratatosk/status.svg)](https://ci.kobert.dev/squirrel-labs/ratatosk)
 
 You might have heard of a game called [Nidhogg](https://github.com/TrueDoctor/ratatosk/wiki/Nidhogg). The aim of this
 project is to provide a similar game accessible through the web.
