@@ -2,12 +2,14 @@ kind: pipeline
 name: default
 
 steps:
-- name: build
-  image: truedoctor/rust-wasm:lts
-  commands:
-  - nix-shell --run 'cargo make all' -v # build all projects
 - name: format
-  image: truedoctor/rust-wasm:lts
+  image: truedoctor/rust-wasm:1.0
+  pull: if-not-exists
   commands:
-  - cargo make format # build all projects
+  - nix-shell --run 'cargo make format' # build all projects
+- name: build
+  image: truedoctor/rust-wasm:1.0
+  pull: if-not-exists
+  commands:
+  - nix-shell --run 'cargo make all -v' # build all projects
 
