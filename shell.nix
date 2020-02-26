@@ -6,6 +6,7 @@ with import (fetchTarball {
 mkShell {
   name = "ratatosk";
   buildInputs = [
+    git
     python3
     rustup
     pkgconfig
@@ -13,7 +14,6 @@ mkShell {
     cargo
     openssl
     cargo-make
-    wabt
     binaryen
     wasm-bindgen-cli
   ];
