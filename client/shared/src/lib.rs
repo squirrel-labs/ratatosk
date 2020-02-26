@@ -1,4 +1,3 @@
-#![feature(custom_attribute)]
 #![feature(allocator_api)]
 
 pub mod alloc;

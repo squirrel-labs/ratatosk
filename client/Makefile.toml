@@ -4,13 +4,17 @@ extend = "../scripts/cargo-helpers.toml"
 workspace = false
 dependencies = [ "logic", "graphics" ]
 
+[tasks.format]
+workspace = false
+command = "cargo"
+args = [ "fmt", "--all" ]
+
 [tasks.logic]
 workspace = false
 env = { STACK_SIZE = "134217728" }
 script = [
   "cargo make crate-build wasm-logic",
   "cargo make wasm logic",
-  "cargo make disassemble logic"
 ]
 
 [tasks.graphics]
@@ -19,7 +23,6 @@ env = { STACK_SIZE = "4194304" }
 script = [
   "cargo make crate-build wasm-graphics",
   "cargo make wasm graphics",
-  "cargo make disassemble graphics"
 ]
 
 [tasks.crate-build]
@@ -65,6 +68,5 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 wasm2wat --enable-threads -f --no-debug-names gen/${@}.wasm -o gen/${@}.wat --enable-bulk-memory
-cargo run -p atomify gen/${@}.wat
 '''
 ]
