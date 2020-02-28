@@ -1,6 +1,4 @@
-# Rask [![Build Status](https://ci.kobert.dev/api/badges/squirrel-labs/ratatosk/status.svg)](https://ci.kobert.dev/squirrel-labs/ratatosk) [![Test Status](https://jenkins.kobert.dev/buildStatus/icon?job=Test&subject=tests)](https://jenkins.kobert.dev/job/Test/) [![Format Status](https://jenkins.kobert.dev/buildStatus/icon?job=Format&subject=format)](https://jenkins.kobert.dev/job/Format/) 
-
-## Motivation
+# Rask [![Build Status](https://ci.kobert.dev/api/badges/squirrel-labs/ratatosk/status.svg)](https://ci.kobert.dev/squirrel-labs/ratatosk)
 
 You might have heard of a game called [Nidhogg](https://github.com/TrueDoctor/ratatosk/wiki/Nidhogg). The aim of this
 project is to provide a similar game accessible through the web.
@@ -37,8 +35,8 @@ Optionally, all dependencies can be obtained with [Nix](https://nixos.org/nix/) 
 First of all, you need to install the `nightly` toolchain using rustup:
 
 ```
-rustup install nightly-2020-02-06
-rustup default nightly-2020-02-06
+rustup install nightly-2020-02-28
+rustup default nightly-2020-02-28
 rustup target add wasm32-unknown-unknown  # for the frontend part
 cargo install wasm-bindgen-cli  # for optimizing wasm code
 ```
