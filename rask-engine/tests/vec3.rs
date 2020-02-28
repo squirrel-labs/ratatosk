@@ -1,4 +1,4 @@
-use rask_engine::math::*;
+use rask_engine::math::{EPSILON, Vec3};
 
 #[test]
 fn test_add_vec3() {
@@ -54,10 +54,26 @@ fn test_mul_f32() {
 }
 
 #[test]
+fn test_mul_vec3() {
+    let a = Vec3::new(1.0, 7.5, 4.0);
+    let b = Vec3::new(-4.2, 2.0, 0.25);
+
+    assert_eq!(a * b, Vec3::new(-4.2, 15.0, 1.0));
+}
+
+#[test]
 fn test_div_f32() {
     let a = Vec3::new(3.0, 4.2, -6.2);
 
     assert_eq!(a / 2.0, Vec3::new(1.5, 2.1, -3.1));
+}
+
+#[test]
+fn test_div_vec3() {
+    let a = Vec3::new(-4.2, 7.5, 4.0);
+    let b = Vec3::new(1.0, 2.0, 0.25);
+
+    assert_eq!(a / b, Vec3::new(-4.2, 3.75, 16.0));
 }
 
 #[test]
@@ -111,13 +127,13 @@ fn test_dot() {
     let a = Vec3::new(3.0, 1.0, -6.0);
     let b = Vec3::new(1.0, 1.0, 7.0);
 
-    assert_eq!(a.dot(b), -38.0);
+    assert!(f32::abs(a.dot(b) - -38.0) < EPSILON);
 }
 
 #[test]
-fn test_normalize_vec3() {
+fn test_normalized_vec3() {
     let a = Vec3::new(-1.0, 1.0, std::f32::consts::SQRT_2);
     let b = Vec3::new(-0.5, 0.5, std::f32::consts::FRAC_1_SQRT_2);
 
-    assert_eq!(a.normalize(), b);
+    assert_eq!(a.normalized(), b);
 }

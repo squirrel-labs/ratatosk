@@ -247,7 +247,7 @@ impl Mat3 {
 
     /// Returns the zero matrix.
     pub fn zero() -> Self {
-        Self::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+        Self::default()
     }
 
     /// Returns the identity matrix.

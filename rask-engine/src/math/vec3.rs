@@ -138,6 +138,18 @@ impl PartialEq for Vec3 {
 
 impl Eq for Vec3 {}
 
+impl From<(f32, f32, f32)> for Vec3 {
+    fn from((x, y, z): (f32, f32, f32)) -> Self {
+        Self::new(x, y, z)
+    }
+}
+
+impl From<Vec3> for (f32, f32, f32) {
+    fn from(vec: Vec3) -> Self {
+        (vec.x(), vec.y(), vec.z())
+    }
+}
+
 impl Vec3 {
     /// Creates a new `Vec3` from x and y coordinates.
     pub fn new(x: f32, y: f32, z: f32) -> Self {
@@ -146,7 +158,7 @@ impl Vec3 {
 
     /// Returns the zero vector.
     pub fn zero() -> Self {
-        Self::new(0.0, 0.0, 0.0)
+        Self::default()
     }
 
     /// Returns the x coordinate.
