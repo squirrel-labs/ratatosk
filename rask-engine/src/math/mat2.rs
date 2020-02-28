@@ -149,22 +149,22 @@ impl Mat2 {
     /// Creates a new `Mat2` of the form:
     /// (a b)
     /// (c d)
-    pub fn new(a: f32, b: f32, c: f32, d: f32) -> Self {
+    pub const fn new(a: f32, b: f32, c: f32, d: f32) -> Self {
         Self { data: [a, c, b, d] }
     }
 
     /// Creates a new `Mat2` from two column `Vec2`s.
-    pub fn from_vec2(v1: Vec2, v2: Vec2) -> Self {
+    pub const fn from_vec2(v1: Vec2, v2: Vec2) -> Self {
         Self::new(v1.x(), v2.x(), v1.y(), v2.y())
     }
 
     /// Returns the zero matrix.
-    pub fn zero() -> Self {
-        Self::default()
+    pub const fn zero() -> Self {
+        Self::new(0.0, 0.0, 0.0, 0.0)
     }
 
     /// Returns the identity matrix.
-    pub fn identity() -> Self {
+    pub const fn identity() -> Self {
         Self::new(1.0, 0.0, 0.0, 1.0)
     }
 
@@ -176,12 +176,12 @@ impl Mat2 {
     }
 
     /// Returns a matrix that scales by `scale_x` and `scale_y`.
-    pub fn scaling(scale_x: f32, scale_y: f32) -> Self {
+    pub const fn scaling(scale_x: f32, scale_y: f32) -> Self {
         Self::new(scale_x, 0.0, 0.0, scale_y)
     }
 
     /// Returns the transposed matrix.
-    pub fn transpose(self) -> Self {
+    pub const fn transpose(self) -> Self {
         Self::new(self.data[0], self.data[1], self.data[2], self.data[3])
     }
 }

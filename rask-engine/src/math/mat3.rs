@@ -224,14 +224,14 @@ impl Mat3 {
     /// (a b c)
     /// (d e f)
     /// (g h i)
-    pub fn new(a: f32, b: f32, c: f32, d: f32, e: f32, f: f32, g: f32, h: f32, i: f32) -> Self {
+    pub const fn new(a: f32, b: f32, c: f32, d: f32, e: f32, f: f32, g: f32, h: f32, i: f32) -> Self {
         Self {
             data: [a, d, g, b, e, h, c, f, i],
         }
     }
 
     /// Creates a new `Mat3` from three column `Vec3`s.
-    pub fn from_vec3(v1: Vec3, v2: Vec3, v3: Vec3) -> Self {
+    pub const fn from_vec3(v1: Vec3, v2: Vec3, v3: Vec3) -> Self {
         Self::new(
             v1.x(),
             v2.x(),
@@ -246,12 +246,12 @@ impl Mat3 {
     }
 
     /// Returns the zero matrix.
-    pub fn zero() -> Self {
-        Self::default()
+    pub const fn zero() -> Self {
+        Self::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     }
 
     /// Returns the identity matrix.
-    pub fn identity() -> Self {
+    pub const fn identity() -> Self {
         Self::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
     }
 
@@ -263,17 +263,17 @@ impl Mat3 {
     }
 
     /// Returns a matrix that scales by `scale_x` and `scale_y`.
-    pub fn scaling(scale_x: f32, scale_y: f32) -> Self {
+    pub const fn scaling(scale_x: f32, scale_y: f32) -> Self {
         Self::new(scale_x, 0.0, 0.0, 0.0, scale_y, 0.0, 0.0, 0.0, 1.0)
     }
 
     /// Returns a matrix that translates by (`x`, `y`).
-    pub fn translation(x: f32, y: f32) -> Self {
+    pub const fn translation(x: f32, y: f32) -> Self {
         Self::new(1.0, 0.0, x, 0.0, 1.0, y, 0.0, 0.0, 1.0)
     }
 
     /// Returns the transposed matrix.
-    pub fn transpose(self) -> Self {
+    pub const fn transpose(self) -> Self {
         Self::new(
             self.data[0],
             self.data[1],

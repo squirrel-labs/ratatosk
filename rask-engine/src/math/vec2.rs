@@ -148,22 +148,22 @@ impl From<Vec2> for (f32, f32) {
 
 impl Vec2 {
     /// Creates a new `Vec2` from x and y coordinates.
-    pub fn new(x: f32, y: f32) -> Self {
+    pub const fn new(x: f32, y: f32) -> Self {
         Self { x, y }
     }
 
     /// Returns the zero vector.
-    pub fn zero() -> Self {
-        Self::default()
+    pub const fn zero() -> Self {
+        Self::new(0.0, 0.0)
     }
 
     /// Returns the x coordinate.
-    pub fn x(self) -> f32 {
+    pub const fn x(self) -> f32 {
         self.x
     }
 
     /// Returns the y coordinate.
-    pub fn y(self) -> f32 {
+    pub const fn y(self) -> f32 {
         self.y
     }
 
