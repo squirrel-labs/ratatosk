@@ -1,7 +1,7 @@
 //! The boxes module exposes AABox (axis-aligned box) and RBox (rotated box).
 //! These are used to model objects.
 
-use std::ops;
+use core::ops;
 
 use crate::math::Vec2;
 
@@ -15,6 +15,7 @@ pub struct AABox {
 
 impl ops::Add<Vec2> for AABox {
     type Output = Self;
+
     fn add(self, other: Vec2) -> Self {
         Self {
             pos: self.pos + other,
@@ -31,6 +32,7 @@ impl ops::AddAssign<Vec2> for AABox {
 
 impl ops::Sub<Vec2> for AABox {
     type Output = Self;
+
     fn sub(self, other: Vec2) -> Self {
         Self {
             pos: self.pos - other,
@@ -45,22 +47,22 @@ impl ops::SubAssign<Vec2> for AABox {
     }
 }
 
-impl std::cmp::PartialEq for AABox {
+impl PartialEq for AABox {
     fn eq(&self, other: &Self) -> bool {
         self.pos == other.pos && self.size == other.size
     }
 }
 
-impl std::cmp::Eq for AABox {}
+impl Eq for AABox {}
 
 /// A rotated box.
 #[derive(Clone, Copy, Debug)]
 pub struct RBox {
     /// The origin.
     pub pos: Vec2,
-    /// Vector1
+    /// Vector 1.
     pub v1: Vec2,
-    /// Vector2: this Vector has to always be orthogonal to v1
+    /// Vector 2: This vector always has to be orthogonal to v1.
     pub v2: Vec2,
 }
 
@@ -79,6 +81,7 @@ impl RBox {
 
 impl ops::Add<Vec2> for RBox {
     type Output = Self;
+
     fn add(self, other: Vec2) -> Self {
         Self {
             pos: self.pos + other,
@@ -96,6 +99,7 @@ impl ops::AddAssign<Vec2> for RBox {
 
 impl ops::Sub<Vec2> for RBox {
     type Output = Self;
+
     fn sub(self, other: Vec2) -> Self {
         Self {
             pos: self.pos - other,
@@ -111,10 +115,10 @@ impl ops::SubAssign<Vec2> for RBox {
     }
 }
 
-impl std::cmp::PartialEq for RBox {
+impl PartialEq for RBox {
     fn eq(&self, other: &Self) -> bool {
         self.pos == other.pos && self.v1 == other.v1 && self.v2 == other.v2
     }
 }
 
-impl std::cmp::Eq for RBox {}
+impl Eq for RBox {}

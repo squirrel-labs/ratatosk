@@ -1,10 +1,10 @@
-use std::cmp::Ordering;
-use std::ops;
+use core::cmp::Ordering;
+use core::ops;
 
 use crate::math::EPSILON;
 
-/// A 2-dimensional euclidean vector with f32 elements.
-#[derive(Clone, Copy, Debug)]
+/// A 2-dimensional euclidean vector with `f32` elements.
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Vec2 {
     // The x coordinate.
     x: f32,
@@ -22,8 +22,7 @@ impl ops::Add for Vec2 {
 
 impl ops::AddAssign for Vec2 {
     fn add_assign(&mut self, other: Self) {
-        self.x += other.x;
-        self.y += other.y;
+        *self = *self + other
     }
 }
 
@@ -37,8 +36,7 @@ impl ops::Sub for Vec2 {
 
 impl ops::SubAssign for Vec2 {
     fn sub_assign(&mut self, other: Self) {
-        self.x -= other.x;
-        self.y -= other.y;
+        *self = *self - other
     }
 }
 
@@ -58,10 +56,17 @@ impl ops::Mul<f32> for Vec2 {
     }
 }
 
+impl ops::Mul<Vec2> for f32 {
+    type Output = Vec2;
+
+    fn mul(self, rhs: Vec2) -> Self::Output {
+        rhs * self
+    }
+}
+
 impl ops::MulAssign<f32> for Vec2 {
     fn mul_assign(&mut self, scale: f32) {
-        self.x *= scale;
-        self.y *= scale;
+        *self = *self * scale
     }
 }
 
@@ -75,8 +80,7 @@ impl ops::Mul for Vec2 {
 
 impl ops::MulAssign for Vec2 {
     fn mul_assign(&mut self, other: Self) {
-        self.x *= other.x;
-        self.y *= other.y;
+        *self = *self * other
     }
 }
 
@@ -90,8 +94,7 @@ impl ops::Div<f32> for Vec2 {
 
 impl ops::DivAssign<f32> for Vec2 {
     fn div_assign(&mut self, scale: f32) {
-        self.x /= scale;
-        self.y /= scale;
+        *self = *self / scale
     }
 }
 
@@ -105,8 +108,7 @@ impl ops::Div for Vec2 {
 
 impl ops::DivAssign for Vec2 {
     fn div_assign(&mut self, other: Self) {
-        self.x /= other.x;
-        self.y /= other.y;
+        *self = *self / other
     }
 }
 
@@ -132,24 +134,36 @@ impl PartialEq for Vec2 {
 
 impl Eq for Vec2 {}
 
+impl From<(f32, f32)> for Vec2 {
+    fn from((x, y): (f32, f32)) -> Self {
+        Self::new(x, y)
+    }
+}
+
+impl From<Vec2> for (f32, f32) {
+    fn from(vec: Vec2) -> Self {
+        (vec.x(), vec.y())
+    }
+}
+
 impl Vec2 {
-    /// Creates a new Vec2 from x and y coordinates.
-    pub fn new(x: f32, y: f32) -> Self {
+    /// Creates a new `Vec2` from x and y coordinates.
+    pub const fn new(x: f32, y: f32) -> Self {
         Self { x, y }
     }
 
     /// Returns the zero vector.
-    pub fn zero() -> Self {
+    pub const fn zero() -> Self {
         Self::new(0.0, 0.0)
     }
 
     /// Returns the x coordinate.
-    pub fn x(self) -> f32 {
+    pub const fn x(self) -> f32 {
         self.x
     }
 
     /// Returns the y coordinate.
-    pub fn y(self) -> f32 {
+    pub const fn y(self) -> f32 {
         self.y
     }
 
@@ -169,7 +183,7 @@ impl Vec2 {
     }
 
     /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has norm 1.
-    pub fn normalize(self) -> Self {
+    pub fn normalized(self) -> Self {
         self / self.norm()
     }
 }
