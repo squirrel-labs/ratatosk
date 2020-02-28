@@ -1,4 +1,4 @@
-use std::f32::consts::FRAC_PI_2;
+use core::f32::consts::FRAC_PI_2;
 
 use rask_engine::math::{Mat2, Vec2};
 

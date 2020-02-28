@@ -1,3 +1,5 @@
+use core::f32::consts::{FRAC_1_SQRT_2, SQRT_2};
+
 use rask_engine::math::{EPSILON, Vec3};
 
 #[test]
@@ -132,8 +134,8 @@ fn test_dot() {
 
 #[test]
 fn test_normalized_vec3() {
-    let a = Vec3::new(-1.0, 1.0, std::f32::consts::SQRT_2);
-    let b = Vec3::new(-0.5, 0.5, std::f32::consts::FRAC_1_SQRT_2);
+    let a = Vec3::new(-1.0, 1.0, SQRT_2);
+    let b = Vec3::new(-0.5, 0.5, FRAC_1_SQRT_2);
 
     assert_eq!(a.normalized(), b);
 }
