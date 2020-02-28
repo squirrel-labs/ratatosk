@@ -1,7 +1,7 @@
 use core::convert;
 use core::ops;
 
-use crate::math::{EPSILON, Vec2};
+use crate::math::{Vec2, EPSILON};
 
 /// A 2x2 matrix with `f32` elements.
 #[derive(Clone, Copy, Debug, Default)]

@@ -1,7 +1,7 @@
 use core::convert;
 use core::ops;
 
-use crate::math::{EPSILON, Vec3};
+use crate::math::{Vec3, EPSILON};
 
 /// A 3x3 matrix with `f32` elements.
 #[derive(Clone, Copy, Debug, Default)]
@@ -224,7 +224,17 @@ impl Mat3 {
     /// (a b c)
     /// (d e f)
     /// (g h i)
-    pub const fn new(a: f32, b: f32, c: f32, d: f32, e: f32, f: f32, g: f32, h: f32, i: f32) -> Self {
+    pub const fn new(
+        a: f32,
+        b: f32,
+        c: f32,
+        d: f32,
+        e: f32,
+        f: f32,
+        g: f32,
+        h: f32,
+        i: f32,
+    ) -> Self {
         Self {
             data: [a, d, g, b, e, h, c, f, i],
         }

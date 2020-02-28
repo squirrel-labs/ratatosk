@@ -13,7 +13,10 @@ fn mat_eq(mat1: &Mat3, mat2: &Mat3, precision: f32) -> bool {
 
 #[test]
 fn test_add_mat3() {
-    assert_eq!(MAT + MAT, Mat3::new(0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0));
+    assert_eq!(
+        MAT + MAT,
+        Mat3::new(0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0)
+    );
 }
 
 #[test]
@@ -24,13 +27,19 @@ fn test_sub_mat3() {
 
 #[test]
 fn test_neg_mat3() {
-    assert_eq!(-MAT, Mat3::new(0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0));
+    assert_eq!(
+        -MAT,
+        Mat3::new(0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0)
+    );
 }
 
 #[test]
 fn test_mul_f32() {
     assert_eq!(MAT * 2.0, 2.0 * MAT);
-    assert_eq!(MAT * 2.0, Mat3::new(0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0));
+    assert_eq!(
+        MAT * 2.0,
+        Mat3::new(0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0)
+    );
 }
 
 #[test]
@@ -42,12 +51,18 @@ fn test_mul_vec3() {
 
 #[test]
 fn test_mul_mat3() {
-    assert_eq!(MAT * MAT, Mat3::new(15.0, 18.0, 21.0, 42.0, 54.0, 66.0, 69.0, 90.0, 111.0));
+    assert_eq!(
+        MAT * MAT,
+        Mat3::new(15.0, 18.0, 21.0, 42.0, 54.0, 66.0, 69.0, 90.0, 111.0)
+    );
 }
 
 #[test]
 fn test_div_f32() {
-    assert_eq!(MAT / 0.5, Mat3::new(0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0));
+    assert_eq!(
+        MAT / 0.5,
+        Mat3::new(0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0)
+    );
 }
 
 #[test]
@@ -88,9 +103,5 @@ fn test_transpose() {
 #[test]
 fn test_rotation() {
     let mat2 = Mat3::new(0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
-    assert!(mat_eq(
-        &Mat3::rotation(FRAC_PI_2),
-        &mat2,
-        1e-7,
-    ));
+    assert!(mat_eq(&Mat3::rotation(FRAC_PI_2), &mat2, 1e-7,));
 }

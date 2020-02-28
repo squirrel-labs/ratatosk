@@ -88,9 +88,5 @@ fn test_transpose() {
 #[test]
 fn test_rotation() {
     let mat2 = Mat2::new(0.0, -1.0, 1.0, 0.0);
-    assert!(mat_eq(
-        &Mat2::rotation(FRAC_PI_2),
-        &mat2,
-        1e-7,
-    ));
+    assert!(mat_eq(&Mat2::rotation(FRAC_PI_2), &mat2, 1e-7,));
 }

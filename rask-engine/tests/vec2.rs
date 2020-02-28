@@ -1,6 +1,6 @@
 use core::f32::consts::FRAC_1_SQRT_2;
 
-use rask_engine::math::{EPSILON, Vec2};
+use rask_engine::math::{Vec2, EPSILON};
 
 #[test]
 fn test_add_vec2() {
@@ -136,10 +136,7 @@ fn test_dot() {
 #[test]
 fn test_normalized_vec2() {
     let a = Vec2::new(2.0, -2.0);
-    let b = Vec2::new(
-        FRAC_1_SQRT_2,
-        -FRAC_1_SQRT_2,
-    );
+    let b = Vec2::new(FRAC_1_SQRT_2, -FRAC_1_SQRT_2);
 
     assert_eq!(a.normalized(), b);
 }

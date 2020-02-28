@@ -1,6 +1,6 @@
 use core::f32::consts::{FRAC_1_SQRT_2, SQRT_2};
 
-use rask_engine::math::{EPSILON, Vec3};
+use rask_engine::math::{Vec3, EPSILON};
 
 #[test]
 fn test_add_vec3() {
