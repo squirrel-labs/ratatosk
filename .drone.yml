@@ -6,10 +6,15 @@ steps:
   image: truedoctor/rust-wasm:nightly-2020-02-28
   pull: if-not-exists
   commands:
-  - nix-shell --run 'cargo make check-format' # build all projects
+  - nix-shell --run 'cargo make check-format' # check formatting for all projects
 - name: build
   image: truedoctor/rust-wasm:nightly-2020-02-28
   pull: if-not-exists
   commands:
-  - nix-shell --run 'cargo make all -v' # build all projects
+  - nix-shell --run 'cargo make all' # build all projects
+- name: test
+  image: truedoctor/rust-wasm:nightly-2020-02-28
+  pull: if-not-exists
+  commands:
+  - nix-shell --run 'cargo make test' # test all projects
 
