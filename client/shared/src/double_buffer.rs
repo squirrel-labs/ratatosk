@@ -13,13 +13,11 @@ pub struct DoubleBuffer<T: Element> {
 }
 
 pub unsafe fn atomic_read(v: *const Flag) -> Flag {
-    (*(v as *const core::sync::atomic::AtomicU8))
-        .load(core::sync::atomic::Ordering::SeqCst)
+    (*(v as *const core::sync::atomic::AtomicU8)).load(core::sync::atomic::Ordering::SeqCst)
 }
 
 pub unsafe fn atomic_write(v: *mut Flag, flag: Flag) {
-    (*(v as *mut core::sync::atomic::AtomicU8))
-        .store(flag, core::sync::atomic::Ordering::SeqCst)
+    (*(v as *mut core::sync::atomic::AtomicU8)).store(flag, core::sync::atomic::Ordering::SeqCst)
 }
 
 #[derive(Debug)]
