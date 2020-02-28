@@ -19,9 +19,6 @@
 # Python Tools for Visual Studio (PTVS)
 *.pyc
 
-# Let the fockin cargo shit be
-Cargo.lock
-
 # dont save that target (bad boy)
 target/
 
