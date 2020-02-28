@@ -20,7 +20,7 @@ rand = "0.7"
 image = "0.23"
 
 [dependencies.rask-engine]
-version = "0.1.0"
+version = "0.2.0"
 path = "../../rask-engine"
 
 [dependencies.web-sys]
