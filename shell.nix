@@ -16,6 +16,7 @@ mkShell {
     cargo-make
     binaryen
     wasm-bindgen-cli
+    cargo-audit
   ];
 
   shellHook = ''
