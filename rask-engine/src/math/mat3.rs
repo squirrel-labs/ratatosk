@@ -1,9 +1,10 @@
-use std::ops;
+use core::convert;
+use core::ops;
 
-use crate::math::Vec3;
+use crate::math::{EPSILON, Vec3};
 
-/// A 3x3 matrix with f32 elements.
-#[derive(Clone, Copy, Debug, PartialEq)]
+/// A 3x3 matrix with `f32` elements.
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Mat3 {
     // The elements of the matrix.
     // (a d g)
@@ -32,15 +33,7 @@ impl ops::Add for Mat3 {
 
 impl ops::AddAssign for Mat3 {
     fn add_assign(&mut self, other: Self) {
-        self.data[0] += other.data[0];
-        self.data[6] += other.data[6];
-        self.data[3] += other.data[3];
-        self.data[1] += other.data[1];
-        self.data[4] += other.data[4];
-        self.data[7] += other.data[7];
-        self.data[2] += other.data[2];
-        self.data[5] += other.data[5];
-        self.data[8] += other.data[8];
+        *self = *self + other
     }
 }
 
@@ -64,15 +57,7 @@ impl ops::Sub for Mat3 {
 
 impl ops::SubAssign for Mat3 {
     fn sub_assign(&mut self, other: Self) {
-        self.data[0] -= other.data[0];
-        self.data[1] -= other.data[1];
-        self.data[2] -= other.data[2];
-        self.data[3] -= other.data[3];
-        self.data[4] -= other.data[4];
-        self.data[5] -= other.data[5];
-        self.data[6] -= other.data[6];
-        self.data[7] -= other.data[7];
-        self.data[8] -= other.data[8];
+        *self = *self - other
     }
 }
 
@@ -112,17 +97,17 @@ impl ops::Mul<f32> for Mat3 {
     }
 }
 
+impl ops::Mul<Mat3> for f32 {
+    type Output = Mat3;
+
+    fn mul(self, rhs: Mat3) -> Self::Output {
+        rhs * self
+    }
+}
+
 impl ops::MulAssign<f32> for Mat3 {
     fn mul_assign(&mut self, scale: f32) {
-        self.data[0] *= scale;
-        self.data[3] *= scale;
-        self.data[6] *= scale;
-        self.data[1] *= scale;
-        self.data[4] *= scale;
-        self.data[7] *= scale;
-        self.data[2] *= scale;
-        self.data[5] *= scale;
-        self.data[8] *= scale;
+        *self = *self * scale
     }
 }
 
@@ -141,8 +126,7 @@ impl ops::Mul<Vec3> for Mat3 {
 impl ops::Mul for Mat3 {
     type Output = Self;
 
-    /// Laderman Algorithm
-    /// see:
+    /// Laderman Algorithm, see:
     /// http://www.ams.org/journals/bull/1976-82-01/S0002-9904-1976-13988-2/S0002-9904-1976-13988-2.pdf
     fn mul(self, b: Self) -> Self::Output {
         let a = move |y: usize, x: usize| self.data[y + 3 * x - 4];
@@ -172,8 +156,8 @@ impl ops::Mul for Mat3 {
         let m22 = a(3, 1) * b(1, 2);
         let m23 = a(3, 3) * b(3, 3);
 
-        println!("{:?}", (m12, m15));
-        println!("{:?}", (-b(3, 1), b(3, 2)));
+        // println!("{:?}", (m12, m15));
+        // println!("{:?}", (-b(3, 1), b(3, 2)));
 
         Self::new(
             m6 + m14 + m19,
@@ -215,21 +199,28 @@ impl ops::Div<f32> for Mat3 {
 
 impl ops::DivAssign<f32> for Mat3 {
     fn div_assign(&mut self, scale: f32) {
-        self.data[0] /= scale;
-        self.data[3] /= scale;
-        self.data[6] /= scale;
-        self.data[1] /= scale;
-        self.data[4] /= scale;
-        self.data[7] /= scale;
-        self.data[2] /= scale;
-        self.data[5] /= scale;
-        self.data[8] /= scale;
+        *self = *self / scale
     }
 }
 
+impl PartialEq for Mat3 {
+    fn eq(&self, other: &Self) -> bool {
+        f32::abs(self.data[0] - other.data[0]) < EPSILON
+            && f32::abs(self.data[3] - other.data[3]) < EPSILON
+            && f32::abs(self.data[6] - other.data[6]) < EPSILON
+            && f32::abs(self.data[1] - other.data[1]) < EPSILON
+            && f32::abs(self.data[4] - other.data[4]) < EPSILON
+            && f32::abs(self.data[7] - other.data[7]) < EPSILON
+            && f32::abs(self.data[2] - other.data[2]) < EPSILON
+            && f32::abs(self.data[5] - other.data[5]) < EPSILON
+            && f32::abs(self.data[8] - other.data[8]) < EPSILON
+    }
+}
+
+impl Eq for Mat3 {}
+
 impl Mat3 {
-    /// Creates a new Mat3
-    /// of the form:
+    /// Creates a new `Mat3` of the form:
     /// (a b c)
     /// (d e f)
     /// (g h i)
@@ -239,7 +230,7 @@ impl Mat3 {
         }
     }
 
-    /// Creates a new Mat3 from three Vec3.
+    /// Creates a new `Mat3` from three column `Vec3`s.
     pub fn from_vec3(v1: Vec3, v2: Vec3, v3: Vec3) -> Self {
         Self::new(
             v1.x(),
@@ -271,9 +262,9 @@ impl Mat3 {
         Self::new(cos, -sin, 0.0, sin, cos, 0.0, 0.0, 0.0, 1.0)
     }
 
-    /// Returns a matrix that scales by `sx and sy`.
-    pub fn scaling(sx: f32, sy: f32) -> Self {
-        Self::new(sx, 0.0, 0.0, 0.0, sy, 0.0, 0.0, 0.0, 1.0)
+    /// Returns a matrix that scales by `scale_x` and `scale_y`.
+    pub fn scaling(scale_x: f32, scale_y: f32) -> Self {
+        Self::new(scale_x, 0.0, 0.0, 0.0, scale_y, 0.0, 0.0, 0.0, 1.0)
     }
 
     /// Returns a matrix that translates by (`x`, `y`).
@@ -297,7 +288,7 @@ impl Mat3 {
     }
 }
 
-impl std::convert::AsRef<[f32; 9]> for Mat3 {
+impl convert::AsRef<[f32; 9]> for Mat3 {
     fn as_ref(&self) -> &[f32; 9] {
         &self.data
     }
