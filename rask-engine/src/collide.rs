@@ -5,11 +5,11 @@ use crate::boxes::{AABox, RBox};
 use crate::math::Vec2;
 
 /// A trait for objects that can collide with other objects.
-pub trait Collide<Rhs> {
+pub trait Collide<Rhs = Self> {
     fn collides(&self, other: &Rhs) -> bool;
 }
 
-impl Collide<Vec2> for Vec2 {
+impl Collide for Vec2 {
     fn collides(&self, other: &Self) -> bool {
         self == other
     }
@@ -17,11 +17,11 @@ impl Collide<Vec2> for Vec2 {
 
 impl Collide<Vec2> for AABox {
     fn collides(&self, other: &Vec2) -> bool {
-        self.pos < *other && other < &(self.pos + self.size)
+        self.pos < *other && *other < self.pos + self.size
     }
 }
 
-impl Collide<AABox> for AABox {
+impl Collide for AABox {
     fn collides(&self, other: &Self) -> bool {
         self.pos.x() < other.pos.x() + other.size.x()
             && other.pos.x() < self.pos.x() + self.size.x()
