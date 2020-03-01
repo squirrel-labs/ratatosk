@@ -1,4 +1,5 @@
 #![feature(allocator_api)]
+#![feature(link_llvm_intrinsics)]
 
 pub mod alloc;
 pub mod double_buffer;
