@@ -1,4 +1,5 @@
 const WORKER_URI = 'site/worker.js'
+const WEBSOCKET_URI = 'ws://localhost:3000/'
 let workers = [];
 let memory;  // global for debugging
 
@@ -71,10 +72,14 @@ function mem(addr) {
     return new Uint8Array(memory.buffer.slice(addr, addr + 1))[0];
 }
 
-(async function() {
-    let canvas = createCanvas();
-    if (canvas === undefined) return;
-    memory = generateMemory();
+let canvas = createCanvas();
+if (canvas === undefined) throw Error('canvas creation failed');
+memory = generateMemory();
 
-    spawnModules(canvas, memory);
-})();
+spawnModules(canvas, memory);
+
+async function wakeLogic() {
+    console.log('wake logic');
+}
+
+window.setInterval(wakeLogic, 1000);
