@@ -69,4 +69,4 @@ args = [ "build", "-p ${@}" ]
 # testierung
 [tasks.test]
 workspace = false
-env = { CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--all --exclude rask-wasm-logic --exclude rask-wasm-graphics" }
+env = { CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--all --exclude rask-wasm-logic --exclude rask-wasm-graphics --exclude rask-wasm-shared" }
