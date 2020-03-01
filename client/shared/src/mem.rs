@@ -70,13 +70,13 @@ extern "C" {
     /// see https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators
     pub fn llvm_atomic_wait_i32(ptr: *mut i32, exp: i32, timeout: i64) -> i32;
 
-    /// see https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators
     #[link_name = "llvm.wasm.atomic.notify"]
+    /// see https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators
     fn llvm_atomic_notify(ptr: *mut i32, cnt: i32) -> i32;
 }
 
-pub unsafe fn atomic_write_u8(ptr: *const u8, v: u8) {
-    (*(ptr as *const core::sync::atomic::AtomicU8)).store(v, core::sync::atomic::Ordering::SeqCst)
+pub unsafe fn atomic_write_u8(ptr: *mut u8, v: u8) {
+    (*(ptr as *mut core::sync::atomic::AtomicU8)).store(v, core::sync::atomic::Ordering::SeqCst)
 }
 
 pub unsafe fn atomic_read_u8(ptr: *const u8) -> u8 {

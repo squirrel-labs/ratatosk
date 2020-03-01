@@ -78,7 +78,7 @@ impl<T: Element> DoubleBuffer<T> {
     }
 
     #[inline(always)]
-    pub extern "C" fn get_reading_at(&mut self) -> Flag {
+    pub extern "C" fn get_reading_at(&self) -> Flag {
         unsafe { mem::atomic_read_u8(&self.reading_at) }
     }
 
@@ -88,7 +88,7 @@ impl<T: Element> DoubleBuffer<T> {
     }
 
     #[inline(always)]
-    pub extern "C" fn get_provided(&mut self) -> Flag {
+    pub extern "C" fn get_provided(&self) -> Flag {
         unsafe { mem::atomic_read_u8(&self.provided) }
     }
 }
