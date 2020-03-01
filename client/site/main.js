@@ -35,6 +35,10 @@ function spawnModules(canvas, memory) {
 
 function createCanvas() {
     let canvas = document.getElementById('c');
+    if (canvas.transferControlToOffscreen === undefined) {
+        document.write('your browser does not seem to support OffscreenCanvas.');
+        return;
+    }
     canvas = canvas.transferControlToOffscreen();
     return canvas;
 }
@@ -51,15 +55,6 @@ function generateMemory() {
     return new WebAssembly.Memory(memoryDescriptor);
 }
 
-(async function() {
-    let canvas = createCanvas();
-    memory = generateMemory();
-
-    spawnModules(canvas, memory);
-})();
-
-// ========= DEBUG FUNCTIONS =========================================
-
 // kill everything
 function kill() {
     let i = 0;
@@ -75,3 +70,11 @@ function kill() {
 function mem(addr) {
     return new Uint8Array(memory.buffer.slice(addr, addr + 1))[0];
 }
+
+(async function() {
+    let canvas = createCanvas();
+    if (canvas === undefined) return;
+    memory = generateMemory();
+
+    spawnModules(canvas, memory);
+})();
