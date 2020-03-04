@@ -17,4 +17,31 @@ steps:
   pull: if-not-exists
   commands:
   - nix-shell --run 'cargo make test' # test all projects
+- name: doc
+  image: truedoctor/rust-wasm:nightly-2020-02-28
+  pull: if-not-exists
+  volumes:
+  - name: doc
+    path: /drone/src/target/doc
+  commands:
+  - nix-shell --run 'cargo doc' # document all projects
+- name: demo
+  image: truedoctor/rust-wasm:nightly-2020-02-28
+  pull: if-not-exists
+  when:
+    branch:
+    - master
+  volumes:
+  - name: demo
+    path: /tmp/demo
+  commands:
+  - cp -r client /tmp/demo
+
+volumes:
+- name: demo
+  host:
+    path: /usr/website/ratatosk
+- name: doc
+  host:
+    path: /usr/website/ratatosk/doc
 
