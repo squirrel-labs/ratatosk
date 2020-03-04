@@ -24,7 +24,7 @@ steps:
   - name: doc
     path: /drone/src/target/doc
   commands:
-  - nix-shell --run 'cargo doc' # document all projects
+  - nix-shell --run 'cargo doc --no-deps' # document all projects
 - name: demo
   image: truedoctor/rust-wasm:nightly-2020-02-28
   pull: if-not-exists
