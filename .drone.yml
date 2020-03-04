@@ -20,6 +20,9 @@ steps:
 - name: doc
   image: truedoctor/rust-wasm:nightly-2020-02-28
   pull: if-not-exists
+  when:
+    branch:
+    - master
   volumes:
   - name: doc
     path: /drone/src/target/doc
