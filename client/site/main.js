@@ -42,11 +42,11 @@ function createCanvas() {
     let canvas = document.getElementById('c');
     if (canvas.transferControlToOffscreen === undefined)
         return throwMissingOffscreenCanvasSupport();
-    try
+    try {
         canvas = canvas.transferControlToOffscreen();
-    catch (NS_ERROR_NOT_IMPLEMENTED)
+    } catch (NS_ERROR_NOT_IMPLEMENTED) {
         return throwMissingOffscreenCanvasSupport();
-    return canvas;
+    } return canvas;
 }
 
 function generateMemory() {
