@@ -34,13 +34,18 @@ function spawnModules(canvas, memory) {
     workers.push(spawnModule('graphics', memory, canvas));
 }
 
+function throwMissingOffscreenCanvasSupport() {
+    document.write('your browser does not seem to support OffscreenCanvas.');
+}
+
 function createCanvas() {
     let canvas = document.getElementById('c');
-    if (canvas.transferControlToOffscreen === undefined) {
-        document.write('your browser does not seem to support OffscreenCanvas.');
-        return;
-    }
-    canvas = canvas.transferControlToOffscreen();
+    if (canvas.transferControlToOffscreen === undefined)
+        return throwMissingOffscreenCanvasSupport();
+    try
+        canvas = canvas.transferControlToOffscreen();
+    catch (NS_ERROR_NOT_IMPLEMENTED)
+        return throwMissingOffscreenCanvasSupport();
     return canvas;
 }
 
