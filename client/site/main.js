@@ -78,6 +78,10 @@ memory = generateMemory();
 
 spawnModules(canvas, memory);
 
+function wakeUpAt(addr) {
+    Atomics.notify(memory.buffer, addr, +Infinity);
+}
+
 async function wakeLogic() {
     console.log('wake logic');
 }
