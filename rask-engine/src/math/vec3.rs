@@ -1,4 +1,5 @@
 use core::cmp::Ordering;
+use core::iter::{Chain, Once, once};
 use core::ops;
 
 use crate::math::EPSILON;
@@ -147,6 +148,17 @@ impl From<(f32, f32, f32)> for Vec3 {
 impl From<Vec3> for (f32, f32, f32) {
     fn from(vec: Vec3) -> Self {
         (vec.x(), vec.y(), vec.z())
+    }
+}
+
+pub type IntoIter = Chain<Once<f32>, Chain<Once<f32>, Once<f32>>>;
+
+impl IntoIterator for Vec3 {
+    type Item = f32;
+    type IntoIter = IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        once(self.x).chain(once(self.y).chain(once(self.z)))
     }
 }
 
