@@ -1,5 +1,4 @@
-use core::cmp::Ordering;
-use core::iter::{Chain, Once, once};
+use core::iter::{once, Chain, Once};
 use core::ops;
 
 use crate::math::EPSILON;
@@ -112,20 +111,6 @@ impl ops::Div for Vec3 {
 impl ops::DivAssign for Vec3 {
     fn div_assign(&mut self, other: Self) {
         *self = *self / other
-    }
-}
-
-impl PartialOrd for Vec3 {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self == other {
-            Some(Ordering::Equal)
-        } else if self.x <= other.x && self.y <= other.y && self.z <= other.z {
-            Some(Ordering::Less)
-        } else if self.x >= other.x && self.y >= other.y && self.z >= other.z {
-            Some(Ordering::Greater)
-        } else {
-            None
-        }
     }
 }
 
