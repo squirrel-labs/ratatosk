@@ -1253,6 +1253,10 @@ dependencies = [
 [[package]]
 name = "rask-engine"
 version = "0.2.0"
+dependencies = [
+ "image",
+ "spine_tiny",
+]
 
 [[package]]
 name = "rask-server"

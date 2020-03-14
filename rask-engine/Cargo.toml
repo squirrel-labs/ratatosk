@@ -5,3 +5,7 @@ authors = ["konsumlamm <konsumlamm@gmail.com>", "Dennis Kobert <dennis@kobert.de
 edition = "2018"
 
 [dependencies]
+image = "0.23"
+
+[dependencies.spine_tiny]
+git = "http://github.com/tomaka/spine-rs"

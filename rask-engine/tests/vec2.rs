@@ -80,38 +80,6 @@ fn test_div_vec2() {
 }
 
 #[test]
-fn test_less_vec2() {
-    let a = Vec2::new(1.0, 7.5);
-    let b = Vec2::new(-3.0, 2.5);
-
-    assert!(b < a);
-}
-
-#[test]
-fn test_less_vec2_fail() {
-    let a = Vec2::new(1.0, 7.5);
-    let b = Vec2::new(3.0, 2.5);
-
-    assert!(!(a < b));
-}
-
-#[test]
-fn test_greater_vec2() {
-    let a = Vec2::new(1.0, 7.5);
-    let b = Vec2::new(-3.0, 2.5);
-
-    assert!(a > b);
-}
-
-#[test]
-fn test_greater_vec2_fail() {
-    let a = Vec2::new(1.0, 7.5);
-    let b = Vec2::new(3.0, 2.5);
-
-    assert!(!(a > b));
-}
-
-#[test]
 fn test_norm_vec2() {
     let a = Vec2::new(3.0, 4.0);
 
