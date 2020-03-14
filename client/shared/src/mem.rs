@@ -24,7 +24,7 @@ pub const COMMUNICATION_MEMORY_START: usize = ALLOCATOR_AREA_START + MiB(1);
 
 /// The address of the double buffer (size: target dependent)
 pub const SHARED_BUFFER_AREA_START: usize =
-    COMMUNICATION_MEMORY_START + core::mem::size_of::<CommunicationMemory>;
+    COMMUNICATION_MEMORY_START + core::mem::size_of::<CommunicationMemory>();
 
 /// The logic heap address (size: 32MiB)
 pub const LOGIC_ALLOCATION_AREA_START: usize =
@@ -46,18 +46,18 @@ pub struct CommunicationMemory {
 }
 
 impl CommunicationMemory {
-    unsafe pub fn get() -> &Self {
-        &(COMMUNICATION_MEMORY_START as *const Self)
+    pub unsafe fn get() -> &'static Self {
+        &*(COMMUNICATION_MEMORY_START as *const Self)
     }
 
-    unsafe pub fn get_mut() -> &mut Self {
-        &mut (COMMUNICATION_MEMORY_START as *mut Self)
+    pub unsafe fn get_mut() -> &'static mut Self {
+        &mut *(COMMUNICATION_MEMORY_START as *mut Self)
     }
 
     pub fn wait_for_main_thread_notify(&mut self) {
         self.last_elapsed_ms = self.elapsed_ms;
         while self.last_elapsed_ms == self.elapsed_ms {
-            wait_until_wake_up_at(((&mut self.elapsed_ms) as *mut i32))
+            wait_until_wake_up_at((&mut self.elapsed_ms) as *mut u64 as *mut i32)
         }
     }
 }
