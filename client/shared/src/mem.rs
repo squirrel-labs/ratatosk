@@ -12,12 +12,23 @@ const fn MiB(n: usize) -> usize {
 
 const STACK_ALIGNMENT: usize = 1024 * 63;
 
+/// The size of the stack. Its start is at address 0
 pub const GRAPHIC_STACK_SIZE: usize = MiB(4) + STACK_ALIGNMENT;
+
+/// The address of the Allocator structures (size: 1MiB)
 pub const ALLOCATOR_AREA_START: usize = GRAPHIC_STACK_SIZE;
+
+/// The address of the double buffer (size: target dependent)
 pub const SHARED_BUFFER_AREA_START: usize = ALLOCATOR_AREA_START + MiB(1);
+
+/// The logic heap address (size: 32MiB)
 pub const LOGIC_ALLOCATION_AREA_START: usize =
     SHARED_BUFFER_AREA_START + std::mem::size_of::<Buffer>();
+
+/// The graphics heap address (size: 32MiB)
 pub const GRAPHICS_ALLOCATION_AREA_START: usize = LOGIC_ALLOCATION_AREA_START + MiB(32);
+
+/// The start of unbounded shared memory (size: unbounded)
 pub const SHARED_ALLOCATION_AREA_START: usize = GRAPHICS_ALLOCATION_AREA_START + MiB(32);
 
 pub fn get_double_buffer() -> &'static mut Buffer {
