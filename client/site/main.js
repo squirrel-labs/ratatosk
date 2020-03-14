@@ -1,5 +1,7 @@
 const WORKER_URI = 'site/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:3000/'
+// synchronization memory address (see client/shared/src/mem.rs)
+const SYNCHRONIZATION_MEMORY = 0x50fc00 / 4;
 let workers = [];
 let memory;  // global for debugging
 
@@ -80,6 +82,7 @@ function mem(addr) {
 let canvas = createCanvas();
 if (canvas === undefined) throw Error('canvas creation failed');
 memory = generateMemory();
+let memoryView32 = new Int32Array(memory.buffer);
 
 spawnModules(canvas, memory);
 
@@ -87,8 +90,11 @@ function wakeUpAt(addr) {
     Atomics.notify(memory.buffer, addr, +Infinity);
 }
 
+let counter = 0;
 async function wakeLogic() {
-    console.log('wake logic');
+    console.log('wake logic', Atomics.load(memoryView32, SYNCHRONIZATION_MEMORY));
+    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, counter++);
+    Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
 }
 
 window.setInterval(wakeLogic, 1000);

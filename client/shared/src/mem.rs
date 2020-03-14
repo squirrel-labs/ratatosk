@@ -20,6 +20,8 @@ pub const ALLOCATOR_AREA_START: usize = GRAPHIC_STACK_SIZE;
 
 /// The address memory synchronization area. (size: 1MiB)
 /// It contains data needed for synchronization between main thread and logic thread.
+/// This address must currently be 0x50fc00.
+/// On change you have to modify the corresponding js file.
 pub const SYNCHRONIZATION_MEMORY_START: usize = ALLOCATOR_AREA_START + MiB(1);
 
 /// The address of the double buffer (size: target dependent)
@@ -40,9 +42,10 @@ pub fn get_double_buffer() -> &'static mut Buffer {
     unsafe { &mut *(SHARED_BUFFER_AREA_START as *mut Buffer) }
 }
 
+#[repr(align(4))]
 pub struct SynchronizationMemory {
-    elapsed_ms: u64,
-    last_elapsed_ms: u64,
+    pub elapsed_ms: i32,
+    last_elapsed_ms: i32,
 }
 
 impl SynchronizationMemory {
@@ -57,7 +60,7 @@ impl SynchronizationMemory {
     pub fn wait_for_main_thread_notify(&mut self) {
         self.last_elapsed_ms = self.elapsed_ms;
         while self.last_elapsed_ms == self.elapsed_ms {
-            wait_until_wake_up_at((&mut self.elapsed_ms) as *mut u64 as *mut i32)
+            wait_until_wake_up_at((&mut self.elapsed_ms) as *mut i32)
         }
     }
 }

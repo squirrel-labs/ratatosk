@@ -26,14 +26,22 @@ pub fn initialise() {
             .map_err(|e| log::error!("{}", e))
             .unwrap(),
     );
+
+    loop {
+        crate::game_context::context_mut()
+            .tick()
+            .map_err(|e| log::error!("{}", e))
+            .unwrap();
+        let sync = unsafe { rask_wasm_shared::mem::SynchronizationMemory::get_mut() };
+        log::info!("lasttime {}", sync.elapsed_ms);
+        sync.wait_for_main_thread_notify()
+    }
 }
 
 /// This function represents a logic tick. State changes caused by network or key events get
 /// accumulated over a period of time and processed here
 #[wasm_bindgen]
 pub fn frame() {
-    crate::game_context::context_mut()
-        .tick()
-        .map_err(|e| log::error!("{}", e))
-        .unwrap();
+    //log::info!("lasttime {:?}",
+    //   unsafe {rask_wasm_shared::mem::SynchronizationMemory::get() as *const i32});
 }
