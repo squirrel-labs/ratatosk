@@ -90,11 +90,9 @@ function wakeUpAt(addr) {
     Atomics.notify(memory.buffer, addr, +Infinity);
 }
 
-let startTime = Date.now();
+const START_TIME = Date.now();
 async function wakeLogic() {
-    console.log('wake logic', Atomics.load(memoryView32, SYNCHRONIZATION_MEMORY));
-    let deltaTime = Date.now() - startTime;
-    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, deltaTime);
+    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, Date.now() - START_TIME);
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
 }
 
