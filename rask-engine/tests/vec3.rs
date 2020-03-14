@@ -79,38 +79,6 @@ fn test_div_vec3() {
 }
 
 #[test]
-fn test_less_vec3() {
-    let a = Vec3::new(1.0, 50.0, 7.5);
-    let b = Vec3::new(-3.0, 1.0, 2.5);
-
-    assert!(b < a);
-}
-
-#[test]
-fn test_less_vec3_fail() {
-    let a = Vec3::new(1.0, 67.0, 7.5);
-    let b = Vec3::new(3.0, -2.0, 2.5);
-
-    assert!(!(a < b));
-}
-
-#[test]
-fn test_greater_vec3() {
-    let a = Vec3::new(1.0, 4.0, 7.5);
-    let b = Vec3::new(-3.0, 1.0, 2.5);
-
-    assert!(a > b);
-}
-
-#[test]
-fn test_greater_vec3_fail() {
-    let a = Vec3::new(1.0, 54.0, 7.5);
-    let b = Vec3::new(3.0, 5.0, 2.5);
-
-    assert!(!(a > b));
-}
-
-#[test]
 fn test_norm_vec3() {
     let a = Vec3::new(13.0, 4.0, 16.0);
 
