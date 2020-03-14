@@ -17,8 +17,14 @@ impl Collide for Vec2 {
 
 impl Collide<Vec2> for AABox {
     fn collides(&self, other: &Vec2) -> bool {
-        self.pos.into_iter().zip(other.into_iter()).all(|(a, b)| a < b)
-            && other.into_iter().zip((self.pos + self.size).into_iter()).all(|(a, b)| a < b)
+        self.pos
+            .into_iter()
+            .zip(other.into_iter())
+            .all(|(a, b)| a < b)
+            && other
+                .into_iter()
+                .zip((self.pos + self.size).into_iter())
+                .all(|(a, b)| a < b)
     }
 }
 

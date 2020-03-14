@@ -1,4 +1,4 @@
-use core::iter::{Chain, Once, once};
+use core::iter::{once, Chain, Once};
 use core::ops;
 
 use crate::math::EPSILON;
