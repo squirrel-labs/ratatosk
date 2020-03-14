@@ -1,4 +1,4 @@
-use crate::error::ClientError;
+use crate::error::EngineError;
 use image::{png::PngDecoder, ImageDecoder};
 
 use std::convert::TryInto;
