@@ -96,4 +96,4 @@ async function wakeLogic() {
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
 }
 
-window.setInterval(wakeLogic, 1000);
+window.setInterval(wakeLogic, 100);

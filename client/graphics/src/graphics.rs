@@ -209,6 +209,7 @@ impl GraphicsApi for WebGl {
     }
 
     fn upload_texture(&mut self, texture: &mut Texture, n: u32) -> Result<(), ClientError> {
+        log::debug!("uploading texture (id {}, {}x{})", n, texture.dimension().0, texture.dimension().1);
         let handle = WebGlApiTexture::new(&self.gl)?;
         self.gl.active_texture(Gl2::TEXTURE0);
         handle.bind(&self.gl);

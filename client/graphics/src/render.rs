@@ -40,7 +40,7 @@ impl<T: GraphicsApi> Render<T> {
     pub fn update_textures(&mut self) -> Result<(), ClientError> {
         if let Some(textures) = rask_wasm_shared::mem::shared_heap().textures_mut() {
             let n = textures.len() as u32;
-            self.graphics.resize_texture_pool(n);
+            self.graphics.resize_texture_pool(n)?;
             if n > self.texture_count {
                 for (i, texture) in textures
                     .iter_mut()

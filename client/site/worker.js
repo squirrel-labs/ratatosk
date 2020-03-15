@@ -5,7 +5,7 @@ function onwasm(ctx, desc, module) {
         module.initialise(desc.canvas);
     }
 
-    setInterval(module.frame, desc.deltaTime);
+    //setInterval(module.frame, desc.deltaTime);
 }
 
 onmessage = async function(e) {

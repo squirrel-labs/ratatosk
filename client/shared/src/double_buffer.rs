@@ -72,6 +72,14 @@ impl<T: Element> DoubleBuffer<T> {
         }
     }
 
+    pub fn wait(&mut self) {
+        mem::wait_until_wake_up_at((&mut *self) as *mut Self as *mut i32)
+    }
+
+    pub fn notify(&mut self) -> bool {
+        mem::wake_up_at((&mut *self) as *mut Self as *mut i32)
+    }
+
     #[inline(always)]
     pub extern "C" fn set_reading_at(&mut self, reading_at: Flag) {
         unsafe { mem::atomic_write_u8(&mut self.reading_at, reading_at) }
@@ -118,5 +126,6 @@ impl<'a, T: Element> std::ops::Drop for ReaderBufferView<'a, T> {
 impl<'a, T: Element> std::ops::Drop for WriterBufferView<'a, T> {
     fn drop(&mut self) {
         self.ptr.set_provided(self.write_pos + 1);
+        self.ptr.notify();
     }
 }
