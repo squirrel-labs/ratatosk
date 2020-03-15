@@ -1255,6 +1255,7 @@ name = "rask-engine"
 version = "0.2.0"
 dependencies = [
  "image",
+ "lazy_static",
  "spine_tiny",
 ]
 

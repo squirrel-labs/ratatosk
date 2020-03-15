@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 image = "0.23"
+lazy_static = "1.4.0"
 
 [dependencies.spine_tiny]
 git = "http://github.com/tomaka/spine-rs"

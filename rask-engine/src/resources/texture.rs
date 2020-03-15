@@ -1,7 +1,8 @@
-use crate::error::EngineError;
+use std::convert::TryInto;
+
 use image::{png::PngDecoder, ImageDecoder};
 
-use std::convert::TryInto;
+use crate::error::EngineError;
 
 pub use image::ColorType;
 
@@ -9,7 +10,7 @@ pub struct Texture {
     raw_data: Vec<u8>,
     w: u32,
     h: u32,
-    colortype: ColorType,
+    color_type: ColorType,
 }
 
 impl Texture {
@@ -32,7 +33,7 @@ impl Texture {
             raw_data: bytes,
             w,
             h,
-            colortype,
+            color_type: colortype,
         })
     }
 
@@ -40,11 +41,11 @@ impl Texture {
         (self.w, self.h)
     }
 
-    pub fn colortype(&self) -> ColorType {
-        self.colortype
+    pub fn color_type(&self) -> ColorType {
+        self.color_type
     }
 
-    pub fn raw(&self) -> &Vec<u8> {
+    pub fn raw(&self) -> &[u8] {
         &self.raw_data
     }
 

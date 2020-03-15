@@ -5,7 +5,7 @@
 pub mod boxes;
 pub mod collide;
 pub mod math;
-pub mod ressources;
+pub mod resources;
 pub mod world;
 
 use std::error::Error;
@@ -22,3 +22,5 @@ impl Display for EngineError {
 }
 
 impl Error for EngineError {}
+#[doc(inline)]
+pub use error::EngineError;
