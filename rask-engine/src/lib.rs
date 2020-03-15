@@ -8,3 +8,6 @@ pub mod error;
 pub mod math;
 pub mod ressources;
 pub mod world;
+
+#[doc(inline)]
+pub use error::EngineError;
