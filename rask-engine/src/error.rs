@@ -5,6 +5,7 @@ use std::fmt::{self, Display};
 #[derive(Debug)]
 pub enum EngineError {
     ResourceError(String),
+    MathError(String),
     Misc(String),
 }
 
@@ -13,24 +14,24 @@ impl Display for EngineError {
         match self {
             EngineError::ResourceError(e) => write!(f, "ResourceError: {}", e),
             EngineError::Misc(e) => write!(f, "EngineError: {}", e),
+            EngineError::MathError(e) => write!(f, "MathError: {}", e),
         }
     }
 }
 
 impl Error for EngineError {}
 
-impl From<&str> for EngineError {
-    fn from(error: &str) -> Self {
-        EngineError::Misc(error.to_owned())
-    }
+macro_rules! derive_from {
+    ($type: ty, $kind: ident) => {
+        impl From<$type> for EngineError {
+            fn from(error: $type) -> Self {
+                EngineError::$kind(format!("{}", error))
+            }
+        }
+    };
 }
-impl From<String> for EngineError {
-    fn from(error: String) -> Self {
-        EngineError::Misc(error)
-    }
-}
-impl From<image::error::ImageError> for EngineError {
-    fn from(error: image::error::ImageError) -> Self {
-        EngineError::ResourceError(format!("{}", error))
-    }
-}
+
+derive_from!(&str, Misc);
+derive_from!(String, Misc);
+derive_from!(image::error::ImageError, ResourceError);
+derive_from!(stackvec::error::IncompleteArrayError, MathError);

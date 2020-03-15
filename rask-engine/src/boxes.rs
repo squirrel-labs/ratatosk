@@ -121,4 +121,16 @@ impl PartialEq for RBox {
     }
 }
 
+impl From<&spine::skeleton::SRT> for RBox {
+    fn from(srt: &spine::skeleton::SRT) -> RBox {
+        use crate::math::Vec3;
+        let mat3 = super::math::Mat3::from_nested_arr(&srt.to_matrix3())
+            .expect("Fatal error, spine matrix is not 3x3");
+        let pos = (mat3 * Vec3::new(-1f32, 1f32, 1f32)).to_vec2();
+        let v1 = pos - (mat3 * Vec3::new(-1f32, -1f32, 1f32)).to_vec2();
+        let v2 = pos - (mat3 * Vec3::new(1f32, 1f32, 1f32)).to_vec2();
+        RBox { pos, v1, v2 }
+    }
+}
+
 impl Eq for RBox {}
