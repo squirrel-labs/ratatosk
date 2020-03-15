@@ -1,7 +1,8 @@
 use crate::state::State;
 type Buffer = crate::double_buffer::DoubleBuffer<State>;
 
-use crate::{sprite::*, texture::*};
+use crate::sprite::*;
+use rask_engine::ressources::texture::*;
 
 const fn KiB(n: usize) -> usize {
     n * 1024

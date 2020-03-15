@@ -4,5 +4,7 @@
 
 pub mod boxes;
 pub mod collide;
+pub mod error;
 pub mod math;
 pub mod ressources;
+pub mod world;
