@@ -192,4 +192,9 @@ impl Vec3 {
     pub fn normalized(self) -> Self {
         self / self.norm()
     }
+
+    /// Returns vec2 disregarding the last dimension
+    pub fn to_vec2(&self) -> super::Vec2 {
+        super::Vec2::new(self.x(), self.y())
+    }
 }

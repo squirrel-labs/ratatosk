@@ -46,6 +46,18 @@ impl Collide<Vec2> for RBox {
         //&& v2_diff < self.pos + self.v1 && self.pos < v2_diff
     }
 }
+impl Collide<Vec2> for spine::skeleton::SRT {
+    fn collides(&self, other: &Vec2) -> bool {
+        let rbox: RBox = self.into();
+        rbox.collides(other)
+    }
+}
+impl Collide<AABox> for spine::skeleton::SRT {
+    fn collides(&self, other: &AABox) -> bool {
+        let rbox: RBox = self.into();
+        rbox.collides(other)
+    }
+}
 
 impl Collide<AABox> for RBox {
     fn collides(&self, other: &AABox) -> bool {
