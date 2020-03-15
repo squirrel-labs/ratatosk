@@ -22,7 +22,7 @@ impl Display for EngineError {
 impl Error for EngineError {}
 
 macro_rules! derive_from {
-    ($type: ty, $kind: ident) => {
+    ($type:ty, $kind:ident) => {
         impl From<$type> for EngineError {
             fn from(error: $type) -> Self {
                 EngineError::$kind(format!("{}", error))
@@ -34,4 +34,3 @@ macro_rules! derive_from {
 derive_from!(&str, Misc);
 derive_from!(String, Misc);
 derive_from!(image::error::ImageError, ResourceError);
-derive_from!(stackvec::error::IncompleteArrayError, MathError);

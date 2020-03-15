@@ -6,10 +6,11 @@ use core::ops;
 use crate::math::Vec2;
 
 /// An axis-aligned box.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct AABox {
+    /// The position of the box.
     pub pos: Vec2,
-    /// the size may not be smaller than zero
+    /// The size, may not be smaller than zero.
     pub size: Vec2,
 }
 
@@ -47,16 +48,8 @@ impl ops::SubAssign<Vec2> for AABox {
     }
 }
 
-impl PartialEq for AABox {
-    fn eq(&self, other: &Self) -> bool {
-        self.pos == other.pos && self.size == other.size
-    }
-}
-
-impl Eq for AABox {}
-
 /// A rotated box.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct RBox {
     /// The origin.
     pub pos: Vec2,
@@ -68,9 +61,9 @@ pub struct RBox {
 
 impl RBox {
     /// Creates a new rotated box from a position, an orientation and a width.
-    pub fn new(pos: Vec2, orientation: Vec2, width: f32) -> Self {
-        let scale = width / orientation.norm();
-        let orth = Vec2::new(orientation.x(), -orientation.y()) / scale;
+    pub fn new(pos: Vec2, orientation: Vec2, height: f32) -> Self {
+        let scale = height / orientation.norm();
+        let orth = Vec2::new(-orientation.y(), orientation.x()) * scale;
         Self {
             pos,
             v1: orientation,
@@ -115,22 +108,11 @@ impl ops::SubAssign<Vec2> for RBox {
     }
 }
 
-impl PartialEq for RBox {
-    fn eq(&self, other: &Self) -> bool {
-        self.pos == other.pos && self.v1 == other.v1 && self.v2 == other.v2
-    }
-}
-
 impl From<&spine::skeleton::SRT> for RBox {
     fn from(srt: &spine::skeleton::SRT) -> RBox {
-        use crate::math::Vec3;
-        let mat3 = super::math::Mat3::from_nested_arr(&srt.to_matrix3())
-            .expect("Fatal error, spine matrix is not 3x3");
-        let pos = (mat3 * Vec3::new(-1f32, 1f32, 1f32)).to_vec2();
-        let v1 = pos - (mat3 * Vec3::new(-1f32, -1f32, 1f32)).to_vec2();
-        let v2 = pos - (mat3 * Vec3::new(1f32, 1f32, 1f32)).to_vec2();
+        let pos = srt.transform([-1.0, -1.0]).into();
+        let v1 = Vec2::from(srt.transform([1.0, -1.0])) - pos;
+        let v2 = Vec2::from(srt.transform([-1.0, 1.0])) - pos;
         RBox { pos, v1, v2 }
     }
 }
-
-impl Eq for RBox {}

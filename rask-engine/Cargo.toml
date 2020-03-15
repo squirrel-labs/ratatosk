@@ -7,7 +7,6 @@ edition = "2018"
 [dependencies]
 image = "0.23"
 lazy_static = "1.4.0"
-stackvec = "0.2"
 
 [dependencies.spine_tiny]
 git = "https://github.com/reeFridge/spine-rs"

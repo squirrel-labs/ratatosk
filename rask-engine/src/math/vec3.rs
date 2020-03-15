@@ -136,6 +136,18 @@ impl From<Vec3> for (f32, f32, f32) {
     }
 }
 
+impl From<[f32; 3]> for Vec3 {
+    fn from([x, y, z]: [f32; 3]) -> Self {
+        Self::new(x, y, z)
+    }
+}
+
+impl From<Vec3> for [f32; 3] {
+    fn from(vec: Vec3) -> Self {
+        [vec.x(), vec.y(), vec.z()]
+    }
+}
+
 pub type IntoIter = Chain<Once<f32>, Chain<Once<f32>, Once<f32>>>;
 
 impl IntoIterator for Vec3 {
@@ -193,8 +205,8 @@ impl Vec3 {
         self / self.norm()
     }
 
-    /// Returns vec2 disregarding the last dimension
-    pub fn to_vec2(&self) -> super::Vec2 {
+    /// Returns this `Vec3` as a `Vec2`, disregarding the z component.
+    pub fn into_vec2(self) -> super::Vec2 {
         super::Vec2::new(self.x(), self.y())
     }
 }

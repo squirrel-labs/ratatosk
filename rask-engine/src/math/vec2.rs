@@ -132,6 +132,18 @@ impl From<Vec2> for (f32, f32) {
     }
 }
 
+impl From<[f32; 2]> for Vec2 {
+    fn from([x, y]: [f32; 2]) -> Self {
+        Self::new(x, y)
+    }
+}
+
+impl From<Vec2> for [f32; 2] {
+    fn from(vec: Vec2) -> Self {
+        [vec.x(), vec.y()]
+    }
+}
+
 pub type IntoIter = Chain<Once<f32>, Once<f32>>;
 
 impl IntoIterator for Vec2 {

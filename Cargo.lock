@@ -1237,7 +1237,6 @@ dependencies = [
  "image",
  "lazy_static",
  "spine_tiny 0.1.0 (git+https://github.com/reeFridge/spine-rs)",
- "stackvec",
 ]
 
 [[package]]
@@ -1592,12 +1591,6 @@ dependencies = [
  "serde_derive",
  "serde_json",
 ]
-
-[[package]]
-name = "stackvec"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a28337dadadf1f595e7472e02ed7e27cbc790828b10336f144b5790d21152c16"
 
 [[package]]
 name = "string"

@@ -224,6 +224,7 @@ impl Mat3 {
     /// (a b c)
     /// (d e f)
     /// (g h i)
+    #[allow(clippy::too_many_arguments)]
     #[allow(clippy::many_single_char_names)]
     pub const fn new(
         a: f32,
@@ -254,14 +255,6 @@ impl Mat3 {
             v2.z(),
             v3.z(),
         )
-    }
-
-    pub fn from_nested_arr(arr: &[[f32; 3]; 3]) -> Result<Mat3, crate::EngineError> {
-        extern crate stackvec;
-        use ::stackvec::prelude::*;
-        Ok(Mat3 {
-            data: arr.into_iter().flatten().cloned().try_collect()?,
-        })
     }
 
     /// Returns the zero matrix.
