@@ -1,8 +1,11 @@
 use super::Resource;
 use crate::EngineError;
 
+/// Size of the internal catalog.
+/// This determines the highest available id.
 const CATALOG_SIZE: usize = 512;
 
+/// The library is used to store and retrieve resources.
 pub struct Library {
     catalog: &'static mut [Resource],
 }
@@ -24,14 +27,34 @@ macro_rules! get_store {
 }
 
 pub trait GetStore<T> {
+    /// Retrieve a resource from the library.
+    ///
+    /// # Safety
+    ///
+    /// The function is not thread safe.
     unsafe fn get(&'static self, id: usize) -> Result<&'static T, EngineError>;
+    /// Store a resource to the library
+    ///
+    /// # Safety
+    ///
+    /// The function is not thread safe.
     unsafe fn store(&'static mut self, data: T, id: usize);
 }
 
 impl Library {
+    /// Create a new library at a specific position in memory.
+    ///
+    /// # Safety
+    ///
+    /// The function is safe as long as the memory from memory_offset to memory_offset + CATALOG_SIZE * sizeof(Resource)
     pub unsafe fn new(memory_offset: usize) -> Self {
         Library {
             catalog: core::slice::from_raw_parts_mut(memory_offset as *mut Resource, CATALOG_SIZE),
+        }
+    }
+    pub unsafe fn init(&mut self) {
+        for i in 0..CATALOG_SIZE {
+            self.catalog[i] = Resource::None;
         }
     }
 }

@@ -4,23 +4,10 @@
 
 pub mod boxes;
 pub mod collide;
+pub mod error;
 pub mod math;
 pub mod resources;
 pub mod world;
 
-use std::error::Error;
-use std::fmt::{self, Display};
-
-/// The error type used by the game engine.
-#[derive(Debug)]
-pub enum EngineError {}
-
-impl Display for EngineError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        todo!()
-    }
-}
-
-impl Error for EngineError {}
 #[doc(inline)]
 pub use error::EngineError;

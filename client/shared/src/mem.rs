@@ -1,8 +1,9 @@
 type Buffer = crate::double_buffer::DoubleBuffer<State>;
 
+use crate::sprite::*;
 use crate::state::State;
-use crate::{sprite::*, texture::*};
 use const_env::from_env;
+use rask_engine::resources::texture::*;
 
 #[from_env]
 /// The position of the stack.

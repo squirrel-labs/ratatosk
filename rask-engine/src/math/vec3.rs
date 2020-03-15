@@ -136,6 +136,18 @@ impl From<Vec3> for (f32, f32, f32) {
     }
 }
 
+impl From<[f32; 3]> for Vec3 {
+    fn from([x, y, z]: [f32; 3]) -> Self {
+        Self::new(x, y, z)
+    }
+}
+
+impl From<Vec3> for [f32; 3] {
+    fn from(vec: Vec3) -> Self {
+        [vec.x(), vec.y(), vec.z()]
+    }
+}
+
 pub type IntoIter = Chain<Once<f32>, Chain<Once<f32>, Once<f32>>>;
 
 impl IntoIterator for Vec3 {
@@ -191,5 +203,10 @@ impl Vec3 {
     /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has norm 1.
     pub fn normalized(self) -> Self {
         self / self.norm()
+    }
+
+    /// Returns this `Vec3` as a `Vec2`, disregarding the z component.
+    pub fn into_vec2(self) -> super::Vec2 {
+        super::Vec2::new(self.x(), self.y())
     }
 }
