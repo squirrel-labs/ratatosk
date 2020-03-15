@@ -6,7 +6,7 @@ pub mod boxes;
 pub mod collide;
 pub mod error;
 pub mod math;
-pub mod ressources;
+pub mod resources;
 pub mod world;
 
 #[doc(inline)]
