@@ -1,9 +1,9 @@
 function onwasm(ctx, desc, module) {
     if (desc.canvas === undefined) {
-        module.initialise();
+        module.run_main_loop();
     } else {
-        module.initialise(desc.canvas);
-        setInterval(module.frame, desc.deltaTime);
+        module.initialise_graphics_context(desc.canvas);
+        setInterval(module.draw_frame, desc.deltaTime);
     }
 }
 

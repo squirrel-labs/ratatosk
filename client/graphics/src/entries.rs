@@ -8,7 +8,7 @@ use rask_wasm_shared::get_double_buffer;
 use rask_wasm_shared::wasm_log::WasmLog;
 
 #[wasm_bindgen]
-pub fn initialise(canvas: web_sys::OffscreenCanvas) {
+pub fn initialise_graphics_context(canvas: web_sys::OffscreenCanvas) {
     unsafe {
         crate::ALLOCATOR.reset();
     }
@@ -26,7 +26,7 @@ pub fn initialise(canvas: web_sys::OffscreenCanvas) {
 }
 
 #[wasm_bindgen]
-pub fn frame() {
+pub fn draw_frame() {
     context::context_mut()
         .render()
         .map_err(|e| log::error!("{}", e))

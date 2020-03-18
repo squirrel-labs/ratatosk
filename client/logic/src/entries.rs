@@ -9,7 +9,7 @@ use rask_wasm_shared::wasm_log::WasmLog;
 /// This function is used to initialize the gamestate, communication
 /// with the graphics worker and setup networking
 #[wasm_bindgen]
-pub fn initialise() {
+pub fn run_main_loop() {
     unsafe {
         crate::ALLOCATOR.reset();
     }
@@ -36,12 +36,4 @@ pub fn initialise() {
         log::info!("lasttime {}", sync.elapsed_ms);
         sync.wait_for_main_thread_notify()
     }
-}
-
-/// This function represents a logic tick. State changes caused by network or key events get
-/// accumulated over a period of time and processed here
-#[wasm_bindgen]
-pub fn frame() {
-    //log::info!("lasttime {:?}",
-    //   unsafe {rask_wasm_shared::mem::SynchronizationMemory::get() as *const i32});
 }
