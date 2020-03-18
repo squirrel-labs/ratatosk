@@ -267,7 +267,8 @@ impl GraphicsApi for WebGl {
         self.fb.render_pass_1(&self.gl);
         self.gl
             .viewport(0, 0, self.width as i32, self.height as i32);
-        self.draw_rect_notexture(&math::Vec2::new(0.0, 0.0), &-Mat3::identity())
+        self.draw_rect_notexture(&math::Vec2::new(0.0, 0.0), &-Mat3::identity())?;
+        Ok(())
     }
 
     fn draw_rect(&self, pos: &math::Vec2, mat: &Mat3, tex: TextureId) -> Result<(), ClientError> {

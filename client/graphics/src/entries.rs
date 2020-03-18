@@ -23,16 +23,12 @@ pub fn initialise(canvas: web_sys::OffscreenCanvas) {
             .map_err(|e| log::error!("{}", e))
             .unwrap(),
     );
-
-    loop {
-        get_double_buffer().wait();
-        context::context_mut()
-            .render()
-            .map_err(|e| log::error!("{}", e))
-            .unwrap();
-    }
 }
 
 #[wasm_bindgen]
 pub fn frame() {
+    context::context_mut()
+        .render()
+        .map_err(|e| log::error!("{}", e))
+        .unwrap();
 }
