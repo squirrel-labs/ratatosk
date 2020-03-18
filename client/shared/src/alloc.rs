@@ -65,13 +65,13 @@ impl MutableAlloc for SimpleAllocator {
 }
 
 pub trait Initial<T> {
-    fn init() -> T {
-        unsafe { std::mem::zeroed() }
+    unsafe fn init() -> T {
+        std::mem::zeroed()
     }
 }
 
-pub struct NaiveInitial;
-impl<T> Initial<T> for NaiveInitial {}
+pub struct ZeroedInitial;
+impl<T> Initial<T> for ZeroedInitial {}
 
 pub struct Allocator<M, S: AllocSettings, I: Initial<M>>(
     pub std::marker::PhantomData<M>,
@@ -118,7 +118,7 @@ macro_rules! create_allocator {
     ($name:ident,$method:ty,$setting:ty,$v:expr) => {
         struct __Initial;
         impl Initial<$method> for __Initial {
-            fn init() -> $method {
+            unsafe fn init() -> $method {
                 $v
             }
         }
@@ -137,4 +137,14 @@ macro_rules! create_allocator {
             std::marker::PhantomData,
         );
     };
+}
+
+use crate::wasm_log::WasmLog;
+
+pub unsafe fn reset_heap<M: Sized + 'static, S: AllocSettings, I: Initial<M>>(alloc: &Allocator<M, S, I>, log_level_filter: log::LevelFilter) {
+    alloc.reset();
+
+    log::set_boxed_logger(Box::new(WasmLog::new()))
+        .map(|()| log::set_max_level(log_level_filter))
+        .unwrap();
 }

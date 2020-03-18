@@ -23,11 +23,8 @@ fn wait_for_main_thread_notify() {
 #[wasm_bindgen]
 pub fn run_main_loop() {
     unsafe {
-        crate::ALLOCATOR.reset();
+        rask_wasm_shared::alloc::reset_heap(&crate::ALLOCATOR, log::LevelFilter::Debug);
     }
-    log::set_boxed_logger(Box::new(WasmLog::new()))
-        .map(|()| log::set_max_level(log::LevelFilter::Debug))
-        .unwrap();
 
     log::info!("logic entry reached");
     reset_state();

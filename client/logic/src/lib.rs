@@ -4,7 +4,7 @@
 #![feature(allocator_api)]
 
 use rask_wasm_shared::{
-    alloc::{settings::Logic, Allocator, Initial, NaiveInitial, SimpleAllocator},
+    alloc::{settings::Logic, Allocator, Initial, SimpleAllocator},
     create_allocator, wee_alloc,
 };
 
@@ -14,7 +14,6 @@ create_allocator!(
     Logic,
     wee_alloc::WeeAlloc::INIT
 );
-//create_allocator!(ALLOCATOR, SimpleAllocator, Logic);
 
 pub mod entries;
 pub mod game_context;
