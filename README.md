@@ -38,6 +38,7 @@ First of all, you need to install the `nightly` toolchain using rustup:
 rustup install nightly-2020-02-28
 rustup default nightly-2020-02-28
 rustup target add wasm32-unknown-unknown  # for the frontend part
+cargo install cargo-make --git git://github.com/Ma27/cargo-make --branch loglevel
 cargo install wasm-bindgen-cli  # for optimizing wasm code
 ```
 
