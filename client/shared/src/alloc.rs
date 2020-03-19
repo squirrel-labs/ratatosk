@@ -141,7 +141,10 @@ macro_rules! create_allocator {
 
 use crate::wasm_log::WasmLog;
 
-pub unsafe fn reset_heap<M: Sized + 'static, S: AllocSettings, I: Initial<M>>(alloc: &Allocator<M, S, I>, log_level_filter: log::LevelFilter) {
+pub unsafe fn reset_heap<M: Sized + 'static, S: AllocSettings, I: Initial<M>>(
+    alloc: &Allocator<M, S, I>,
+    log_level_filter: log::LevelFilter,
+) {
     alloc.reset();
 
     log::set_boxed_logger(Box::new(WasmLog::new()))

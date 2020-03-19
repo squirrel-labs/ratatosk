@@ -1,5 +1,5 @@
-use std::fmt::Debug;
 use crate::mem;
+use std::fmt::Debug;
 
 pub trait Element: Clone + Sized + Default + Debug {}
 type Flag = u8;

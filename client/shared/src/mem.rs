@@ -135,7 +135,9 @@ pub fn wait_until_wake_up_at(ptr: *mut i32) {
 
 /// performs a notify at a given address and return the count of waiters
 pub fn wake_up_at(ptr: *mut i32) -> bool {
-    // documented at https://tc39.es/ecma262/#sec-atomics.notify and https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators
-    // the notify function wakes all waiters up 
+    // Documented at https://tc39.es/ecma262/#sec-atomics.notify
+    // and https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators.
+    // The notify function wakes all waiters up.
+
     (unsafe { llvm_atomic_notify(ptr, -1) }) > 0
 }
