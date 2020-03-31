@@ -3,7 +3,7 @@ members = [
   "rask-engine",
   "rask-server",
   "wasm",
-  "lobby/",
+  "lobby",
 ]
 
 [profile.release]
