@@ -13,7 +13,7 @@ args = [ "make", "--cwd", "client/", "--makefile", "Makefile.toml", "all" ]
 
 [tasks.backend]
 workspace = false
-dependencies = [ "rask-engine", "rask-server" ]
+dependencies = [ "rask-engine", "rask-server", "lobby" ]
 
 # package builds
 [tasks.rask-server]
@@ -25,6 +25,12 @@ args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask-server" ]
 workspace = false
 command = "cargo"
 args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask-engine" ]
+
+
+[tasks.lobby]
+workspace = false
+command = "cargo"
+args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "lobby" ]
 
 # dev tools
 [tasks.serve-frontend]
