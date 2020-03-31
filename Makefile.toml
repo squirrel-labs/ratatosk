@@ -29,7 +29,6 @@ workspace = false
 command = "cargo"
 args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask-engine" ]
 
-
 [tasks.lobby]
 workspace = false
 command = "cargo"
