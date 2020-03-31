@@ -5,6 +5,7 @@ members = [
   "client/graphics",
   "client/logic",
   "tools/bone-cake",
+  "lobby/",
 ]
 
 [profile.release]
