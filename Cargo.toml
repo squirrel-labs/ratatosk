@@ -4,6 +4,7 @@ members = [
   "rask-server",
   "client/graphics",
   "client/logic",
+  "lobby/",
 ]
 
 [profile.release]

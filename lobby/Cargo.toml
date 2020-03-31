@@ -1,0 +1,9 @@
+[package]
+name = "lobby"
+version = "0.1.0"
+authors = ["ma27"]
+edition = "2018"
+description = "The game-lobby."
+
+[dependencies]
+rocket = "0.4.4"
