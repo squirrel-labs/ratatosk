@@ -34,6 +34,11 @@ workspace = false
 command = "cargo"
 args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "lobby" ]
 
+[tasks.lobby]
+workspace = false
+command = "cargo"
+args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "lobby" ]
+
 # dev tools
 [tasks.serve]
 workspace = false
