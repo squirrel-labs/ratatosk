@@ -1,6 +1,5 @@
 [package]
-default-run = "lobby"
-name = "lobby"
+name = "rask-lobby"
 version = "0.1.0"
 authors = ["ma27"]
 edition = "2018"

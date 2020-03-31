@@ -4,7 +4,6 @@ extend = "./scripts/cargo-helpers.toml"
 additional_profiles = [ "watch" ]
 
 # component builds
-[tasks.all]
 dependencies = ["backend", "frontend", "lobby" ]
 workspace = false
 
@@ -40,7 +39,7 @@ args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "lobby" ]
 workspace = false
 watch = true
 dependencies = [ "stop",  "backend", "lobby" ]
-script = [ 
+script = [
 '''
 cargo make serve-lobby &
 #sleep 5 && ./scripts/dev-server &
@@ -50,7 +49,7 @@ cargo make serve-backend
 [tasks.stop]
 workspace = false
 watch = true
-script = [ 
+script = [
 '''
 #kill $(pgrep ./scripts/dev-server -f) 2>/dev/null || true
 kill $(pgrep target/debug/lobby -f) 2>/dev/null || true
