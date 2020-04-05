@@ -52,6 +52,11 @@ workspace = false
 command = "cargo"
 args = [ "make", "exec-${BUILD_ENV}", "--", "run", "-p", "rask-server" ]
 
+[tasks.serve-lobby]
+workspace = false
+command = "cargo"
+args = [ "make", "exec-${BUILD_ENV}", "--", "run", "-p", "lobby" ]
+
 [tasks.cleanup]
 workspace = false
 dependencies = [ "clean" ]
