@@ -1,7 +1,14 @@
+[env]
+watch = "false"
+
 [env.development]
 BUILD_ENV = "debug"
+CARGO_MAKE_DISABLE_WATCH = "true"
 [env.production]
 BUILD_ENV = "release"
+CARGO_MAKE_DISABLE_WATCH = "true"
+[env.watch]
+BUILD_ENV = "debug"
 
 [tasks.exec-debug]
 command = "cargo"
