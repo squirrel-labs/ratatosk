@@ -57,3 +57,10 @@ The following scripts can be used to start test servers
 cargo make serve-frontend # for the wasm/frontend setup
 cargo make serve-backend  # for the backend/game_server
 ```
+
+For development purposes it might be helpful to activate the `watch`-profile in the
+build-system:
+
+```
+cargo make serve-backend -p watch
+```
