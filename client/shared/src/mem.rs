@@ -44,6 +44,7 @@ pub fn get_double_buffer() -> &'static mut Buffer {
 
 #[repr(align(4))]
 pub struct SynchronizationMemory {
+    /// time elapsed since logic thread initialisation in milliseconds
     pub elapsed_ms: i32,
     last_elapsed_ms: i32,
 }
