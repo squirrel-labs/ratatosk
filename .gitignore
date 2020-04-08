@@ -26,7 +26,6 @@ target/
 .directory
 
 # cargo
-bin/
 gen/
 
 # Direnv state-directory
