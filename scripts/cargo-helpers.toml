@@ -1,5 +1,7 @@
-[env]
+[env.development]
 BUILD_ENV = "debug"
+[env.production]
+BUILD_ENV = "release"
 
 [tasks.exec-debug]
 command = "cargo"
