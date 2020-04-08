@@ -876,6 +876,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3baa92041a6fec78c687fa0cc2b3fae8884f743d672cf551bed1d6dac6988d0f"
 
 [[package]]
+name = "lobby"
+version = "0.1.0"
+dependencies = [
+ "rocket",
+ "rocket_contrib",
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
 name = "lock_api"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1448,17 +1459,6 @@ dependencies = [
  "image",
  "lazy_static",
  "spine_tiny",
-]
-
-[[package]]
-name = "rask-lobby"
-version = "0.1.0"
-dependencies = [
- "rocket",
- "rocket_contrib",
- "serde",
- "serde_derive",
- "serde_json",
 ]
 
 [[package]]
