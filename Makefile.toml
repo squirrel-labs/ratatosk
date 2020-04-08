@@ -1,5 +1,8 @@
 extend = "./scripts/cargo-helpers.toml"
 
+[config]
+additional_profiles = [ "watch" ]
+
 # component builds
 [tasks.all]
 dependencies = [ "tools", "backend", "frontend" ]
@@ -45,16 +48,19 @@ args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "lobby" ]
 command = "./scripts/dev-server"
 workspace = false
 args = [ "${@}" ]
+watch = true
 dependencies = [ "frontend" ]
 
 [tasks.serve-backend]
 workspace = false
 command = "cargo"
+watch = true
 args = [ "make", "exec-${BUILD_ENV}", "--", "run", "-p", "rask-server" ]
 
 [tasks.serve-lobby]
 workspace = false
 command = "cargo"
+watch = true
 args = [ "make", "exec-${BUILD_ENV}", "--", "run", "-p", "lobby" ]
 
 [tasks.cleanup]
@@ -68,13 +74,6 @@ script = [
 [tasks.ci-flow]
 workspace = false
 dependencies = [ "cleanup", "all", "check-format", "test" ]
-
-# watcher
-[tasks.watch]
-workspace = false
-watch = true
-command = "cargo"
-args = [ "build", "-p ${@}" ]
 
 # testierung
 [tasks.test]
