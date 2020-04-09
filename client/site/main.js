@@ -96,4 +96,64 @@ async function wakeLogic() {
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
 }
 
+const KEYDOWN = 0x0101;
+const KEYUP   = 0x0102;
+
+function sendEvent(e) {
+}
+
+function getKey(val) {
+    let code = new Uint8Array(4);
+    for (let i = 0; i < 4; i++) {
+        code[i] = val.charCodeAt(i);
+    }
+    return code;
+}
+
+function keyMod(key) {
+    return +key.shiftKey + (key.ctrlKey << 1) + (key.altKey << 2) + (key.metaKey << 3);
+}
+
+function evalKey(key) {
+    if (key.isComposing && key.repeat) { return; }
+    const scode = key.code;
+    if (scode.startsWith('Key') && scode.length == 4) { return getKey(scode); }
+    else if (scode.startsWith('Digit') && scode.length == 6) { return getKey('Key' + scode[5]); }
+    else if (scode.startsWith('Numpad')) { return getKey('Num' + scode[6]); }
+    else {
+        switch (scode) {
+            case 'Minus': return getKey('Key-');
+            case 'Plus': return getKey('Key+');
+            case 'BracketLeft': return getKey('Key[');
+            case 'BracketRight': return getKey('Key]');
+            case 'Enter': return getKey('Key\n');
+            case 'Backspace': return getKey('Bcks');
+            case 'Tab': return getKey('Tabu');
+            case 'ControlLeft': return getKey('CtrL');
+            case 'ControlRight': return getKey('CtrR');
+            case 'ShiftLeft': return getKey('ShiL');
+            case 'ShiftRight': return getKey('ShiR');
+            case 'ArrowUp': return getKey('ArrU');
+            case 'ArrowDown': return getKey('ArrD');
+            case 'ArrowLeft': return getKey('ArrL');
+            case 'ArrowRight': return getKey('ArrR');
+            case 'Equal': return getKey('Key=');
+            case 'Unidentified': return;
+            default: return getKey(scode.padEnd(4, ' ').substr(0, 4));
+        }
+    }
+}
+
+window.addEventListener('keydown', function(e) {
+    const key = evalKey(e);
+    const mod = keyMod(e);
+    if (key !== undefined && mod !== undefined) { sendEvent([KEYDOWN, key, mod]); }
+});
+
+window.addEventListener('keyup', function(e) {
+    const key = evalKey(e);
+    const mod = keyMod(e);
+    if (key !== undefined && mod !== undefined) { sendEvent([KEYUP, key, mod]); }
+});
+
 window.setInterval(wakeLogic, 100);

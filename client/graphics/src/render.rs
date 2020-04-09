@@ -58,7 +58,7 @@ impl<T: GraphicsApi> Render<T> {
     pub fn draw_sprites(&mut self, animations: &[Animation]) -> Result<bool, ClientError> {
         if let Some(state) = get_double_buffer().borrow_reader() {
             for sprite in state.get().sprites().iter() {
-                log::debug!("draw sprite: {:?}", sprite);
+                //log::debug!("draw sprite: {:?}", sprite);
                 self.draw_sprite(sprite, animations)?;
             }
             Ok(true)
