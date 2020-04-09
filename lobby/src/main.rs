@@ -2,8 +2,10 @@
 
 use std::vec::Vec;
 
-#[macro_use] extern crate rocket;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate rocket;
+#[macro_use]
+extern crate serde_derive;
 use rocket::fairing::AdHoc;
 use rocket::http::Header;
 use rocket_contrib::json::Json;
@@ -41,15 +43,15 @@ fn index() -> &'static str {
     "Hello, rask!"
 }
 
-#[get("/api/lobby", format="json")]
+#[get("/api/lobby", format = "json")]
 fn gameIndex() -> Json<GameOverview> {
     let mock_data = GameOverview {
         gameTypes: vec![
             (GameType {
                 name: "rask".to_string(),
                 icon: "./resources/icon_rask.png".to_string(),
-                displayName: "Rask".to_string()
-            })
+                displayName: "Rask".to_string(),
+            }),
         ],
         games: vec![
             (Game {
@@ -59,15 +61,16 @@ fn gameIndex() -> Json<GameOverview> {
                 maxUsers: 5,
                 userCount: 0,
                 hasPassword: true,
-            })
-        ]
+            }),
+        ],
     };
 
     Json(mock_data)
 }
 
 fn main() {
-    rocket::ignite().mount("/", routes![index, gameIndex])
+    rocket::ignite()
+        .mount("/", routes![index, gameIndex])
         .attach(AdHoc::on_response("CORS header for dev env", |req, res| {
             #[cfg(debug_assertions)]
             res.set_header(Header::new("Access-Control-Allow-Origin", "*"));
