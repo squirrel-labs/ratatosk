@@ -13,8 +13,9 @@ impl Context {
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
-        self.render
-            .render(rask_wasm_shared::mem::shared_heap().animations())
+        //self.render
+        //    .render(rask_wasm_shared::mem::shared_heap().animations())
+        Ok(())
     }
 }
 
