@@ -18,6 +18,7 @@ js-sys = "=0.3.35"
 fern = "0.5.9"
 rand = "0.7"
 image = "0.23"
+const_env = "0.1"
 
 [dependencies.rask-engine]
 version = "0.2.0"

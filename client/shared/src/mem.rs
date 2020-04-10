@@ -48,6 +48,8 @@ pub struct SynchronizationMemory {
     /// time elapsed since logic thread initialisation in milliseconds
     pub elapsed_ms: i32,
     last_elapsed_ms: i32,
+    pub mouse_x: f32,
+    pub mouse_y: f32,
 }
 
 impl SynchronizationMemory {
@@ -82,14 +84,15 @@ impl<T: Sized + Clone> MessageQueueElement<T> {
     fn get_writing(&self) -> u8 {
         unsafe { atomic_read_u8(&self.writing) }
     }
-    
     fn read(&mut self) -> Option<T> {
         self.set_reading(1);
         if self.get_writing() == 0 {
             let e = self.payload.clone();
             self.set_reading(0);
             Some(e)
-        } else { None }
+        } else {
+            None
+        }
     }
 }
 
@@ -99,7 +102,7 @@ pub struct MessageQueue<T: Sized + Clone> {
     writer_index: u32,
     /// the index of the next element to be read
     reader_index: u32,
-    _phantom: core::marker::PhantomData<T>
+    _phantom: core::marker::PhantomData<T>,
 }
 
 impl<T: Sized + Clone> MessageQueue<T> {
@@ -112,7 +115,12 @@ impl<T: Sized + Clone> MessageQueue<T> {
     }
 
     unsafe fn get_mut(&mut self, n: usize) -> Option<&mut MessageQueueElement<T>> {
-        core::slice::from_raw_parts_mut((self as *mut Self as *mut u8).offset(core::mem::size_of::<Self>() as isize) as *mut MessageQueueElement<T>, Self::length()).get_mut(n)
+        core::slice::from_raw_parts_mut(
+            (self as *mut Self as *mut u8).offset(core::mem::size_of::<Self>() as isize)
+                as *mut MessageQueueElement<T>,
+            Self::length(),
+        )
+        .get_mut(n)
     }
 
     pub fn pop(&mut self) -> Option<T> {

@@ -27,10 +27,12 @@ script = [
 
 [tasks.crate-build]
 workspace = false
-command = "cargo"
 condition = { env_set = [ "STACK_SIZE", "CARGO_TARGET_DIR" ] }
 env = { "RUSTFLAGS" = "-Clink-arg=--stack-first -Clink-arg=--no-entry -Clink-arg=--allow-undefined -Clink-arg=--strip-all -Clink-arg=--export-dynamic -Clink-arg=--import-memory -Clink-arg=--shared-memory -Clink-arg=--max-memory=1073741824 -Clink-arg=--threads -Clink-arg=-zstack-size=${STACK_SIZE} -Clink-arg=--export=__wasm_init_memory -Clink-arg=--no-check-features -Clink-arg=--export=__wasm_init_tls -Clink-arg=--export=__tls_size -Ctarget-feature=+atomics,+bulk-memory" }
-args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask-${@}", "--target", "wasm32-unknown-unknown" ]
+script = [
+	"touch build.rs && cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown",
+	"mv $CARGO_TARGET_DIR/output/* dist/",
+]
 
 # TODO cargo doesn't seem to have a post-build hook but it might be nice
 # to determine if a rebuild happened (otherwise we don't need to rerun wasm-bindgen).
