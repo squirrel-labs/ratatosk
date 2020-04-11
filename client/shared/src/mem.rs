@@ -1,9 +1,7 @@
 type Buffer = crate::double_buffer::DoubleBuffer<State>;
 
 use crate::state::State;
-use crate::{sprite::*, texture::*};
 use const_env::from_env;
-use rask_engine::resources::texture::*;
 
 #[from_env]
 /// The position of the stack.
@@ -24,7 +22,7 @@ pub const GRAPHICS_HEAP: usize = 0;
 pub const SYNCHRONIZATION_MEMORY: usize = 0;
 
 /// Adress of the internal resource library.
-pub const CATALOG: usize = 0;
+pub const RESOURCE_TABLE: usize = 0;
 
 /// The address of the double buffer (size: target dependent)
 pub const DOUBLE_BUFFER: usize = 0;

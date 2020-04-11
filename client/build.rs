@@ -9,6 +9,9 @@ const fn KiB(n: usize) -> usize {
 const fn MiB(n: usize) -> usize {
     n * KiB(1024)
 }
+const fn align(n: usize) -> usize {
+    (n + 3) & !3
+}
 
 const WORKER_NAME_VAR: &'static str = "CRATE";
 
@@ -27,7 +30,7 @@ const ALLOCATOR_SIZE: usize = MiB(1);
 
 /// Size of the internal resource library.
 /// This determines the highest available id.
-const CATALOG_SIZE: usize = 512;
+const RESOURCE_TABLE_SIZE: usize = 512;
 
 /// Size of rask_engine::resources::resource
 const RESOURCE_SIZE: usize = 32;
@@ -63,21 +66,21 @@ fn main() -> std::io::Result<()> {
         Err(err) => panic!("env var parsing failed (\"{:?}\")", err),
     };
 
-    let graphics_stack = STACK_ALIGNMENT + GRAPHICS_STACK_SIZE;
-    let alloc = graphics_stack;
-    let graphics_heap = alloc + ALLOCATOR_SIZE;
-    let sync = alloc + GRAPHICS_HEAP_SIZE;
-    let catalog = sync + SYNCHRONIZATION_MEMORY_SIZE;
-    let buffer = catalog + RESOURCE_SIZE * CATALOG_SIZE;
-    let queue = buffer + BUFFER_SPRITE_SIZE * BUFFER_SPRITE_COUNT;
-    let logic_heap = queue + MESSAGE_QUEUE_ELEMENT_SIZE * MESSAGE_QUEUE_LENGTH;
+    let graphics_stack = align(STACK_ALIGNMENT + GRAPHICS_STACK_SIZE);
+    let alloc = align(graphics_stack);
+    let graphics_heap = align(alloc + ALLOCATOR_SIZE);
+    let sync = align(alloc + GRAPHICS_HEAP_SIZE);
+    let table = align(sync + SYNCHRONIZATION_MEMORY_SIZE);
+    let buffer = align(table + RESOURCE_SIZE * RESOURCE_TABLE_SIZE);
+    let queue = align(buffer + BUFFER_SPRITE_SIZE * BUFFER_SPRITE_COUNT);
+    let logic_heap = align(queue + MESSAGE_QUEUE_ELEMENT_SIZE * MESSAGE_QUEUE_LENGTH);
 
     println!("cargo:rustc-env=GRAPHICS_STACK={}", graphics_stack);
     println!("cargo:rustc-env=ALLOCATOR={}", alloc);
     println!("cargo:rustc-env=GRAPHICS_HEAP={}", graphics_heap);
     println!("cargo:rustc-env=SYNCHRONIZATION_MEMORY={}", sync);
-    println!("cargo:rustc-env=CATALOG={}", catalog);
-    println!("cargo:rustc-env=DOUBLE_BUFFER={}", catalog);
+    println!("cargo:rustc-env=RESOURCE_TABLE={}", table);
+    println!("cargo:rustc-env=DOUBLE_BUFFER={}", buffer);
     println!("cargo:rustc-env=MESSAGE_QUEUE={}", queue);
     println!("cargo:rustc-env=LOGIC_HEAP={}", logic_heap);
 

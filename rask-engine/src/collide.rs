@@ -27,8 +27,7 @@ impl Collide<Vec2> for AABox {
 
 impl Collide for AABox {
     fn collides(&self, other: &Self) -> bool {
-        left_under(self.pos, other.pos + other.size)
-            && left_under(other.pos, self.pos + self.size)
+        left_under(self.pos, other.pos + other.size) && left_under(other.pos, self.pos + self.size)
     }
 }
 
