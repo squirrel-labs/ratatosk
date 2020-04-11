@@ -21,12 +21,12 @@ fn test() {
 ```
 */
 
-pub mod library;
+mod library;
 pub mod sound;
 pub mod texture;
 
 #[doc(inline)]
-pub use library::Library;
+pub use library::*;
 #[doc(inline)]
 pub use sound::Sound;
 #[doc(inline)]
