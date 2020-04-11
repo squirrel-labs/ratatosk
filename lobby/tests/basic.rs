@@ -1,7 +1,7 @@
 use lobby::main::*;
 
-use rocket::local::Client;
 use rocket::http::{ContentType, Status};
+use rocket::local::Client;
 
 #[test]
 fn test_index_route() {
