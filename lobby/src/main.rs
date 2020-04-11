@@ -14,25 +14,28 @@ use rocket::{get,routes};
 // this is just here for a POC.
 // TODO move those into their own file
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct GameType {
     name: String,
     icon: String,
-    displayName: String,
+    display_name: String,
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct Game {
     name: String,
     type_: String,
     id: u8,
-    maxUsers: u8,
-    userCount: u8,
-    hasPassword: bool,
+    max_users: u8,
+    user_count: u8,
+    has_password: bool,
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct GameOverview {
-    gameTypes: Vec<GameType>,
+    game_types: Vec<GameType>,
     games: Vec<Game>,
 }
 
@@ -43,13 +46,13 @@ fn index() -> &'static str {
 }
 
 #[get("/api/lobby", format = "json")]
-fn gameIndex() -> Json<GameOverview> {
+fn game_index() -> Json<GameOverview> {
     let mock_data = GameOverview {
-        gameTypes: vec![
+        game_types: vec![
             (GameType {
                 name: "rask".to_string(),
                 icon: "./resources/icon_rask.png".to_string(),
-                displayName: "Rask".to_string(),
+                display_name: "Rask".to_string(),
             }),
         ],
         games: vec![
@@ -57,9 +60,9 @@ fn gameIndex() -> Json<GameOverview> {
                 name: "Rask".to_string(),
                 type_: "rask".to_string(),
                 id: 1,
-                maxUsers: 5,
-                userCount: 0,
-                hasPassword: true,
+                max_users: 5,
+                user_count: 0,
+                has_password: true,
             }),
         ],
     };
@@ -68,7 +71,7 @@ fn gameIndex() -> Json<GameOverview> {
 }
 
 pub fn rocket() -> rocket::Rocket {
-    let routes = routes![index, gameIndex];
+    let routes = routes![index, game_index];
     rocket::ignite()
         .mount("/", routes)
         .attach(AdHoc::on_response("CORS header for dev env", |req, res| {
