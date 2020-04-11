@@ -109,7 +109,7 @@ dependencies = [
  "rask-engine",
  "serde",
  "serde_json",
- "spine_tiny",
+ "spine_tiny 0.1.0 (git+http://github.com/tomaka/spine-rs)",
 ]
 
 [[package]]
@@ -752,9 +752,9 @@ checksum = "b294d6fa9ee409a054354afc4352b0b9ef7ca222c69b8812cbea9e7d2bf3783f"
 
 [[package]]
 name = "libc"
-version = "0.2.68"
+version = "0.2.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dea0c0405123bba743ee3f91f49b1c7cfb684eef0da0a50110f758ccf24cdff0"
+checksum = "99e85c08494b21a9054e7fe1374a732aeadaff3980b6990b94bfd3a70f690005"
 
 [[package]]
 name = "lock_api"
@@ -1256,7 +1256,7 @@ version = "0.2.0"
 dependencies = [
  "image",
  "lazy_static",
- "spine_tiny",
+ "spine_tiny 0.1.0 (git+http://github.com/reeFridge/spine-rs)",
 ]
 
 [[package]]
@@ -1278,6 +1278,7 @@ version = "0.1.0"
 dependencies = [
  "fern",
  "js-sys",
+ "lazy_static",
  "log",
  "rand 0.7.3",
  "rask-engine",
@@ -1418,6 +1419,12 @@ name = "rustc-demangle"
 version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4c691c0e608126e00913e33f0ccf3727d5fc84573623b8d65b2df340b5201783"
+
+[[package]]
+name = "rustc-hex"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ceb8ce7a5e520de349e1fa172baeba4a9e8d5ef06c47471863530bc4972ee1e"
 
 [[package]]
 name = "rustc-serialize"
@@ -1587,6 +1594,17 @@ name = "spin"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
+
+[[package]]
+name = "spine_tiny"
+version = "0.1.0"
+source = "git+http://github.com/reeFridge/spine-rs#280ae6cbbe24cdfb8374adac583b755395321ac4"
+dependencies = [
+ "rustc-hex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
 
 [[package]]
 name = "spine_tiny"
@@ -1830,9 +1848,9 @@ dependencies = [
 
 [[package]]
 name = "typenum"
-version = "1.11.2"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d2783fe2d6b8c1101136184eb41be8b1ad379e4657050b8aaff0c79ee7575f9"
+checksum = "373c8a200f9e67a0c95e62a4f52fbf80c23b4381c05a17845531982fa99e6b33"
 
 [[package]]
 name = "unicase"

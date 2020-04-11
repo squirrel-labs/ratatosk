@@ -69,7 +69,7 @@ pub trait GraphicsApi: Sized {
 
     fn start_frame(&mut self, color: &[f32; 3]) -> Result<(), ClientError>;
     fn end_frame(&self) -> Result<(), ClientError>;
-    fn draw_rect(&self, pos: &math::Vec2, mat: &Mat3, tex: u32) -> Result<(), ClientError>;
+    fn draw_rect(&self, mat: &Mat3, tex: u32) -> Result<(), ClientError>;
     fn upload_texture(&mut self, texture: &mut Texture, n: u32) -> Result<(), ClientError>;
     fn resize_texture_pool(&mut self, n: u32) -> Result<(), ClientError>;
     fn ok(&self) -> Result<(), Self::GraphicsError>;
@@ -218,13 +218,13 @@ impl GraphicsApi for WebGl {
         let handle = WebGlApiTexture::new(&self.gl)?;
         self.gl.active_texture(Gl2::TEXTURE0);
         handle.bind(&self.gl);
-        if let ColorType::Rgb8 = texture.colortype() {
+        if let ColorType::Rgb8 = texture.color_type() {
             // TODO: copy RGB buffer to RGBA
             return Err(ClientError::ResourceError(format!(
                 "RGB not yet implemented"
             )));
         }
-        let (internalformat, format) = Self::colorformat(texture.colortype())?;
+        let (internalformat, format) = Self::colorformat(texture.color_type())?;
         let (w, h) = texture.dimension();
         self.gl
             .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
@@ -272,13 +272,13 @@ impl GraphicsApi for WebGl {
         self.fb.render_pass_1(&self.gl);
         self.gl
             .viewport(0, 0, self.width as i32, self.height as i32);
-        self.draw_rect_notexture(&math::Vec2::new(0.0, 0.0), &-Mat3::identity())?;
+        self.draw_rect_notexture(&-Mat3::identity())?;
         Ok(())
     }
 
-    fn draw_rect(&self, pos: &math::Vec2, mat: &Mat3, tex: TextureId) -> Result<(), ClientError> {
+    fn draw_rect(&self, mat: &Mat3, tex: TextureId) -> Result<(), ClientError> {
         self.bind_texture(tex);
-        self.draw_rect_notexture(pos, mat)
+        self.draw_rect_notexture(mat)
     }
 }
 
@@ -348,11 +348,10 @@ impl WebGl {
         }
     }
 
-    fn draw_rect_notexture(&self, pos: &math::Vec2, mat: &Mat3) -> Result<(), ClientError> {
+    fn draw_rect_notexture(&self, mat: &Mat3) -> Result<(), ClientError> {
         self.prog.upload_fransformation(&self.gl, mat);
         self.prog.upload_texture_id(&self.gl, 0);
-        self.gl
-            .vertex_attrib2fv_with_f32_array(1, &[pos.x(), pos.y()]);
+        // TODO Fix self.gl.vertex_attrib2fv_with_f32_array(1, &[pos.x(), pos.y()]);
         self.gl.draw_arrays(Gl2::TRIANGLES, 0, 6);
         Ok(())
     }

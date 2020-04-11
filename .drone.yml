@@ -2,11 +2,6 @@ kind: pipeline
 name: default
 
 steps:
-- name: format
-  image: truedoctor/rust-wasm:nightly-2020-02-28
-  pull: if-not-exists
-  commands:
-  - nix-shell --run 'cargo make check-format' --arg inCI true # check formatting for all projects
 - name: build
   image: truedoctor/rust-wasm:nightly-2020-02-28
   pull: if-not-exists
@@ -39,6 +34,11 @@ steps:
     path: /tmp/demo
   commands:
   - cp -r client /tmp/demo
+- name: format
+  image: truedoctor/rust-wasm:nightly-2020-02-28
+  pull: if-not-exists
+  commands:
+  - nix-shell --run 'cargo make check-format' --arg inCI true # check formatting for all projects
 
 volumes:
 - name: demo

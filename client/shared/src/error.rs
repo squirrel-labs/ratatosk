@@ -25,6 +25,7 @@ pub enum ClientError {
     WebSocketError(JsValue),
     WebGlError(String),
     ResourceError(String),
+    EngineError(String),
 }
 
 fn jsvalue_to_string(v: &JsValue) -> String {
@@ -45,7 +46,9 @@ impl std::fmt::Display for ClientError {
             ClientError::JsValueError(e) | ClientError::WebSocketError(e) => {
                 write!(f, "{}", jsvalue_to_string(e))
             }
-            ClientError::ResourceError(e) | ClientError::WebGlError(e) => write!(f, "{}", e),
+            ClientError::ResourceError(e)
+            | ClientError::WebGlError(e)
+            | ClientError::EngineError(e) => write!(f, "{}", e),
         }
     }
 }
@@ -53,5 +56,10 @@ impl std::fmt::Display for ClientError {
 impl From<JsValue> for ClientError {
     fn from(error: JsValue) -> Self {
         ClientError::JsValueError(error)
+    }
+}
+impl From<rask_engine::error::EngineError> for ClientError {
+    fn from(error: rask_engine::error::EngineError) -> Self {
+        ClientError::EngineError(format!("{}", error))
     }
 }
