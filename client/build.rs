@@ -83,7 +83,10 @@ fn main() -> std::io::Result<()> {
 
     if !is_logic {
         println!("cargo:rustc-cdylib-link-arg=--stack-first");
-        println!("cargo:rustc-cdylib-link-arg=-zstack-size={}", graphics_stack);
+        println!(
+            "cargo:rustc-cdylib-link-arg=-zstack-size={}",
+            graphics_stack
+        );
     };
     println!("cargo:rustc-cdylib-link-arg=--max-memory={}", MAX_MEORY);
 
