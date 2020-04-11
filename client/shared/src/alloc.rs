@@ -1,6 +1,8 @@
+use settings::AllocSettings;
+use std::alloc::{GlobalAlloc, Layout};
+
 pub mod settings {
     use crate::mem::*;
-    use std::alloc::{GlobalAlloc, Layout};
 
     pub trait AllocSettings {
         fn allocator_addr<T: Sized>() -> usize;
@@ -27,9 +29,6 @@ pub mod settings {
         }
     }
 }
-
-use settings::AllocSettings;
-use std::alloc::{GlobalAlloc, Layout};
 
 pub trait MutableAlloc {
     unsafe fn alloc(&mut self, layout: Layout) -> *mut u8;
