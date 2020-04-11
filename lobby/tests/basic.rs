@@ -1,4 +1,4 @@
-use lobby::main::*;
+use lobby::server::*;
 
 use rocket::http::{ContentType, Status};
 use rocket::local::Client;
