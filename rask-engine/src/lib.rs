@@ -4,4 +4,10 @@
 
 pub mod boxes;
 pub mod collide;
+pub mod error;
 pub mod math;
+pub mod resources;
+pub mod world;
+
+#[doc(inline)]
+pub use error::EngineError;

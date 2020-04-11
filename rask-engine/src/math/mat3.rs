@@ -221,6 +221,8 @@ impl Mat3 {
     /// (a b c)
     /// (d e f)
     /// (g h i)
+    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::many_single_char_names)]
     pub const fn new(
         a: f32,
         b: f32,

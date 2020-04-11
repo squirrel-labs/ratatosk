@@ -9,6 +9,10 @@ pub trait Collide<Rhs = Self> {
     fn collides(&self, other: &Rhs) -> bool;
 }
 
+fn left_under(v1: Vec2, v2: Vec2) -> bool {
+    v1.x() < v2.x() && v1.y() < v2.y()
+}
+
 impl Collide for Vec2 {
     fn collides(&self, other: &Self) -> bool {
         self == other
@@ -17,16 +21,14 @@ impl Collide for Vec2 {
 
 impl Collide<Vec2> for AABox {
     fn collides(&self, other: &Vec2) -> bool {
-        self.pos < *other && *other < self.pos + self.size
+        left_under(self.pos, *other) && left_under(*other, self.pos + self.size)
     }
 }
 
 impl Collide for AABox {
     fn collides(&self, other: &Self) -> bool {
-        self.pos.x() < other.pos.x() + other.size.x()
-            && other.pos.x() < self.pos.x() + self.size.x()
-            && self.pos.y() < other.pos.y() + other.size.y()
-            && other.pos.y() < self.pos.y() + self.size.y()
+        left_under(self.pos, other.pos + other.size)
+            && left_under(other.pos, self.pos + self.size)
     }
 }
 
@@ -40,6 +42,20 @@ impl Collide<Vec2> for RBox {
         0.0 <= v1_dist && v1_dist <= 1.0 && 0.0 <= v2_dist && v2_dist <= 1.0
         //v1_diff < self.pos + self.v2 && self.pos < v1_diff
         //&& v2_diff < self.pos + self.v1 && self.pos < v2_diff
+    }
+}
+
+impl Collide<Vec2> for spine::skeleton::SRT {
+    fn collides(&self, other: &Vec2) -> bool {
+        let rbox: RBox = self.into();
+        rbox.collides(other)
+    }
+}
+
+impl Collide<AABox> for spine::skeleton::SRT {
+    fn collides(&self, other: &AABox) -> bool {
+        let rbox: RBox = self.into();
+        rbox.collides(other)
     }
 }
 
@@ -82,19 +98,19 @@ impl Collide<AABox> for RBox {
             v2_dist_size.y()
         };
 
-        let minx = f32::min(
+        let min_x = f32::min(
             self.pos.x(),
             f32::min((self.pos + self.v1).x(), (self.pos + self.v2).x()),
         );
-        let maxx = f32::max(
+        let max_x = f32::max(
             self.pos.x(),
             f32::max((self.pos + self.v1).x(), (self.pos + self.v2).x()),
         );
-        let miny = f32::min(
+        let min_y = f32::min(
             self.pos.y(),
             f32::min((self.pos + self.v1).y(), (self.pos + self.v2).y()),
         );
-        let maxy = f32::max(
+        let max_y = f32::max(
             self.pos.y(),
             f32::max((self.pos + self.v1).y(), (self.pos + self.v2).y()),
         );
@@ -103,14 +119,14 @@ impl Collide<AABox> for RBox {
             && v1_dist <= 1.0
             && 0.0 <= v2_dist_size
             && v2_dist <= 1.0
-            && other.pos.x() <= maxx
-            && minx <= other.pos.x() + other.size.x()
-            && other.pos.y() <= maxy
-            && miny <= other.pos.y() + other.size.y()
+            && other.pos.x() <= max_x
+            && min_x <= other.pos.x() + other.size.x()
+            && other.pos.y() <= max_y
+            && min_y <= other.pos.y() + other.size.y()
     }
 }
 
-impl<S, T: Collide<S>> Collide<S> for Vec<T> {
+impl<S, T: Collide<S>> Collide<S> for [T] {
     fn collides(&self, other: &S) -> bool {
         self.iter().any(|x| x.collides(other))
     }

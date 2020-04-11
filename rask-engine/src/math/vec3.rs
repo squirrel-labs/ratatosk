@@ -1,4 +1,4 @@
-use core::cmp::Ordering;
+use core::iter::{once, Chain, Once};
 use core::ops;
 
 use crate::math::EPSILON;
@@ -114,20 +114,6 @@ impl ops::DivAssign for Vec3 {
     }
 }
 
-impl PartialOrd for Vec3 {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self == other {
-            Some(Ordering::Equal)
-        } else if self.x <= other.x && self.y <= other.y && self.z <= other.z {
-            Some(Ordering::Less)
-        } else if self.x >= other.x && self.y >= other.y && self.z >= other.z {
-            Some(Ordering::Greater)
-        } else {
-            None
-        }
-    }
-}
-
 impl PartialEq for Vec3 {
     fn eq(&self, other: &Self) -> bool {
         f32::abs(self.x - other.x) < EPSILON
@@ -147,6 +133,29 @@ impl From<(f32, f32, f32)> for Vec3 {
 impl From<Vec3> for (f32, f32, f32) {
     fn from(vec: Vec3) -> Self {
         (vec.x(), vec.y(), vec.z())
+    }
+}
+
+impl From<[f32; 3]> for Vec3 {
+    fn from([x, y, z]: [f32; 3]) -> Self {
+        Self::new(x, y, z)
+    }
+}
+
+impl From<Vec3> for [f32; 3] {
+    fn from(vec: Vec3) -> Self {
+        [vec.x(), vec.y(), vec.z()]
+    }
+}
+
+pub type IntoIter = Chain<Once<f32>, Chain<Once<f32>, Once<f32>>>;
+
+impl IntoIterator for Vec3 {
+    type Item = f32;
+    type IntoIter = IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        once(self.x).chain(once(self.y).chain(once(self.z)))
     }
 }
 
@@ -194,5 +203,10 @@ impl Vec3 {
     /// Returns a normalized version of the vector, that is, a vector that points in the same direction, but has norm 1.
     pub fn normalized(self) -> Self {
         self / self.norm()
+    }
+
+    /// Returns this `Vec3` as a `Vec2`, disregarding the z component.
+    pub fn into_vec2(self) -> super::Vec2 {
+        super::Vec2::new(self.x(), self.y())
     }
 }
