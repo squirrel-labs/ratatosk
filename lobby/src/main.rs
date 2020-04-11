@@ -1,16 +1,15 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+#![feature(decl_macro)]
+#![feature(proc_macro_hygiene)]
 
 use std::vec::Vec;
 
-#[macro_use]
-extern crate rocket;
-#[macro_use]
-extern crate serde_derive;
 use rocket::fairing::AdHoc;
 use rocket::http::Header;
 use rocket_contrib::json::Json;
 
-use serde::Serialize;
+use serde_derive::Serialize;
+
+use rocket::{get,routes};
 
 // this is just here for a POC.
 // TODO move those into their own file
@@ -68,12 +67,16 @@ fn gameIndex() -> Json<GameOverview> {
     Json(mock_data)
 }
 
-fn main() {
+pub fn rocket() -> rocket::Rocket {
+    let routes = routes![index, gameIndex];
     rocket::ignite()
-        .mount("/", routes![index, gameIndex])
+        .mount("/", routes)
         .attach(AdHoc::on_response("CORS header for dev env", |req, res| {
             #[cfg(debug_assertions)]
             res.set_header(Header::new("Access-Control-Allow-Origin", "*"));
         }))
-        .launch();
+}
+
+pub fn main() {
+    rocket().launch();
 }
