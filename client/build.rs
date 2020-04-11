@@ -1,14 +1,16 @@
 use std::fs::File;
 use std::io::prelude::*;
 
+#[allow(non_snake_case)]
 const fn KiB(n: usize) -> usize {
     n * 1024
 }
+#[allow(non_snake_case)]
 const fn MiB(n: usize) -> usize {
     n * KiB(1024)
 }
 
-const WORKER_NAME_VAR: &'static str = "CARGO_PKG_NAME";
+const WORKER_NAME_VAR: &'static str = "CRATE";
 
 /// Reserved memory
 const MAX_MEORY: usize = MiB(2048);
@@ -49,8 +51,8 @@ fn main() -> std::io::Result<()> {
     println!("{:#?}", std::env::vars().collect::<Vec<_>>());
     let name = std::env::var(WORKER_NAME_VAR);
     let is_logic = match name {
-        Ok(worker) if &worker == "rask-wasm-logic" => true,
-        Ok(worker) if &worker == "rask-wasm-graphics" => false,
+        Ok(worker) if &worker == "logic" => true,
+        Ok(worker) if &worker == "graphics" => false,
         Ok(key) => panic!(
             "{} is no valid value. Possibel values are logic and graphics",
             key
@@ -69,7 +71,6 @@ fn main() -> std::io::Result<()> {
     let buffer = catalog + RESOURCE_SIZE * CATALOG_SIZE;
     let queue = buffer + BUFFER_SPRITE_SIZE * BUFFER_SPRITE_COUNT;
     let logic_heap = queue + MESSAGE_QUEUE_ELEMENT_SIZE * MESSAGE_QUEUE_LENGTH;
-    let logic_stack = MAX_MEORY - MiB(1);
 
     println!("cargo:rustc-env=GRAPHICS_STACK={}", graphics_stack);
     println!("cargo:rustc-env=ALLOCATOR={}", alloc);
@@ -79,27 +80,12 @@ fn main() -> std::io::Result<()> {
     println!("cargo:rustc-env=DOUBLE_BUFFER={}", catalog);
     println!("cargo:rustc-env=MESSAGE_QUEUE={}", queue);
     println!("cargo:rustc-env=LOGIC_HEAP={}", logic_heap);
-    println!("cargo:rustc-env=LOGIC_STACK={}", logic_stack);
 
-    let stacksize = if is_logic {
-        logic_stack
-    } else {
+    if !is_logic {
         println!("cargo:rustc-cdylib-link-arg=--stack-first");
         println!("cargo:rustc-cdylib-link-arg=-zstack-size={}", graphics_stack);
-        graphics_stack
     };
-    //println!("cargo:rustc-cdylib-link-arg=--no-entry");
-    //println!("cargo:rustc-cdylib-link-arg=--allow-undefined");
-    //println!("cargo:rustc-cdylib-link-arg=--strip-all");
-    //println!("cargo:rustc-cdylib-link-arg=--export-dynamic");
-    //println!("cargo:rustc-cdylib-link-arg=--import-memory");
-    //println!("cargo:rustc-cdylib-link-arg=--shared-memory");
     println!("cargo:rustc-cdylib-link-arg=--max-memory={}", MAX_MEORY);
-    //println!("cargo:rustc-cdylib-link-arg=--threads");
-    //println!("cargo:rustc-cdylib-link-arg=--export=__wasm_init_memory");
-    //println!("cargo:rustc-cdylib-link-arg=--no-check-features");
-    //println!("cargo:rustc-cdylib-link-arg=--export=__wasm_init_tls");
-    //println!("cargo:rustc-cdylib-link-arg=--export=__tls_size");
 
     let out_dir = std::env::var("OUT_DIR").unwrap();
     let mut file = File::create(format!("{}/mem.json", out_dir))?;
