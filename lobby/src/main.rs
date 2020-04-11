@@ -9,7 +9,7 @@ use rocket_contrib::json::Json;
 
 use serde_derive::Serialize;
 
-use rocket::{get,routes};
+use rocket::{get, routes};
 
 // this is just here for a POC.
 // TODO move those into their own file
