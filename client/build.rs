@@ -13,7 +13,7 @@ const fn MiB(n: usize) -> usize {
 const WORKER_NAME_VAR: &'static str = "CRATE";
 
 /// Reserved memory
-const MAX_MEORY: usize = MiB(2048);
+const MAX_MEORY: usize = MiB(512);
 
 /// The first page of memory is reserved
 const STACK_ALIGNMENT: usize = 1024 * 63;

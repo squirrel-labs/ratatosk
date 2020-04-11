@@ -11,19 +11,19 @@ pub mod settings {
 
     impl AllocSettings for Logic {
         fn allocator_addr<T: Sized>() -> usize {
-            ALLOCATOR_AREA_START
+            ALLOCATOR
         }
         fn allocation_start_address<T: Sized>() -> isize {
-            LOGIC_ALLOCATION_AREA_START as isize
+            LOGIC_HEAP as isize
         }
     }
 
     impl AllocSettings for Graphics {
         fn allocator_addr<T: Sized>() -> usize {
-            ALLOCATOR_AREA_START + std::mem::size_of::<T>()
+            ALLOCATOR + std::mem::size_of::<T>()
         }
         fn allocation_start_address<T: Sized>() -> isize {
-            GRAPHICS_ALLOCATION_AREA_START as isize
+            GRAPHICS_HEAP as isize
         }
     }
 }

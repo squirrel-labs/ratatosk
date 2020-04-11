@@ -26,10 +26,10 @@ impl<T: GraphicsApi> Render<T> {
         self.graphics
             .ok()
             .map_err(|e| ClientError::WebGlError(format!("WebGl2 error: {}", e)))?;
-        if rask_wasm_shared::mem::shared_heap().get_texture_notify() {
-            rask_wasm_shared::mem::shared_heap().unset_texture_notify();
-            self.update_textures()?;
-        }
+        //if rask_wasm_shared::mem::shared_heap().get_texture_notify() {
+        //    rask_wasm_shared::mem::shared_heap().unset_texture_notify();
+        //    self.update_textures()?;
+        //}
         self.graphics.start_frame(&[0.8, 0.05, 0.55])?;
         if self.draw_sprites(animations)? {
             self.frame_nr += 1;
@@ -38,7 +38,7 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn update_textures(&mut self) -> Result<(), ClientError> {
-        if let Some(textures) = rask_wasm_shared::mem::shared_heap().textures_mut() {
+        /*if let Some(textures) = rask_wasm_shared::mem::shared_heap().textures_mut() {
             let n = textures.len() as u32;
             self.graphics.resize_texture_pool(n)?;
             if n > self.texture_count {
@@ -51,7 +51,7 @@ impl<T: GraphicsApi> Render<T> {
                 }
             }
             self.texture_count = n;
-        }
+        }*/
         Ok(())
     }
 

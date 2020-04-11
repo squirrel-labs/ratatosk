@@ -41,7 +41,7 @@ impl GameContext {
             self.state
                 .append_sprite(&Sprite::new(math::Vec2::new(-0.6, 0.6), 1, 0, 1));
 
-            let shared_heap = rask_wasm_shared::mem::shared_heap();
+            /*let shared_heap = rask_wasm_shared::mem::shared_heap();
             *shared_heap.animations_mut() = vec![
                 Animation::new(vec![
                     Frame::new(vec![rask_engine::math::Mat3::scaling(0.4, 0.4)]),
@@ -67,8 +67,10 @@ impl GameContext {
                 rask_wasm_shared::texture::Texture::from_png_stream(IMAGE2_DATA)?,
             ]);
             shared_heap.set_texture_notify();
+            */
         }
 
+        /*
         let animations = rask_wasm_shared::mem::shared_heap().animations();
         for sprite in self.state.sprites_mut().iter_mut() {
             if (self.tick_nr % 10) == 9 {
@@ -76,7 +78,7 @@ impl GameContext {
                     .next_frame(animations)
                     .ok_or(ClientError::ResourceError(format!("invalid animation id")))?;
             }
-        }
+        }*/
         self.push_state()?;
         self.tick_nr += 1;
         Ok(())

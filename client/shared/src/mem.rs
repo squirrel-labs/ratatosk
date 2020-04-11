@@ -1,46 +1,41 @@
-use crate::state::State;
 type Buffer = crate::double_buffer::DoubleBuffer<State>;
 
+use crate::state::State;
 use crate::{sprite::*, texture::*};
+use const_env::from_env;
 
-const fn KiB(n: usize) -> usize {
-    n * 1024
-}
-const fn MiB(n: usize) -> usize {
-    n * KiB(1024)
-}
+#[from_env]
+/// The position of the stack.
+pub const GRAPHIC_STACK: usize = 0;
 
-const STACK_ALIGNMENT: usize = 1024 * 63;
-const MESSAGE_QUEUE_LENGTH: usize = 32;
+#[from_env]
+/// The address of the Allocator structures
+pub const ALLOCATOR: usize = 0;
 
-/// The size of the stack. Its start is at address 0
-pub const GRAPHIC_STACK_SIZE: usize = MiB(4) + STACK_ALIGNMENT;
+/// The graphics heap address
+pub const GRAPHICS_HEAP: usize = 0;
 
-/// The address of the Allocator structures (size: 1MiB)
-pub const ALLOCATOR_AREA_START: usize = GRAPHIC_STACK_SIZE;
-
+#[from_env]
 /// The address memory synchronization area. (size: 1MiB)
 /// It contains data needed for synchronization between main thread and logic thread.
 /// This address must currently be 0x50fc00.
 /// On change you have to modify the corresponding js file.
-pub const SYNCHRONIZATION_MEMORY_START: usize = ALLOCATOR_AREA_START + MiB(1);
+pub const SYNCHRONIZATION_MEMORY: usize = 0;
+
+/// Adress of the internal resource library.
+pub const CATALOG: usize = 0;
 
 /// The address of the double buffer (size: target dependent)
-pub const SHARED_BUFFER_AREA_START: usize =
-    SYNCHRONIZATION_MEMORY_START + core::mem::size_of::<SynchronizationMemory>();
+pub const DOUBLE_BUFFER: usize = 0;
+
+/// Adress of the event queue
+pub const MESSAGE_QUEUE: usize = 0;
 
 /// The logic heap address (size: 32MiB)
-pub const LOGIC_ALLOCATION_AREA_START: usize =
-    SHARED_BUFFER_AREA_START + core::mem::size_of::<Buffer>();
-
-/// The graphics heap address (size: 32MiB)
-pub const GRAPHICS_ALLOCATION_AREA_START: usize = LOGIC_ALLOCATION_AREA_START + MiB(32);
-
-/// The start of unbounded shared memory (size: unbounded)
-pub const SHARED_ALLOCATION_AREA_START: usize = GRAPHICS_ALLOCATION_AREA_START + MiB(32);
+pub const LOGIC_HEAP: usize = 0;
 
 pub fn get_double_buffer() -> &'static mut Buffer {
-    unsafe { &mut *(SHARED_BUFFER_AREA_START as *mut Buffer) }
+    unsafe { &mut *(DOUBLE_BUFFER as *mut Buffer) }
 }
 
 #[repr(align(4))]
@@ -54,11 +49,11 @@ pub struct SynchronizationMemory {
 
 impl SynchronizationMemory {
     pub unsafe fn get() -> &'static Self {
-        &*(SYNCHRONIZATION_MEMORY_START as *const Self)
+        &*(SYNCHRONIZATION_MEMORY as *const Self)
     }
 
     pub unsafe fn get_mut() -> &'static mut Self {
-        &mut *(SYNCHRONIZATION_MEMORY_START as *mut Self)
+        &mut *(SYNCHRONIZATION_MEMORY as *mut Self)
     }
 
     pub fn wait_for_main_thread_notify(&mut self) {
@@ -107,7 +102,7 @@ pub struct MessageQueue<T: Sized + Clone> {
 
 impl<T: Sized + Clone> MessageQueue<T> {
     pub fn length() -> usize {
-        MESSAGE_QUEUE_LENGTH
+        MESSAGE_QUEUE
     }
 
     fn mem_size() -> usize {
@@ -132,47 +127,6 @@ impl<T: Sized + Clone> MessageQueue<T> {
         }
         Some(e)
     }
-}
-
-pub struct SharedHeap {
-    last_addr: u32,
-    animations: Vec<Animation>,
-    texture_notify: bool,
-    textures: Option<Vec<Texture>>,
-}
-
-impl SharedHeap {
-    pub fn animations_mut(&mut self) -> &mut Vec<Animation> {
-        &mut self.animations
-    }
-
-    pub fn animations(&self) -> &Vec<Animation> {
-        &self.animations
-    }
-
-    pub fn unset_texture_notify(&mut self) {
-        self.texture_notify = false
-    }
-
-    pub fn set_texture_notify(&mut self) {
-        self.texture_notify = true
-    }
-
-    pub fn get_texture_notify(&mut self) -> bool {
-        self.texture_notify
-    }
-
-    pub fn textures_mut(&mut self) -> &mut Option<Vec<Texture>> {
-        &mut self.textures
-    }
-
-    pub fn textures(&self) -> &Option<Vec<Texture>> {
-        &self.textures
-    }
-}
-
-pub fn shared_heap() -> &'static mut SharedHeap {
-    unsafe { &mut *(SHARED_ALLOCATION_AREA_START as *mut SharedHeap) }
 }
 
 extern "C" {
