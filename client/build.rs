@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::prelude::*;
+
 const fn KiB(n: usize) -> usize {
     n * 1024
 }
@@ -5,10 +8,10 @@ const fn MiB(n: usize) -> usize {
     n * KiB(1024)
 }
 
-const WEBWORKER_VAR: &'static str = "WEBWORKER"; 
+const WORKER_NAME_VAR: &'static str = "CARGO_PKG_NAME";
 
 /// Reserved memory
-const MAX_MEORY: usize = 1073741824;
+const MAX_MEORY: usize = MiB(2048);
 
 /// The first page of memory is reserved
 const STACK_ALIGNMENT: usize = 1024 * 63;
@@ -24,7 +27,7 @@ const ALLOCATOR_SIZE: usize = MiB(1);
 /// This determines the highest available id.
 const CATALOG_SIZE: usize = 512;
 
-/// Size of rask_engine::resources::resource 
+/// Size of rask_engine::resources::resource
 const RESOURCE_SIZE: usize = 32;
 
 /// Length of the message queue used to communicate between main.js and the logic thread
@@ -42,29 +45,31 @@ const BUFFER_SPRITE_COUNT: usize = 32;
 /// Size of each sprites
 const BUFFER_SPRITE_SIZE: usize = 32;
 
-
 fn main() -> std::io::Result<()> {
-    let logic = None;
-    match std::env::var_os(WEBWORKER_VAR).map(|x|x.to_str().expect(format!("Failed to parse {}", WEBWORKER_VAR).as_str())) {
-        Some("logic") => logic = Some(true),
-        Some("graphics") => logic = Some(false),
-        Some(key) => println!("{} is no valid value. Possibel values are logic and graphics", key),
-        None => println!("{} is not defined in the environment.", WEBWORKER_VAR),
-    }
-    
-    if logic.is_none() {
-        std::process::exit(1)
-    }
+    println!("{:#?}", std::env::vars().collect::<Vec<_>>());
+    let name = std::env::var(WORKER_NAME_VAR);
+    let is_logic = match name {
+        Ok(worker) if &worker == "rask-wasm-logic" => true,
+        Ok(worker) if &worker == "rask-wasm-graphics" => false,
+        Ok(key) => panic!(
+            "{} is no valid value. Possibel values are logic and graphics",
+            key
+        ),
+        Err(std::env::VarError::NotPresent) => {
+            panic!("{} is not defined in the environment.", WORKER_NAME_VAR)
+        }
+        Err(err) => panic!("env var parsing failed (\"{:?}\")", err),
+    };
 
     let graphics_stack = STACK_ALIGNMENT + GRAPHICS_STACK_SIZE;
     let alloc = graphics_stack;
-    let graphics_heap = alloc + ALLOCATOR_SIZE; 
-    let sync  = alloc + GRAPHICS_HEAP_SIZE;
+    let graphics_heap = alloc + ALLOCATOR_SIZE;
+    let sync = alloc + GRAPHICS_HEAP_SIZE;
     let catalog = sync + SYNCHRONIZATION_MEMORY_SIZE;
     let buffer = catalog + RESOURCE_SIZE * CATALOG_SIZE;
     let queue = buffer + BUFFER_SPRITE_SIZE * BUFFER_SPRITE_COUNT;
     let logic_heap = queue + MESSAGE_QUEUE_ELEMENT_SIZE * MESSAGE_QUEUE_LENGTH;
-    let logic_stack = MAX_MEORY;
+    let logic_stack = MAX_MEORY - MiB(1);
 
     println!("cargo:rustc-env=GRAPHICS_STACK={}", graphics_stack);
     println!("cargo:rustc-env=ALLOCATOR={}", alloc);
@@ -76,14 +81,34 @@ fn main() -> std::io::Result<()> {
     println!("cargo:rustc-env=LOGIC_HEAP={}", logic_heap);
     println!("cargo:rustc-env=LOGIC_STACK={}", logic_stack);
 
+    let stacksize = if is_logic {
+        logic_stack
+    } else {
+        println!("cargo:rustc-cdylib-link-arg=--stack-first");
+        println!("cargo:rustc-cdylib-link-arg=-zstack-size={}", graphics_stack);
+        graphics_stack
+    };
+    //println!("cargo:rustc-cdylib-link-arg=--no-entry");
+    //println!("cargo:rustc-cdylib-link-arg=--allow-undefined");
+    //println!("cargo:rustc-cdylib-link-arg=--strip-all");
+    //println!("cargo:rustc-cdylib-link-arg=--export-dynamic");
+    //println!("cargo:rustc-cdylib-link-arg=--import-memory");
+    //println!("cargo:rustc-cdylib-link-arg=--shared-memory");
+    println!("cargo:rustc-cdylib-link-arg=--max-memory={}", MAX_MEORY);
+    //println!("cargo:rustc-cdylib-link-arg=--threads");
+    //println!("cargo:rustc-cdylib-link-arg=--export=__wasm_init_memory");
+    //println!("cargo:rustc-cdylib-link-arg=--no-check-features");
+    //println!("cargo:rustc-cdylib-link-arg=--export=__wasm_init_tls");
+    //println!("cargo:rustc-cdylib-link-arg=--export=__tls_size");
 
-    let stacksize = if logic.unwrap() {logic_stack} else {graphics_stack};
-    println!("cargo:rustc-flags=-Clink-arg=--stack-first -Clink-arg=--no-entry -Clink-arg=--allow-undefined -Clink-arg=--strip-all -Clink-arg=--export-dynamic -Clink-arg=--import-memory -Clink-arg=--shared-memory -Clink-arg=--max-memory={} -Clink-arg=--threads -Clink-arg=-zstack-size={} -Clink-arg=--export=__wasm_init_memory -Clink-arg=--no-check-features -Clink-arg=--export=__wasm_init_tls -Clink-arg=--export=__tls_size -Ctarget-feature=+atomics,+bulk-memory", MAX_MEORY, stacksize);
-
-    use std::fs::File;
-    use std::io::prelude::*;
     let out_dir = std::env::var("OUT_DIR").unwrap();
     let mut file = File::create(format!("{}/mem.json", out_dir))?;
-    file.write_all(format!("{{max_memory:{},queue_start:{},sync_area:{}}}", MAX_MEORY, queue, sync).as_bytes())?;
+    file.write_all(
+        format!(
+            "{{max_memory:{},queue_start:{},sync_area:{}}}",
+            MAX_MEORY, queue, sync
+        )
+        .as_bytes(),
+    )?;
     Ok(())
 }
