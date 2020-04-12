@@ -11,7 +11,7 @@ args = [ "fmt", "--all" ]
 
 [tasks.logic]
 workspace = false
-env = { STACK_SIZE = "134217728" }
+env = { STACK_SIZE = "134217728", CARGO_TARGET_DIR = "../target/logic", CRATE = "logic" }
 script = [
   "cargo make crate-build wasm-logic",
   "cargo make wasm logic",
@@ -19,7 +19,7 @@ script = [
 
 [tasks.graphics]
 workspace = false
-env = { STACK_SIZE = "4194304" }
+env = { STACK_SIZE = "4194304", CARGO_TARGET_DIR = "../target/graphics", CRATE = "graphics" }
 script = [
   "cargo make crate-build wasm-graphics",
   "cargo make wasm graphics",
@@ -28,21 +28,24 @@ script = [
 [tasks.crate-build]
 workspace = false
 command = "cargo"
-condition = { env_set = [ "STACK_SIZE" ] }
+condition = { env_set = [ "STACK_SIZE", "CARGO_TARGET_DIR" ] }
 env = { "RUSTFLAGS" = "-Clink-arg=--stack-first -Clink-arg=--no-entry -Clink-arg=--allow-undefined -Clink-arg=--strip-all -Clink-arg=--export-dynamic -Clink-arg=--import-memory -Clink-arg=--shared-memory -Clink-arg=--max-memory=1073741824 -Clink-arg=--threads -Clink-arg=-zstack-size=${STACK_SIZE} -Clink-arg=--export=__wasm_init_memory -Clink-arg=--no-check-features -Clink-arg=--export=__wasm_init_tls -Clink-arg=--export=__tls_size -Ctarget-feature=+atomics,+bulk-memory" }
 args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask-${@}", "--target", "wasm32-unknown-unknown" ]
 
+# TODO cargo doesn't seem to have a post-build hook but it might be nice
+# to determine if a rebuild happened (otherwise we don't need to rerun wasm-bindgen).
 [tasks.wasm]
 workspace = false
+condition = { env_set = [ "CRATE" ] }
 script = [
 '''
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash -ex
 top=$(git rev-parse --show-toplevel 2>/dev/null)
 if [ $? -ne 0 ]; then
   echo "Not in a git repo!"
   exit 1
 fi
-file=$top/target/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm_${@}.wasm
+file=$top/target/${CRATE}/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm_${@}.wasm
 wasm-bindgen $file --out-dir $top/client/gen \
   --no-typescript \
   --target no-modules \
