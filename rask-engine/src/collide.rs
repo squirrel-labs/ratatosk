@@ -3,6 +3,7 @@
 
 use crate::boxes::{AABox, RBox};
 use crate::math::Vec2;
+use core::ops::Range;
 
 // For information on the SAT, see: http://www.dyn4j.org/2010/01/sat/.
 
@@ -53,6 +54,35 @@ fn project(rbox: &RBox, axis: &Vec2) -> Projection {
     )
 }
 
+/// Calculate the bound in a line segment that collides an AABox projected onto an axis.
+/// `bound` is a tuple of the start and ending point of the AABB.
+/// `pos` is a component of the position vector of the line segment.
+/// `direction` is a component of the direction vector of the line segment.
+fn calculate_aabox_rbox_component_bounds(bound: Range<f32>, pos: f32, direction: f32)
+        -> (f32, f32) {
+    if direction == 0.0 { return (0.0, 1.0) }
+    // get bounds of s by transforming "g(s) = pos + s * direction"
+    // and applying the inequation g(s) >= bound.start and g(s) <= bound.end
+    let (s1, s2) = ((bound.start - pos) / direction, (bound.end - pos) / direction);
+    // if direction is negative, you have to switch the values
+    if direction > 0.0 { (s1, s2) }
+    else { (s2, s1) }
+}
+
+/// Test for collision between an AABox and an edge of a rbox
+fn collide_aabox_rbox_segment(xbound: Range<f32>, ybound: Range<f32>, pos: Vec2, direction: Vec2)
+        -> bool {
+    let sbound1 = calculate_aabox_rbox_component_bounds(xbound, pos.x(), direction.x());
+    if sbound1.0 > sbound1.1 { return false; }
+    let sbound2 = calculate_aabox_rbox_component_bounds(ybound, pos.y(), direction.y());
+    if sbound2.0 > sbound2.1 { return false; }
+    let (sbound1, sbound2) = (sbound1.0..sbound1.1, sbound2.0..sbound2.1);
+
+    sbound1.end >= sbound2.start && sbound1.start <= sbound2.end
+        && sbound1.end >= 0.0 && sbound2.end >= 0.0
+        && sbound1.start <= 1.0 && sbound2.start <= 1.0
+}
+
 impl Collide for Vec2 {
     fn collides(&self, other: &Self) -> bool {
         self == other
@@ -97,8 +127,14 @@ impl Collide<AABox> for spine::skeleton::SRT {
 
 impl Collide<AABox> for RBox {
     fn collides(&self, other: &AABox) -> bool {
-        let rbox: RBox = (*other).into();
-        self.collides(&rbox)
+        let xbound = other.pos.x()..other.pos.x()+other.size.x();
+        let ybound = other.pos.y()..other.pos.y()+other.size.y();
+        let edges = [(self.pos, self.v1), (self.pos, self.v2),
+                     (self.pos + self.v1, self.v2), (self.pos + self.v2, self.v1)];
+        collide_aabox_rbox_segment(xbound.clone(), ybound.clone(), self.pos, self.v1)
+        || collide_aabox_rbox_segment(xbound.clone(), ybound.clone(), self.pos, self.v2)
+        || collide_aabox_rbox_segment(xbound.clone(), ybound.clone(), self.pos + self.v1, self.v2)
+        || collide_aabox_rbox_segment(xbound, ybound, self.pos + self.v2, self.v1)
     }
 }
 
