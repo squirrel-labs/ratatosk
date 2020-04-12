@@ -42,7 +42,7 @@ workspace = false
 condition = { env_set = [ "CRATE" ] }
 script = [
 '''
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash -ex
 top=$(git rev-parse --show-toplevel 2>/dev/null)
 if [ $? -ne 0 ]; then
   echo "Not in a git repo!"
