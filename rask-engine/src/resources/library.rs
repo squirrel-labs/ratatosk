@@ -7,11 +7,11 @@ pub struct ResourceTable(&'static mut [Resource]);
 macro_rules! get_store {
     ($type: ty, $enum_type: ident) => {
         impl GetStore<$type> for ResourceTable {
-            unsafe fn get(&'static self, id: usize) -> Result<&'static $type, EngineError> {
+            unsafe fn get(&self, id: usize) -> Result<&$type, EngineError> {
                 self.index_check(id)?;
                 match &self.0[id] {
                     Resource::$enum_type(value) => Ok(&value),
-                    _ => Err("Wrong resource type".into()),
+                    _ => Err(EngineError::ResourceType("Wrong resource type".into())),
                 }
             }
             unsafe fn store(&mut self, data: $type, id: usize) -> Result<(), EngineError> {
@@ -28,7 +28,7 @@ pub trait GetStore<T> {
     /// # Safety
     ///
     /// The function is not thread safe.
-    unsafe fn get(&'static self, id: usize) -> Result<&'static T, EngineError>;
+    unsafe fn get(&self, id: usize) -> Result<&T, EngineError>;
     /// Store a resource to the library
     ///
     /// # Safety
@@ -43,13 +43,14 @@ impl ResourceTable {
     /// # Safety
     ///
     /// The function is safe as long as the memory from memory_offset to memory_offset + CATALOG_SIZE * sizeof(Resource)
-    pub unsafe fn new(memory_offset: usize, catalog_size: usize) -> Self {
+    pub unsafe fn from_memory(memory_offset: usize, catalog_size: usize) -> Self {
         ResourceTable(core::slice::from_raw_parts_mut(
             memory_offset as *mut Resource,
             catalog_size,
         ))
     }
-    pub unsafe fn init(&mut self) {
+
+    pub fn clear(&mut self) {
         for i in 0..self.0.len() {
             self.0[i] = Resource::None;
         }
@@ -57,7 +58,7 @@ impl ResourceTable {
 
     fn index_check(&self, id: usize) -> Result<(), EngineError> {
         if id >= self.0.len() {
-            return Err(EngineError::ResourceError(format!(
+            return Err(EngineError::ResourceIndex(format!(
                 "The requested resource index: {} is out ouf range, the max id is {}",
                 id,
                 self.0.len() - 1
