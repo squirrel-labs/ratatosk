@@ -51,7 +51,6 @@ impl<T: GraphicsApi> Render<T> {
             for sprite in sprites {
                 //log::debug!("draw sprite: {:?}", sprite);
                 self.upload_texture(sprite.tex_id)?;
-
                 self.graphics.draw_rect(&sprite.transform, sprite.tex_id)?;
             }
             Ok(true)
