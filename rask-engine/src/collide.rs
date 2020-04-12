@@ -1,6 +1,8 @@
 //! The collide module provides the Collide trait for objects that can collide along with several
 //! implementations for various types.
 
+use spine::skeleton::SRT;
+
 use crate::boxes::{AABox, RBox};
 use crate::math::Vec2;
 use core::ops::Range;
@@ -8,7 +10,7 @@ use core::ops::Range;
 // For information on the SAT, see: http://www.dyn4j.org/2010/01/sat/.
 
 /// A trait for objects that can collide with other objects.
-pub trait Collide<Rhs = Self> {
+pub trait Collide<Rhs: ?Sized = Self> {
     fn collides(&self, other: &Rhs) -> bool;
 }
 
@@ -36,22 +38,17 @@ fn project(rbox: &RBox, axis: &Vec2) -> Projection {
         rbox.pos + rbox.v1 + rbox.v2,
     ];
     // project each vertex onto axis
-    vertices.iter().fold(
-        {
-            let p = axis.dot(rbox.pos);
-            Projection { min: p, max: p }
-        },
-        |Projection { min, max }, vertex| {
-            let p = axis.dot(*vertex);
-            if p < min {
-                Projection { min: p, max }
-            } else if p > max {
-                Projection { min, max: p }
-            } else {
-                Projection { min, max }
-            }
-        },
-    )
+    let p = axis.dot(rbox.pos);
+    let mut proj = Projection { min: p, max: p };
+    for &vertex in vertices.iter() {
+        let p = axis.dot(vertex);
+        if p < proj.min {
+            proj.min = p;
+        } else if p > proj.max {
+            proj.max = p;
+        }
+    }
+    proj
 }
 
 /// Calculate the bound in a line segment that collides an AABox projected onto an axis.
@@ -106,14 +103,50 @@ fn collide_aabox_rbox_segment(
 }
 
 impl Collide for Vec2 {
+    #[inline]
     fn collides(&self, other: &Self) -> bool {
         self == other
+    }
+}
+
+impl Collide<AABox> for Vec2 {
+    #[inline]
+    fn collides(&self, other: &AABox) -> bool {
+        other.collides(self)
+    }
+}
+
+impl Collide<RBox> for Vec2 {
+    #[inline]
+    fn collides(&self, other: &RBox) -> bool {
+        other.collides(self)
+    }
+}
+
+impl Collide<SRT> for Vec2 {
+    #[inline]
+    fn collides(&self, other: &SRT) -> bool {
+        other.collides(self)
     }
 }
 
 impl Collide<Vec2> for AABox {
     fn collides(&self, other: &Vec2) -> bool {
         left_under(self.pos, *other) && left_under(*other, self.pos + self.size)
+    }
+}
+
+impl Collide<RBox> for AABox {
+    #[inline]
+    fn collides(&self, other: &RBox) -> bool {
+        other.collides(self)
+    }
+}
+
+impl Collide<SRT> for AABox {
+    #[inline]
+    fn collides(&self, other: &SRT) -> bool {
+        other.collides(self)
     }
 }
 
@@ -133,14 +166,14 @@ impl Collide<Vec2> for RBox {
     }
 }
 
-impl Collide<Vec2> for spine::skeleton::SRT {
+impl Collide<Vec2> for SRT {
     fn collides(&self, other: &Vec2) -> bool {
         let rbox: RBox = self.into();
         rbox.collides(other)
     }
 }
 
-impl Collide<AABox> for spine::skeleton::SRT {
+impl Collide<AABox> for SRT {
     fn collides(&self, other: &AABox) -> bool {
         let rbox: RBox = self.into();
         rbox.collides(other)
@@ -151,12 +184,6 @@ impl Collide<AABox> for RBox {
     fn collides(&self, other: &AABox) -> bool {
         let xbound = other.pos.x()..other.pos.x() + other.size.x();
         let ybound = other.pos.y()..other.pos.y() + other.size.y();
-        let edges = [
-            (self.pos, self.v1),
-            (self.pos, self.v2),
-            (self.pos + self.v1, self.v2),
-            (self.pos + self.v2, self.v1),
-        ];
         collide_aabox_rbox_segment(xbound.clone(), ybound.clone(), self.pos, self.v1)
             || collide_aabox_rbox_segment(xbound.clone(), ybound.clone(), self.pos, self.v2)
             || collide_aabox_rbox_segment(
@@ -173,14 +200,22 @@ impl Collide for RBox {
     fn collides(&self, other: &Self) -> bool {
         // using the SAT
         // TODO: optimization: remove duplicate axes
-        let axes = [self.v1, self.v2, other.v1, other.v2];
-        axes.iter()
-            .all(|axis| project(self, axis).collides(&project(other, axis)))
+        project(self, &self.v1).collides(&project(other, &self.v1))
+            && project(self, &self.v2).collides(&project(other, &self.v2))
+            && project(self, &other.v1).collides(&project(other, &other.v1))
+            && project(self, &other.v2).collides(&project(other, &other.v2))
     }
 }
 
 impl<S, T: Collide<S>> Collide<S> for [T] {
     fn collides(&self, other: &S) -> bool {
         self.iter().any(|x| x.collides(other))
+    }
+}
+
+impl<S, T: Collide<S>> Collide<[T]> for S {
+    #[inline]
+    fn collides(&self, other: &[T]) -> bool {
+        other.collides(self)
     }
 }
