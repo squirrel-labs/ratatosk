@@ -10,7 +10,7 @@ use crate::math::Vec2;
 pub struct AABox {
     /// The position of the box.
     pub pos: Vec2,
-    /// The size, may not be smaller than zero.
+    /// The size, both components must be greater than zero.
     pub size: Vec2,
 }
 
@@ -61,6 +61,7 @@ pub struct RBox {
 
 impl RBox {
     /// Creates a new rotated box from a position, an orientation and a width.
+    // v2 has the same direction as v1 rotated to the left by 90°
     pub fn new(pos: Vec2, orientation: Vec2, height: f32) -> Self {
         let scale = height / orientation.norm();
         let orth = Vec2::new(-orientation.y(), orientation.x()) * scale;
@@ -105,6 +106,16 @@ impl ops::Sub<Vec2> for RBox {
 impl ops::SubAssign<Vec2> for RBox {
     fn sub_assign(&mut self, other: Vec2) {
         self.pos -= other
+    }
+}
+
+impl From<AABox> for RBox {
+    fn from(aabox: AABox) -> Self {
+        Self {
+            pos: aabox.pos,
+            v1: Vec2::new(aabox.size.x(), 0.0),
+            v2: Vec2::new(0.0, aabox.size.y()),
+        }
     }
 }
 
