@@ -56,9 +56,9 @@ impl ResourceTable {
     }
 
     fn index_check(&self, id: usize) -> Result<(), EngineError> {
-        if id > self.0.len() {
+        if id >= self.0.len() {
             return Err(EngineError::ResourceError(format!(
-                "The requested texture index: {} is out ouf range, the max id is {}",
+                "The requested resource index: {} is out ouf range, the max id is {}",
                 id,
                 self.0.len() - 1
             )));

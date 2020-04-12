@@ -9,7 +9,8 @@ const fn KiB(n: usize) -> usize {
 const fn MiB(n: usize) -> usize {
     n * KiB(1024)
 }
-const fn align(n: usize) -> usize {
+/// align the given address to the next 32bit
+const fn align32_up(n: usize) -> usize {
     (n + 3) & !3
 }
 
@@ -33,12 +34,12 @@ const ALLOCATOR_SIZE: usize = MiB(1);
 const RESOURCE_TABLE_SIZE: usize = KiB(1);
 
 /// Size of the message queue used to communicate between main.js and the logic thread
-/// Its address must be exorted to javascript.
+/// Its address must be exported to javascript.
 const MESSAGE_QUEUE_SIZE: usize = 64;
 
 /// The address memory synchronization area.
 /// It contains data needed for synchronization between main thread and logic thread.
-/// This address must be exorted to javascript.
+/// This address must be exported to javascript.
 const SYNCHRONIZATION_MEMORY_SIZE: usize = 32;
 
 /// Number of sprites to store in the double buffer
@@ -51,8 +52,8 @@ fn main() -> std::io::Result<()> {
         Ok(worker) if &worker == "logic" => true,
         Ok(worker) if &worker == "graphics" => false,
         Ok(key) => panic!(
-            "{} is no valid value. Possibel values are logic and graphics",
-            key
+            "{} is no valid value for {}. Possible values are logic and graphics",
+            key, WORKER_NAME_VAR,
         ),
         Err(std::env::VarError::NotPresent) => {
             panic!("{} is not defined in the environment.", WORKER_NAME_VAR)
@@ -60,14 +61,14 @@ fn main() -> std::io::Result<()> {
         Err(err) => panic!("env var parsing failed (\"{:?}\")", err),
     };
 
-    let graphics_stack = align(STACK_ALIGNMENT + GRAPHICS_STACK_SIZE);
-    let alloc = align(graphics_stack);
-    let graphics_heap = align(alloc + ALLOCATOR_SIZE);
-    let sync = align(alloc + GRAPHICS_HEAP_SIZE);
-    let table = align(sync + SYNCHRONIZATION_MEMORY_SIZE);
-    let buffer = align(table + RESOURCE_TABLE_SIZE);
-    let queue = align(buffer + BUFFER_SIZE);
-    let logic_heap = align(queue + MESSAGE_QUEUE_SIZE);
+    let graphics_stack = align32_up(STACK_ALIGNMENT + GRAPHICS_STACK_SIZE);
+    let alloc = align32_up(graphics_stack);
+    let graphics_heap = align32_up(alloc + ALLOCATOR_SIZE);
+    let sync = align32_up(alloc + GRAPHICS_HEAP_SIZE);
+    let table = align32_up(sync + SYNCHRONIZATION_MEMORY_SIZE);
+    let buffer = align32_up(table + RESOURCE_TABLE_SIZE);
+    let queue = align32_up(buffer + BUFFER_SIZE);
+    let logic_heap = align32_up(queue + MESSAGE_QUEUE_SIZE);
 
     println!("cargo:rustc-env=GRAPHICS_STACK={}", graphics_stack);
     println!("cargo:rustc-env=ALLOCATOR={}", alloc);

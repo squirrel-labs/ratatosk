@@ -30,7 +30,8 @@ workspace = false
 condition = { env_set = [ "CARGO_TARGET_DIR" ] }
 env = { "RUSTFLAGS" = "-Clink-arg=--no-entry -Clink-arg=--allow-undefined -Clink-arg=--strip-all -Clink-arg=--export-dynamic -Clink-arg=--import-memory -Clink-arg=--shared-memory  -Clink-arg=--threads  -Clink-arg=--export=__wasm_init_memory -Clink-arg=--no-check-features -Clink-arg=--export=__wasm_init_tls -Clink-arg=--export=__tls_size -Ctarget-feature=+atomics,+bulk-memory" }
 script = [
-	"touch build.rs && cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown",
+	"touch build.rs #triggers the build.rs to be rebuild every time",
+	"cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown",
 	"mkdir -p gen",
 	"mv $(find $CARGO_TARGET_DIR/ -name mem.json) gen/",
 ]
