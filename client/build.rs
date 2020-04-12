@@ -23,7 +23,7 @@ const MAX_MEORY: u32 = MiB(512);
 const STACK_ALIGNMENT: u32 = 1024 * 63;
 
 /// The size of the stack. Its start is at address 0
-const GRAPHICS_STACK_SIZE: u32 = MiB(4);
+const GRAPHICS_STACK_SIZE: u32 = MiB(1);
 const GRAPHICS_HEAP_SIZE: u32 = MiB(1);
 
 /// The size of the Allocator structures
@@ -31,7 +31,7 @@ const ALLOCATOR_SIZE: u32 = MiB(1);
 
 /// Size of the internal resource library.
 /// This determines the highest available id.
-const RESOURCE_TABLE_SIZE: u32 = KiB(1);
+const RESOURCE_TABLE_SIZE: u32 = KiB(8);
 
 /// Size of the message queue used to communicate between main.js and the logic thread
 /// Its address must be exported to javascript.
@@ -91,11 +91,11 @@ fn main() -> std::io::Result<()> {
     };
     println!("cargo:rustc-cdylib-link-arg=--max-memory={}", MAX_MEORY);
 
-    let out_dir = std::env::var("OUT_DIR").unwrap();
-    let mut file = File::create(format!("{}/mem.json", out_dir))?;
+    let out_dir = std::env::var("MEM_GEN").unwrap();
+    let mut file = File::create(format!("{}", out_dir))?;
     write!(
         &mut file,
-        "{{max_memory:{},queue_start:{},sync_area:{}}}",
+        "var memoryParameters = {{max_memory:{},queue_start:{},sync_area:{}}}",
         MAX_MEORY, queue, sync
     )?;
     Ok(())

@@ -17,12 +17,16 @@ pub struct GameContext {
 
 impl GameContext {
     pub fn new() -> Result<Self, ClientError> {
+        log::info!("creating game_context");
+        log::info!("table address: {}", RESOURCE_TABLE);
+        log::info!("table length: {}", RESOURCE_TABLE_ELEMENT_COUNT);
+        let mut resource_table =
+            unsafe { ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT) };
+        resource_table.clear();
         Ok(Self {
             state: State::default(),
             tick_nr: 0,
-            resource_table: unsafe {
-                ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT)
-            },
+            resource_table,
         })
     }
 

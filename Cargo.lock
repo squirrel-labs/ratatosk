@@ -1281,6 +1281,7 @@ dependencies = [
  "log",
  "rand 0.7.3",
  "rask-engine",
+ "static_assertions",
  "wasm-bindgen",
  "web-sys",
  "wee_alloc",
@@ -1577,6 +1578,12 @@ dependencies = [
  "from_json",
  "rustc-serialize",
 ]
+
+[[package]]
+name = "static_assertions"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
 name = "string"
@@ -1987,7 +1994,7 @@ dependencies = [
 [[package]]
 name = "wee_alloc"
 version = "0.4.5"
-source = "git+https://github.com/NatrixAeria/wee_alloc#7a241cd1b441b10251375304e6f7834a67fb54c7"
+source = "git+https://github.com/squirrel-labs/wee_alloc#7a241cd1b441b10251375304e6f7834a67fb54c7"
 dependencies = [
  "cfg-if",
  "libc",

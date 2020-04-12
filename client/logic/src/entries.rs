@@ -25,14 +25,31 @@ pub fn run_main_loop() {
         rask_wasm_shared::alloc::reset_heap(&crate::ALLOCATOR, log::LevelFilter::Debug);
     }
 
+    use rask_wasm_shared as mem;
     log::info!("logic entry reached");
+    //log::info!("Allocator: {}", mem::ALLOCATOR);
+    //log::info!("logic heap: {}", mem::LOGIC_HEAP);
+    //log::info!("buffer: {}", mem::DOUBLE_BUFFER);
+    //log::info!("graphics_heap: {}", mem::GRAPHICS_HEAP);
+    //log::info!("graphics_stack: {}", mem::GRAPHICS_STACK);
+    log::info!("queue: {}", mem::MESSAGE_QUEUE);
+    log::info!("table: {}", mem::RESOURCE_TABLE);
+    //log::info!("buffer size: {}", mem::DOUBLE_BUFFER_SIZE);
+    log::info!("queue size: {}", mem::MESSAGE_QUEUE_SIZE);
+    log::info!("table size: {}", mem::RESOURCE_TABLE_SIZE);
+    log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
+    log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
+    log::info!("buffer count: {}", mem::DOUBLE_BUFFER_ELEMENT_COUNT);
+    //log::info!("sync: {}", mem::SYNCHRONIZATION_MEMORY);
     reset_state();
     let mut game = GameContext::new()
         .map_err(|e| log::error!("{}", e))
         .unwrap();
 
+    log::info!("game_context crated");
     loop {
         game.tick().map_err(|e| log::error!("{}", e)).unwrap();
+        log::info!("wait_for_main_thread_notify()");
         wait_for_main_thread_notify();
     }
 }

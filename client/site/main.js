@@ -53,11 +53,12 @@ function createCanvas() {
 
 function generateMemory() {
     // memory pages of 65,536 bytes = 64 KiB
-    const MiB = 16;
-    const GiB = 1024 * MiB;
+    const page = 65536
+    let mem = memoryParameters.max_memory
+    let max = (mem + page -1 ) / page
     const memoryDescriptor = {
-        initial: 256 * MiB,
-        maximum: 1   * GiB,
+        initial: max,
+        maximum: max,
         shared: true
     };
     return new WebAssembly.Memory(memoryDescriptor);

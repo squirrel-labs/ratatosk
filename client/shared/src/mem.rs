@@ -7,17 +7,26 @@ use const_env::from_env;
 use rask_engine::resources::{Resource, ResourceTable};
 use std::mem::size_of;
 
+macro_rules! assert_env {
+    ($var:expr) => {
+        const _: &str = env!($var);
+    };
+}
+
 #[from_env]
 /// The position of the stack.
-pub const GRAPHIC_STACK: usize = 0;
+pub const GRAPHICS_STACK: usize = 0;
+assert_env!("GRAPHICS_STACK");
 
 #[from_env]
 /// The address of the Allocator structures
 pub const ALLOCATOR: usize = 0;
+assert_env!("ALLOCATOR");
 
 #[from_env]
 /// The graphics heap address
 pub const GRAPHICS_HEAP: usize = 0;
+assert_env!("GRAPHICS_HEAP");
 
 #[from_env]
 /// The address memory synchronization area. (size: 1MiB)
@@ -25,12 +34,15 @@ pub const GRAPHICS_HEAP: usize = 0;
 /// This address must currently be 0x50fc00.
 /// On change you have to modify the corresponding js file.
 pub const SYNCHRONIZATION_MEMORY: usize = 0;
+assert_env!("SYNCHRONIZATION_MEMORY");
 
 #[from_env]
 /// Address of the internal resource library.
 pub const RESOURCE_TABLE: usize = 0;
+assert_env!("RESOURCE_TABLE");
 #[from_env]
 pub const RESOURCE_TABLE_SIZE: usize = 0;
+assert_env!("RESOURCE_TABLE_SIZE");
 pub const RESOURCE_TABLE_ELEMENT_COUNT: usize = (RESOURCE_TABLE_SIZE as i64
     - size_of::<ResourceTable>() as i64) as usize
     / size_of::<Resource>();
@@ -38,8 +50,10 @@ pub const RESOURCE_TABLE_ELEMENT_COUNT: usize = (RESOURCE_TABLE_SIZE as i64
 #[from_env]
 /// The address of the double buffer (size: target dependent)
 pub const DOUBLE_BUFFER: usize = 0;
+assert_env!("DOUBLE_BUFFER");
 #[from_env]
 pub const DOUBLE_BUFFER_SIZE: usize = 0;
+assert_env!("DOUBLE_BUFFER_SIZE");
 pub const DOUBLE_BUFFER_ELEMENT_COUNT: usize =
     (DOUBLE_BUFFER_SIZE as i64 - size_of::<DoubleBuffer<State>>() as i64) as usize
         / size_of::<Sprite>();
@@ -47,8 +61,10 @@ pub const DOUBLE_BUFFER_ELEMENT_COUNT: usize =
 #[from_env]
 /// Address of the event queue
 pub const MESSAGE_QUEUE: usize = 0;
+assert_env!("MESSAGE_QUEUE");
 #[from_env]
 pub const MESSAGE_QUEUE_SIZE: usize = 0;
+assert_env!("MESSAGE_QUEUE_SIZE");
 pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = (MESSAGE_QUEUE_SIZE as i64
     - size_of::<MessageQueue<u8>>() as i64) as usize
     / size_of::<MessageQueueElement<u8>>();
@@ -56,6 +72,7 @@ pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = (MESSAGE_QUEUE_SIZE as i64
 #[from_env]
 /// The logic heap address (size: 32MiB)
 pub const LOGIC_HEAP: usize = 0;
+assert_env!("LOGIC_HEAP");
 
 pub fn get_double_buffer() -> &'static mut Buffer {
     unsafe { &mut *(DOUBLE_BUFFER as *mut Buffer) }
