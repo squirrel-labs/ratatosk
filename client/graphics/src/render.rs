@@ -1,10 +1,12 @@
+use crate::context::RESOURCE_TABLE;
 use crate::graphics::GraphicsApi;
 use rask_engine::math::Mat3;
+use rask_engine::resources::GetStore;
+use rask_engine::resources::Texture;
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
 use rask_wasm_shared::sprite::{Frame, Sprite};
 use rask_wasm_shared::state::State;
-use rask_wasm_shared::texture::Texture;
 
 pub struct Render<T> {
     graphics: T,
@@ -33,10 +35,23 @@ impl<T: GraphicsApi> Render<T> {
         self.graphics.end_frame()
     }
 
+    pub fn upload_texture(&mut self, id: u32) -> Result<(), ClientError> {
+        let texture = unsafe { RESOURCE_TABLE.get(id as usize)? };
+        //self.graphics.grow_texture_pool(1);
+        self.graphics.upload_texture(texture, id)?;
+        self.texture_count += 1;
+        Ok(())
+    }
+
     pub fn draw_sprites(&mut self) -> Result<bool, ClientError> {
         if let Some(state) = get_double_buffer().borrow_reader() {
-            for sprite in state.get().sprites().iter() {
+            let sprites = state.get().sprites();
+            self.graphics.resize_texture_pool(sprites.len() as u32)?;
+            self.texture_count = 0;
+            for sprite in sprites {
                 //log::debug!("draw sprite: {:?}", sprite);
+                self.upload_texture(sprite.tex_id)?;
+
                 self.graphics.draw_rect(&sprite.transform, sprite.tex_id)?;
             }
             Ok(true)
