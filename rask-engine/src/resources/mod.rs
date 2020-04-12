@@ -8,12 +8,12 @@ use lazy_static::lazy_static;
 # use rask_engine::resources::*;
 
 lazy_static! {
-    static ref LIB: ResourceTable = unsafe { ResourceTable::new(0, 0) };
+    static ref TABLE: ResourceTable = unsafe { ResourceTable::new(0, 0) };
 }
 
 fn test() {
     unsafe {
-        let _texture: &Texture = LIB.get(0).unwrap();
+        let _texture: &Texture = TABLE.get(0).unwrap();
     }
 }
 ```
