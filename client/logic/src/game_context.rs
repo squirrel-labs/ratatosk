@@ -21,7 +21,7 @@ impl GameContext {
             state: State::default(),
             tick_nr: 0,
             resource_table: unsafe {
-                ResourceTable::new(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT)
+                ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT)
             },
         })
     }

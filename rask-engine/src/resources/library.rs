@@ -43,14 +43,14 @@ impl ResourceTable {
     /// # Safety
     ///
     /// The function is safe as long as the memory from memory_offset to memory_offset + CATALOG_SIZE * sizeof(Resource)
-    pub unsafe fn new(memory_offset: usize, catalog_size: usize) -> Self {
+    pub unsafe fn from_memory(memory_offset: usize, catalog_size: usize) -> Self {
         ResourceTable(core::slice::from_raw_parts_mut(
             memory_offset as *mut Resource,
             catalog_size,
         ))
     }
 
-    pub unsafe fn init(&mut self) {
+    pub fn clear(&mut self) {
         for i in 0..self.0.len() {
             self.0[i] = Resource::None;
         }

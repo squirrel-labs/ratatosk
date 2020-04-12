@@ -50,8 +50,7 @@ pub const MESSAGE_QUEUE: usize = 0;
 #[from_env]
 pub const MESSAGE_QUEUE_SIZE: usize = 0;
 pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = (MESSAGE_QUEUE_SIZE as i64
-    - size_of::<MessageQueue<MessageQueueElement<u8>>>() as i64)
-    as usize
+    - size_of::<MessageQueue<u8>>() as i64) as usize
     / size_of::<MessageQueueElement<u8>>();
 
 #[from_env]
@@ -89,7 +88,6 @@ impl SynchronizationMemory {
 }
 
 #[repr(align(4))]
-#[derive(Clone)]
 struct MessageQueueElement<T: Sized + Clone> {
     reading: u8,
     writing: u8,
@@ -127,7 +125,7 @@ pub struct MessageQueue<T: Sized + Clone> {
 
 impl<T: Sized + Clone> MessageQueue<T> {
     pub fn length() -> usize {
-        MESSAGE_QUEUE
+        MESSAGE_QUEUE_ELEMENT_COUNT
     }
 
     fn mem_size() -> usize {

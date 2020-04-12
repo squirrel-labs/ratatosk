@@ -8,8 +8,9 @@ use rask_wasm_shared::sprite::Frame;
 
 lazy_static! {
     pub static ref RESOURCE_TABLE: ResourceTable = unsafe {
-        let mut table = ResourceTable::new(mem::RESOURCE_TABLE, mem::RESOURCE_TABLE_ELEMENT_COUNT);
-        table.init();
+        let mut table =
+            ResourceTable::from_memory(mem::RESOURCE_TABLE, mem::RESOURCE_TABLE_ELEMENT_COUNT);
+        table.clear();
         table
     };
 }
