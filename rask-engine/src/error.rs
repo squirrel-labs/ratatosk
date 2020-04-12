@@ -4,7 +4,8 @@ use std::fmt::{self, Display};
 /// The error type used by the game engine.
 #[derive(Debug)]
 pub enum EngineError {
-    ResourceError(String),
+    ResourceType(String),
+    ResourceIndex(String),
     MathError(String),
     Misc(String),
 }
@@ -12,7 +13,8 @@ pub enum EngineError {
 impl Display for EngineError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            EngineError::ResourceError(e) => write!(f, "ResourceError: {}", e),
+            EngineError::ResourceType(e) => write!(f, "ResourceError: {}", e),
+            EngineError::ResourceIndex(e) => write!(f, "ResourceError: {}", e),
             EngineError::Misc(e) => write!(f, "EngineError: {}", e),
             EngineError::MathError(e) => write!(f, "MathError: {}", e),
         }
@@ -33,4 +35,4 @@ macro_rules! derive_from {
 
 derive_from!(&str, Misc);
 derive_from!(String, Misc);
-derive_from!(image::error::ImageError, ResourceError);
+derive_from!(image::error::ImageError, ResourceType);

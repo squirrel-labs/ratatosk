@@ -11,7 +11,7 @@ macro_rules! get_store {
                 self.index_check(id)?;
                 match &self.0[id] {
                     Resource::$enum_type(value) => Ok(&value),
-                    _ => Err("Wrong resource type".into()),
+                    _ => Err(EngineError::ResourceType("Wrong resource type".into())),
                 }
             }
             unsafe fn store(&mut self, data: $type, id: usize) -> Result<(), EngineError> {
@@ -58,7 +58,7 @@ impl ResourceTable {
 
     fn index_check(&self, id: usize) -> Result<(), EngineError> {
         if id >= self.0.len() {
-            return Err(EngineError::ResourceError(format!(
+            return Err(EngineError::ResourceIndex(format!(
                 "The requested resource index: {} is out ouf range, the max id is {}",
                 id,
                 self.0.len() - 1
