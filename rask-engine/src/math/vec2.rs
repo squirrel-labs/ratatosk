@@ -1,4 +1,4 @@
-use core::cmp::Ordering;
+use core::iter::{once, Chain, Once};
 use core::ops;
 
 use crate::math::EPSILON;
@@ -112,20 +112,6 @@ impl ops::DivAssign for Vec2 {
     }
 }
 
-impl PartialOrd for Vec2 {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self == other {
-            Some(Ordering::Equal)
-        } else if self.x <= other.x && self.y <= other.y {
-            Some(Ordering::Less)
-        } else if self.x >= other.x && self.y >= other.y {
-            Some(Ordering::Greater)
-        } else {
-            None
-        }
-    }
-}
-
 impl PartialEq for Vec2 {
     fn eq(&self, other: &Self) -> bool {
         f32::abs(self.x - other.x) < EPSILON && f32::abs(self.y - other.y) < EPSILON
@@ -143,6 +129,29 @@ impl From<(f32, f32)> for Vec2 {
 impl From<Vec2> for (f32, f32) {
     fn from(vec: Vec2) -> Self {
         (vec.x(), vec.y())
+    }
+}
+
+impl From<[f32; 2]> for Vec2 {
+    fn from([x, y]: [f32; 2]) -> Self {
+        Self::new(x, y)
+    }
+}
+
+impl From<Vec2> for [f32; 2] {
+    fn from(vec: Vec2) -> Self {
+        [vec.x(), vec.y()]
+    }
+}
+
+pub type IntoIter = Chain<Once<f32>, Once<f32>>;
+
+impl IntoIterator for Vec2 {
+    type Item = f32;
+    type IntoIter = IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        once(self.x).chain(once(self.y))
     }
 }
 

@@ -31,3 +31,6 @@ gen/
 
 # Direnv state-directory
 .direnv/
+
+# IntelliJ
+ratatosk.iml

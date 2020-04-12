@@ -212,13 +212,13 @@ impl GraphicsApi for WebGl {
         let handle = WebGlApiTexture::new(&self.gl)?;
         self.gl.active_texture(Gl2::TEXTURE0);
         handle.bind(&self.gl);
-        if let ColorType::Rgb8 = texture.colortype() {
+        if let ColorType::Rgb8 = texture.color_type() {
             // TODO: copy RGB buffer to RGBA
             return Err(ClientError::ResourceError(format!(
                 "RGB not yet implemented"
             )));
         }
-        let (internalformat, format) = Self::colorformat(texture.colortype())?;
+        let (internalformat, format) = Self::colorformat(texture.color_type())?;
         let (w, h) = texture.dimension();
         self.gl
             .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
