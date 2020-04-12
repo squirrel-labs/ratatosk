@@ -1,10 +1,10 @@
 use crate::shader::Program;
 use rask_engine::math;
 use rask_engine::math::Mat3;
+use rask_engine::resources::texture::{ColorType, Texture};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::sprite::TextureId;
 use rask_wasm_shared::state::State;
-use rask_wasm_shared::texture::{ColorType, Texture};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::WebGl2RenderingContext as Gl2;
@@ -70,8 +70,9 @@ pub trait GraphicsApi: Sized {
     fn start_frame(&mut self, color: &[f32; 3]) -> Result<(), ClientError>;
     fn end_frame(&self) -> Result<(), ClientError>;
     fn draw_rect(&self, mat: &Mat3, tex: u32) -> Result<(), ClientError>;
-    fn upload_texture(&mut self, texture: &mut Texture, n: u32) -> Result<(), ClientError>;
+    fn upload_texture(&mut self, texture: &Texture, n: u32) -> Result<(), ClientError>;
     fn resize_texture_pool(&mut self, n: u32) -> Result<(), ClientError>;
+    fn grow_texture_pool(&mut self, n: u32) -> Result<(), ClientError>;
     fn ok(&self) -> Result<(), Self::GraphicsError>;
 }
 
@@ -208,7 +209,7 @@ impl GraphicsApi for WebGl {
         })
     }
 
-    fn upload_texture(&mut self, texture: &mut Texture, n: u32) -> Result<(), ClientError> {
+    fn upload_texture(&mut self, texture: &Texture, n: u32) -> Result<(), ClientError> {
         log::debug!(
             "uploading texture (id {}, {}x{})",
             n,
@@ -254,6 +255,12 @@ impl GraphicsApi for WebGl {
             self.texture_handles.resize(n, None)
         }
         Ok(())
+    }
+
+    fn grow_texture_pool(&mut self, n: u32) -> Result<(), ClientError> {
+        Ok(self
+            .texture_handles
+            .resize(self.texture_handles.len() + n as usize, None))
     }
 
     fn ok(&self) -> Result<(), Self::GraphicsError> {

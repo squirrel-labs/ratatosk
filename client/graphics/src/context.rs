@@ -8,7 +8,7 @@ use rask_wasm_shared::mem::{RESOURCE_TABLE as rt, RESOURCE_TABLE_ELEMENT_COUNT a
 use rask_wasm_shared::sprite::Frame;
 
 lazy_static! {
-    static ref RESOURCE_TABLE: ResourceTable = unsafe {
+    pub static ref RESOURCE_TABLE: ResourceTable = unsafe {
         let mut table = ResourceTable::new(rt, rtc);
         table.init();
         table
@@ -25,8 +25,7 @@ impl Context {
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
-        self.render.render();
-        Ok(())
+        self.render.render()
     }
 }
 

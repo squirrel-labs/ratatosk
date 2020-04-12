@@ -72,21 +72,25 @@ impl<T: Element> DoubleBuffer<T> {
         }
     }
 
+    #[allow(unused_attributes)]
     #[inline(always)]
     pub extern "C" fn set_reading_at(&mut self, reading_at: Flag) {
         unsafe { mem::atomic_write_u8(&mut self.reading_at, reading_at) }
     }
 
+    #[allow(unused_attributes)]
     #[inline(always)]
     pub extern "C" fn get_reading_at(&self) -> Flag {
         unsafe { mem::atomic_read_u8(&self.reading_at) }
     }
 
+    #[allow(unused_attributes)]
     #[inline(always)]
     pub extern "C" fn set_provided(&mut self, provided: Flag) {
         unsafe { mem::atomic_write_u8(&mut self.provided, provided) }
     }
 
+    #[allow(unused_attributes)]
     #[inline(always)]
     pub extern "C" fn get_provided(&self) -> Flag {
         unsafe { mem::atomic_read_u8(&self.provided) }
