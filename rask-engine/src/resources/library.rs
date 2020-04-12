@@ -6,8 +6,8 @@ pub struct ResourceTable(&'static mut [Resource]);
 
 macro_rules! get_store {
     ($type: ty, $enum_type: ident) => {
-        impl<'a> GetStore<'a, $type> for ResourceTable {
-            unsafe fn get(&'a self, id: usize) -> Result<&'a $type, EngineError> {
+        impl GetStore<$type> for ResourceTable {
+            unsafe fn get(&self, id: usize) -> Result<&$type, EngineError> {
                 self.index_check(id)?;
                 match &self.0[id] {
                     Resource::$enum_type(value) => Ok(&value),
@@ -22,13 +22,13 @@ macro_rules! get_store {
     };
 }
 
-pub trait GetStore<'a, T> {
+pub trait GetStore<T> {
     /// Retrieve a resource from the library.
     ///
     /// # Safety
     ///
     /// The function is not thread safe.
-    unsafe fn get(&'a self, id: usize) -> Result<&'a T, EngineError>;
+    unsafe fn get(&self, id: usize) -> Result<&T, EngineError>;
     /// Store a resource to the library
     ///
     /// # Safety
