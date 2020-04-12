@@ -30,15 +30,11 @@ const ALLOCATOR_SIZE: usize = MiB(1);
 
 /// Size of the internal resource library.
 /// This determines the highest available id.
-const RESOURCE_TABLE_SIZE: usize = 512;
+const RESOURCE_TABLE_SIZE: usize = KiB(1);
 
-/// Size of rask_engine::resources::resource
-const RESOURCE_SIZE: usize = 32;
-
-/// Length of the message queue used to communicate between main.js and the logic thread
-/// This address must be exorted to javascript.
-const MESSAGE_QUEUE_LENGTH: usize = 64;
-const MESSAGE_QUEUE_ELEMENT_SIZE: usize = 32;
+/// Size of the message queue used to communicate between main.js and the logic thread
+/// Its address must be exorted to javascript.
+const MESSAGE_QUEUE_SIZE: usize = 64;
 
 /// The address memory synchronization area.
 /// It contains data needed for synchronization between main thread and logic thread.
@@ -46,9 +42,7 @@ const MESSAGE_QUEUE_ELEMENT_SIZE: usize = 32;
 const SYNCHRONIZATION_MEMORY_SIZE: usize = 32;
 
 /// Number of sprites to store in the double buffer
-const BUFFER_SPRITE_COUNT: usize = 32;
-/// Size of each sprites
-const BUFFER_SPRITE_SIZE: usize = 32;
+const BUFFER_SIZE: usize = KiB(1);
 
 fn main() -> std::io::Result<()> {
     println!("{:#?}", std::env::vars().collect::<Vec<_>>());
@@ -71,17 +65,20 @@ fn main() -> std::io::Result<()> {
     let graphics_heap = align(alloc + ALLOCATOR_SIZE);
     let sync = align(alloc + GRAPHICS_HEAP_SIZE);
     let table = align(sync + SYNCHRONIZATION_MEMORY_SIZE);
-    let buffer = align(table + RESOURCE_SIZE * RESOURCE_TABLE_SIZE);
-    let queue = align(buffer + BUFFER_SPRITE_SIZE * BUFFER_SPRITE_COUNT);
-    let logic_heap = align(queue + MESSAGE_QUEUE_ELEMENT_SIZE * MESSAGE_QUEUE_LENGTH);
+    let buffer = align(table + RESOURCE_TABLE_SIZE);
+    let queue = align(buffer + BUFFER_SIZE);
+    let logic_heap = align(queue + MESSAGE_QUEUE_SIZE);
 
     println!("cargo:rustc-env=GRAPHICS_STACK={}", graphics_stack);
     println!("cargo:rustc-env=ALLOCATOR={}", alloc);
     println!("cargo:rustc-env=GRAPHICS_HEAP={}", graphics_heap);
     println!("cargo:rustc-env=SYNCHRONIZATION_MEMORY={}", sync);
     println!("cargo:rustc-env=RESOURCE_TABLE={}", table);
+    println!("cargo:rustc-env=RESOURCE_TABLE_SIZE={}", buffer - table);
     println!("cargo:rustc-env=DOUBLE_BUFFER={}", buffer);
+    println!("cargo:rustc-env=DOUBLE_BUFFER_SIZE={}", queue - buffer);
     println!("cargo:rustc-env=MESSAGE_QUEUE={}", queue);
+    println!("cargo:rustc-env=MESSAGE_QUEUE_SIZE={}", logic_heap - queue);
     println!("cargo:rustc-env=LOGIC_HEAP={}", logic_heap);
 
     if !is_logic {

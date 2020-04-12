@@ -1278,6 +1278,7 @@ version = "0.1.0"
 dependencies = [
  "fern",
  "js-sys",
+ "lazy_static",
  "log",
  "rand 0.7.3",
  "rask-engine",

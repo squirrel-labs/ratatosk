@@ -1,7 +1,11 @@
 type Buffer = crate::double_buffer::DoubleBuffer<State>;
 
+use crate::double_buffer::DoubleBuffer;
+use crate::sprite::Sprite;
 use crate::state::State;
 use const_env::from_env;
+use rask_engine::resources::{Resource, ResourceTable};
+use std::mem::size_of;
 
 #[from_env]
 /// The position of the stack.
@@ -11,6 +15,7 @@ pub const GRAPHIC_STACK: usize = 0;
 /// The address of the Allocator structures
 pub const ALLOCATOR: usize = 0;
 
+#[from_env]
 /// The graphics heap address
 pub const GRAPHICS_HEAP: usize = 0;
 
@@ -21,15 +26,35 @@ pub const GRAPHICS_HEAP: usize = 0;
 /// On change you have to modify the corresponding js file.
 pub const SYNCHRONIZATION_MEMORY: usize = 0;
 
-/// Adress of the internal resource library.
+#[from_env]
+/// Address of the internal resource library.
 pub const RESOURCE_TABLE: usize = 0;
+#[from_env]
+pub const RESOURCE_TABLE_SIZE: usize = 0;
+pub const RESOURCE_TABLE_ELEMENT_COUNT: usize = (RESOURCE_TABLE_SIZE as i64
+    - size_of::<ResourceTable>() as i64) as usize
+    / size_of::<Resource>();
 
+#[from_env]
 /// The address of the double buffer (size: target dependent)
 pub const DOUBLE_BUFFER: usize = 0;
+#[from_env]
+pub const DOUBLE_BUFFER_SIZE: usize = 0;
+pub const DOUBLE_BUFFER_ELEMENT_COUNT: usize =
+    (DOUBLE_BUFFER_SIZE as i64 - size_of::<DoubleBuffer<State>>() as i64) as usize
+        / size_of::<Sprite>();
 
-/// Adress of the event queue
+#[from_env]
+/// Address of the event queue
 pub const MESSAGE_QUEUE: usize = 0;
+#[from_env]
+pub const MESSAGE_QUEUE_SIZE: usize = 0;
+pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = (MESSAGE_QUEUE_SIZE as i64
+    - size_of::<MessageQueue<MessageQueueElement<u8>>>() as i64)
+    as usize
+    / size_of::<MessageQueueElement<u8>>();
 
+#[from_env]
 /// The logic heap address (size: 32MiB)
 pub const LOGIC_HEAP: usize = 0;
 
@@ -64,6 +89,7 @@ impl SynchronizationMemory {
 }
 
 #[repr(align(4))]
+#[derive(Clone)]
 struct MessageQueueElement<T: Sized + Clone> {
     reading: u8,
     writing: u8,

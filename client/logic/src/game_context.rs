@@ -1,6 +1,8 @@
 use rask_engine::math;
+use rask_engine::resources::{GetStore, ResourceTable, Texture};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
+use rask_wasm_shared::mem::{RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT};
 use rask_wasm_shared::sprite::*;
 use rask_wasm_shared::state::State;
 
@@ -10,6 +12,7 @@ const IMAGE2_DATA: &[u8] = include_bytes!("../../res/thief.png");
 pub struct GameContext {
     state: State,
     tick_nr: u64,
+    resource_table: ResourceTable,
 }
 
 impl GameContext {
@@ -17,6 +20,9 @@ impl GameContext {
         Ok(Self {
             state: State::default(),
             tick_nr: 0,
+            resource_table: unsafe {
+                ResourceTable::new(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT)
+            },
         })
     }
 
@@ -28,57 +34,16 @@ impl GameContext {
 
     pub fn tick(&mut self) -> Result<(), ClientError> {
         if self.state.sprites().is_empty() {
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(0.0, 0.0), 3, 0, 0));
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(0.0, 0.0), 2, 0, 0));
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(0.3, 0.3), 0, 0, 1));
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(0.0, 0.0), 1, 0, 1));
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(0.0, -0.6), 0, 0, 1));
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(-0.6, 0.6), 1, 0, 1));
+            self.state.append_sprite(&Sprite::default());
 
-            /*let shared_heap = rask_wasm_shared::mem::shared_heap();
-            *shared_heap.animations_mut() = vec![
-                Animation::new(vec![
-                    Frame::new(vec![rask_engine::math::Mat3::scaling(0.4, 0.4)]),
-                    Frame::new(vec![
-                        rask_engine::math::Mat3::scaling(0.4, 0.4)
-                            * rask_engine::math::Mat3::translation(0.5, 0.0)
-                            * rask_engine::math::Mat3::rotation(6.0),
-                    ]),
-                ]),
-                Animation::new(vec![
-                    Frame::new(vec![rask_engine::math::Mat3::scaling(0.4, 0.4)]),
-                    Frame::new(vec![rask_engine::math::Mat3::scaling(0.6, 0.2)]),
-                ]),
-                Animation::new(vec![Frame::new(vec![rask_engine::math::Mat3::scaling(
-                    9.0 / 16.0,
-                    1.0,
-                )])]),
-                Animation::new(vec![Frame::new(vec![rask_engine::math::Mat3::identity()])]),
-            ];
-
-            *shared_heap.textures_mut() = Some(vec![
-                rask_wasm_shared::texture::Texture::from_png_stream(IMAGE1_DATA)?,
-                rask_wasm_shared::texture::Texture::from_png_stream(IMAGE2_DATA)?,
-            ]);
-            shared_heap.set_texture_notify();
-            */
+            unsafe {
+                self.resource_table
+                    .store(Texture::from_png_stream(IMAGE1_DATA)?, 0)?;
+                self.resource_table
+                    .store(Texture::from_png_stream(IMAGE2_DATA)?, 1)?;
+            }
         }
 
-        /*
-        let animations = rask_wasm_shared::mem::shared_heap().animations();
-        for sprite in self.state.sprites_mut().iter_mut() {
-            if (self.tick_nr % 10) == 9 {
-                sprite
-                    .next_frame(animations)
-                    .ok_or(ClientError::ResourceError(format!("invalid animation id")))?;
-            }
-        }*/
         self.push_state()?;
         self.tick_nr += 1;
         Ok(())
