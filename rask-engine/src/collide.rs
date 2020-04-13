@@ -4,6 +4,7 @@
 use crate::boxes::{AABox, RBox};
 use crate::math::Vec2;
 use core::ops::Range;
+use spine::skeleton::SRT;
 
 // For information on the SAT, see: http://www.dyn4j.org/2010/01/sat/.
 
@@ -111,9 +112,39 @@ impl Collide for Vec2 {
     }
 }
 
+impl Collide<AABox> for Vec2 {
+    fn collides(&self, other: &AABox) -> bool {
+        other.collides(self)
+    }
+}
+
+impl Collide<RBox> for Vec2 {
+    fn collides(&self, other: &RBox) -> bool {
+        other.collides(self)
+    }
+}
+
+impl Collide<SRT> for Vec2 {
+    fn collides(&self, other: &SRT) -> bool {
+        other.collides(self)
+    }
+}
+
 impl Collide<Vec2> for AABox {
     fn collides(&self, other: &Vec2) -> bool {
         left_under(self.pos, *other) && left_under(*other, self.pos + self.size)
+    }
+}
+
+impl Collide<RBox> for AABox {
+    fn collides(&self, other: &RBox) -> bool {
+        other.collides(self)
+    }
+}
+
+impl Collide<SRT> for AABox {
+    fn collides(&self, other: &SRT) -> bool {
+        other.collides(self)
     }
 }
 
@@ -151,12 +182,6 @@ impl Collide<AABox> for RBox {
     fn collides(&self, other: &AABox) -> bool {
         let xbound = other.pos.x()..other.pos.x() + other.size.x();
         let ybound = other.pos.y()..other.pos.y() + other.size.y();
-        let edges = [
-            (self.pos, self.v1),
-            (self.pos, self.v2),
-            (self.pos + self.v1, self.v2),
-            (self.pos + self.v2, self.v1),
-        ];
         collide_aabox_rbox_segment(xbound.clone(), ybound.clone(), self.pos, self.v1)
             || collide_aabox_rbox_segment(xbound.clone(), ybound.clone(), self.pos, self.v2)
             || collide_aabox_rbox_segment(

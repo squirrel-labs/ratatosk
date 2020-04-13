@@ -53,9 +53,9 @@ function createCanvas() {
 
 function generateMemory() {
     // memory pages of 65,536 bytes = 64 KiB
-    const page = 65536
-    let mem = memoryParameters.max_memory
-    let max = (mem + page -1 ) / page
+    const page = 65536;
+    let mem = memoryParameters.max_memory;
+    let max = Math.floor((mem + page -1 ) / page);
     const memoryDescriptor = {
         initial: max,
         maximum: max,

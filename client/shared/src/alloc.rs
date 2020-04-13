@@ -88,13 +88,23 @@ impl<M: Sized + 'static, S: AllocSettings, I: Initial<M>> Allocator<M, S, I> {
     }
 }
 
+use wasm_bindgen::prelude::*;
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console, js_name = debug)]
+    fn console_debug_u32(il: bool, a: u32, b: u32);
+}
+
 unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> GlobalAlloc
     for Allocator<M, S, I>
 {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        Self::allocator()
+        let out = Self::allocator()
             .alloc(layout)
-            .offset(S::allocation_start_address::<M>())
+            .offset(S::allocation_start_address::<M>());
+        let is_logic = S::allocator_addr::<M>() == crate::mem::ALLOCATOR;
+        console_debug_u32(is_logic, SimpleAllocator::layout_to_size(layout) as u32, out as usize as u32);
+        out
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {

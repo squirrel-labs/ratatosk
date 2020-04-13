@@ -28,11 +28,16 @@ script = [
 [tasks.crate-build]
 workspace = false
 condition = { env_set = [ "CARGO_TARGET_DIR" ] }
-env = { MEM_GEN = "${PWD}/gen/mem.json", RUSTFLAGS = "-Clink-arg=--no-entry -Clink-arg=--allow-undefined -Clink-arg=--strip-all -Clink-arg=--export-dynamic -Clink-arg=--import-memory -Clink-arg=--shared-memory  -Clink-arg=--threads  -Clink-arg=--export=__wasm_init_memory -Clink-arg=--no-check-features -Clink-arg=--export=__wasm_init_tls -Clink-arg=--export=__tls_size -Ctarget-feature=+atomics,+bulk-memory" }
+env = { MEM_GEN = "${PWD}/gen/", RUSTFLAGS = "-Clink-arg=--stack-first -Clink-arg=--no-entry -Clink-arg=--allow-undefined -Clink-arg=--strip-all -Clink-arg=--export-dynamic -Clink-arg=--import-memory -Clink-arg=--shared-memory  -Clink-arg=--threads  -Clink-arg=--export=__wasm_init_memory -Clink-arg=--no-check-features -Clink-arg=--export=__wasm_init_tls -Clink-arg=--export=__tls_size -Ctarget-feature=+atomics,+bulk-memory" }
 script = [
 	"mkdir -p gen",
-	"touch build.rs #triggers the build.rs to be rebuild every time",
-	"cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown",
+	"touch shared/build.rs #triggers the build.rs to be rebuild every time",
+	"rustc gen_mem_layout.rs -o gen/gen_mem_layout",
+	"MEMORY_LAYOUT_PARAMETERS=$(gen/gen_mem_layout)",
+	"RUSTFLAGS=$RUSTFLAGS$(cat ${MEM_GEN}/mem.conf)",
+	"echo $RUSTFLAGS",
+	"echo $MEMORY_LAYOUT_PARAMETERS",
+	"MEMORY_LAYOUT_PARAMETERS=$MEMORY_LAYOUT_PARAMETERS RUSTFLAGS=$RUSTFLAGS cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown",
 	"#mv $(find $CARGO_TARGET_DIR/ -name mem.json | tail -n 1) gen/",
 ]
 

@@ -15,6 +15,11 @@ macro_rules! assert_env {
 
 #[from_env]
 /// The position of the stack.
+pub const LOGIC_STACK: usize = 0;
+assert_env!("LOGIC_STACK");
+
+#[from_env]
+/// The position of the stack.
 pub const GRAPHICS_STACK: usize = 0;
 assert_env!("GRAPHICS_STACK");
 
@@ -65,8 +70,8 @@ assert_env!("MESSAGE_QUEUE");
 #[from_env]
 pub const MESSAGE_QUEUE_SIZE: usize = 0;
 assert_env!("MESSAGE_QUEUE_SIZE");
-pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = (MESSAGE_QUEUE_SIZE as i64
-    - size_of::<MessageQueue<u8>>() as i64) as usize
+pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = (MESSAGE_QUEUE_SIZE as i32
+    - size_of::<MessageQueue<u8>>() as i32) as usize
     / size_of::<MessageQueueElement<u8>>();
 
 #[from_env]
