@@ -25,14 +25,16 @@ const WORKER_NAME_VAR: &'static str = "CRATE";
 const STACK_ALIGNMENT: u32 = 1024 * 63;
 
 /// The size of the stack. Its start is at address 0
-const GRAPHICS_STACK_SIZE: u32 = MiB(100);
-const GRAPHICS_HEAP_SIZE: u32 = MiB(200);
-const LOGIC_HEAP_SIZE: u32 = MiB(200);
-const LOGIC_STACK_SIZE: u32 = MiB(100);
+const GRAPHICS_STACK_SIZE: u32 = MiB(10);
+const GRAPHICS_HEAP_SIZE: u32 = MiB(50);
+const LOGIC_HEAP_SIZE: u32 = MiB(20);
+const LOGIC_STACK_SIZE: u32 = MiB(10);
+const LOGIC_GLOBAL_SIZE: u32 = MiB(30);
+const GRAPHICS_GLOBAL_SIZE: u32 = MiB(30);
 
 /// The size of the Allocator structures
 /// the size of on of the the wee_alloc structures is 2056 bytes
-const ALLOCATOR_SIZE: u32 = MiB(6);
+const ALLOCATOR_SIZE: u32 = MiB(1);
 
 /// The address memory synchronization area.
 /// It contains data needed for synchronization between main thread and logic thread.
@@ -65,16 +67,18 @@ fn main() -> std::io::Result<()> {
         Err(err) => panic!("env var parsing failed (\"{:?}\")", err),
     };
 
-    let logic_stack = align32_up(STACK_ALIGNMENT + LOGIC_STACK_SIZE);
-    let graphics_stack = align32_up(logic_stack + GRAPHICS_STACK_SIZE);
-    let sync = align32_up(graphics_stack + KiB(1));
+    let logic_stack = align_page_up(STACK_ALIGNMENT + LOGIC_STACK_SIZE) - 16;
+    let logic_heap = align_page_up(logic_stack + 1);
+    let graphics_stack = align_page_up(logic_heap + LOGIC_HEAP_SIZE + GRAPHICS_STACK_SIZE) - 16;
+    let graphics_heap = align_page_up(graphics_stack + 1);
+    let sync = align32_up(graphics_heap + GRAPHICS_HEAP_SIZE);
     let table = align32_up(sync + SYNCHRONIZATION_MEMORY_SIZE);
     let buffer = align32_up(table + RESOURCE_TABLE_SIZE);
     let queue = align32_up(buffer + BUFFER_SIZE);
     let alloc = align32_up(queue + MESSAGE_QUEUE_SIZE);
-    let graphics_heap = align32_up(alloc + ALLOCATOR_SIZE);
-    let logic_heap = align32_up(graphics_heap + GRAPHICS_HEAP_SIZE);
-    let max_mem = align_page_up(logic_heap + LOGIC_HEAP_SIZE);
+    let logic_global = align_page_up(alloc + ALLOCATOR_SIZE);
+    let graphics_global = align32_up(logic_global + LOGIC_GLOBAL_SIZE);
+    let max_mem = align_page_up(graphics_global + GRAPHICS_GLOBAL_SIZE);
 
     println!("cargo:rustc-env=LOGIC_STACK={}", logic_stack);
     println!("cargo:rustc-env=GRAPHICS_STACK={}", graphics_stack);
@@ -88,21 +92,23 @@ fn main() -> std::io::Result<()> {
     println!("cargo:rustc-env=MESSAGE_QUEUE={}", queue);
     println!("cargo:rustc-env=MESSAGE_QUEUE_SIZE={}", alloc - queue);
     println!("cargo:rustc-env=LOGIC_HEAP={}", logic_heap);
+    println!("cargo:rustc-env=LOGIC_GLOBAL={}", logic_global);
+    println!("cargo:rustc-env=GRAPHICS_GLOBAL={}", graphics_global);
 
     let out_dir = std::env::var("MEM_GEN").unwrap();
     let mut file = File::create(format!("{}/mem.conf", out_dir))?;
     if is_logic {
         write!(
             &mut file,
-            " -Clink-arg=-zstack-size={} -Clink-arg=--max-memory={}",
-            logic_stack, max_mem
+            " -Clink-arg=-zstack-size={} -Clink-arg=--max-memory={} -Clink-arg=--global-base={}",
+            logic_stack, max_mem, logic_global
         )?;
         println!("cargo:rustc-env=WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES={}", LOGIC_HEAP_SIZE);
     } else {
         write!(
             &mut file,
-            " -Clink-arg=-zstack-size={} -Clink-arg=--max-memory={}",
-            graphics_stack, max_mem
+            " -Clink-arg=-zstack-size={} -Clink-arg=--max-memory={} -Clink-arg=--global-base={}",
+            graphics_stack, max_mem, logic_global
         )?;
         println!("cargo:rustc-env=WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES={}", GRAPHICS_HEAP_SIZE);
     }

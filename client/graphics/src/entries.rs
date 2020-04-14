@@ -24,7 +24,7 @@ pub fn initialise_graphics_context(canvas: web_sys::OffscreenCanvas) {
 /// This function is being exposed to javascript
 #[wasm_bindgen]
 pub fn draw_frame() {
-    return;
+    //return;
     context::context_mut()
         .render()
         .map_err(|e| log::error!("{}", e))

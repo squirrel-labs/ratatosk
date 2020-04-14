@@ -9,6 +9,7 @@ function onwasm(ctx, desc, module) {
 
 onmessage = async function(e) {
     let desc = e.data;
+    if (desc.canvas != undefined) return;
 
     let source = fetch(desc.wasmSourceLocation);
     importScripts(desc.jsSourceLocation);

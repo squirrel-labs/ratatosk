@@ -25,6 +25,17 @@ pub fn run_main_loop() {
         rask_wasm_shared::alloc::reset_heap(&crate::ALLOCATOR, log::LevelFilter::Debug);
     }
 
+    //let b = Box::new(0u8);
+    //unsafe {std::ptr::read_volatile(&b)};
+    use std::alloc::GlobalAlloc;
+    unsafe {
+        let addr = crate::ALLOCATOR.alloc(core::alloc::Layout::from_size_align_unchecked(1, 4)) as *mut u32;
+        std::ptr::read_volatile(addr);
+        *addr = 0xffffffff;
+        std::ptr::read_volatile(addr);
+    };
+    return;
+
     use rask_wasm_shared as mem;
     log::info!("logic entry reached");
     log::info!("logic_stack: {:#x}", mem::LOGIC_STACK);
@@ -48,7 +59,6 @@ pub fn run_main_loop() {
         .unwrap();
 
     log::info!("game_context crated");
-    return;
     loop {
         game.tick().map_err(|e| log::error!("{}", e)).unwrap();
         log::info!("wait_for_main_thread_notify()");

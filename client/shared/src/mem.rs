@@ -1,6 +1,7 @@
 type Buffer = crate::double_buffer::DoubleBuffer<State>;
 
 use crate::double_buffer::DoubleBuffer;
+use crate::message_queue::{Message, MessageQueue, MessageQueueElement};
 use crate::sprite::Sprite;
 use crate::state::{State, UnspecificState};
 use const_env::from_env;
@@ -71,9 +72,9 @@ assert_env!("MESSAGE_QUEUE");
 #[from_env]
 pub const MESSAGE_QUEUE_SIZE: usize = 0;
 assert_env!("MESSAGE_QUEUE_SIZE");
-pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = (MESSAGE_QUEUE_SIZE as i32
-    - size_of::<MessageQueue<u8>>() as i32) as usize
-    / size_of::<MessageQueueElement<u8>>();
+pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = (MESSAGE_QUEUE_SIZE as i64
+    - size_of::<MessageQueue<()>>() as i64) as usize
+    / size_of::<MessageQueueElement<Message>>();
 
 #[from_env]
 /// The logic heap address (size: 32MiB)
@@ -107,71 +108,6 @@ impl SynchronizationMemory {
         while self.last_elapsed_ms == self.elapsed_ms {
             wait_until_wake_up_at((&mut self.elapsed_ms) as *mut i32)
         }
-    }
-}
-
-#[repr(align(4))]
-struct MessageQueueElement<T: Sized + Clone> {
-    reading: u8,
-    writing: u8,
-    payload: T,
-}
-
-impl<T: Sized + Clone> MessageQueueElement<T> {
-    fn set_reading(&mut self, val: u8) {
-        unsafe { atomic_write_u8(&mut self.reading, val) }
-    }
-
-    fn get_writing(&self) -> u8 {
-        unsafe { atomic_read_u8(&self.writing) }
-    }
-    fn read(&mut self) -> Option<T> {
-        self.set_reading(1);
-        if self.get_writing() == 0 {
-            let e = self.payload.clone();
-            self.set_reading(0);
-            Some(e)
-        } else {
-            None
-        }
-    }
-}
-
-#[repr(align(4))]
-pub struct MessageQueue<T: Sized + Clone> {
-    /// the index of the next element to be written
-    writer_index: u32,
-    /// the index of the next element to be read
-    reader_index: u32,
-    _phantom: core::marker::PhantomData<T>,
-}
-
-impl<T: Sized + Clone> MessageQueue<T> {
-    pub fn length() -> usize {
-        MESSAGE_QUEUE_ELEMENT_COUNT
-    }
-
-    fn mem_size() -> usize {
-        core::mem::size_of::<T>() * Self::length() + core::mem::size_of::<Self>()
-    }
-
-    unsafe fn get_mut(&mut self, n: usize) -> Option<&mut MessageQueueElement<T>> {
-        core::slice::from_raw_parts_mut(
-            (self as *mut Self as *mut u8).offset(core::mem::size_of::<Self>() as isize)
-                as *mut MessageQueueElement<T>,
-            Self::length(),
-        )
-        .get_mut(n)
-    }
-
-    pub fn pop(&mut self) -> Option<T> {
-        let e = unsafe { self.get_mut(self.reader_index as usize)? };
-        let e = e.read()?;
-        self.reader_index += 1;
-        if self.reader_index as usize >= Self::length() {
-            self.reader_index = 0;
-        }
-        Some(e)
     }
 }
 
