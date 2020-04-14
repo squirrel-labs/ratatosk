@@ -25,10 +25,10 @@ const WORKER_NAME_VAR: &'static str = "CRATE";
 const STACK_ALIGNMENT: u32 = 1024 * 63;
 
 /// The size of the stack. Its start is at address 0
-const GRAPHICS_STACK_SIZE: u32 = MiB(2);
-const GRAPHICS_HEAP_SIZE: u32 = MiB(2);
+const GRAPHICS_STACK_SIZE: u32 = MiB(100);
+const GRAPHICS_HEAP_SIZE: u32 = MiB(200);
 const LOGIC_HEAP_SIZE: u32 = MiB(200);
-const LOGIC_STACK_SIZE: u32 = MiB(2);
+const LOGIC_STACK_SIZE: u32 = MiB(100);
 
 /// The size of the Allocator structures
 /// the size of on of the the wee_alloc structures is 2056 bytes

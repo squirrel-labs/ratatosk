@@ -6,6 +6,7 @@ type Flag = u8;
 
 impl<T: Clone + Sized + Default + Debug> Element for T {}
 
+#[repr(C)]
 #[derive(Debug, Default)]
 pub struct DoubleBuffer<T: Element> {
     pub(self) reading_at: Flag,

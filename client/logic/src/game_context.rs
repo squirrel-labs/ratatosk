@@ -22,7 +22,8 @@ impl GameContext {
         log::info!("table length: {}", RESOURCE_TABLE_ELEMENT_COUNT);
         let mut resource_table =
             unsafe { ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT) };
-        resource_table.clear();
+        log::info!("real address: {:?} ({:?})", resource_table.0.as_ptr() as usize, resource_table.0.len());
+        //log::info!("write addr: {}", resource_table.clear());
         Ok(Self {
             state: State::default(),
             tick_nr: 0,

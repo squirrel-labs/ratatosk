@@ -2,7 +2,7 @@ use super::Resource;
 use crate::EngineError;
 
 /// The library is used to store and retrieve resources.
-pub struct ResourceTable(&'static mut [Resource]);
+pub struct ResourceTable(pub &'static mut [Resource]);
 
 macro_rules! get_store {
     ($type: ty, $enum_type: ident) => {
@@ -50,10 +50,14 @@ impl ResourceTable {
         ))
     }
 
-    pub fn clear(&mut self) {
+    pub fn clear(&mut self) -> usize {
+        /*self.0[self.0.len() - 1] = Resource::None;
+        unsafe { self.0.as_ptr().offset(self.0.len() as isize -1) as usize }
+        */
         for i in 0..self.0.len() {
             self.0[i] = Resource::None;
         }
+        0
     }
 
     fn index_check(&self, id: usize) -> Result<(), EngineError> {

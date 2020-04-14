@@ -1,8 +1,8 @@
 type Buffer = crate::double_buffer::DoubleBuffer<State>;
 
 use crate::double_buffer::DoubleBuffer;
-use crate::sprite::*;
-use crate::state::State;
+use crate::sprite::Sprite;
+use crate::state::{State, UnspecificState};
 use const_env::from_env;
 use rask_engine::resources::{Resource, ResourceTable};
 use std::mem::size_of;
@@ -12,6 +12,8 @@ macro_rules! assert_env {
         const _: &str = env!($var);
     };
 }
+
+assert_env!("WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES");
 
 #[from_env]
 /// The position of the stack.
@@ -48,9 +50,7 @@ assert_env!("RESOURCE_TABLE");
 #[from_env]
 pub const RESOURCE_TABLE_SIZE: usize = 0;
 assert_env!("RESOURCE_TABLE_SIZE");
-pub const RESOURCE_TABLE_ELEMENT_COUNT: usize = (RESOURCE_TABLE_SIZE as i64
-    - size_of::<ResourceTable>() as i64) as usize
-    / size_of::<Resource>();
+pub const RESOURCE_TABLE_ELEMENT_COUNT: usize = RESOURCE_TABLE_SIZE / size_of::<Resource>();
 
 #[from_env]
 /// The address of the double buffer (size: target dependent)
@@ -59,8 +59,9 @@ assert_env!("DOUBLE_BUFFER");
 #[from_env]
 pub const DOUBLE_BUFFER_SIZE: usize = 0;
 assert_env!("DOUBLE_BUFFER_SIZE");
-pub const DOUBLE_BUFFER_ELEMENT_COUNT: usize =
-    (DOUBLE_BUFFER_SIZE as i64 - size_of::<DoubleBuffer<State>>() as i64) as usize
+pub const DOUBLE_BUFFER_SPRITE_COUNT: usize =
+    ((DOUBLE_BUFFER_SIZE as i64 - size_of::<DoubleBuffer<()>>() as i64) / 2
+        - size_of::<UnspecificState<()>>() as i64) as usize
         / size_of::<Sprite>();
 
 #[from_env]

@@ -41,14 +41,14 @@ pub fn run_main_loop() {
     log::info!("table size: {:#x}", mem::RESOURCE_TABLE_SIZE);
     log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
     log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
-    log::info!("buffer count: {}", mem::DOUBLE_BUFFER_ELEMENT_COUNT);
-    return;
+    log::info!("buffer count: {}", mem::DOUBLE_BUFFER_SPRITE_COUNT);
     reset_state();
     let mut game = GameContext::new()
         .map_err(|e| log::error!("{}", e))
         .unwrap();
 
     log::info!("game_context crated");
+    return;
     loop {
         game.tick().map_err(|e| log::error!("{}", e)).unwrap();
         log::info!("wait_for_main_thread_notify()");

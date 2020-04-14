@@ -1,12 +1,15 @@
 use crate::sprite::Sprite;
 
-const MAX_SPRITES: usize = 64;
+const MAX_SPRITES: usize = crate::mem::DOUBLE_BUFFER_SPRITE_COUNT;
 
+#[repr(C)]
 #[derive(Clone, Copy)]
-pub struct State {
+pub struct UnspecificState<S> {
     sprite_len: usize,
-    sprites: [Sprite; MAX_SPRITES],
+    sprites: S,
 }
+
+pub type State = UnspecificState<[Sprite; MAX_SPRITES]>;
 
 impl State {
     pub fn sprites(&self) -> &[Sprite] {
