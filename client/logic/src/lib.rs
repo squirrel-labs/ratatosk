@@ -4,7 +4,7 @@
 #![feature(allocator_api)]
 
 use rask_wasm_shared::{
-    alloc::{settings::Logic, Allocator, Initial, SimpleAllocator},
+    alloc::{settings::Logic, Allocator, Initial},
     create_allocator, wee_alloc,
 };
 

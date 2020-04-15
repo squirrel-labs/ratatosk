@@ -2,7 +2,7 @@ extend = "./scripts/cargo-helpers.toml"
 
 # component builds
 [tasks.all]
-dependencies = [ "tools", "backend", "frontend" ]
+dependencies = [ "backend", "frontend" ]
 workspace = false
 
 [tasks.frontend]
@@ -10,10 +10,6 @@ workspace = false
 dependencies = [  ]
 command = "cargo"
 args = [ "make", "--cwd", "client/", "--makefile", "Makefile.toml", "all" ]
-
-[tasks.tools]
-workspace = false
-dependencies = [ "bone-cake" ]
 
 [tasks.backend]
 workspace = false
@@ -29,11 +25,6 @@ args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask-server" ]
 workspace = false
 command = "cargo"
 args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "rask-engine" ]
-
-[tasks.bone-cake]
-workspace = false
-command = "cargo"
-args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "bone-cake" ]
 
 # dev tools
 [tasks.serve-frontend]

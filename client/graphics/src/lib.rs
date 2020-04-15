@@ -1,7 +1,7 @@
 #![feature(allocator_api)]
 
 use rask_wasm_shared::{
-    alloc::{settings::Graphics, Allocator, Initial, SimpleAllocator},
+    alloc::{settings::Graphics, Allocator, Initial},
     create_allocator, wee_alloc,
 };
 

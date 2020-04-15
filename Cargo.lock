@@ -97,16 +97,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bone-cake"
-version = "0.1.0"
-dependencies = [
- "rask-engine",
- "serde",
- "serde_json",
- "spine_tiny 0.1.0 (git+http://github.com/tomaka/spine-rs)",
-]
-
-[[package]]
 name = "bumpalo"
 version = "3.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -204,6 +194,16 @@ dependencies = [
  "atty",
  "lazy_static",
  "winapi 0.3.8",
+]
+
+[[package]]
+name = "console_error_panic_hook"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b8d976903543e0c48546a91908f21588a680a8c8f984df9a5d69feccb2b2a211"
+dependencies = [
+ "cfg-if",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -445,14 +445,6 @@ name = "foreign-types-shared"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
-
-[[package]]
-name = "from_json"
-version = "0.0.1"
-source = "git+https://github.com/tomaka/from_json#b064110b13b5907f46db44de8e7f62d207e4fee1"
-dependencies = [
- "rustc-serialize",
-]
 
 [[package]]
 name = "fuchsia-cprng"
@@ -1225,7 +1217,7 @@ version = "0.2.0"
 dependencies = [
  "image",
  "lazy_static",
- "spine_tiny 0.1.0 (git+http://github.com/reeFridge/spine-rs)",
+ "spine_tiny",
 ]
 
 [[package]]
@@ -1245,6 +1237,7 @@ dependencies = [
 name = "rask-wasm-graphics"
 version = "0.1.0"
 dependencies = [
+ "console_error_panic_hook",
  "fern",
  "js-sys",
  "lazy_static",
@@ -1260,6 +1253,7 @@ dependencies = [
 name = "rask-wasm-logic"
 version = "0.1.0"
 dependencies = [
+ "console_error_panic_hook",
  "fern",
  "js-sys",
  "log",
@@ -1395,12 +1389,6 @@ name = "rustc-hex"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0ceb8ce7a5e520de349e1fa172baeba4a9e8d5ef06c47471863530bc4972ee1e"
-
-[[package]]
-name = "rustc-serialize"
-version = "0.3.24"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 
 [[package]]
 name = "rustc_version"
@@ -1568,15 +1556,6 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
-]
-
-[[package]]
-name = "spine_tiny"
-version = "0.1.0"
-source = "git+http://github.com/tomaka/spine-rs#a009113c64f1111ef8531ecc8c39e3b0a2919a31"
-dependencies = [
- "from_json",
- "rustc-serialize",
 ]
 
 [[package]]

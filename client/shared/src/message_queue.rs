@@ -40,6 +40,7 @@ impl<T: Sized + Clone> MessageQueueElement<T> {
 }
 
 #[repr(align(4))]
+#[allow(dead_code)]
 pub struct MessageQueue<T: Sized + Clone> {
     /// the index of the next element to be written
     writer_index: u32,
@@ -51,10 +52,6 @@ pub struct MessageQueue<T: Sized + Clone> {
 impl<T: Sized + Clone> MessageQueue<T> {
     pub fn length() -> usize {
         MESSAGE_QUEUE_ELEMENT_COUNT
-    }
-
-    fn mem_size() -> usize {
-        core::mem::size_of::<T>() * Self::length() + core::mem::size_of::<Self>()
     }
 
     unsafe fn get_mut(&mut self, n: usize) -> Option<&mut MessageQueueElement<T>> {

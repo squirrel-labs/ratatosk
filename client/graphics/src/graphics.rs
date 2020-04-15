@@ -4,7 +4,6 @@ use rask_engine::math::Mat3;
 use rask_engine::resources::texture::{ColorType, Texture};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::sprite::TextureId;
-use rask_wasm_shared::state::State;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::WebGl2RenderingContext as Gl2;
@@ -76,6 +75,7 @@ pub trait GraphicsApi: Sized {
     fn ok(&self) -> Result<(), Self::GraphicsError>;
 }
 
+#[allow(dead_code)]
 struct GlFramebuffer {
     fb: web_sys::WebGlFramebuffer,
     rb: web_sys::WebGlRenderbuffer,
@@ -152,6 +152,7 @@ impl GlFramebuffer {
     }
 }
 
+#[allow(dead_code)]
 pub struct WebGl {
     gl: Gl2,
     fb: GlFramebuffer,
@@ -283,6 +284,7 @@ impl GraphicsApi for WebGl {
         Ok(())
     }
 
+    #[allow(unused_must_use)]
     fn draw_rect(&self, mat: &Mat3, tex: TextureId) -> Result<(), ClientError> {
         self.bind_texture(tex);
         self.draw_rect_notexture(mat)

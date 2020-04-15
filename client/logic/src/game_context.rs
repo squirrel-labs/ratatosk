@@ -1,4 +1,3 @@
-use rask_engine::math;
 use rask_engine::resources::{GetStore, ResourceTable, Texture};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
@@ -12,18 +11,20 @@ const IMAGE2_DATA: &[u8] = include_bytes!("../../res/thief.png");
 pub struct GameContext {
     state: State,
     tick_nr: u64,
+    #[allow(dead_code)]
     resource_table: ResourceTable,
 }
 
 impl GameContext {
     pub fn new() -> Result<Self, ClientError> {
-        log::info!("creating game_context");
-        log::info!("table address: {}", RESOURCE_TABLE);
-        log::info!("table length: {}", RESOURCE_TABLE_ELEMENT_COUNT);
-        let mut resource_table =
-            unsafe { ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT) };
-        log::info!("real address: {:?} ({:?})", resource_table.0.as_ptr() as usize, resource_table.0.len());
-        //log::info!("write addr: {}", resource_table.clear());
+        let resource_table = unsafe {
+            let mut resource_table =
+                ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT);
+            resource_table.clear();
+            resource_table.store(Texture::from_png_stream(IMAGE1_DATA)?, 0)?;
+            resource_table.store(Texture::from_png_stream(IMAGE2_DATA)?, 1)?;
+            resource_table
+        };
         Ok(Self {
             state: State::default(),
             tick_nr: 0,
@@ -39,14 +40,10 @@ impl GameContext {
 
     pub fn tick(&mut self) -> Result<(), ClientError> {
         if self.state.sprites().is_empty() {
-            self.state.append_sprite(&Sprite::default());
-
-            unsafe {
-                self.resource_table
-                    .store(Texture::from_png_stream(IMAGE1_DATA)?, 0)?;
-                self.resource_table
-                    .store(Texture::from_png_stream(IMAGE2_DATA)?, 1)?;
-            }
+            let mut sprite = Sprite::default();
+            self.state.append_sprite(&sprite);
+            sprite.tex_id += 1;
+            self.state.append_sprite(&sprite);
         }
 
         self.push_state()?;

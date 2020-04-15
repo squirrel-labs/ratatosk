@@ -6,6 +6,7 @@ use crate::error::EngineError;
 
 pub use image::ColorType;
 
+#[derive(Debug)]
 pub struct Texture {
     raw_data: Vec<u8>,
     w: u32,

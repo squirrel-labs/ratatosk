@@ -50,14 +50,10 @@ impl ResourceTable {
         ))
     }
 
-    pub fn clear(&mut self) -> usize {
-        /*self.0[self.0.len() - 1] = Resource::None;
-        unsafe { self.0.as_ptr().offset(self.0.len() as isize -1) as usize }
-        */
+    pub fn clear(&mut self) {
         for i in 0..self.0.len() {
             self.0[i] = Resource::None;
         }
-        0
     }
 
     fn index_check(&self, id: usize) -> Result<(), EngineError> {

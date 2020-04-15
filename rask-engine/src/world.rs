@@ -16,6 +16,7 @@ pub trait Move {
     }
 }
 
+#[allow(dead_code)]
 pub struct World {
     players: Vec<Player>,
     entities: Vec<Entity>,
@@ -23,6 +24,7 @@ pub struct World {
     background: Background,
 }
 
+#[allow(dead_code)]
 pub struct Player {
     position: Vec2,
     velocity: Vec2,

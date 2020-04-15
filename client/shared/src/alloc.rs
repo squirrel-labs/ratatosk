@@ -94,32 +94,28 @@ extern "C" {
     #[wasm_bindgen(js_namespace = console, js_name = debug)]
     fn console_debug_u32(il: bool, a: u32, b: u32, s: u32, e: u32, f: u32);
     #[wasm_bindgen(js_namespace = console, js_name = error)]
-    fn console_error_u32(il: bool, a: u32, b: u32, s: u32, e: u32, f: u32);
+    fn console_error_u32(a: u32, b: u32, s: u32, e: u32);
 }
 
 unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> GlobalAlloc
     for Allocator<M, S, I>
 {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        let is_logic = S::allocator_addr::<M>() == crate::mem::ALLOCATOR;
-        let tout = Self::allocator()
-            .alloc(layout);
-        let out = tout
-            .offset(S::allocation_start_address::<M>() - (if is_logic { crate::mem::LOGIC_STACK } else { crate::mem::GRAPHICS_STACK }) as isize) as usize as u32;
-        let tout = tout as usize as u32;
+        let out = Self::allocator().alloc(layout);
+        let tout = out as usize as u32;
         let size = SimpleAllocator::layout_to_size(layout) as u32;
         let start = S::allocation_start_address::<M>() as usize as u32;
-        let heaplen: u32 = env!("WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES").parse().unwrap();
-        if out + size > start + heaplen || out < start {
-            console_error_u32(is_logic, size, out, start, start + heaplen, tout);
-        } else {
-            console_debug_u32(is_logic, size, out, start, start + heaplen, tout);
+        let heaplen: u32 = env!("WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES")
+            .parse()
+            .unwrap();
+        if tout + size > start + heaplen || tout < start {
+            console_error_u32(size, start, start + heaplen, tout);
         }
-        out as usize as *mut u8
+        out
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        Self::allocator().dealloc(ptr.offset(-S::allocation_start_address::<M>()), layout)
+        Self::allocator().dealloc(ptr, layout)
     }
 }
 

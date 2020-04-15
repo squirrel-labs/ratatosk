@@ -5,7 +5,7 @@ use crate::message_queue::{Message, MessageQueue, MessageQueueElement};
 use crate::sprite::Sprite;
 use crate::state::{State, UnspecificState};
 use const_env::from_env;
-use rask_engine::resources::{Resource, ResourceTable};
+use rask_engine::resources::Resource;
 use std::mem::size_of;
 
 macro_rules! assert_env {

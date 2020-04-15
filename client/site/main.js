@@ -1,7 +1,7 @@
 const WORKER_URI = 'site/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:3000/'
-// synchronization memory address (see client/shared/src/mem.rs)
-const SYNCHRONIZATION_MEMORY = 0x50fc00 / 4;
+// synchronization memory address (read from mem.json, see gen_mem_layout.rs)
+const SYNCHRONIZATION_MEMORY = memoryParameters.sync_area / 4;
 let workers = [];
 let memory;  // global for debugging
 

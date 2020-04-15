@@ -36,7 +36,7 @@ pub fn run(address: &str, port: &str) -> Result<JoinHandle<()>, ServerError> {
             })
             .unwrap()
         })
-        .map_err(|e| ServerError::WebsocketCreation(e))
+        .map_err(ServerError::WebsocketCreation)
 }
 
 impl Handler for Socket {
@@ -72,10 +72,7 @@ impl Handler for Socket {
         info!("Socket got message '{}'. ", msg);
 
         self.group
-            .send(GroupMessage::Data((
-                self.ip.clone(),
-                Box::new(msg.into_data()),
-            )))
+            .send(GroupMessage::Data((self.ip.clone(), msg.into_data())))
             .unwrap_or_else(|err| {
                 let err = format!("failed to deliver internal message {}", err);
                 error!("{}", err);
@@ -93,7 +90,7 @@ impl Handler for Socket {
                 if group.remove_client(&self.ws).is_err() {
                     warn!("failed to remove Client from Game");
                 }
-                if group.clients.len() == 0 {
+                if group.clients.is_empty() {
                     guard.remove(&self.id);
                 }
             }
@@ -106,7 +103,6 @@ impl Socket {
         match self.groups.lock() {
             Ok(mut guard) => {
                 self.id = response.group_id;
-                let group_type = response.group_type.clone();
                 if !guard.contains_key(&response.group_id) {
                     let group = Group::new(response)?;
                     self.group = group.sender.clone();
