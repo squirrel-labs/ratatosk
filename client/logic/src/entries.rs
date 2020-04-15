@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::game_context::GameContext;
 use rask_wasm_shared::get_double_buffer;
+use rask_wasm_shared::mem;
 use rask_wasm_shared::state::State;
 
 fn reset_state() {
@@ -14,7 +15,7 @@ fn reset_state() {
 }
 
 fn wait_for_main_thread_notify() {
-    unsafe { rask_wasm_shared::mem::SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
+    unsafe { mem::SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
 }
 
 /// Initialize the gamestate, communicate with
@@ -27,7 +28,6 @@ pub fn run_main_loop() {
     }
     panic::set_hook(Box::new(console_error_panic_hook::hook));
 
-    use rask_wasm_shared::mem;
     log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
     log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
     log::info!("buffer count: {}", mem::DOUBLE_BUFFER_SPRITE_COUNT);
@@ -38,7 +38,12 @@ pub fn run_main_loop() {
 
     loop {
         game.tick().map_err(|e| panic!("{}", e)).unwrap();
-        log::info!("wait_for_main_thread_notify()");
+        let (mouse_x, mouse_y) = unsafe { mem::SynchronizationMemory::get() }.mouse_pos();
+        log::info!(
+            "wait_for_main_thread_notify()\nMouse pos: {}x {}y",
+            mouse_x,
+            mouse_y
+        );
         wait_for_main_thread_notify();
     }
 }

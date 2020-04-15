@@ -4,6 +4,8 @@ const WEBSOCKET_URI = 'ws://localhost:3000/'
 const SYNCHRONIZATION_MEMORY = memoryParameters.sync_area / 4;
 let workers = [];
 let memory;  // global for debugging
+let mousex = 0;
+let mousey = 0;
 
 function postWorkerDescriptor(worker, desc) {
     if (desc.canvas === undefined)
@@ -94,6 +96,8 @@ function wakeUpAt(addr) {
 const START_TIME = Date.now();
 async function wakeLogic() {
     Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, Date.now() - START_TIME);
+    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 1, Math.floor(mousex));
+    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 2, Math.floor(mousey));
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
 }
 
@@ -149,6 +153,11 @@ window.addEventListener('keydown', function(e) {
     const key = evalKey(e);
     const mod = keyMod(e);
     if (key !== undefined && mod !== undefined) { sendEvent([KEYDOWN, key, mod]); }
+});
+
+window.addEventListener('mousemove', e => {
+    mousex = e.clientX;
+    mousey = e.clientY;
 });
 
 window.addEventListener('keyup', function(e) {

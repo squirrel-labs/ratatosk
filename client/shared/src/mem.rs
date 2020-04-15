@@ -86,17 +86,21 @@ pub fn get_double_buffer() -> &'static mut Buffer {
 }
 
 #[repr(align(4))]
+#[repr(C)]
 pub struct SynchronizationMemory {
     /// time elapsed since logic thread initialisation in milliseconds
     pub elapsed_ms: i32,
+    pub mouse_x: i32,
+    pub mouse_y: i32,
     last_elapsed_ms: i32,
-    pub mouse_x: f32,
-    pub mouse_y: f32,
 }
 
 impl SynchronizationMemory {
     pub unsafe fn get() -> &'static Self {
         &*(SYNCHRONIZATION_MEMORY as *const Self)
+    }
+    pub fn mouse_pos(&self) -> (i32, i32) {
+        (self.mouse_x, self.mouse_y)
     }
 
     pub unsafe fn get_mut() -> &'static mut Self {
