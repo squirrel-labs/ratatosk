@@ -1,18 +1,20 @@
-use crate::mem::{atomic_read_u8, atomic_write_u8, MESSAGE_QUEUE_ELEMENT_COUNT};
+use crate::mem::{atomic_read_u8, atomic_write_u8, MESSAGE_QUEUE, MESSAGE_QUEUE_ELEMENT_COUNT};
 
 #[repr(C, u16)]
 #[derive(Debug, Clone)]
 pub enum Message {
+    None,
     Unknown,
-    KeyDown,
-    KeyUp,
-    TextInput,
+    KeyDown(i32),
+    KeyPress(u16),
+    KeyUp(i32),
+    TextInput(bool),
     Click { x: i32, y: i32 },
-    ResizeWindow,
-    ResquestAlloc,
+    ResizeWindow { x: i32, y: i32 },
+    ResquestAlloc(i32),
 }
 
-#[repr(align(4))]
+#[repr(align(16))]
 pub struct MessageQueueElement<T: Sized + Clone> {
     reading: u8,
     writing: u8,
@@ -41,29 +43,32 @@ impl<T: Sized + Clone> MessageQueueElement<T> {
 
 #[repr(align(4))]
 #[allow(dead_code)]
-pub struct MessageQueue<T: Sized + Clone> {
-    /// the index of the next element to be written
-    writer_index: u32,
+pub struct MessageQueueReader {
     /// the index of the next element to be read
     reader_index: u32,
-    _phantom: core::marker::PhantomData<T>,
 }
 
-impl<T: Sized + Clone> MessageQueue<T> {
+impl MessageQueueReader {
     pub fn length() -> usize {
         MESSAGE_QUEUE_ELEMENT_COUNT
     }
 
-    unsafe fn get_mut(&mut self, n: usize) -> Option<&mut MessageQueueElement<T>> {
+    pub fn new() -> Self {
+        MessageQueueReader { reader_index: 0 }
+    }
+
+    unsafe fn get_mut<T: Sized + Clone>(
+        &mut self,
+        n: usize,
+    ) -> Option<&mut MessageQueueElement<T>> {
         core::slice::from_raw_parts_mut(
-            (self as *mut Self as *mut u8).offset(core::mem::size_of::<Self>() as isize)
-                as *mut MessageQueueElement<T>,
+            MESSAGE_QUEUE as *mut MessageQueueElement<T>,
             Self::length(),
         )
         .get_mut(n)
     }
 
-    pub fn pop(&mut self) -> Option<T> {
+    pub fn pop<T: Sized + Clone>(&mut self) -> Option<T> {
         let e = unsafe { self.get_mut(self.reader_index as usize)? };
         let e = e.read()?;
         self.reader_index += 1;

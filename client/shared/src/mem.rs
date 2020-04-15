@@ -1,7 +1,7 @@
 type Buffer = crate::double_buffer::DoubleBuffer<State>;
 
 use crate::double_buffer::DoubleBuffer;
-use crate::message_queue::{Message, MessageQueue, MessageQueueElement};
+use crate::message_queue::{Message, MessageQueueElement};
 use crate::sprite::Sprite;
 use crate::state::{State, UnspecificState};
 use const_env::from_env;
@@ -72,9 +72,8 @@ assert_env!("MESSAGE_QUEUE");
 #[from_env]
 pub const MESSAGE_QUEUE_SIZE: usize = 0;
 assert_env!("MESSAGE_QUEUE_SIZE");
-pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = (MESSAGE_QUEUE_SIZE as i64
-    - size_of::<MessageQueue<()>>() as i64) as usize
-    / size_of::<MessageQueueElement<Message>>();
+pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize =
+    MESSAGE_QUEUE_SIZE / size_of::<MessageQueueElement<Message>>();
 
 #[from_env]
 /// The logic heap address (size: 32MiB)
