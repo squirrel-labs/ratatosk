@@ -13,5 +13,4 @@ pub mod wasm_log;
 pub use error::*;
 pub use mem::*;
 
-//pub use rask_engine::resources::texture;
 pub use wee_alloc;

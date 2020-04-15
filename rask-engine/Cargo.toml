@@ -9,4 +9,4 @@ image = "0.23"
 lazy_static = "1.4.0"
 
 [dependencies.spine_tiny]
-git = "http://github.com/reeFridge/spine-rs"
+git = "https://github.com/reeFridge/spine-rs"

@@ -2,7 +2,7 @@ use super::Resource;
 use crate::EngineError;
 
 /// The library is used to store and retrieve resources.
-pub struct ResourceTable(pub &'static mut [Resource]);
+pub struct ResourceTable(&'static mut [Resource]);
 
 macro_rules! get_store {
     ($type: ty, $enum_type: ident) => {

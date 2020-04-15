@@ -1,15 +1,16 @@
 //! The collide module provides the Collide trait for objects that can collide along with several
 //! implementations for various types.
 
+use spine::skeleton::SRT;
+
 use crate::boxes::{AABox, RBox};
 use crate::math::Vec2;
 use core::ops::Range;
-use spine::skeleton::SRT;
 
 // For information on the SAT, see: http://www.dyn4j.org/2010/01/sat/.
 
 /// A trait for objects that can collide with other objects.
-pub trait Collide<Rhs = Self> {
+pub trait Collide<Rhs: ?Sized = Self> {
     fn collides(&self, other: &Rhs) -> bool;
 }
 
@@ -37,22 +38,17 @@ fn project(rbox: &RBox, axis: &Vec2) -> Projection {
         rbox.pos + rbox.v1 + rbox.v2,
     ];
     // project each vertex onto axis
-    vertices.iter().fold(
-        {
-            let p = axis.dot(rbox.pos);
-            Projection { min: p, max: p }
-        },
-        |Projection { min, max }, vertex| {
-            let p = axis.dot(*vertex);
-            if p < min {
-                Projection { min: p, max }
-            } else if p > max {
-                Projection { min, max: p }
-            } else {
-                Projection { min, max }
-            }
-        },
-    )
+    let p = axis.dot(rbox.pos);
+    let mut proj = Projection { min: p, max: p };
+    for &vertex in vertices.iter() {
+        let p = axis.dot(vertex);
+        if p < proj.min {
+            proj.min = p;
+        } else if p > proj.max {
+            proj.max = p;
+        }
+    }
+    proj
 }
 
 /// Calculate the bound in a line segment that collides an AABox projected onto an axis.
@@ -107,6 +103,7 @@ fn collide_aabox_rbox_segment(
 }
 
 impl Collide for Vec2 {
+    #[inline]
     fn collides(&self, other: &Self) -> bool {
         self == other
     }
@@ -164,14 +161,14 @@ impl Collide<Vec2> for RBox {
     }
 }
 
-impl Collide<Vec2> for spine::skeleton::SRT {
+impl Collide<Vec2> for SRT {
     fn collides(&self, other: &Vec2) -> bool {
         let rbox: RBox = self.into();
         rbox.collides(other)
     }
 }
 
-impl Collide<AABox> for spine::skeleton::SRT {
+impl Collide<AABox> for SRT {
     fn collides(&self, other: &AABox) -> bool {
         let rbox: RBox = self.into();
         rbox.collides(other)
@@ -207,5 +204,12 @@ impl Collide for RBox {
 impl<S, T: Collide<S>> Collide<S> for [T] {
     fn collides(&self, other: &S) -> bool {
         self.iter().any(|x| x.collides(other))
+    }
+}
+
+impl<S, T: Collide<S>> Collide<[T]> for S {
+    #[inline]
+    fn collides(&self, other: &[T]) -> bool {
+        other.collides(self)
     }
 }

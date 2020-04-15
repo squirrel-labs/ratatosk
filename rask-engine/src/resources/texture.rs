@@ -16,19 +16,16 @@ pub struct Texture {
 
 impl Texture {
     pub fn from_png_stream<R: std::io::Read>(r: R) -> Result<Self, EngineError> {
-        let decoder = PngDecoder::new(r)
-            .map_err(|e| EngineError::ResourceType(format!("png image reading error: {}", e)))?;
+        let decoder = PngDecoder::new(r)?;
 
         let (w, h) = decoder.dimensions();
-        let e = |_| EngineError::ResourceType("invalid image resolution".into());
+        let e = |_| EngineError::ResourceType("invalid image resolution".to_owned());
         let (w, h) = (w.try_into().map_err(e)?, h.try_into().map_err(e)?);
 
         let colortype = decoder.color_type();
 
         let mut bytes = vec![0; w as usize * h as usize * colortype.bytes_per_pixel() as usize];
-        decoder
-            .read_image(&mut bytes)
-            .map_err(|e| EngineError::ResourceType(format!("png image decoding error: {}", e)))?;
+        decoder.read_image(&mut bytes)?;
 
         Ok(Self {
             raw_data: bytes,
