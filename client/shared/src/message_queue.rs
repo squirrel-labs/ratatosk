@@ -4,8 +4,8 @@ use crate::mem::{atomic_read_u8, atomic_write_u8, MESSAGE_QUEUE, MESSAGE_QUEUE_E
 #[derive(Debug, Clone)]
 pub enum Message {
     None,
-    KeyDown(u8, i32),
-    KeyUp(u8, i32),
+    KeyDown(KeyModifier, i32),
+    KeyUp(KeyModifier, i32),
     KeyPress(u16),
     TextInput(bool),
     Click { x: i32, y: i32 },
@@ -16,6 +16,23 @@ pub enum Message {
 impl Default for Message {
     fn default() -> Self {
         Message::None
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct KeyModifier(u8);
+impl KeyModifier {
+    pub fn shift(&self) -> bool {
+        self.0 & 1 == 1
+    }
+    pub fn control(&self) -> bool {
+        self.0 & (1 << 1) == 1
+    }
+    pub fn alt(&self) -> bool {
+        self.0 & (1 << 2) == 1
+    }
+    pub fn meta(&self) -> bool {
+        self.0 & (1 << 3) == 1
     }
 }
 
@@ -50,20 +67,8 @@ impl MessageQueueReader {
         MESSAGE_QUEUE_ELEMENT_COUNT
     }
 
-    pub fn new<T: Sized + Clone + Default>() -> Self {
-        let mut queue = MessageQueueReader { reader_index: 0 };
-        unsafe {
-            queue.init::<T>();
-        }
-        queue
-    }
-
-    unsafe fn init<T: Sized + Clone + Default>(&mut self) {
-        for i in 0..Self::length() {
-            if let Some(e) = self.get_mut::<T>(i) {
-                e.payload = T::default();
-            }
-        }
+    pub fn new() -> Self {
+        MessageQueueReader { reader_index: 0 }
     }
 
     unsafe fn get_mut<T: Sized + Clone>(
@@ -79,12 +84,20 @@ impl MessageQueueReader {
 
     pub fn pop<T: Sized + Clone + Default + std::fmt::Debug>(&mut self) -> T {
         loop {
+            let i = self.reader_index;
             let e = unsafe { self.get_mut(self.reader_index as usize).unwrap() };
-            //log::info!("bytes are  {:?}", unsafe { std::slice::from_raw_parts_mut(e as *mut MessageQueueElement<_> as *mut u8, 16) });
+            /*log::info!(
+                "bytes are  {:?}\nreading at: {}",
+                unsafe {
+                    std::slice::from_raw_parts_mut(e as *mut MessageQueueElement<_> as *mut u8, 16)
+                },
+                i
+            );*/
             let e = e.read();
-            let none = T::default();
-            if let Some(none) = e {
-                return none;
+            if let Some(n) = e.clone() {
+                if std::mem::discriminant(&T::default()) == std::mem::discriminant(&n) {
+                    return n;
+                }
             }
             self.reader_index += 1;
             if self.reader_index as usize >= Self::length() {
