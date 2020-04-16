@@ -2,6 +2,9 @@ const WORKER_URI = 'site/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:3000/'
 // synchronization memory address (read from mem.json, see gen_mem_layout.rs)
 const SYNCHRONIZATION_MEMORY = memoryParameters.sync_area / 4;
+const MESSAGE_QUEUE = memoryParameters.queue_start / 4;
+const MESSAGE_ITEM_SIZE = 16;
+const MESSAGE_QUEUE_LENGTH = memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
 let workers = [];
 let memory;  // global for debugging
 let mousex = 0;
@@ -86,6 +89,7 @@ let canvas = createCanvas();
 if (canvas === undefined) throw Error('canvas creation failed');
 memory = generateMemory();
 let memoryView32 = new Int32Array(memory.buffer);
+let memoryView8 = new Int8Array(memory.buffer);
 
 spawnModules(canvas, memory);
 
@@ -105,6 +109,21 @@ const KEYDOWN = 0x0101;
 const KEYUP   = 0x0102;
 
 function sendEvent(e) {
+}
+
+class MessageQueueWriter {
+    constructor(pos, elemetSize) {
+        this.pos = pos;
+        this.size = elemetSize;
+        this.index = 0;
+    }
+    write_i32() {
+        let ptr = (this.pos + this.size * this.index++) / 4;
+        for (let i = 0; i < arguments.length; i++) {
+            Atomics.store(memoryView32, this.ptr, arguments[i]);
+        }
+        index = this.index % MESSAGE_QUEUE_LENGTH;
+    }
 }
 
 function getKey(val) {

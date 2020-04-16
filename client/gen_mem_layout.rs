@@ -118,8 +118,8 @@ fn main() -> std::io::Result<()> {
     let mut file = File::create(format!("{}/mem.json", out_dir))?;
     write!(
         &mut file,
-        "var memoryParameters = {{max_memory:{},queue_start:{},sync_area:{}}}",
-        max_mem, queue, sync
+        "var memoryParameters = {{max_memory:{},queue_start:{},queue_size:{},sync_area:{}}}",
+        max_mem, queue, MESSAGE_QUEUE_SIZE, sync
     )?;
     Ok(())
 }
