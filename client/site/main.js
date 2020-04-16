@@ -2,7 +2,7 @@ const WORKER_URI = 'site/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:3000/'
 // synchronization memory address (read from mem.json, see gen_mem_layout.rs)
 const SYNCHRONIZATION_MEMORY = memoryParameters.sync_area / 4;
-const MESSAGE_QUEUE = memoryParameters.queue_start / 4;
+const MESSAGE_QUEUE = memoryParameters.queue_start;
 const MESSAGE_ITEM_SIZE = 16;
 const MESSAGE_QUEUE_LENGTH = memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
 let workers = [];
@@ -18,14 +18,17 @@ class MessageQueueWriter {
     }
     write_i32() {
         let ptr = Math.floor((this.pos + this.size * this.index++) / 4);
-        for (let i = 0; i < arguments.length; i++) {
-            Atomics.store(memoryView32, ptr + 1, arguments[i]);
+        let iptr = ptr;
+        Atomics.store(memoryView8, ptr * 4, 1);
+        for (let i of arguments) {
+            Atomics.store(memoryView32, ++iptr, i);
         }
+        Atomics.store(memoryView8, ptr * 4, 0);
         this.index = this.index % MESSAGE_QUEUE_LENGTH;
     }
 }
 
-queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_QUEUE_LENGTH);
+queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
 
 function postWorkerDescriptor(worker, desc) {
     if (desc.canvas === undefined)
@@ -150,8 +153,8 @@ function evalKey(key) {
 window.addEventListener('keydown', function(e) {
     const key = evalKey(e);
     const mod = keyMod(e);
-    // 1| 1<< 8 = 257
-    if (key !== undefined && mod !== undefined) { queue.write_i32(257 | mod << 16, key); }
+    
+    if (key !== undefined && mod !== undefined) { queue.write_i32(1, mod, key); }
 });
 
 window.addEventListener('mousemove', e => {
@@ -159,16 +162,15 @@ window.addEventListener('mousemove', e => {
     mousey = e.clientY;
 });
 
-window.addEventListener('onclick', () => {
-    // 1|5<<8 = 1281
-    queue.write_i32(1281, mousex, mousey)
+window.addEventListener('click', () => {
+    queue.write_i32(5, mousex, mousey)
 });
 
 window.addEventListener('keyup', function(e) {
     const key = evalKey(e);
     const mod = keyMod(e);
-    // 1| 2<< 8 = 513
-    if (key !== undefined && mod !== undefined) { queue.write_i32(257 | mod << 16, key); }
+
+    if (key !== undefined && mod !== undefined) { queue.write_i32(2, mod, key); }
 });
 
 window.setInterval(wakeLogic, 100);

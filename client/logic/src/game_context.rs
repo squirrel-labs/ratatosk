@@ -49,9 +49,11 @@ impl GameContext {
             self.state.append_sprite(&sprite);
             sprite.tex_id += 1;
             self.state.append_sprite(&sprite);
-            while let Some(msg) = self.message_queue.pop::<Message>() {
-                log::info!("{:?}", msg);
-            }
+        }
+        loop {
+            let msg = self.message_queue.pop::<Message>();
+            if let Message::None = msg { break; }
+            log::info!("{:?}", msg);
         }
 
         self.push_state()?;

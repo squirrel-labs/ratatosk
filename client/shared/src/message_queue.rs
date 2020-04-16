@@ -1,6 +1,6 @@
 use crate::mem::{atomic_read_u8, atomic_write_u8, MESSAGE_QUEUE, MESSAGE_QUEUE_ELEMENT_COUNT};
 
-#[repr(C, u8)]
+#[repr(C, u32)]
 #[derive(Debug, Clone)]
 pub enum Message {
     None,
@@ -20,6 +20,7 @@ impl Default for Message {
 }
 
 #[repr(C, align(16))]
+#[derive(Debug)]
 pub struct MessageQueueElement<T: Sized + Clone> {
     writing: u8,
     payload: T,
@@ -76,9 +77,10 @@ impl MessageQueueReader {
         .get_mut(n)
     }
 
-    pub fn pop<T: Sized + Clone + Default>(&mut self) -> T {
+    pub fn pop<T: Sized + Clone + Default + std::fmt::Debug>(&mut self) -> T {
         loop {
             let e = unsafe { self.get_mut(self.reader_index as usize).unwrap() };
+            //log::info!("bytes are  {:?}", unsafe { std::slice::from_raw_parts_mut(e as *mut MessageQueueElement<_> as *mut u8, 16) });
             let e = e.read();
             let none = T::default();
             if let Some(none) = e {
@@ -90,7 +92,7 @@ impl MessageQueueReader {
             }
             match e {
                 None => continue,
-                msg => return msg,
+                Some(msg) => return msg,
             }
         }
     }
