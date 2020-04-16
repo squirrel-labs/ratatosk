@@ -28,5 +28,5 @@ pub fn initialise_graphics_context(canvas: web_sys::OffscreenCanvas) {
 pub fn draw_frame() {
     let _ = context::context_mut()
         .render()
-        .map_err(|e| log::debug!("{}", e));
+        .map_err(|e| log::error!("{}", e));
 }
