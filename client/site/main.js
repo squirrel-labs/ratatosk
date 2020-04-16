@@ -10,6 +10,23 @@ let memory;  // global for debugging
 let mousex = 0;
 let mousey = 0;
 
+class MessageQueueWriter {
+    constructor(pos, elemetSize) {
+        this.pos = pos;
+        this.size = elemetSize;
+        this.index = 0;
+    }
+    write_i32() {
+        let ptr = Math.floor((this.pos + this.size * this.index++) / 4);
+        for (let i = 0; i < arguments.length; i++) {
+            Atomics.store(memoryView32, ptr + 1, arguments[i]);
+        }
+        this.index = this.index % MESSAGE_QUEUE_LENGTH;
+    }
+}
+
+queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_QUEUE_LENGTH);
+
 function postWorkerDescriptor(worker, desc) {
     if (desc.canvas === undefined)
         worker.postMessage(desc);
@@ -108,70 +125,33 @@ async function wakeLogic() {
 const KEYDOWN = 0x0101;
 const KEYUP   = 0x0102;
 
-function sendEvent(e) {
-}
-
-class MessageQueueWriter {
-    constructor(pos, elemetSize) {
-        this.pos = pos;
-        this.size = elemetSize;
-        this.index = 0;
+String.prototype.hashCode = function() {
+    var hash = 0;
+    if (this.length == 0) {
+        return hash;
     }
-    write_i32() {
-        let ptr = (this.pos + this.size * this.index++) / 4;
-        for (let i = 0; i < arguments.length; i++) {
-            Atomics.store(memoryView32, this.ptr, arguments[i]);
-        }
-        index = this.index % MESSAGE_QUEUE_LENGTH;
+    for (var i = 0; i < this.length; i++) {
+        var char = this.charCodeAt(i);
+        hash = ((hash<<5)-hash)+char;
+        hash = hash & hash; // Convert to 32bit integer
     }
-}
-
-function getKey(val) {
-    let code = new Uint8Array(4);
-    for (let i = 0; i < 4; i++) {
-        code[i] = val.charCodeAt(i);
-    }
-    return code;
+    return hash;
 }
 
 function keyMod(key) {
-    return +key.shiftKey + (key.ctrlKey << 1) + (key.altKey << 2) + (key.metaKey << 3);
+    return key.shiftKey + (key.ctrlKey << 1) + (key.altKey << 2) + (key.metaKey << 3);
 }
 
 function evalKey(key) {
-    if (key.isComposing && key.repeat) { return; }
-    const scode = key.code;
-    if (scode.startsWith('Key') && scode.length == 4) { return getKey(scode); }
-    else if (scode.startsWith('Digit') && scode.length == 6) { return getKey('Key' + scode[5]); }
-    else if (scode.startsWith('Numpad')) { return getKey('Num' + scode[6]); }
-    else {
-        switch (scode) {
-            case 'Minus': return getKey('Key-');
-            case 'Plus': return getKey('Key+');
-            case 'BracketLeft': return getKey('Key[');
-            case 'BracketRight': return getKey('Key]');
-            case 'Enter': return getKey('Key\n');
-            case 'Backspace': return getKey('Bcks');
-            case 'Tab': return getKey('Tabu');
-            case 'ControlLeft': return getKey('CtrL');
-            case 'ControlRight': return getKey('CtrR');
-            case 'ShiftLeft': return getKey('ShiL');
-            case 'ShiftRight': return getKey('ShiR');
-            case 'ArrowUp': return getKey('ArrU');
-            case 'ArrowDown': return getKey('ArrD');
-            case 'ArrowLeft': return getKey('ArrL');
-            case 'ArrowRight': return getKey('ArrR');
-            case 'Equal': return getKey('Key=');
-            case 'Unidentified': return;
-            default: return getKey(scode.padEnd(4, ' ').substr(0, 4));
-        }
-    }
+    if (key.isComposing && key.repeat) { return 0; }
+    return key.code.hashCode()
 }
 
 window.addEventListener('keydown', function(e) {
     const key = evalKey(e);
     const mod = keyMod(e);
-    if (key !== undefined && mod !== undefined) { sendEvent([KEYDOWN, key, mod]); }
+    // 1| 1<< 8 = 257
+    if (key !== undefined && mod !== undefined) { queue.write_i32(257 | mod << 16, key); }
 });
 
 window.addEventListener('mousemove', e => {
@@ -179,10 +159,16 @@ window.addEventListener('mousemove', e => {
     mousey = e.clientY;
 });
 
+window.addEventListener('onclick', () => {
+    // 1|5<<8 = 1281
+    queue.write_i32(1281, mousex, mousey)
+});
+
 window.addEventListener('keyup', function(e) {
     const key = evalKey(e);
     const mod = keyMod(e);
-    if (key !== undefined && mod !== undefined) { sendEvent([KEYUP, key, mod]); }
+    // 1| 2<< 8 = 513
+    if (key !== undefined && mod !== undefined) { queue.write_i32(257 | mod << 16, key); }
 });
 
 window.setInterval(wakeLogic, 100);

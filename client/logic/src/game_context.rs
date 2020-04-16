@@ -3,7 +3,10 @@ use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
 use rask_wasm_shared::mem::{RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT};
 use rask_wasm_shared::sprite::*;
-use rask_wasm_shared::state::State;
+use rask_wasm_shared::{
+    message_queue::{Message, MessageQueueReader},
+    state::State,
+};
 
 const IMAGE1_DATA: &[u8] = include_bytes!("../../res/empty.png");
 const IMAGE2_DATA: &[u8] = include_bytes!("../../res/thief.png");
@@ -13,6 +16,7 @@ pub struct GameContext {
     tick_nr: u64,
     #[allow(dead_code)]
     resource_table: ResourceTable,
+    message_queue: MessageQueueReader,
 }
 
 impl GameContext {
@@ -29,6 +33,7 @@ impl GameContext {
             state: State::default(),
             tick_nr: 0,
             resource_table,
+            message_queue: MessageQueueReader::new::<Message>(),
         })
     }
 
@@ -44,6 +49,9 @@ impl GameContext {
             self.state.append_sprite(&sprite);
             sprite.tex_id += 1;
             self.state.append_sprite(&sprite);
+            while let Some(msg) = self.message_queue.pop::<Message>() {
+                log::info!("{:?}", msg);
+            }
         }
 
         self.push_state()?;

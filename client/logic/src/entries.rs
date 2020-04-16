@@ -37,13 +37,13 @@ pub fn run_main_loop() {
         .unwrap();
 
     loop {
+        wait_for_main_thread_notify();
         game.tick().map_err(|e| panic!("{}", e)).unwrap();
         let (mouse_x, mouse_y) = unsafe { mem::SynchronizationMemory::get() }.mouse_pos();
-        log::info!(
+        /*log::info!(
             "wait_for_main_thread_notify()\nMouse pos: {}x {}y",
             mouse_x,
             mouse_y
-        );
-        wait_for_main_thread_notify();
+        );*/
     }
 }

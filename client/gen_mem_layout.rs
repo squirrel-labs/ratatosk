@@ -78,6 +78,7 @@ fn main() -> std::io::Result<()> {
     let buffer = align32_up(table + RESOURCE_TABLE_SIZE);
     let queue = align32_up(buffer + BUFFER_SIZE);
     let alloc = align_page_up(queue + MESSAGE_QUEUE_SIZE);
+    let queue_size = align32_up(alloc - queue - 3);
     let logic_global = align_page_up(alloc + ALLOCATOR_SIZE);
     let graphics_global = align_page_up(logic_global + LOGIC_GLOBAL_SIZE);
     let max_mem = align_page_up(graphics_global + GRAPHICS_GLOBAL_SIZE);
@@ -92,7 +93,7 @@ fn main() -> std::io::Result<()> {
     println!("cargo:rustc-env=DOUBLE_BUFFER={}", buffer);
     println!("cargo:rustc-env=DOUBLE_BUFFER_SIZE={}", queue - buffer);
     println!("cargo:rustc-env=MESSAGE_QUEUE={}", queue);
-    println!("cargo:rustc-env=MESSAGE_QUEUE_SIZE={}", alloc - queue);
+    println!("cargo:rustc-env=MESSAGE_QUEUE_SIZE={}", queue_size);
     println!("cargo:rustc-env=LOGIC_HEAP={}", logic_heap);
     println!("cargo:rustc-env=LOGIC_GLOBAL={}", logic_global);
     println!("cargo:rustc-env=GRAPHICS_GLOBAL={}", graphics_global);
@@ -119,7 +120,7 @@ fn main() -> std::io::Result<()> {
     write!(
         &mut file,
         "var memoryParameters = {{max_memory:{},queue_start:{},queue_size:{},sync_area:{}}}",
-        max_mem, queue, MESSAGE_QUEUE_SIZE, sync
+        max_mem, queue, queue_size, sync
     )?;
     Ok(())
 }

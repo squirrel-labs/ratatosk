@@ -4,9 +4,9 @@ use crate::mem::{atomic_read_u8, atomic_write_u8, MESSAGE_QUEUE, MESSAGE_QUEUE_E
 #[derive(Debug, Clone)]
 pub enum Message {
     None,
-    KeyDown(u16),
+    KeyDown((u8, i32)),
+    KeyUp((u8, i32)),
     KeyPress(u16),
-    KeyUp(u16),
     TextInput(bool),
     Click { x: i32, y: i32 },
     ResizeWindow { x: i32, y: i32 },
@@ -49,8 +49,20 @@ impl MessageQueueReader {
         MESSAGE_QUEUE_ELEMENT_COUNT
     }
 
-    pub fn new() -> Self {
-        MessageQueueReader { reader_index: 0 }
+    pub fn new<T: Sized + Clone + Default>() -> Self {
+        let mut queue = MessageQueueReader { reader_index: 0 };
+        unsafe {
+            queue.init::<T>();
+        }
+        queue
+    }
+
+    unsafe fn init<T: Sized + Clone + Default>(&mut self) {
+        for i in 0..MessageQueueReader::length() {
+            if let Some(e) = self.get_mut::<T>(i) {
+                e.payload = T::default();
+            }
+        }
     }
 
     unsafe fn get_mut<T: Sized + Clone>(
@@ -65,12 +77,22 @@ impl MessageQueueReader {
     }
 
     pub fn pop<T: Sized + Clone + Default>(&mut self) -> Option<T> {
-        let e = unsafe { self.get_mut(self.reader_index as usize)? };
-        let e = e.read()?;
-        self.reader_index += 1;
-        if self.reader_index as usize >= Self::length() {
-            self.reader_index = 0;
+        loop {
+            let e = unsafe { self.get_mut(self.reader_index as usize)? };
+            let e = e.read()?;
+            let _none = T::default();
+            if let Some(_none) = e {
+                return None;
+            }
+            log::info!("index: {}", self.reader_index);
+            self.reader_index += 1;
+            if self.reader_index as usize >= Self::length() {
+                self.reader_index = 0;
+            }
+            match e {
+                None => continue,
+                msg => return msg,
+            }
         }
-        Some(e)
     }
 }

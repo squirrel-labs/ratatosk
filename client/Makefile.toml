@@ -60,7 +60,7 @@ wasm-bindgen $file --out-dir $top/client/gen \
   --remove-producers-section \
   --target no-modules #\
 wasm-opt $top/client/gen/rask_wasm_${@}_bg.wasm \
-  --memory-packing --remove-unused-brs --enable-mutable-globals --enable-threads -O2 --enable-bulk-memory \
+  --memory-packing --remove-unused-brs --enable-mutable-globals --enable-threads --enable-bulk-memory \
    -g --detect-features -o $top/client/gen/${@}.wasm
 rm $top/client/gen/rask_wasm_${@}_bg.wasm
 mv $top/client/gen/rask_wasm_${@}.js $top/client/gen/${@}.js
