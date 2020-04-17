@@ -37,7 +37,7 @@ impl GameContext {
             state: State::default(),
             tick_nr: 0,
             resource_table,
-            message_queue: MessageQueueReader::new::<Message>(),
+            message_queue: MessageQueueReader::new(),
         })
     }
 
@@ -56,7 +56,9 @@ impl GameContext {
         }
         loop {
             let msg = self.message_queue.pop::<Message>();
-            if let Message::None = msg { break; }
+            if let Message::None = msg {
+                break;
+            }
             log::info!("{:?}", msg);
         }
 

@@ -3,7 +3,7 @@ const WEBSOCKET_URI = 'ws://localhost:3000/'
 // synchronization memory address (read from mem.json, see gen_mem_layout.rs)
 const SYNCHRONIZATION_MEMORY = memoryParameters.sync_area / 4;
 const MESSAGE_QUEUE = memoryParameters.queue_start;
-const MESSAGE_ITEM_SIZE = 16;
+const MESSAGE_ITEM_SIZE = 32;
 const MESSAGE_QUEUE_LENGTH = memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
 let workers = [];
 let memory;  // global for debugging
@@ -15,16 +15,33 @@ class MessageQueueWriter {
         this.pos = pos;
         this.size = elemetSize;
         this.index = 0;
+        this._queue = [];
+        this._locked = false;
     }
-    write_i32() {
+    _write_i32(args) {
         let ptr = Math.floor((this.pos + this.size * this.index++) / 4);
-        let iptr = ptr;
-        Atomics.store(memoryView8, ptr * 4, 1);
-        for (let i of arguments) {
+        let iptr = ptr
+        console.log(args)
+        Atomics.store(memoryView32, ptr, 1);
+        for (let i of args) {
             Atomics.store(memoryView32, ++iptr, i);
         }
-        Atomics.store(memoryView8, ptr * 4, 0);
+        Atomics.store(memoryView32, ptr, 0);
         this.index = this.index % MESSAGE_QUEUE_LENGTH;
+        this._dequeue()
+    }
+    write_i32(task) {
+        this._queue.push(task);
+        if(!this._locked) this._dequeue();
+    }
+    _dequeue() {
+        this._busy = true;
+        let next = this._queue.shift();
+
+        if(next)
+            this._write_i32(next)
+        else
+            this._busy = false;
     }
 }
 
@@ -150,11 +167,16 @@ function evalKey(key) {
     return key.code.hashCode()
 }
 
-window.addEventListener('keydown', function(e) {
+window.addEventListener('keydown', e => {
     const key = evalKey(e);
     const mod = keyMod(e);
-    
-    if (key !== undefined && mod !== undefined) { queue.write_i32(1, mod, key); }
+    if (key !== undefined && mod !== undefined) { queue.write_i32([1, mod, key]); }
+});
+
+window.addEventListener('keyup', e => {
+    const key = evalKey(e);
+    const mod = keyMod(e);
+    if (key !== undefined && mod !== undefined) { queue.write_i32([2, mod, key]); }
 });
 
 window.addEventListener('mousemove', e => {
@@ -162,15 +184,18 @@ window.addEventListener('mousemove', e => {
     mousey = e.clientY;
 });
 
-window.addEventListener('click', () => {
-    queue.write_i32(5, mousex, mousey)
-});
-
-window.addEventListener('keyup', function(e) {
-    const key = evalKey(e);
+window.addEventListener('mousedown', e => {
     const mod = keyMod(e);
-
-    if (key !== undefined && mod !== undefined) { queue.write_i32(2, mod, key); }
+    if (mod !== undefined) {queue.write_i32([5, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
 });
 
-window.setInterval(wakeLogic, 100);
+window.addEventListener('mouseup', e => {
+    const mod = keyMod(e);
+    if (mod !== undefined) {queue.write_i32([6, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
+});
+
+window.addEventListener('resize', () => {
+    queue.write_i32([7, window.innerWidth, window.innerHeight]);
+});
+
+window.setInterval(wakeLogic, 50);
