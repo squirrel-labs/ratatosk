@@ -60,8 +60,10 @@ class MessageQueueWriter {
 queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
 
 function postWorkerDescriptor(worker, desc) {
-    if (desc.canvas === undefined)
+    if (desc.canvas === undefined) {
         worker.postMessage(desc);
+        worker.addEventListener("message", LogicMessage);
+    }
     else
         worker.postMessage(desc, [desc.canvas]);
 }
@@ -134,6 +136,38 @@ function mem(addr) {
     return new Uint8Array(memory.buffer.slice(addr, addr + 1))[0];
 }
 
+function LogicMessage(e) {
+    let x = new Uint32Array(e.date);
+    let type = x[0] & 255;
+    if (type >= 128) {
+        ws.post(x.slice(1));
+    } else if (type === 0) {
+        const id = x[1];
+        let ptr = x[2];
+        if (resource_map.has(id)) {
+            for (let i of resource_map.get(id).forEach()) {
+                Atomics.store(memoryViewu32, ptr++, i);
+            }
+            resource_map.delete(id);
+            queue.write_i32([8, id]);
+        } else {
+            console.error("Requested resource not in resource_map, id: " + id)
+        }
+    } else if (type === 1) {
+        if (x[1] === 0) {
+            window.addEventListener('input', input);
+        } else {
+            window.removeEventListener('input', input);
+        }
+    }
+}
+
+resource_map = new Map();
+function upload_resource(data) {
+    resource_map.set(data[0] & 0xff00, data)
+    queue.write_i32(7, data.length);
+}
+
 let canvas = createCanvas();
 if (canvas === undefined) throw Error('canvas creation failed');
 memory = generateMemory();
@@ -164,12 +198,6 @@ async function wakeLogic() {
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
 }
 
-resource_map = new Map();
-function upload_resource(data) {
-    resource_map.set(data[0] & 0xff00, data)
-    queue.write_i32(7, data.length);
-}
-
 function setup_ws() {
     ws.addEventListener('open',  () => {
         add_text('ws connection to ' + WS_URL + 'established');
@@ -186,9 +214,9 @@ function setup_ws() {
     ws.addEventListener('message', event => {
         let data = new UInt32Array(event.data.buffer);
         let type = data[0] & 255;
-        if (type == 10) {
+        if (type === 10) {
             upload_resource(data);
-        } else if (type == 11) {
+        } else if (type === 11) {
             Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 2, data[3]);
@@ -198,7 +226,7 @@ function setup_ws() {
 
 String.prototype.hashCode = function() {
     var hash = 0;
-    if (this.length == 0) {
+    if (this.length === 0) {
         return hash;
     }
     for (var i = 0; i < this.length; i++) {
@@ -216,6 +244,15 @@ function keyMod(key) {
 function evalKey(key) {
     if (key.isComposing && key.repeat) { return 0; }
     return key.code.hashCode()
+}
+
+function input(e) {
+    let str = e.data;
+    if (e.inputType !== "insertText") return;
+    for (var i = 0; i < str.length; i++) {
+        queue.write_i32([3, 1, str.charAt(i)]);
+    }
+    queue.write_i32([1, e.data]);
 }
 
 window.addEventListener('keydown', e => {

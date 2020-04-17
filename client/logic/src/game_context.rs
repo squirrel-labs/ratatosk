@@ -1,4 +1,4 @@
-use rask_engine::events::Event;
+use rask_engine::events::{Event, Key};
 use rask_engine::resources::{registry, GetStore, ResourceTable, Texture, TextureIds};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
@@ -8,6 +8,7 @@ use rask_wasm_shared::{
     message_queue::{Message, MessageQueueReader},
     state::State,
 };
+use std::collections::HashMap;
 
 const IMAGE1_DATA: &[u8] = include_bytes!("../../res/empty.png");
 const IMAGE2_DATA: &[u8] = include_bytes!("../../res/thief.png");
@@ -18,6 +19,8 @@ pub struct GameContext {
     #[allow(dead_code)]
     resource_table: ResourceTable,
     message_queue: MessageQueueReader,
+    worker_scope: web_sys::DedicatedWorkerGlobalScope,
+    buffer_table: HashMap<u32, (*const u8, u32)>,
 }
 
 impl GameContext {
@@ -43,11 +46,18 @@ impl GameContext {
             )?;
             resource_table
         };
+        use wasm_bindgen::JsCast;
+        let worker_scope = js_sys::global()
+            .dyn_into::<web_sys::DedicatedWorkerGlobalScope>()
+            .unwrap();
+
         Ok(Self {
             state: State::default(),
             tick_nr: 0,
             resource_table,
             message_queue: MessageQueueReader::new(),
+            worker_scope,
+            buffer_table: HashMap::new(),
         })
     }
 
@@ -70,19 +80,60 @@ impl GameContext {
                 break;
             }
             log::info!("{:?}", msg);
-            GameContext::handle_message(msg: Message)?;
+            self.handle_message(msg: Message)?;
         }
 
-        self.state.sprites_mut()[1].transform = rask_engine::math::Mat3::rotation(0.02) * self.state.sprites_mut()[1].transform;
+        self.state.sprites_mut()[1].transform =
+            rask_engine::math::Mat3::rotation(0.02) * self.state.sprites_mut()[1].transform;
+        // self.worker_scope
+        //     .post_message(&wasm_bindgen::JsValue::NULL)
+        //     .unwrap();
 
         self.push_state()?;
         self.tick_nr += 1;
         Ok(())
     }
-    fn handle_message(message: Message) -> Result<Option<rask_engine::events::Event>, ClientError> {
+
+    fn alloc_buffer(&mut self, id: u32, length: u32) -> *const u8 {
+        let layout = unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 4) };
+        let ptr = unsafe { std::alloc::alloc(layout) };
+        self.buffer_table.insert(id, (ptr, length));
+        ptr
+    }
+    fn get_buffer(&mut self, id: u32) -> Option<&[u8]> {
+        if let Some((ptr, length)) = self.buffer_table.get(&id) {
+            unsafe { Some(std::slice::from_raw_parts(*ptr, *length as usize)) }
+        } else {
+            None
+        }
+    }
+    fn dealloc_buffer(&mut self, id: u32) {
+        if let Some((ptr, length)) = self.buffer_table.remove(&id) {
+            let layout =
+                unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 4) };
+            unsafe { std::alloc::dealloc(ptr as *mut u8, layout) }
+        }
+    }
+    fn handle_message(&mut self, message: Message) -> Result<Option<Event>, ClientError> {
         match message {
-            Message::KeyDown(modifier, hash) => Ok(Some(Event::KeyDown)),
-            Message::KeyUp(modifier, hash) => Ok(Some(Event::KeyDown)),
+            Message::KeyDown(modifier, hash) => {
+                Ok(Some(Event::KeyDown(modifier, Key::from_u8(hash))))
+            }
+            Message::KeyUp(modifier, hash) => Ok(Some(Event::KeyUp(modifier, Key::from_u8(hash)))),
+            Message::MouseDown(event) => Ok(Some(Event::MouseDown(event))),
+            Message::MouseUp(event) => Ok(Some(Event::MouseUp(event))),
+            Message::KeyPress(t, code) => Ok(Some(Event::KeyPress(t as u16, code))),
+            Message::ResquestAlloc { id, size } => {
+                let ptr = self.alloc_buffer(id, size);
+                let msg = unsafe { js_sys::Uint32Array::view(&[id, ptr as u32]) };
+                self.worker_scope.post_message(&msg.buffer()).unwrap();
+                Ok(None)
+            }
+            Message::ResourcePush(id) => {
+                let _ = self.get_buffer(id);
+                self.dealloc_buffer(id);
+                Ok(None)
+            }
             _ => Err(ClientError::EngineError("Unknown Message Type".into())),
         }
     }

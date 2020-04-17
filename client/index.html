@@ -24,13 +24,16 @@
     <script>
         function oncanvas() {
             let canvas = document.getElementById('c');
+            let body = document.getElementById('body');
+            canvas.contentEditable = "true";
+            body.contentEditable = "true";
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
     </script>
 </head>
 
-<body>
+<body id='body'>
     <canvas id='c'>
         You've got one shitty browser man!
     </canvas>

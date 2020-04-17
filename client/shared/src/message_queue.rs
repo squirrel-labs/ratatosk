@@ -1,5 +1,5 @@
 use crate::mem::{atomic_read_u8, MESSAGE_QUEUE, MESSAGE_QUEUE_ELEMENT_COUNT};
-use rask_engine::events::{KeyModifier, MouseEvent};
+use rask_engine::events::{Event, KeyModifier, MouseEvent};
 
 #[repr(C, u32)]
 #[derive(Debug, Clone)]
@@ -8,18 +8,26 @@ pub enum Message {
     None,
     KeyDown(KeyModifier, u32), // 1
     KeyUp(KeyModifier, u32),
-    KeyPress(u16),
-    TextInput(bool),
-    MouseDown(MouseEvent), //5
+    KeyPress(u32, u16),
+    MouseDown(MouseEvent) = 5, //5
     MouseUp(MouseEvent),
     ResquestAlloc { id: u32, size: u32 }, //7
-    ResourcePush { id: u32 },
+    ResourcePush(u32),                    // id
 }
 
 impl Default for Message {
     fn default() -> Self {
         Message::None
     }
+}
+
+#[repr(C, u32)]
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum Outbound {
+    RescourceAlloc { id: u32, ptr: u32 } = 0, // The event ids from 0 to 128 are reserved for server to client communication
+    Textmode(bool),
+    EngineEvent(Event) = 129, // Mark the Message as outbound
 }
 
 #[repr(C, align(32))]

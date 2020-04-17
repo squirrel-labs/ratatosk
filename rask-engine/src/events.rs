@@ -1,15 +1,27 @@
+#![allow(clippy::unreadable_literal)]
 //! this module contains The game input/output event defeniton
 
-#![allow(clippy::unreadable_literal)]
+#[derive(Debug, Clone, Copy)]
 #[repr(u32)]
 pub enum Key {
+    Unknown = 0,
     A = 2335202,
     Enter = 67114680,
 }
 
+impl Key {
+    pub fn from_u8(n: u32) -> Key {
+        unsafe { std::mem::transmute(n) }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub enum Event {
-    KeyDown,
-    KeyUp,
+    KeyDown(KeyModifier, Key),
+    KeyUp(KeyModifier, Key),
+    KeyPress(u16, u16),
+    MouseDown(MouseEvent),
+    MouseUp(MouseEvent),
 }
 
 #[derive(Debug, Clone, Copy)]
