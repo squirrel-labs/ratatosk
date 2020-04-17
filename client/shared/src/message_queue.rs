@@ -8,8 +8,9 @@ pub enum Message {
     KeyUp(KeyModifier, i32),
     KeyPress(u16),
     TextInput(bool),
-    Click { x: i32, y: i32 },
-    ResizeWindow { x: i32, y: i32 },
+    MouseDown(MouseEvent),
+    MouseUp(MouseEvent),
+    ResizeWindow { width: i32, height: i32 },
     ResquestAlloc(i32),
 }
 
@@ -20,6 +21,7 @@ impl Default for Message {
 }
 
 #[derive(Debug, Clone, Copy)]
+#[repr(C)]
 pub struct KeyModifier(u8);
 impl KeyModifier {
     pub fn shift(&self) -> bool {
@@ -36,7 +38,28 @@ impl KeyModifier {
     }
 }
 
-#[repr(C, align(16))]
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct MouseEvent {
+    buttons: u8,
+    pub modifier: KeyModifier,
+    pub x: i32,
+    pub y: i32,
+}
+
+impl MouseEvent {
+    pub fn left_mb(&self) -> bool {
+        self.buttons & 1 == 1
+    }
+    pub fn right_mb(&self) -> bool {
+        self.buttons & (1 << 1) == 1
+    }
+    pub fn middle_mb(&self) -> bool {
+        self.buttons & (1 << 2) == 1
+    }
+}
+
+#[repr(C, align(32))]
 #[derive(Debug)]
 pub struct MessageQueueElement<T: Sized + Clone> {
     writing: u8,
