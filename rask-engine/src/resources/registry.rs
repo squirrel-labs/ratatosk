@@ -4,7 +4,7 @@ macro_rules! parse_resource {
             texture: $val.texture,
             atlas: $val.atlas,
             animation: $val.animation,
-            id: $num
+            id: $num,
         };
     };
     ($num:expr, $name:ident, $variant:ident, $val: expr) => {
@@ -33,7 +33,7 @@ macro_rules! resources {
 pub enum ResourceVariant {
     Texture,
     Character,
-    TextureIds
+    TextureIds,
 }
 
 #[derive(Debug)]

@@ -11,8 +11,14 @@ macro_rules! get_store {
                 self.index_check(id)?;
                 match &self.0[id] {
                     Resource::$enum_type(value) => Ok(&value),
-                    Resource::None => Err(EngineError::ResourceMissing(format!("Could not find requested recource #{}", id))),
-                    _ => Err(EngineError::ResourceType(format!("Wrong resource type, required \"{}\"", stringify!($type)))),
+                    Resource::None => Err(
+                        EngineError::ResourceMissing(
+                            format!("Could not find requested recource #{}", id
+                    ))),
+                    _ => Err(
+                        EngineError::ResourceType(
+                            format!("Wrong resource type, required \"{}\"", stringify!($type)
+                    ))),
                 }
             }
             unsafe fn store(&mut self, data: $type, id: usize) -> Result<(), EngineError> {
