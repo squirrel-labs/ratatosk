@@ -84,6 +84,13 @@ pub fn get_double_buffer() -> &'static mut Buffer {
     unsafe { &mut *(DOUBLE_BUFFER as *mut Buffer) }
 }
 
+#[repr(C)]
+pub struct GameState {
+    pub player_x: i32,
+    pub player_y: i32,
+    pub player_state: i32,
+}
+
 #[repr(align(4))]
 #[repr(C)]
 pub struct SynchronizationMemory {
@@ -91,6 +98,8 @@ pub struct SynchronizationMemory {
     pub elapsed_ms: i32,
     pub mouse_x: i32,
     pub mouse_y: i32,
+    pub player: GameState,
+    pub other: GameState,
     last_elapsed_ms: i32,
 }
 

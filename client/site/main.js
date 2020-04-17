@@ -5,8 +5,16 @@ const SYNCHRONIZATION_MEMORY = memoryParameters.sync_area / 4;
 const MESSAGE_QUEUE = memoryParameters.queue_start;
 const MESSAGE_ITEM_SIZE = 32;
 const MESSAGE_QUEUE_LENGTH = memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
+const WS_URL = "wss://rask.rocks/api"
+let params = new URLSearchParams(document.location.search.substring(1));
+//let token = params.get("token");
+let token = 42;
 let workers = [];
 let memory;  // global for debugging
+let ws = new WebSocket(WS_URL, token);
+ws.binaryType = 'arraybuffer';
+let connected = false
+
 let mousex = 0;
 let mousey = 0;
 
@@ -126,6 +134,7 @@ let canvas = createCanvas();
 if (canvas === undefined) throw Error('canvas creation failed');
 memory = generateMemory();
 let memoryView32 = new Int32Array(memory.buffer);
+let memoryViewU32 = new Uint32Array(memory.buffer);
 let memoryView8 = new Int8Array(memory.buffer);
 
 spawnModules(canvas, memory);
@@ -136,14 +145,50 @@ function wakeUpAt(addr) {
 
 const START_TIME = Date.now();
 async function wakeLogic() {
+    if (connected) {
+        let x = new UInt32Array(4);
+        x[0] = 128;
+        x[1] = Atomics.read(memoryView32, SYNCHRONIZATION_MEMORY + 3);
+        x[2] = Atomics.read(memoryView32, SYNCHRONIZATION_MEMORY + 4);
+        x[3] = Atomics.read(memoryView32, SYNCHRONIZATION_MEMORY + 5);
+        ws.post(x.buffer);
+    }
+
     Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, Date.now() - START_TIME);
     Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 1, Math.floor(mousex));
     Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 2, Math.floor(mousey));
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
 }
 
-const KEYDOWN = 0x0101;
-const KEYUP   = 0x0102;
+function upload_resource(data) {
+
+}
+
+function setup_ws() {
+    ws.addEventListener('open',  () => {
+        add_text('ws connection to ' + WS_URL + 'established');
+        connected = true;
+    });
+    ws.addEventListener('error', event => {
+        add_text('ws error occured: "' + event + '"');
+        connected = false;
+    });
+    ws.addEventListener('close', event => {
+        add_text('ws is closed now: ' + event);
+        connected = false;
+    });
+    ws.addEventListener('message', event => {
+        let data = new UInt32Array(event.data.buffer);
+        let type = data[0] & 255;
+        if (type == 10) {
+            upload_resource(data);
+        } else if (type == 11) {
+            Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 6, data[1]);
+            Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 7, data[2]);
+            Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 8, data[3]);
+        }
+    });
+}
 
 String.prototype.hashCode = function() {
     var hash = 0;
