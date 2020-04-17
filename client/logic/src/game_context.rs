@@ -1,3 +1,4 @@
+use rask_engine::events::Event;
 use rask_engine::resources::{registry, GetStore, ResourceTable, Texture, TextureIds};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
@@ -25,12 +26,21 @@ impl GameContext {
             let mut resource_table =
                 ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT);
             resource_table.clear();
-            resource_table.store(Texture::from_png_stream(IMAGE1_DATA)?, registry::IMAGE1.id as usize)?;
-            resource_table.store(Texture::from_png_stream(IMAGE2_DATA)?, registry::IMAGE2.id as usize)?;
-            resource_table.store(TextureIds {
+            resource_table.store(
+                Texture::from_png_stream(IMAGE1_DATA)?,
+                registry::IMAGE1.id as usize,
+            )?;
+            resource_table.store(
+                Texture::from_png_stream(IMAGE2_DATA)?,
+                registry::IMAGE2.id as usize,
+            )?;
+            resource_table.store(
+                TextureIds {
                     reset_notify: 1,
-                    ids: vec![registry::IMAGE1.id, registry::IMAGE2.id]
-                }, registry::USED_TEXTURE_IDS.id as usize)?;
+                    ids: vec![registry::IMAGE1.id, registry::IMAGE2.id],
+                },
+                registry::USED_TEXTURE_IDS.id as usize,
+            )?;
             resource_table
         };
         Ok(Self {
@@ -60,10 +70,18 @@ impl GameContext {
                 break;
             }
             log::info!("{:?}", msg);
+            GameContext::handle_message(msg: Message)?;
         }
 
         self.push_state()?;
         self.tick_nr += 1;
         Ok(())
+    }
+    fn handle_message(message: Message) -> Result<Option<rask_engine::events::Event>, ClientError> {
+        match message {
+            Message::KeyDown(modifier, hash) => Ok(Some(Event::KeyDown)),
+            Message::KeyUp(modifier, hash) => Ok(Some(Event::KeyDown)),
+            _ => Err(ClientError::EngineError("Unknown Message Type".into())),
+        }
     }
 }

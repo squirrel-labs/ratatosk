@@ -1,61 +1,24 @@
 use crate::mem::{atomic_read_u8, MESSAGE_QUEUE, MESSAGE_QUEUE_ELEMENT_COUNT};
+use rask_engine::events::{KeyModifier, MouseEvent};
 
 #[repr(C, u32)]
 #[derive(Debug, Clone)]
+#[non_exhaustive]
 pub enum Message {
     None,
-    KeyDown(KeyModifier, i32),
-    KeyUp(KeyModifier, i32),
+    KeyDown(KeyModifier, u32), // 1
+    KeyUp(KeyModifier, u32),
     KeyPress(u16),
     TextInput(bool),
-    MouseDown(MouseEvent),
+    MouseDown(MouseEvent), //5
     MouseUp(MouseEvent),
-    ResizeWindow { width: i32, height: i32 },
-    ResquestAlloc(i32),
+    ResquestAlloc { id: u32, size: u32 }, //7
+    ResourcePush { id: u32 },
 }
 
 impl Default for Message {
     fn default() -> Self {
         Message::None
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-#[repr(C)]
-pub struct KeyModifier(u8);
-impl KeyModifier {
-    pub fn shift(&self) -> bool {
-        self.0 & 1 == 1
-    }
-    pub fn control(&self) -> bool {
-        self.0 & (1 << 1) == 1
-    }
-    pub fn alt(&self) -> bool {
-        self.0 & (1 << 2) == 1
-    }
-    pub fn meta(&self) -> bool {
-        self.0 & (1 << 3) == 1
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-#[repr(C)]
-pub struct MouseEvent {
-    buttons: u8,
-    pub modifier: KeyModifier,
-    pub x: i32,
-    pub y: i32,
-}
-
-impl MouseEvent {
-    pub fn left_mb(&self) -> bool {
-        self.buttons & 1 == 1
-    }
-    pub fn right_mb(&self) -> bool {
-        self.buttons & (1 << 1) == 1
-    }
-    pub fn middle_mb(&self) -> bool {
-        self.buttons & (1 << 2) == 1
     }
 }
 

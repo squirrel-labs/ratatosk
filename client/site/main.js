@@ -6,6 +6,10 @@ const MESSAGE_QUEUE = memoryParameters.queue_start;
 const MESSAGE_ITEM_SIZE = 32;
 const MESSAGE_QUEUE_LENGTH = memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
 const WS_URL = "wss://rask.rocks/api"
+const SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
+const SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
+const SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
+const SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
 let params = new URLSearchParams(document.location.search.substring(1));
 //let token = params.get("token");
 let token = 42;
@@ -148,20 +152,22 @@ async function wakeLogic() {
     if (connected) {
         let x = new UInt32Array(4);
         x[0] = 128;
-        x[1] = Atomics.read(memoryView32, SYNCHRONIZATION_MEMORY + 3);
-        x[2] = Atomics.read(memoryView32, SYNCHRONIZATION_MEMORY + 4);
-        x[3] = Atomics.read(memoryView32, SYNCHRONIZATION_MEMORY + 5);
+        x[1] = Atomics.read(memoryView32, SYNC_PLAYER_STATE);
+        x[2] = Atomics.read(memoryView32, SYNC_PLAYER_STATE + 1);
+        x[3] = Atomics.read(memoryView32, SYNC_PLAYER_STATE + 2);
         ws.post(x.buffer);
     }
 
     Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, Date.now() - START_TIME);
-    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 1, Math.floor(mousex));
-    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 2, Math.floor(mousey));
+    Atomics.store(memoryView32, SYNC_MOUSE, Math.floor(mousex));
+    Atomics.store(memoryView32, SYNC_MOUSE + 1, Math.floor(mousey));
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
 }
 
+resource_map = new Map();
 function upload_resource(data) {
-
+    resource_map.set(data[0] & 0xff00, data)
+    queue.write_i32(7, data.length);
 }
 
 function setup_ws() {
@@ -183,9 +189,9 @@ function setup_ws() {
         if (type == 10) {
             upload_resource(data);
         } else if (type == 11) {
-            Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 6, data[1]);
-            Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 7, data[2]);
-            Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 8, data[3]);
+            Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
+            Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);
+            Atomics.store(memoryView32, SYNC_OTHER_STATE + 2, data[3]);
         }
     });
 }
@@ -240,7 +246,8 @@ window.addEventListener('mouseup', e => {
 });
 
 window.addEventListener('resize', () => {
-    queue.write_i32([7, window.innerWidth, window.innerHeight]);
+    Atomics.store(memoryView32, SYNC_CANVAS_SIZE, window.innerWidth);
+    Atomics.store(memoryView32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
 });
 
 window.setInterval(wakeLogic, 50);

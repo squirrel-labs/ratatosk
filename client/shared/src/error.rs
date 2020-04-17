@@ -52,6 +52,15 @@ impl std::fmt::Display for ClientError {
         }
     }
 }
+macro_rules! derive_from {
+    ($type:ty, $kind:ident) => {
+        impl From<$type> for EngineError {
+            fn from(error: $type) -> Self {
+                ClientError::$kind(format!("{}", error))
+            }
+        }
+    };
+}
 
 impl From<JsValue> for ClientError {
     fn from(error: JsValue) -> Self {

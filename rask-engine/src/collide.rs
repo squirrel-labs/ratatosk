@@ -30,7 +30,7 @@ impl Collide for Projection {
     }
 }
 
-fn project(rbox: &RBox, axis: &Vec2) -> Projection {
+fn project(rbox: &RBox, axis: Vec2) -> Projection {
     // the vertices of rbox without rbox.pos
     let vertices = [
         rbox.pos + rbox.v1,
@@ -103,7 +103,6 @@ fn collide_aabox_rbox_segment(
 }
 
 impl Collide for Vec2 {
-    #[inline]
     fn collides(&self, other: &Self) -> bool {
         self == other
     }
@@ -153,9 +152,9 @@ impl Collide for AABox {
 
 impl Collide<Vec2> for RBox {
     fn collides(&self, other: &Vec2) -> bool {
-        let v1_proj = project(self, &self.v1);
+        let v1_proj = project(self, self.v1);
         let p1 = other.dot(self.v1);
-        let v2_proj = project(self, &self.v2);
+        let v2_proj = project(self, self.v2);
         let p2 = other.dot(self.v2);
         v1_proj.min <= p1 && v1_proj.max >= p1 && v2_proj.min <= p2 && v2_proj.max >= p2
     }
@@ -197,7 +196,7 @@ impl Collide for RBox {
         // TODO: optimization: remove duplicate axes
         let axes = [self.v1, self.v2, other.v1, other.v2];
         axes.iter()
-            .all(|axis| project(self, axis).collides(&project(other, axis)))
+            .all(|axis| project(self, *axis).collides(&project(other, *axis)))
     }
 }
 
@@ -208,7 +207,6 @@ impl<S, T: Collide<S>> Collide<S> for [T] {
 }
 
 impl<S, T: Collide<S>> Collide<[T]> for S {
-    #[inline]
     fn collides(&self, other: &[T]) -> bool {
         other.collides(self)
     }
