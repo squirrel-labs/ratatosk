@@ -293,6 +293,7 @@ impl GraphicsApi for WebGl {
 
     #[allow(unused_must_use)]
     fn draw_rect(&self, mat: &Mat3, tex: TextureId) -> Result<Option<()>, ClientError> {
+        log::debug!("r: {:?}", self.bind_texture(tex));
         if self.bind_texture(tex)?.is_none() {
             return Ok(None);
         }
@@ -322,16 +323,12 @@ impl WebGl {
     }
 
     fn bind_texture(&self, tex: TextureId) -> Result<Option<()>, ClientError> {
-        log::debug!("bind tex: {:?}, {:?}", tex, &self.texture_handles);
-        Ok(match self
+        Ok(self
             .texture_handles
             .get(tex as usize)
-            .ok_or_else(|| {
-                ClientError::ResourceError(format!("texture #{} is out of bounds", tex))
-            })? {
-                Some(ref tex) => Some(tex.bind(&self.gl)),
-                None => Some(())
-        })
+            .cloned().flatten()
+            .map(|tex| tex.bind(&self.gl))
+        )
     }
 
     fn create_program(gl: &Gl2) -> Result<Program, ClientError> {
