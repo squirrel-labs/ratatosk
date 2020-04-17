@@ -1,13 +1,13 @@
 use crate::context::RESOURCE_TABLE;
 use crate::graphics::GraphicsApi;
-use rask_engine::resources::GetStore;
+use rask_engine::resources::{registry, GetStore, TextureIds};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
 
 pub struct Render<T> {
     graphics: T,
-    texture_count: u32,
     frame_nr: u64,
+    used_texture_ids: Vec<u32>,
 }
 
 impl<T: GraphicsApi> Render<T> {
@@ -15,8 +15,8 @@ impl<T: GraphicsApi> Render<T> {
         let factor = rask_engine::math::vec2::Vec2::new(0.2, 0.2);
         T::new(canvas, factor).map(|api| Self {
             graphics: api,
-            texture_count: 0,
             frame_nr: 0,
+            used_texture_ids: vec![]
         })
     }
 
@@ -33,22 +33,45 @@ impl<T: GraphicsApi> Render<T> {
 
     pub fn upload_texture(&mut self, id: u32) -> Result<(), ClientError> {
         let texture = unsafe { RESOURCE_TABLE.get(id as usize)? };
+        self.graphics.resize_texture_pool(id + 1)?;
         self.graphics.upload_texture(texture, id)?;
-        self.texture_count += 1;
+        if !self.used_texture_ids.contains(&id) {
+            self.used_texture_ids.push(id)
+        }
+        Ok(())
+    }
+
+    pub fn unload_texture(&mut self, id: u32) -> Result<(), ClientError> {
+        let texture = unsafe { RESOURCE_TABLE.get(id as usize)? };
+        self.graphics.resize_texture_pool(id + 1)?;
+        self.graphics.upload_texture(texture, id)?;
+        Ok(())
+    }
+
+    pub fn reset_textures(&mut self, used_textures: &TextureIds) -> Result<(), ClientError> {
+        for texture in self.used_texture_ids.clone().iter() {
+            if !used_textures.ids.contains(texture) {
+                self.unload_texture(*texture);
+                self.used_texture_ids.swap_remove(*texture as usize);
+            }
+        }
+        unsafe { *(used_textures.reset_notify as *mut u8) = 0 };
         Ok(())
     }
 
     pub fn draw_sprites(&mut self) -> Result<bool, ClientError> {
+        let used_textures: &TextureIds = unsafe { RESOURCE_TABLE.get(registry::USED_TEXTURE_IDS.id as usize)? };
+        if used_textures.reset_notify >= 0 {
+            self.reset_textures(used_textures);
+        }
         if let Some(state) = get_double_buffer().borrow_reader() {
-            let sprites = state.get().sprites();
-            self.graphics.resize_texture_pool(sprites.len() as u32)?;
-            self.texture_count = 0;
+            let state = state.get();
+            let sprites = state.sprites();
             for sprite in sprites {
-                self.upload_texture(sprite.tex_id)?;
-                if self.texture_count < 2 {
+                if self.graphics.draw_rect(&sprite.transform, sprite.tex_id)?.is_none() {
                     self.upload_texture(sprite.tex_id)?;
+                    self.graphics.draw_rect(&sprite.transform, sprite.tex_id)?.unwrap();
                 }
-                self.graphics.draw_rect(&sprite.transform, sprite.tex_id)?;
             }
             Ok(true)
         } else {

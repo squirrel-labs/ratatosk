@@ -20,6 +20,7 @@ fn test() {
 */
 
 mod library;
+pub mod registry;
 pub mod sound;
 pub mod texture;
 
@@ -28,11 +29,12 @@ pub use library::*;
 #[doc(inline)]
 pub use sound::Sound;
 #[doc(inline)]
-pub use texture::Texture;
+pub use texture::{Texture, TextureIds};
 
 pub enum Resource {
     None,
     Texture(Texture),
+    TextureIds(TextureIds),
     Sound(Sound),
     Skeleton(spine::skeleton::Skeleton),
 }

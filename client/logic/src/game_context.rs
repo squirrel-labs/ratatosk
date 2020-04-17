@@ -1,4 +1,4 @@
-use rask_engine::resources::{GetStore, ResourceTable, Texture};
+use rask_engine::resources::{registry, GetStore, ResourceTable, Texture, TextureIds};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
 use rask_wasm_shared::mem::{RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT};
@@ -25,8 +25,12 @@ impl GameContext {
             let mut resource_table =
                 ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT);
             resource_table.clear();
-            resource_table.store(Texture::from_png_stream(IMAGE1_DATA)?, 0)?;
-            resource_table.store(Texture::from_png_stream(IMAGE2_DATA)?, 1)?;
+            resource_table.store(Texture::from_png_stream(IMAGE1_DATA)?, registry::IMAGE1.id as usize)?;
+            resource_table.store(Texture::from_png_stream(IMAGE2_DATA)?, registry::IMAGE2.id as usize)?;
+            resource_table.store(TextureIds {
+                    reset_notify: 1,
+                    ids: vec![registry::IMAGE1.id, registry::IMAGE2.id]
+                }, registry::USED_TEXTURE_IDS.id as usize)?;
             resource_table
         };
         Ok(Self {

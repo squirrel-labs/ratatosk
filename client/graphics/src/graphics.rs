@@ -68,10 +68,10 @@ pub trait GraphicsApi: Sized {
 
     fn start_frame(&mut self, color: &[f32; 3]) -> Result<(), ClientError>;
     fn end_frame(&self) -> Result<(), ClientError>;
-    fn draw_rect(&self, mat: &Mat3, tex: u32) -> Result<(), ClientError>;
+    fn draw_rect(&self, mat: &Mat3, tex: u32) -> Result<Option<()>, ClientError>;
     fn upload_texture(&mut self, texture: &Texture, n: u32) -> Result<(), ClientError>;
+    fn unload_texture(&mut self, id: u32) -> Result<(), ClientError>;
     fn resize_texture_pool(&mut self, n: u32) -> Result<(), ClientError>;
-    fn grow_texture_pool(&mut self, n: u32) -> Result<(), ClientError>;
     fn ok(&self) -> Result<(), Self::GraphicsError>;
 }
 
@@ -250,18 +250,25 @@ impl GraphicsApi for WebGl {
         Ok(())
     }
 
+    fn unload_texture(&mut self, id: u32) -> Result<(), ClientError> {
+        let err = || ClientError::ResourceError(
+            format!("Tried to unload non-existent texture #{}", id)
+        );
+        let texture = self.texture_handles.get_mut(id as usize).ok_or_else(err)?;
+        if let Some(texture) = texture {
+            texture.delete(&self.gl);
+        } else {
+            return Err(err());
+        }
+        Ok(*texture = None)
+    }
+
     fn resize_texture_pool(&mut self, n: u32) -> Result<(), ClientError> {
         let n = n as usize;
         if self.texture_handles.len() < n {
             self.texture_handles.resize(n, None)
         }
         Ok(())
-    }
-
-    fn grow_texture_pool(&mut self, n: u32) -> Result<(), ClientError> {
-        Ok(self
-            .texture_handles
-            .resize(self.texture_handles.len() + n as usize, None))
     }
 
     fn ok(&self) -> Result<(), Self::GraphicsError> {
@@ -285,9 +292,11 @@ impl GraphicsApi for WebGl {
     }
 
     #[allow(unused_must_use)]
-    fn draw_rect(&self, mat: &Mat3, tex: TextureId) -> Result<(), ClientError> {
-        self.bind_texture(tex);
-        self.draw_rect_notexture(mat)
+    fn draw_rect(&self, mat: &Mat3, tex: TextureId) -> Result<Option<()>, ClientError> {
+        if self.bind_texture(tex)?.is_none() {
+            return Ok(None);
+        }
+        self.draw_rect_notexture(mat).map(|v| Some(v))
     }
 }
 
@@ -312,16 +321,17 @@ impl WebGl {
         Ok((vao, vbo))
     }
 
-    fn bind_texture(&self, tex: TextureId) -> Result<(), ClientError> {
-        Ok(self
+    fn bind_texture(&self, tex: TextureId) -> Result<Option<()>, ClientError> {
+        log::debug!("bind tex: {:?}, {:?}", tex, &self.texture_handles);
+        Ok(match self
             .texture_handles
             .get(tex as usize)
             .ok_or_else(|| {
                 ClientError::ResourceError(format!("texture #{} is out of bounds", tex))
-            })?
-            .as_ref()
-            .ok_or_else(|| ClientError::ResourceError(format!("could not get texture #{}", tex)))?
-            .bind(&self.gl))
+            })? {
+                Some(ref tex) => Some(tex.bind(&self.gl)),
+                None => Some(())
+        })
     }
 
     fn create_program(gl: &Gl2) -> Result<Program, ClientError> {
@@ -366,7 +376,7 @@ impl WebGl {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct WebGlApiTexture(web_sys::WebGlTexture);
 
 impl WebGlApiTexture {
@@ -388,5 +398,9 @@ impl WebGlApiTexture {
             Some(&self.0),
             0,
         )
+    }
+
+    pub fn delete(&self, gl: &Gl2) {
+        gl.delete_texture(Some(&self.0))
     }
 }
