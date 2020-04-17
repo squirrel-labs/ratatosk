@@ -14,6 +14,11 @@ pub struct Texture {
     color_type: ColorType,
 }
 
+pub struct TextureIds {
+    pub reset_notify: u8,
+    pub ids: Vec<u32>,
+}
+
 impl Texture {
     pub fn from_png_stream<R: std::io::Read>(r: R) -> Result<Self, EngineError> {
         let decoder = PngDecoder::new(r)?;

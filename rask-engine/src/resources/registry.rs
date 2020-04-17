@@ -32,9 +32,8 @@ macro_rules! resources {
 #[derive(Debug)]
 pub enum ResourceVariant {
     Texture,
-    Misupilami,
     Character,
-    Othertype
+    TextureIds
 }
 
 #[derive(Debug)]
@@ -58,24 +57,13 @@ pub struct CharacterInfo {
     pub id: u32,
 }
 
-resources!{
-    (BIRD1,     Texture,      "/path"         ),
-    (BIRD5,     Texture,      "../conf.conf"  ),
-    (BIRDC,     Misupilami,   "/jungle"       ),
-    (WIZO,      Character,    Character {
-                  texture:   "textur.png",
-                  atlas:     "atlas.atlas",
-                  animation: "animation.anim"
-    }                                         ),
-    (_SCHMOCK,  Texture,     "bam.jpg"        ),
-    (BIRD2,     Othertype,   "boringfile.js"  )
-}
-
-fn main() {
-    println!("{:?}", BIRD1);
-    println!("{:?}", BIRD5);
-    println!("{:?}", BIRDC);
-    println!("{:?}", WIZO);
-    println!("{:?}", _SCHMOCK);
-    println!("{:?}", BIRD2);
+resources! {
+    (IMAGE1,            Texture,        "see game_context.rs"    ),
+    (IMAGE2,            Texture,        "see game_context.rs"    ),
+    (UNUSED,            Character,      Character {
+                          texture:   "textur.png",
+                          atlas:     "atlas.atlas",
+                          animation: "animation.anim"
+    }                                                            ),
+    (USED_TEXTURE_IDS,  TextureIds,     ""                       )
 }

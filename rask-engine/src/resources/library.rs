@@ -71,3 +71,4 @@ impl ResourceTable {
 get_store!(super::Texture, Texture);
 get_store!(spine::skeleton::Skeleton, Skeleton);
 get_store!(super::Sound, Sound);
+get_store!(super::TextureIds, TextureIds);
