@@ -240,6 +240,7 @@ window.addEventListener('mouseup', e => {
 });
 
 window.addEventListener('resize', () => {
+    oncanvas();
     queue.write_i32([7, window.innerWidth, window.innerHeight]);
 });
 
