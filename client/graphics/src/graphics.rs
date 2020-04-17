@@ -293,7 +293,6 @@ impl GraphicsApi for WebGl {
 
     #[allow(unused_must_use)]
     fn draw_rect(&self, mat: &Mat3, tex: TextureId) -> Result<Option<()>, ClientError> {
-        log::debug!("r: {:?}", self.bind_texture(tex));
         if self.bind_texture(tex)?.is_none() {
             return Ok(None);
         }
@@ -367,7 +366,6 @@ impl WebGl {
     fn draw_rect_notexture(&self, mat: &Mat3) -> Result<(), ClientError> {
         self.prog.upload_fransformation(&self.gl, mat);
         self.prog.upload_texture_id(&self.gl, 0);
-        // TODO Fix self.gl.vertex_attrib2fv_with_f32_array(1, &[pos.x(), pos.y()]);
         self.gl.draw_arrays(Gl2::TRIANGLES, 0, 6);
         Ok(())
     }
