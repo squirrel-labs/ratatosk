@@ -85,9 +85,6 @@ impl GameContext {
 
         self.state.sprites_mut()[1].transform =
             rask_engine::math::Mat3::rotation(0.02) * self.state.sprites_mut()[1].transform;
-        // self.worker_scope
-        //     .post_message(&wasm_bindgen::JsValue::NULL)
-        //     .unwrap();
 
         self.push_state()?;
         self.tick_nr += 1;
