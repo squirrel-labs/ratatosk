@@ -1,4 +1,4 @@
-use crate::mem::{atomic_read_u8, atomic_write_u8, MESSAGE_QUEUE, MESSAGE_QUEUE_ELEMENT_COUNT};
+use crate::mem::{atomic_read_u8, MESSAGE_QUEUE, MESSAGE_QUEUE_ELEMENT_COUNT};
 
 #[repr(C, u32)]
 #[derive(Debug, Clone)]
@@ -107,15 +107,8 @@ impl MessageQueueReader {
 
     pub fn pop<T: Sized + Clone + Default + std::fmt::Debug>(&mut self) -> T {
         loop {
-            let i = self.reader_index;
             let e = unsafe { self.get_mut(self.reader_index as usize).unwrap() };
-            /*log::info!(
-                "bytes are  {:?}\nreading at: {}",
-                unsafe {
-                    std::slice::from_raw_parts_mut(e as *mut MessageQueueElement<_> as *mut u8, 16)
-                },
-                i
-            );*/
+            //log::info!("bytes are  {:?}", unsafe {std::slice::from_raw_parts_mut(e as *mut MessageQueueElement<_> as *mut u8, 16)});
             let e = e.read();
             if let Some(n) = e.clone() {
                 if std::mem::discriminant(&T::default()) == std::mem::discriminant(&n) {
