@@ -6,6 +6,7 @@ use spine::skeleton::{
     animation::{SkinAnimation, Sprite as SpriteState, Sprites as SpriteStates},
     Skeleton, SRT,
 };
+use std::convert::TryInto;
 
 use std::collections::HashMap;
 use std::io::Read;
@@ -142,4 +143,19 @@ impl Character {
             &self.atlas,
         ))
     }
+    pub fn from_u8(data: &[u8]) -> Result<Self, EngineError> {
+        let tex_data = u32::from_le_bytes(pop(data)?) as usize;
+        let atlas_data = u32::from_le_bytes(pop(&(data[4..8]))?) as usize;
+        let animation_data = u32::from_le_bytes(pop(&(data[8..12]))?) as usize;
+        let texture = Texture::from_png_stream(&data[0..tex_data]);
+        let atlas = spine::atlas::Atlas::from_reader(&data[tex_data..atlas_data]);
+        let skeleton =
+            spine::skeleton::Skeleton::from_reader(&data[(tex_data + atlas_data)..animation_data]);
+        Character::new(texture?, skeleton?, atlas?)
+    }
+}
+fn pop(barry: &[u8]) -> Result<[u8; 4], EngineError> {
+    barry
+        .try_into()
+        .map_err(|_| EngineError::ResourceFormat("invalid index in charakter binary".into()))
 }

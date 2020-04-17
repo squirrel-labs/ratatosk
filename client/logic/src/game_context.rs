@@ -127,9 +127,30 @@ impl GameContext {
                 Ok(None)
             }
             Message::ResourcePush(id) => {
-                let _ = self.get_buffer(id);
-                self.dealloc_buffer(id);
-                Ok(None)
+                if let Some(data) = self.get_buffer(id) {
+                    match data[0] as u32 | (data[1] as u32) << 8 {
+                        2 => {
+                            let img = rask_engine::resources::Texture::from_png_stream(&data[4..])?;
+                            unsafe { self.resource_table.store(img, id as usize) };
+                        }
+                        3 => {
+                            let chr = rask_engine::resources::Character::from_u8(&data[4..])?;
+                            unsafe { self.resource_table.store(chr, id as usize) };
+                        }
+                        _ => {
+                            self.dealloc_buffer(id);
+                            return Err(ClientError::ResourceError(
+                                "unknown RescorceType while parsing".into(),
+                            ));
+                        }
+                    }
+                    self.dealloc_buffer(id);
+                    Ok(None)
+                } else {
+                    Err(ClientError::ResourceError(
+                        "Requested Buffer not allocated".into(),
+                    ))
+                }
             }
             _ => Err(ClientError::EngineError("Unknown Message Type".into())),
         }

@@ -43,3 +43,4 @@ derive_from!(&str, Misc);
 derive_from!(String, Misc);
 derive_from!(image::error::ImageError, ResourceType);
 derive_from!(spine::skeleton::error::SkeletonError, ResourceFormat);
+derive_from!(spine::atlas::AtlasError, ResourceFormat);
