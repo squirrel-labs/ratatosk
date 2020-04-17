@@ -322,16 +322,12 @@ impl WebGl {
     }
 
     fn bind_texture(&self, tex: TextureId) -> Result<Option<()>, ClientError> {
-        log::debug!("bind tex: {:?}, {:?}", tex, &self.texture_handles);
-        Ok(match self
+        Ok(self
             .texture_handles
             .get(tex as usize)
-            .ok_or_else(|| {
-                ClientError::ResourceError(format!("texture #{} is out of bounds", tex))
-            })? {
-                Some(ref tex) => Some(tex.bind(&self.gl)),
-                None => Some(())
-        })
+            .cloned().flatten()
+            .map(|tex| tex.bind(&self.gl))
+        )
     }
 
     fn create_program(gl: &Gl2) -> Result<Program, ClientError> {
@@ -370,7 +366,6 @@ impl WebGl {
     fn draw_rect_notexture(&self, mat: &Mat3) -> Result<(), ClientError> {
         self.prog.upload_fransformation(&self.gl, mat);
         self.prog.upload_texture_id(&self.gl, 0);
-        // TODO Fix self.gl.vertex_attrib2fv_with_f32_array(1, &[pos.x(), pos.y()]);
         self.gl.draw_arrays(Gl2::TRIANGLES, 0, 6);
         Ok(())
     }

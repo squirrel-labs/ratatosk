@@ -73,6 +73,8 @@ impl GameContext {
             GameContext::handle_message(msg: Message)?;
         }
 
+        self.state.sprites_mut()[1].transform = rask_engine::math::Mat3::rotation(0.02) * self.state.sprites_mut()[1].transform;
+
         self.push_state()?;
         self.tick_nr += 1;
         Ok(())
