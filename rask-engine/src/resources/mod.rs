@@ -20,15 +20,15 @@ fn test() {
 */
 
 pub mod character;
-mod library;
 pub mod registry;
+mod resource_table;
 pub mod sound;
 pub mod texture;
 
 #[doc(inline)]
-pub use library::*;
-#[doc(inline)]
 pub use character::Character;
+#[doc(inline)]
+pub use resource_table::{GetStore, ResourceTable};
 #[doc(inline)]
 pub use sound::Sound;
 #[doc(inline)]
@@ -40,5 +40,4 @@ pub enum Resource {
     Texture(Texture),
     TextureIds(TextureIds),
     Sound(Sound),
-    Skeleton(spine::skeleton::Skeleton),
 }

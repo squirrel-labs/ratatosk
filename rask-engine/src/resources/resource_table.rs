@@ -4,6 +4,12 @@ use crate::EngineError;
 /// The library is used to store and retrieve resources.
 pub struct ResourceTable(&'static mut [Resource]);
 
+macro_rules! character_check_helper {
+    (Texture, $value: ident) => {
+        return Ok($value.texture());
+    };
+    ($enum_type: ident, $value: ident) => {};
+}
 macro_rules! get_store {
     ($type: ty, $enum_type: ident) => {
         impl GetStore<$type> for ResourceTable {
@@ -11,14 +17,22 @@ macro_rules! get_store {
                 self.index_check(id)?;
                 match &self.0[id] {
                     Resource::$enum_type(value) => Ok(&value),
-                    Resource::None => Err(
-                        EngineError::ResourceMissing(
-                            format!("Could not find requested recource #{}", id
+                    Resource::None => Err(EngineError::ResourceMissing(format!(
+                        "Could not find requested recource #{}",
+                        id
                     ))),
-                    _ => Err(
-                        EngineError::ResourceType(
-                            format!("Wrong resource type, required \"{}\"", stringify!($type)
-                    ))),
+                    res => {
+                        #[allow(unused_variables)]
+                        {
+                            if let Resource::Character(value) = res {
+                                character_check_helper!($enum_type, value);
+                            }
+                        }
+                        Err(EngineError::ResourceType(format!(
+                            "Wrong resource type, required \"{}\"",
+                            stringify!($type)
+                        )))
+                    }
                 }
             }
             unsafe fn store(&mut self, data: $type, id: usize) -> Result<(), EngineError> {
@@ -76,6 +90,5 @@ impl ResourceTable {
 }
 
 get_store!(super::Texture, Texture);
-get_store!(spine::skeleton::Skeleton, Skeleton);
 get_store!(super::Sound, Sound);
 get_store!(super::TextureIds, TextureIds);

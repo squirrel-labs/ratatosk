@@ -16,7 +16,7 @@ impl<T: GraphicsApi> Render<T> {
         T::new(canvas, factor).map(|api| Self {
             graphics: api,
             frame_nr: 0,
-            used_texture_ids: vec![]
+            used_texture_ids: vec![],
         })
     }
 
@@ -61,7 +61,9 @@ impl<T: GraphicsApi> Render<T> {
 
     pub fn draw_sprites(&mut self) -> Result<bool, ClientError> {
         let used_textures = unsafe { RESOURCE_TABLE.get(registry::USED_TEXTURE_IDS.id as usize) };
-        if let Err(rask_engine::EngineError::ResourceMissing(_)) = used_textures { return Ok(true); }
+        if let Err(rask_engine::EngineError::ResourceMissing(_)) = used_textures {
+            return Ok(true);
+        }
         let used_textures: &TextureIds = used_textures?;
         if used_textures.reset_notify >= 0 {
             self.reset_textures(used_textures);
@@ -70,9 +72,15 @@ impl<T: GraphicsApi> Render<T> {
             let state = state.get();
             let sprites = state.sprites();
             for sprite in sprites {
-                if self.graphics.draw_rect(&sprite.transform, sprite.tex_id)?.is_none() {
+                if self
+                    .graphics
+                    .draw_rect(&sprite.transform, sprite.tex_id)?
+                    .is_none()
+                {
                     self.upload_texture(sprite.tex_id)?;
-                    self.graphics.draw_rect(&sprite.transform, sprite.tex_id)?.unwrap();
+                    self.graphics
+                        .draw_rect(&sprite.transform, sprite.tex_id)?
+                        .unwrap();
                 }
             }
             Ok(true)

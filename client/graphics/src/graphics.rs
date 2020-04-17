@@ -251,9 +251,8 @@ impl GraphicsApi for WebGl {
     }
 
     fn unload_texture(&mut self, id: u32) -> Result<(), ClientError> {
-        let err = || ClientError::ResourceError(
-            format!("Tried to unload non-existent texture #{}", id)
-        );
+        let err =
+            || ClientError::ResourceError(format!("Tried to unload non-existent texture #{}", id));
         let texture = self.texture_handles.get_mut(id as usize).ok_or_else(err)?;
         if let Some(texture) = texture {
             texture.delete(&self.gl);
@@ -325,9 +324,9 @@ impl WebGl {
         Ok(self
             .texture_handles
             .get(tex as usize)
-            .cloned().flatten()
-            .map(|tex| tex.bind(&self.gl))
-        )
+            .cloned()
+            .flatten()
+            .map(|tex| tex.bind(&self.gl)))
     }
 
     fn create_program(gl: &Gl2) -> Result<Program, ClientError> {

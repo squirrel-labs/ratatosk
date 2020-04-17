@@ -1,16 +1,14 @@
-use crate::{EngineError, math::Mat3};
-use super::{Texture};
-use spine::skeleton::{Skeleton, SRT,
-                      animation::{
-                          Sprite as SpriteState,
-                          Sprites as SpriteStates,
-                          SkinAnimation,
-}};
+use super::Texture;
+use crate::{math::Mat3, EngineError};
 use spine::atlas::Atlas;
 use spine::atlas::Texture as TextureSegment;
+use spine::skeleton::{
+    animation::{SkinAnimation, Sprite as SpriteState, Sprites as SpriteStates},
+    Skeleton, SRT,
+};
 
-use std::io::Read;
 use std::collections::HashMap;
+use std::io::Read;
 
 struct OwnedSpriteState {
     attachment: String,
@@ -34,11 +32,11 @@ pub struct AnimationStates<'a> {
 }
 
 impl<'a> AnimationStates<'a> {
-    fn new(sprites: std::vec::IntoIter<OwnedSpriteState>, atlas: &'a HashMap<String, TextureSegment>) -> Self {
-        Self {
-            sprites,
-            atlas,
-        }
+    fn new(
+        sprites: std::vec::IntoIter<OwnedSpriteState>,
+        atlas: &'a HashMap<String, TextureSegment>,
+    ) -> Self {
+        Self { sprites, atlas }
     }
 }
 
@@ -51,10 +49,13 @@ impl<'a> Iterator for AnimationStates<'a> {
                 rotated: region.rotate,
                 pos: region.xy,
                 size: region.size,
-                transform: Mat3::from(sprite.srt)
+                transform: Mat3::from(sprite.srt),
             }))
         } else {
-            Some(Err(EngineError::ResourceMissing(format!("Could not get sprite attachment \"{}\"", sprite.attachment))))
+            Some(Err(EngineError::ResourceMissing(format!(
+                "Could not get sprite attachment \"{}\"",
+                sprite.attachment
+            ))))
         }
     }
 }
@@ -66,20 +67,30 @@ pub struct Character {
 }
 
 impl Character {
-    pub fn new<R: Read>(texture: Texture, skeleton: Skeleton, atlas: Atlas<R>) -> Result<Self, EngineError> {
+    pub fn new<R: Read>(
+        texture: Texture,
+        skeleton: Skeleton,
+        atlas: Atlas<R>,
+    ) -> Result<Self, EngineError> {
         let mut segments = HashMap::new();
         for segment in atlas {
-            let segment = segment.map_err(|e| EngineError::ResourceFormat(format!("Could not parse atlas \"{}\"", e)))?;
+            let segment = segment.map_err(|e| {
+                EngineError::ResourceFormat(format!("Could not parse atlas \"{}\"", e))
+            })?;
             segments.insert(segment.name.clone(), segment);
         }
         Ok(Self::from_parts(texture, skeleton, segments))
     }
 
-    pub fn from_parts(texture: Texture, skeleton: Skeleton, atlas: HashMap<String, TextureSegment>) -> Self {
+    pub fn from_parts(
+        texture: Texture,
+        skeleton: Skeleton,
+        atlas: HashMap<String, TextureSegment>,
+    ) -> Self {
         Self {
             texture,
             skeleton,
-            atlas
+            atlas,
         }
     }
 
@@ -107,20 +118,28 @@ impl Character {
         &mut self.atlas
     }
 
-    pub fn interpolate<'a>(&'a self, time: f32, anim_name: &str) -> Result<AnimationStates<'a>, EngineError> {
-        let animated_skin = self.skeleton.get_animated_skin("default", Some(anim_name))?;
+    pub fn interpolate<'a>(
+        &'a self,
+        time: f32,
+        anim_name: &str,
+    ) -> Result<AnimationStates<'a>, EngineError> {
+        let animated_skin = self
+            .skeleton
+            .get_animated_skin("default", Some(anim_name))?;
         Ok(AnimationStates::new(
-                     animated_skin
-                     .interpolate(time)
-                     .ok_or(EngineError::Animation(
-                             format!("Could not interpolate animation at time {}", time
-                     )))?
-                     .map(|s| OwnedSpriteState {
-                         attachment: s.attachment.to_owned(),
-                         srt: s.srt,
-                     })
-                     .collect::<Vec<_>>().into_iter(),
-           &self.atlas
+            animated_skin
+                .interpolate(time)
+                .ok_or(EngineError::Animation(format!(
+                    "Could not interpolate animation at time {}",
+                    time
+                )))?
+                .map(|s| OwnedSpriteState {
+                    attachment: s.attachment.to_owned(),
+                    srt: s.srt,
+                })
+                .collect::<Vec<_>>()
+                .into_iter(),
+            &self.atlas,
         ))
     }
 }
