@@ -136,6 +136,11 @@ function mem(addr) {
     return new Uint8Array(memory.buffer.slice(addr, addr + 1))[0];
 }
 
+function onresize() {
+    Atomics.store(memoryView32, SYNC_CANVAS_SIZE, window.innerWidth);
+    Atomics.store(memoryView32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
+}
+
 function LogicMessage(e) {
     let x = new Uint32Array(e.date);
     let type = x[0] & 255;
@@ -255,6 +260,8 @@ function input(e) {
     queue.write_i32([1, e.data]);
 }
 
+window.addEventListener('resize', onresize);
+
 window.addEventListener('keydown', e => {
     const key = evalKey(e);
     const mod = keyMod(e);
@@ -280,11 +287,6 @@ window.addEventListener('mousedown', e => {
 window.addEventListener('mouseup', e => {
     const mod = keyMod(e);
     if (mod !== undefined) {queue.write_i32([6, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
-});
-
-window.addEventListener('resize', () => {
-    Atomics.store(memoryView32, SYNC_CANVAS_SIZE, window.innerWidth);
-    Atomics.store(memoryView32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
 });
 
 window.setInterval(wakeLogic, 50);

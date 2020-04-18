@@ -37,10 +37,8 @@ pub const GRAPHICS_HEAP: usize = 0;
 assert_env!("GRAPHICS_HEAP");
 
 #[from_env]
-/// The address memory synchronization area. (size: 1MiB)
+/// The address memory synchronization area.
 /// It contains data needed for synchronization between main thread and logic thread.
-/// This address must currently be 0x50fc00.
-/// On change you have to modify the corresponding js file.
 pub const SYNCHRONIZATION_MEMORY: usize = 0;
 assert_env!("SYNCHRONIZATION_MEMORY");
 
