@@ -131,11 +131,11 @@ impl GameContext {
                     match data[0] as u32 | (data[1] as u32) << 8 {
                         2 => {
                             let img = rask_engine::resources::Texture::from_png_stream(&data[4..])?;
-                            unsafe { self.resource_table.store(img, id as usize) };
+                            unsafe { self.resource_table.store(img, id as usize) }?;
                         }
                         3 => {
                             let chr = rask_engine::resources::Character::from_u8(&data[4..])?;
-                            unsafe { self.resource_table.store(chr, id as usize) };
+                            unsafe { self.resource_table.store(Box::new(chr), id as usize) }?;
                         }
                         _ => {
                             self.dealloc_buffer(id);

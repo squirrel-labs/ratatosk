@@ -9,6 +9,7 @@ pub enum ServerError {
     GroupCreation(String),
     GameCreation(std::io::Error),
     WebsocketCreation(std::io::Error),
+    WebsocketError(ws::Error),
     BackendRequest(ReqError),
     InvalidProtocol,
     InvalidTokenFormat,
@@ -16,6 +17,7 @@ pub enum ServerError {
     StdErr(Box<dyn std::error::Error>),
     MessageSend(SendError<group::Message>),
     RaskError(error::EngineError),
+    FileError(std::io::Error),
 }
 
 impl std::fmt::Display for ServerError {
@@ -25,6 +27,7 @@ impl std::fmt::Display for ServerError {
             ServerError::GroupCreation(e) => write!(f, "GroupCreationError: {}", e),
             ServerError::GameCreation(e) => write!(f, "GameCreationError: {}", e),
             ServerError::WebsocketCreation(e) => write!(f, "WebsocketCreationError: {}", e),
+            ServerError::WebsocketError(e) => write!(f, "WebsocketError: {}", e),
             ServerError::BackendRequest(e) => write!(f, "BackendRequestError: {}", e),
             ServerError::InvalidProtocol => write!(f, "InvalidProtocolError"),
             ServerError::InvalidTokenFormat => write!(f, "InvalidTokenFormat"),
@@ -32,6 +35,7 @@ impl std::fmt::Display for ServerError {
             ServerError::StdErr(e) => write!(f, "StdErrorError: {}", e),
             ServerError::MessageSend(e) => write!(f, "MessageSendError: {}", e),
             ServerError::RaskError(e) => write!(f, "RaskError: {}", e),
+            ServerError::FileError(e) => write!(f, "FileError: {}", e),
         }
     }
 }
@@ -45,6 +49,8 @@ macro_rules! derive_from {
         }
     };
 }
+derive_from!(ws::Error, WebsocketError);
+derive_from!(std::io::Error, FileError);
 derive_from!(Box<dyn std::error::Error>, StdErr);
 derive_from!(ReqError, BackendRequest);
 derive_from!(SendError<group::Message>, MessageSend);
