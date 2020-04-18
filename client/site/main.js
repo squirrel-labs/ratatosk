@@ -136,6 +136,11 @@ function mem(addr) {
     return new Uint8Array(memory.buffer.slice(addr, addr + 1))[0];
 }
 
+function onresize() {
+    Atomics.store(memoryView32, SYNC_CANVAS_SIZE, window.innerWidth);
+    Atomics.store(memoryView32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
+}
+
 function LogicMessage(e) {
     let x = new Uint32Array(e.date);
     let type = x[0] & 255;
@@ -170,8 +175,6 @@ function upload_resource(data) {
 
 let canvas = createCanvas();
 if (canvas === undefined) throw Error('canvas creation failed');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
 memory = generateMemory();
 let memoryView32 = new Int32Array(memory.buffer);
 let memoryViewU32 = new Uint32Array(memory.buffer);
@@ -256,13 +259,6 @@ function input(e) {
     }
     queue.write_i32([1, e.data]);
 }
-
-function onresize() {
-    Atomics.store(memoryView32, SYNC_CANVAS_SIZE, window.innerWidth);
-    Atomics.store(memoryView32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
-}
-
-onresize();
 
 window.addEventListener('resize', onresize);
 

@@ -10,8 +10,8 @@ use web_sys::WebGl2RenderingContext as Gl2;
 use web_sys::WebGlBuffer;
 use web_sys::WebGlVertexArrayObject as Vao;
 
-const WIDTH: u32  = 640;
-const HEIGHT: u32 = 360;
+const WIDTH: u32  = 160;
+const HEIGHT: u32 = 90;
 
 #[wasm_bindgen]
 extern "C" {
@@ -199,7 +199,7 @@ impl GraphicsApi for WebGl {
         prog.use_program(&gl);
         gl.vertex_attrib_pointer_with_i32(0, 2, Gl2::FLOAT, false, 0, 0);
 
-        Ok(WebGl {
+        let mut gl = WebGl {
             canvas,
             gl,
             fb,
@@ -209,7 +209,9 @@ impl GraphicsApi for WebGl {
             height,
             vbo,
             texture_handles: vec![],
-        })
+        };
+        gl.set_size(width, height);
+        Ok(gl)
     }
 
     fn upload_texture(&mut self, texture: &Texture, n: u32) -> Result<(), ClientError> {
@@ -280,7 +282,7 @@ impl GraphicsApi for WebGl {
     }
     
     fn update_size(&mut self, w: u32, h: u32) {
-        if self.width != w || self.height != h {
+        if (self.width != w || self.height != h) && !(w == 0 || h == 0) {
             self.set_size(w, h);
         }
     }
@@ -299,12 +301,12 @@ impl GraphicsApi for WebGl {
 
     fn end_frame(&self) -> Result<(), ClientError> {
         self.fb.render_pass_1(&self.gl);
-        if self.height > self.width {
-            let h = (self.width as f32 * (HEIGHT as f32 / WIDTH as f32)) as u32;
-            self.gl.viewport(0, ((self.height - h) / 2) as i32, self.width as i32, h as i32);
+        if self.height * WIDTH > self.width * HEIGHT {
+            let h = (self.width as f32 * (HEIGHT as f32 / WIDTH as f32)) as i32;
+            self.gl.viewport(0, ((self.height as i32 - h) / 2) as i32, self.width as i32, h);
         } else {
-            let w = (self.height as f32 * (WIDTH as f32 / HEIGHT as f32)) as u32;
-            self.gl.viewport(((self.width - w) / 2) as i32, 0, w as i32, self.height as i32);
+            let w = (self.height as f32 * (WIDTH as f32 / HEIGHT as f32)) as i32;
+            self.gl.viewport(((self.width as i32 - w) / 2) as i32, 0, w, self.height as i32);
         }
         self.draw_rect_notexture(&-Mat3::identity())?;
         Ok(())
