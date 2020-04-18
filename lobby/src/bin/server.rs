@@ -9,7 +9,7 @@ use rocket_contrib::json::Json;
 
 use serde_derive::Serialize;
 
-use rocket::{get, post, routes};
+use rocket::{get, routes};
 
 // this is just here for a POC.
 // TODO move those into their own file
@@ -84,7 +84,7 @@ fn game_index() -> Json<GameOverview> {
     Json(mock_data)
 }
 
-#[post("/api/lobby/tokens/<token>", format = "json")]
+#[get("/api/lobby/tokens/<token>", format = "json")]
 fn token_request(token: u32) -> Result<Json<TokenResponse>, rocket::http::Status> {
     if token != 42 {
         return Err(rocket::http::Status::new(
@@ -106,7 +106,7 @@ fn token_request(token: u32) -> Result<Json<TokenResponse>, rocket::http::Status
 }
 
 pub fn rocket() -> rocket::Rocket {
-    let routes = routes![index, game_index];
+    let routes = routes![index, game_index, token_request];
     rocket::ignite()
         .mount("/", routes)
         .attach(AdHoc::on_response("CORS header for dev env", |req, res| {
