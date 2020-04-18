@@ -24,6 +24,9 @@
     <script>
         function oncanvas() {
             let canvas = document.getElementById('c');
+            let body = document.getElementById('body');
+            canvas.contentEditable = "true";
+            body.contentEditable = "true";
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             canvas.contentEditable = "true";
