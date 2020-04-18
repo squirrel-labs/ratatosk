@@ -130,10 +130,12 @@ impl Character {
         Ok(AnimationStates::new(
             animated_skin
                 .interpolate(time)
-                .ok_or(EngineError::Animation(format!(
-                    "Could not interpolate animation at time {}",
-                    time
-                )))?
+                .ok_or_else(|| {
+                    EngineError::Animation(format!(
+                        "Could not interpolate animation at time {}",
+                        time
+                    ))
+                })?
                 .map(|s| OwnedSpriteState {
                     attachment: s.attachment.to_owned(),
                     srt: s.srt,

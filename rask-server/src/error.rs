@@ -1,4 +1,5 @@
 use crate::group;
+use rask_engine::error;
 use reqwest::Error as ReqError;
 use std::sync::mpsc::SendError;
 
@@ -14,6 +15,7 @@ pub enum ServerError {
     InvalidToken(String),
     StdErr(Box<dyn std::error::Error>),
     MessageSend(SendError<group::Message>),
+    RaskError(error::EngineError),
 }
 
 impl std::fmt::Display for ServerError {
@@ -29,26 +31,22 @@ impl std::fmt::Display for ServerError {
             ServerError::InvalidToken(e) => write!(f, "InvalidTokenError: {}", e),
             ServerError::StdErr(e) => write!(f, "StdErrorError: {}", e),
             ServerError::MessageSend(e) => write!(f, "MessageSendError: {}", e),
+            ServerError::RaskError(e) => write!(f, "RaskError: {}", e),
         }
     }
 }
 
-impl From<Box<dyn std::error::Error>> for ServerError {
-    fn from(e: Box<dyn std::error::Error>) -> Self {
-        ServerError::StdErr(e)
-    }
+macro_rules! derive_from {
+    ($type:ty, $kind:ident) => {
+        impl From<$type> for ServerError {
+            fn from(error: $type) -> Self {
+                ServerError::$kind(error)
+            }
+        }
+    };
 }
-
-impl From<ReqError> for ServerError {
-    fn from(e: ReqError) -> Self {
-        ServerError::BackendRequest(e)
-    }
-}
-
-impl From<SendError<group::Message>> for ServerError {
-    fn from(e: SendError<group::Message>) -> Self {
-        ServerError::MessageSend(e)
-    }
-}
+derive_from!(Box<dyn std::error::Error>, StdErr);
+derive_from!(ReqError, BackendRequest);
+derive_from!(SendError<group::Message>, MessageSend);
 
 impl std::error::Error for ServerError {}

@@ -13,6 +13,10 @@ colored = "1.8"
 reqwest = "0.9"
 serde = "1.0"
 
+[dependencies.rask-engine]
+version = "0.2.0"
+path = "../rask-engine"
+
 [dependencies.ws]
-version = "*"
+version = "0.9"
 features = ["ssl"]
