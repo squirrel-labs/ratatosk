@@ -80,7 +80,6 @@ function spawnModule(type, memory, canvas) {
     } else if (type === 'logic') {
         module.jsSourceLocation = '../gen/logic.js';
         module.wasmSourceLocation = '../gen/logic.wasm';
-        module.deltaTime = 100;
     } else return;
     let worker = new Worker(WORKER_URI);
     postWorkerDescriptor(worker, module);
@@ -187,6 +186,9 @@ function wakeUpAt(addr) {
 }
 
 const START_TIME = Date.now();
+let last_time = START_TIME;
+const fps_sampling_count = 5;
+let fps_sampling_n = 0;
 async function wakeLogic() {
     if (connected) {
         let x = new UInt32Array(4);
@@ -197,7 +199,13 @@ async function wakeLogic() {
         ws.post(x.buffer);
     }
 
-    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, Date.now() - START_TIME);
+    const t = Date.now() - START_TIME;
+    if (++fps_sampling_n >= fps_sampling_count) {
+        document.getElementById('lfps').textContent = Math.round(100000 / ((t - last_time) / fps_sampling_count)) / 100;
+        last_time = t;
+        fps_sampling_n = 0;
+    }
+    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, t);
     Atomics.store(memoryView32, SYNC_MOUSE, Math.floor(mousex));
     Atomics.store(memoryView32, SYNC_MOUSE + 1, Math.floor(mousey));
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
