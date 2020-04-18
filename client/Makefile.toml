@@ -37,6 +37,7 @@ script = [
 	"RUSTFLAGS=$RUSTFLAGS$(cat ${MEM_GEN}/mem.conf)",
 	"echo $RUSTFLAGS",
 	"echo $MEMORY_LAYOUT_PARAMETERS",
+	"export MEMORY_LAYOUT_PARAMETERS=$MEMORY_LAYOUT_PARAMETERS",
 	"MEMORY_LAYOUT_PARAMETERS=$MEMORY_LAYOUT_PARAMETERS RUSTFLAGS=$RUSTFLAGS cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown",
 	"#mv $(find $CARGO_TARGET_DIR/ -name mem.json | tail -n 1) gen/",
 ]

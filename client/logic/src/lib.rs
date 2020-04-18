@@ -2,6 +2,7 @@
 //! It interacts with the graphics crate through the shared array buffer
 
 #![feature(allocator_api)]
+#![feature(type_ascription)]
 
 use rask_wasm_shared::{
     alloc::{settings::Logic, Allocator, Initial},

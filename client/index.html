@@ -23,14 +23,15 @@
     </style>
     <script>
         function oncanvas() {
-            let canvas = document.getElementById('c');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            document.getElementById('c')
+                    .contentEditable = "true";
+            document.getElementById('body')
+                    .contentEditable = "true";
         }
     </script>
 </head>
 
-<body>
+<body id='body'>
     <canvas id='c'>
         You've got one shitty browser man!
     </canvas>

@@ -6,6 +6,10 @@ const MESSAGE_QUEUE = memoryParameters.queue_start;
 const MESSAGE_ITEM_SIZE = 32;
 const MESSAGE_QUEUE_LENGTH = memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
 const WS_URL = "wss://rask.rocks/api"
+const SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
+const SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
+const SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
+const SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
 let params = new URLSearchParams(document.location.search.substring(1));
 //let token = params.get("token");
 let token = 42;
@@ -56,8 +60,10 @@ class MessageQueueWriter {
 queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
 
 function postWorkerDescriptor(worker, desc) {
-    if (desc.canvas === undefined)
+    if (desc.canvas === undefined) {
         worker.postMessage(desc);
+        worker.addEventListener("message", LogicMessage);
+    }
     else
         worker.postMessage(desc, [desc.canvas]);
 }
@@ -130,8 +136,42 @@ function mem(addr) {
     return new Uint8Array(memory.buffer.slice(addr, addr + 1))[0];
 }
 
+function LogicMessage(e) {
+    let x = new Uint32Array(e.date);
+    let type = x[0] & 255;
+    if (type >= 128) {
+        ws.post(x.slice(1));
+    } else if (type === 0) {
+        const id = x[1];
+        let ptr = x[2];
+        if (resource_map.has(id)) {
+            for (let i of resource_map.get(id).forEach()) {
+                Atomics.store(memoryViewu32, ptr++, i);
+            }
+            resource_map.delete(id);
+            queue.write_i32([8, id]);
+        } else {
+            console.error("Requested resource not in resource_map, id: " + id)
+        }
+    } else if (type === 1) {
+        if (x[1] === 0) {
+            window.addEventListener('input', input);
+        } else {
+            window.removeEventListener('input', input);
+        }
+    }
+}
+
+resource_map = new Map();
+function upload_resource(data) {
+    resource_map.set(data[0] & 0xff00, data)
+    queue.write_i32(7, data.length);
+}
+
 let canvas = createCanvas();
 if (canvas === undefined) throw Error('canvas creation failed');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 memory = generateMemory();
 let memoryView32 = new Int32Array(memory.buffer);
 let memoryViewU32 = new Uint32Array(memory.buffer);
@@ -148,20 +188,16 @@ async function wakeLogic() {
     if (connected) {
         let x = new UInt32Array(4);
         x[0] = 128;
-        x[1] = Atomics.read(memoryView32, SYNCHRONIZATION_MEMORY + 3);
-        x[2] = Atomics.read(memoryView32, SYNCHRONIZATION_MEMORY + 4);
-        x[3] = Atomics.read(memoryView32, SYNCHRONIZATION_MEMORY + 5);
+        x[1] = Atomics.read(memoryView32, SYNC_PLAYER_STATE);
+        x[2] = Atomics.read(memoryView32, SYNC_PLAYER_STATE + 1);
+        x[3] = Atomics.read(memoryView32, SYNC_PLAYER_STATE + 2);
         ws.post(x.buffer);
     }
 
     Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, Date.now() - START_TIME);
-    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 1, Math.floor(mousex));
-    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 2, Math.floor(mousey));
+    Atomics.store(memoryView32, SYNC_MOUSE, Math.floor(mousex));
+    Atomics.store(memoryView32, SYNC_MOUSE + 1, Math.floor(mousey));
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
-}
-
-function upload_resource(data) {
-
 }
 
 function setup_ws() {
@@ -180,19 +216,19 @@ function setup_ws() {
     ws.addEventListener('message', event => {
         let data = new UInt32Array(event.data.buffer);
         let type = data[0] & 255;
-        if (type == 10) {
+        if (type === 10) {
             upload_resource(data);
-        } else if (type == 11) {
-            Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 6, data[1]);
-            Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 7, data[2]);
-            Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY + 8, data[3]);
+        } else if (type === 11) {
+            Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
+            Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);
+            Atomics.store(memoryView32, SYNC_OTHER_STATE + 2, data[3]);
         }
     });
 }
 
 String.prototype.hashCode = function() {
     var hash = 0;
-    if (this.length == 0) {
+    if (this.length === 0) {
         return hash;
     }
     for (var i = 0; i < this.length; i++) {
@@ -211,6 +247,24 @@ function evalKey(key) {
     if (key.isComposing && key.repeat) { return 0; }
     return key.code.hashCode()
 }
+
+function input(e) {
+    let str = e.data;
+    if (e.inputType !== "insertText") return;
+    for (var i = 0; i < str.length; i++) {
+        queue.write_i32([3, 1, str.charAt(i)]);
+    }
+    queue.write_i32([1, e.data]);
+}
+
+function onresize() {
+    Atomics.store(memoryView32, SYNC_CANVAS_SIZE, window.innerWidth);
+    Atomics.store(memoryView32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
+}
+
+onresize();
+
+window.addEventListener('resize', onresize);
 
 window.addEventListener('keydown', e => {
     const key = evalKey(e);
@@ -237,11 +291,6 @@ window.addEventListener('mousedown', e => {
 window.addEventListener('mouseup', e => {
     const mod = keyMod(e);
     if (mod !== undefined) {queue.write_i32([6, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
-});
-
-window.addEventListener('resize', () => {
-    oncanvas();
-    queue.write_i32([7, window.innerWidth, window.innerHeight]);
 });
 
 window.setInterval(wakeLogic, 50);

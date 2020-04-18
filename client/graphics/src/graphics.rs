@@ -10,6 +10,9 @@ use web_sys::WebGl2RenderingContext as Gl2;
 use web_sys::WebGlBuffer;
 use web_sys::WebGlVertexArrayObject as Vao;
 
+const WIDTH: u32  = 640;
+const HEIGHT: u32 = 360;
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace=Float32Array, js_name=of, variadic)]
@@ -72,6 +75,8 @@ pub trait GraphicsApi: Sized {
     fn upload_texture(&mut self, texture: &Texture, n: u32) -> Result<(), ClientError>;
     fn unload_texture(&mut self, id: u32) -> Result<(), ClientError>;
     fn resize_texture_pool(&mut self, n: u32) -> Result<(), ClientError>;
+    fn set_size(&mut self, w: u32, h: u32);
+    fn update_size(&mut self, w: u32, h: u32);
     fn ok(&self) -> Result<(), Self::GraphicsError>;
 }
 
@@ -173,10 +178,7 @@ impl GraphicsApi for WebGl {
         size_multiplicator: math::vec2::Vec2,
     ) -> Result<Self, ClientError> {
         let (width, height) = (canvas.width(), canvas.height());
-        let (target_width, target_height) = (
-            ((width as f32) * size_multiplicator.x()) as u32,
-            ((height as f32) * size_multiplicator.y()) as u32,
-        );
+        let (target_width, target_height) = (WIDTH, HEIGHT);
         let gl: Gl2 = canvas
             .get_context("webgl2")?
             .ok_or(ClientError::WebGlError(
@@ -269,6 +271,19 @@ impl GraphicsApi for WebGl {
         }
         Ok(())
     }
+    
+    fn set_size(&mut self, w: u32, h: u32) {
+        self.width = w;
+        self.height = h;
+        self.canvas.set_width(w);
+        self.canvas.set_height(h);
+    }
+    
+    fn update_size(&mut self, w: u32, h: u32) {
+        if self.width != w || self.height != h {
+            self.set_size(w, h);
+        }
+    }
 
     fn ok(&self) -> Result<(), Self::GraphicsError> {
         Self::_ok(&self.gl)
@@ -284,8 +299,13 @@ impl GraphicsApi for WebGl {
 
     fn end_frame(&self) -> Result<(), ClientError> {
         self.fb.render_pass_1(&self.gl);
-        self.gl
-            .viewport(0, 0, self.width as i32, self.height as i32);
+        if self.height > self.width {
+            let h = (self.width as f32 * (HEIGHT as f32 / WIDTH as f32)) as u32;
+            self.gl.viewport(0, ((self.height - h) / 2) as i32, self.width as i32, h as i32);
+        } else {
+            let w = (self.height as f32 * (WIDTH as f32 / HEIGHT as f32)) as u32;
+            self.gl.viewport(((self.width - w) / 2) as i32, 0, w as i32, self.height as i32);
+        }
         self.draw_rect_notexture(&-Mat3::identity())?;
         Ok(())
     }
