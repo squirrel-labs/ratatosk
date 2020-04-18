@@ -24,7 +24,7 @@ impl<T: GraphicsApi> Render<T> {
         self.graphics
             .ok()
             .map_err(|e| ClientError::WebGlError(format!("WebGl2 error: {}", e)))?;
-        let size = (unsafe {SynchronizationMemory::get()}).canvas_size;
+        let size = (unsafe { SynchronizationMemory::get() }).canvas_size;
         self.graphics.update_size(size.0, size.1);
         self.graphics.start_frame(&[0.0, 0.0, 0.0])?;
         if self.draw_sprites()? {

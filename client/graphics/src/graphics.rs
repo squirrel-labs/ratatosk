@@ -10,7 +10,7 @@ use web_sys::WebGl2RenderingContext as Gl2;
 use web_sys::WebGlBuffer;
 use web_sys::WebGlVertexArrayObject as Vao;
 
-const WIDTH: u32  = 160;
+const WIDTH: u32 = 160;
 const HEIGHT: u32 = 90;
 
 #[wasm_bindgen]
@@ -273,14 +273,14 @@ impl GraphicsApi for WebGl {
         }
         Ok(())
     }
-    
+
     fn set_size(&mut self, w: u32, h: u32) {
         self.width = w;
         self.height = h;
         self.canvas.set_width(w);
         self.canvas.set_height(h);
     }
-    
+
     fn update_size(&mut self, w: u32, h: u32) {
         if (self.width != w || self.height != h) && !(w == 0 || h == 0) {
             self.set_size(w, h);
@@ -303,10 +303,20 @@ impl GraphicsApi for WebGl {
         self.fb.render_pass_1(&self.gl);
         if self.height * WIDTH > self.width * HEIGHT {
             let h = (self.width as f32 * (HEIGHT as f32 / WIDTH as f32)) as i32;
-            self.gl.viewport(0, ((self.height as i32 - h) / 2) as i32, self.width as i32, h);
+            self.gl.viewport(
+                0,
+                ((self.height as i32 - h) / 2) as i32,
+                self.width as i32,
+                h,
+            );
         } else {
             let w = (self.height as f32 * (WIDTH as f32 / HEIGHT as f32)) as i32;
-            self.gl.viewport(((self.width as i32 - w) / 2) as i32, 0, w, self.height as i32);
+            self.gl.viewport(
+                ((self.width as i32 - w) / 2) as i32,
+                0,
+                w,
+                self.height as i32,
+            );
         }
         self.draw_rect_notexture(&-Mat3::identity())?;
         Ok(())
