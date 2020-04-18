@@ -2,7 +2,7 @@ use crate::error::ServerError;
 use crate::group::GroupId;
 use serde::{Deserialize, Serialize};
 
-const API_ENDPOINT: &str = "https://games.kobert.dev/";
+const API_ENDPOINT: &str = "http://localhost:8000/";
 
 /// The group information send as response to
 /// a token request.

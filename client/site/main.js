@@ -12,7 +12,7 @@ const SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
 const SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
 let params = new URLSearchParams(document.location.search.substring(1));
 //let token = params.get("token");
-let token = "Token-63208259";
+let token = "Token-42";
 let workers = [];
 let memory;  // global for debugging
 let ws = new WebSocket(WS_URL, [token, "tuesday"]);
