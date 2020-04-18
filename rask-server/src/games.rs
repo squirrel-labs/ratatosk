@@ -1,5 +1,6 @@
 use crate::error::ServerError;
 use crate::group::{Message, SendGroup};
+use rask_engine::{world, EngineError};
 use std::thread;
 use std::thread::JoinHandle;
 
@@ -31,7 +32,7 @@ impl Game for RaskGame {
         thread::Builder::new()
             .name(format!("group{}", self.group.id))
             .spawn(move || self.game_loop())
-            .map_err(|e| ServerError::GameCreation(e))
+            .map_err(ServerError::GameCreation)
     }
 }
 

@@ -5,17 +5,17 @@ const SYNCHRONIZATION_MEMORY = memoryParameters.sync_area / 4;
 const MESSAGE_QUEUE = memoryParameters.queue_start;
 const MESSAGE_ITEM_SIZE = 32;
 const MESSAGE_QUEUE_LENGTH = memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
-const WS_URL = "wss://rask.rocks/api"
+const WS_URL = "ws://127.0.0.1:5001"
 const SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
 const SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
 const SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
 const SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
 let params = new URLSearchParams(document.location.search.substring(1));
 //let token = params.get("token");
-let token = 42;
+let token = "Token-63208259";
 let workers = [];
 let memory;  // global for debugging
-let ws = new WebSocket(WS_URL, token);
+let ws = new WebSocket(WS_URL, [token, "tuesday"]);
 ws.binaryType = 'arraybuffer';
 let connected = false
 

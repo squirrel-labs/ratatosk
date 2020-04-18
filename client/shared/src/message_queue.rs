@@ -42,7 +42,7 @@ impl<T: Sized + Clone + Default> MessageQueueElement<T> {
         unsafe { atomic_read_u8(&self.writing) }
     }
     fn read(&mut self) -> Option<T> {
-        let e = std::mem::replace(&mut self.payload, T::default());
+        let e = std::mem::take(&mut self.payload);
         if self.get_writing() == 0 {
             Some(e)
         } else {
@@ -51,6 +51,7 @@ impl<T: Sized + Clone + Default> MessageQueueElement<T> {
     }
 }
 
+#[derive(Default)]
 pub struct MessageQueueReader {
     /// the index of the next element to be read
     reader_index: u32,
@@ -76,10 +77,10 @@ impl MessageQueueReader {
         .get_mut(n)
     }
 
+    #[allow(clippy::mem_discriminant_non_enum)]
     pub fn pop<T: Sized + Clone + Default + std::fmt::Debug>(&mut self) -> T {
         loop {
             let e = unsafe { self.get_mut(self.reader_index as usize).unwrap() };
-            //log::info!("bytes are  {:?}", unsafe {std::slice::from_raw_parts_mut(e as *mut MessageQueueElement<_> as *mut u8, 16)});
             let e = e.read();
             if let Some(n) = e.clone() {
                 if std::mem::discriminant(&T::default()) == std::mem::discriminant(&n) {
