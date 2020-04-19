@@ -1,3 +1,4 @@
+use crate::mem;
 use std::fmt::Debug;
 
 pub trait Element: Clone + Sized + Default + Debug {}
@@ -5,19 +6,12 @@ type Flag = u8;
 
 impl<T: Clone + Sized + Default + Debug> Element for T {}
 
+#[repr(C)]
 #[derive(Debug, Default)]
 pub struct DoubleBuffer<T: Element> {
     pub(self) reading_at: Flag,
     pub(self) provided: Flag,
     buffer: [T; 2],
-}
-
-pub unsafe fn atomic_read(v: *const Flag) -> Flag {
-    (*(v as *const core::sync::atomic::AtomicU8)).load(core::sync::atomic::Ordering::SeqCst)
-}
-
-pub unsafe fn atomic_write(v: *mut Flag, flag: Flag) {
-    (*(v as *mut core::sync::atomic::AtomicU8)).store(flag, core::sync::atomic::Ordering::SeqCst)
 }
 
 #[derive(Debug)]
@@ -79,24 +73,20 @@ impl<T: Element> DoubleBuffer<T> {
         }
     }
 
-    #[inline(always)]
     pub extern "C" fn set_reading_at(&mut self, reading_at: Flag) {
-        unsafe { atomic_write(&mut self.reading_at, reading_at) }
+        unsafe { mem::atomic_write_u8(&mut self.reading_at, reading_at) }
     }
 
-    #[inline(always)]
-    pub extern "C" fn get_reading_at(&mut self) -> Flag {
-        unsafe { atomic_read(&self.reading_at) }
+    pub extern "C" fn get_reading_at(&self) -> Flag {
+        unsafe { mem::atomic_read_u8(&self.reading_at) }
     }
 
-    #[inline(always)]
     pub extern "C" fn set_provided(&mut self, provided: Flag) {
-        unsafe { atomic_write(&mut self.provided, provided) }
+        unsafe { mem::atomic_write_u8(&mut self.provided, provided) }
     }
 
-    #[inline(always)]
-    pub extern "C" fn get_provided(&mut self) -> Flag {
-        unsafe { atomic_read(&self.provided) }
+    pub extern "C" fn get_provided(&self) -> Flag {
+        unsafe { mem::atomic_read_u8(&self.provided) }
     }
 }
 

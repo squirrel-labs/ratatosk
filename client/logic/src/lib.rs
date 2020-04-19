@@ -2,9 +2,10 @@
 //! It interacts with the graphics crate through the shared array buffer
 
 #![feature(allocator_api)]
+#![feature(type_ascription)]
 
 use rask_wasm_shared::{
-    alloc::{settings::Logic, Allocator, Initial, NaiveInitial, SimpleAllocator},
+    alloc::{settings::Logic, Allocator, Initial},
     create_allocator, wee_alloc,
 };
 
@@ -14,7 +15,6 @@ create_allocator!(
     Logic,
     wee_alloc::WeeAlloc::INIT
 );
-//create_allocator!(ALLOCATOR, SimpleAllocator, Logic);
 
 pub mod entries;
 pub mod game_context;

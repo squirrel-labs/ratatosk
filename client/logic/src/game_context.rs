@@ -1,24 +1,63 @@
-use rask_engine::math;
+use rask_engine::events::{Event, Key};
+use rask_engine::resources::{registry, GetStore, ResourceTable, Texture, TextureIds};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
+use rask_wasm_shared::mem::{RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT};
 use rask_wasm_shared::sprite::*;
-use rask_wasm_shared::state::State;
+use rask_wasm_shared::{
+    message_queue::{Message, MessageQueueReader},
+    state::State,
+};
+use std::collections::HashMap;
 
-//const IMAGE1_DATA: &[u8] = include_bytes!("../../res/kuh.png");
-//const IMAGE2_DATA: &[u8] = include_bytes!("../../res/mensch.png");
-const IMAGE2_DATA: &[u8] = include_bytes!("../../res/thief.png");
 const IMAGE1_DATA: &[u8] = include_bytes!("../../res/empty.png");
+const IMAGE2_DATA: &[u8] = include_bytes!("../../res/thief.png");
 
 pub struct GameContext {
     state: State,
     tick_nr: u64,
+    #[allow(dead_code)]
+    resource_table: ResourceTable,
+    message_queue: MessageQueueReader,
+    worker_scope: web_sys::DedicatedWorkerGlobalScope,
+    buffer_table: HashMap<u32, (*const u8, u32)>,
 }
 
 impl GameContext {
     pub fn new() -> Result<Self, ClientError> {
+        let resource_table = unsafe {
+            let mut resource_table =
+                ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT);
+            resource_table.clear();
+            resource_table.store(
+                Texture::from_png_stream(IMAGE1_DATA)?,
+                registry::IMAGE1.id as usize,
+            )?;
+            resource_table.store(
+                Texture::from_png_stream(IMAGE2_DATA)?,
+                registry::IMAGE2.id as usize,
+            )?;
+            resource_table.store(
+                TextureIds {
+                    reset_notify: 1,
+                    ids: vec![registry::IMAGE1.id, registry::IMAGE2.id],
+                },
+                registry::USED_TEXTURE_IDS.id as usize,
+            )?;
+            resource_table
+        };
+        use wasm_bindgen::JsCast;
+        let worker_scope = js_sys::global()
+            .dyn_into::<web_sys::DedicatedWorkerGlobalScope>()
+            .unwrap();
+
         Ok(Self {
             state: State::default(),
             tick_nr: 0,
+            resource_table,
+            message_queue: MessageQueueReader::new(),
+            worker_scope,
+            buffer_table: HashMap::new(),
         })
     }
 
@@ -30,67 +69,91 @@ impl GameContext {
 
     pub fn tick(&mut self) -> Result<(), ClientError> {
         if self.state.sprites().is_empty() {
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(0.0, 0.0), 3, 0, 0));
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(0.0, 0.0), 2, 0, 0));
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(0.3, 0.3), 0, 0, 1));
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(0.0, 0.0), 1, 0, 1));
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(0.0, -0.6), 0, 0, 1));
-            self.state
-                .append_sprite(&Sprite::new(math::Vec2::new(-0.6, 0.6), 1, 0, 1));
-
-            let shared_heap = rask_wasm_shared::mem::shared_heap();
-            *shared_heap.animations_mut() = vec![
-                Animation::new(vec![
-                    Frame::new(vec![rask_engine::math::Mat3::scaling(0.4, 0.4)]),
-                    Frame::new(vec![
-                        rask_engine::math::Mat3::scaling(0.4, 0.4)
-                            * rask_engine::math::Mat3::translation(0.5, 0.0)
-                            * rask_engine::math::Mat3::rotation(6.0),
-                    ]),
-                ]),
-                Animation::new(vec![
-                    Frame::new(vec![rask_engine::math::Mat3::scaling(0.4, 0.4)]),
-                    Frame::new(vec![rask_engine::math::Mat3::scaling(0.6, 0.2)]),
-                ]),
-                Animation::new(vec![Frame::new(vec![rask_engine::math::Mat3::scaling(
-                    9.0 / 16.0,
-                    1.0,
-                )])]),
-                Animation::new(vec![Frame::new(vec![rask_engine::math::Mat3::identity()])]),
-            ];
-
-            *shared_heap.textures_mut() = Some(vec![
-                rask_wasm_shared::texture::Texture::from_png_stream(IMAGE1_DATA)?,
-                rask_wasm_shared::texture::Texture::from_png_stream(IMAGE2_DATA)?,
-            ]);
-            shared_heap.set_texture_notify();
+            let mut sprite = Sprite::default();
+            self.state.append_sprite(&sprite);
+            sprite.tex_id += 1;
+            self.state.append_sprite(&sprite);
         }
-
-        let animations = rask_wasm_shared::mem::shared_heap().animations();
-        for sprite in self.state.sprites_mut().iter_mut() {
-            if (self.tick_nr % 10) == 9 {
-                sprite
-                    .next_frame(animations)
-                    .ok_or(ClientError::ResourceError(format!("invalid animation id")))?;
+        loop {
+            let msg = self.message_queue.pop::<Message>();
+            if let Message::None = msg {
+                break;
             }
+            log::info!("{:?}", msg);
+            self.handle_message(msg: Message)?;
         }
+
+        self.state.sprites_mut()[1].transform =
+            rask_engine::math::Mat3::rotation(0.02) * self.state.sprites_mut()[1].transform;
+
         self.push_state()?;
         self.tick_nr += 1;
         Ok(())
     }
-}
 
-static mut GAME_CONTEXT: Option<GameContext> = None;
-
-pub fn set_context(context: GameContext) {
-    unsafe { GAME_CONTEXT = Some(context) }
-}
-
-pub fn context_mut() -> &'static mut GameContext {
-    unsafe { GAME_CONTEXT.as_mut().unwrap() }
+    fn alloc_buffer(&mut self, id: u32, length: u32) -> *const u8 {
+        let layout = unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 4) };
+        let ptr = unsafe { std::alloc::alloc(layout) };
+        self.buffer_table.insert(id, (ptr, length));
+        ptr
+    }
+    fn get_buffer(&mut self, id: u32) -> Option<&[u8]> {
+        if let Some((ptr, length)) = self.buffer_table.get(&id) {
+            unsafe { Some(std::slice::from_raw_parts(*ptr, *length as usize)) }
+        } else {
+            None
+        }
+    }
+    fn dealloc_buffer(&mut self, id: u32) {
+        if let Some((ptr, length)) = self.buffer_table.remove(&id) {
+            unsafe {
+                let layout = std::alloc::Layout::from_size_align_unchecked(length as usize, 4);
+                std::alloc::dealloc(ptr as *mut u8, layout)
+            }
+        }
+    }
+    fn handle_message(&mut self, message: Message) -> Result<Option<Event>, ClientError> {
+        match message {
+            Message::KeyDown(modifier, hash) => {
+                Ok(Some(Event::KeyDown(modifier, Key::from_u8(hash))))
+            }
+            Message::KeyUp(modifier, hash) => Ok(Some(Event::KeyUp(modifier, Key::from_u8(hash)))),
+            Message::MouseDown(event) => Ok(Some(Event::MouseDown(event))),
+            Message::MouseUp(event) => Ok(Some(Event::MouseUp(event))),
+            Message::KeyPress(t, code) => Ok(Some(Event::KeyPress(t as u16, code))),
+            Message::ResquestAlloc { id, size } => {
+                let ptr = self.alloc_buffer(id, size);
+                let msg = unsafe { js_sys::Uint32Array::view(&[id, ptr as u32]) };
+                self.worker_scope.post_message(&msg.buffer()).unwrap();
+                Ok(None)
+            }
+            Message::ResourcePush(id) => {
+                if let Some(data) = self.get_buffer(id) {
+                    match data[0] as u32 | (data[1] as u32) << 8 {
+                        2 => {
+                            let img = rask_engine::resources::Texture::from_png_stream(&data[4..])?;
+                            unsafe { self.resource_table.store(img, id as usize) }?;
+                        }
+                        3 => {
+                            let chr = rask_engine::resources::Character::from_u8(&data[4..])?;
+                            unsafe { self.resource_table.store(Box::new(chr), id as usize) }?;
+                        }
+                        _ => {
+                            self.dealloc_buffer(id);
+                            return Err(ClientError::ResourceError(
+                                "unknown RescorceType while parsing".into(),
+                            ));
+                        }
+                    }
+                    self.dealloc_buffer(id);
+                    Ok(None)
+                } else {
+                    Err(ClientError::ResourceError(
+                        "Requested Buffer not allocated".into(),
+                    ))
+                }
+            }
+            _ => Err(ClientError::EngineError("Unknown Message Type".into())),
+        }
+    }
 }

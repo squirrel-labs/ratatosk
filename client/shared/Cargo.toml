@@ -18,6 +18,8 @@ js-sys = "=0.3.36"
 fern = "0.5.9"
 rand = "0.7"
 image = "0.23"
+const_env = "0.1"
+static_assertions = "1.1.0"
 
 [dependencies.rask-engine]
 version = "0.2.0"
@@ -41,5 +43,5 @@ features = [
 
 [dependencies.wee_alloc]
 version = "=0.4.5"
-features = ["size_classes", "static_array_backend", "nightly"]
-git = "https://github.com/NatrixAeria/wee_alloc"
+features = ["size_classes", "static_array_backend", "nightly", "extra_assertions"]
+git = "https://github.com/squirrel-labs/wee_alloc"

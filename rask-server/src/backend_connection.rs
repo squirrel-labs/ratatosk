@@ -24,6 +24,7 @@ pub struct TokenResponse {
     pub user_name: String,
 }
 
+#[allow(dead_code)]
 /// Make a plaintext get request to API_ENDPOINT/{location}
 pub fn request(location: &str) -> Option<String> {
     let uri = &format!("{}{}", API_ENDPOINT, location);
@@ -36,7 +37,7 @@ pub fn request(location: &str) -> Option<String> {
 /// Verify the token validity
 pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
     let mut res = reqwest::get(&format!("{}api/lobby/tokens/{}", API_ENDPOINT, token))
-        .map_err(|e| ServerError::BackendRequest(e))?;
+        .map_err(ServerError::BackendRequest)?;
     let token_res: Result<TokenResponse, _> = res.json();
     token_res.map_err(|e| {
         warn!("{}", e);

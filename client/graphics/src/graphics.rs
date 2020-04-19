@@ -1,15 +1,17 @@
 use crate::shader::Program;
 use rask_engine::math;
 use rask_engine::math::Mat3;
+use rask_engine::resources::texture::{ColorType, Texture};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::sprite::TextureId;
-use rask_wasm_shared::state::State;
-use rask_wasm_shared::texture::{ColorType, Texture};
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::WebGl2RenderingContext as Gl2;
 use web_sys::WebGlBuffer;
 use web_sys::WebGlVertexArrayObject as Vao;
+
+const WIDTH: u32 = 160;
+const HEIGHT: u32 = 90;
 
 #[wasm_bindgen]
 extern "C" {
@@ -69,12 +71,16 @@ pub trait GraphicsApi: Sized {
 
     fn start_frame(&mut self, color: &[f32; 3]) -> Result<(), ClientError>;
     fn end_frame(&self) -> Result<(), ClientError>;
-    fn draw_rect(&self, pos: &math::Vec2, mat: &Mat3, tex: u32) -> Result<(), ClientError>;
-    fn upload_texture(&mut self, texture: &mut Texture, n: u32) -> Result<(), ClientError>;
+    fn draw_rect(&self, mat: &Mat3, tex: u32) -> Result<Option<()>, ClientError>;
+    fn upload_texture(&mut self, texture: &Texture, n: u32) -> Result<(), ClientError>;
+    fn unload_texture(&mut self, id: u32) -> Result<(), ClientError>;
     fn resize_texture_pool(&mut self, n: u32) -> Result<(), ClientError>;
+    fn set_size(&mut self, w: u32, h: u32);
+    fn update_size(&mut self, w: u32, h: u32);
     fn ok(&self) -> Result<(), Self::GraphicsError>;
 }
 
+#[allow(dead_code)]
 struct GlFramebuffer {
     fb: web_sys::WebGlFramebuffer,
     rb: web_sys::WebGlRenderbuffer,
@@ -151,6 +157,7 @@ impl GlFramebuffer {
     }
 }
 
+#[allow(dead_code)]
 pub struct WebGl {
     gl: Gl2,
     fb: GlFramebuffer,
@@ -171,10 +178,7 @@ impl GraphicsApi for WebGl {
         size_multiplicator: math::vec2::Vec2,
     ) -> Result<Self, ClientError> {
         let (width, height) = (canvas.width(), canvas.height());
-        let (target_width, target_height) = (
-            ((width as f32) * size_multiplicator.x()) as u32,
-            ((height as f32) * size_multiplicator.y()) as u32,
-        );
+        let (target_width, target_height) = (WIDTH, HEIGHT);
         let gl: Gl2 = canvas
             .get_context("webgl2")?
             .ok_or(ClientError::WebGlError(
@@ -195,7 +199,7 @@ impl GraphicsApi for WebGl {
         prog.use_program(&gl);
         gl.vertex_attrib_pointer_with_i32(0, 2, Gl2::FLOAT, false, 0, 0);
 
-        Ok(WebGl {
+        let mut gl = WebGl {
             canvas,
             gl,
             fb,
@@ -205,10 +209,18 @@ impl GraphicsApi for WebGl {
             height,
             vbo,
             texture_handles: vec![],
-        })
+        };
+        gl.set_size(width, height);
+        Ok(gl)
     }
 
-    fn upload_texture(&mut self, texture: &mut Texture, n: u32) -> Result<(), ClientError> {
+    fn upload_texture(&mut self, texture: &Texture, n: u32) -> Result<(), ClientError> {
+        log::debug!(
+            "uploading texture (id {}, {}x{})",
+            n,
+            texture.dimension().0,
+            texture.dimension().1
+        );
         let handle = WebGlApiTexture::new(&self.gl)?;
         self.gl.active_texture(Gl2::TEXTURE0);
         handle.bind(&self.gl);
@@ -242,12 +254,37 @@ impl GraphicsApi for WebGl {
         Ok(())
     }
 
+    fn unload_texture(&mut self, id: u32) -> Result<(), ClientError> {
+        let err =
+            || ClientError::ResourceError(format!("Tried to unload non-existent texture #{}", id));
+        let texture = self.texture_handles.get_mut(id as usize).ok_or_else(err)?;
+        if let Some(texture) = texture {
+            texture.delete(&self.gl);
+        } else {
+            return Err(err());
+        }
+        Ok(*texture = None)
+    }
+
     fn resize_texture_pool(&mut self, n: u32) -> Result<(), ClientError> {
         let n = n as usize;
         if self.texture_handles.len() < n {
             self.texture_handles.resize(n, None)
         }
         Ok(())
+    }
+
+    fn set_size(&mut self, w: u32, h: u32) {
+        self.width = w;
+        self.height = h;
+        self.canvas.set_width(w);
+        self.canvas.set_height(h);
+    }
+
+    fn update_size(&mut self, w: u32, h: u32) {
+        if (self.width != w || self.height != h) && !(w == 0 || h == 0) {
+            self.set_size(w, h);
+        }
     }
 
     fn ok(&self) -> Result<(), Self::GraphicsError> {
@@ -264,14 +301,33 @@ impl GraphicsApi for WebGl {
 
     fn end_frame(&self) -> Result<(), ClientError> {
         self.fb.render_pass_1(&self.gl);
-        self.gl
-            .viewport(0, 0, self.width as i32, self.height as i32);
-        self.draw_rect_notexture(&math::Vec2::new(0.0, 0.0), &-Mat3::identity())
+        if self.height * WIDTH > self.width * HEIGHT {
+            let h = (self.width as f32 * (HEIGHT as f32 / WIDTH as f32)) as i32;
+            self.gl.viewport(
+                0,
+                ((self.height as i32 - h) / 2) as i32,
+                self.width as i32,
+                h,
+            );
+        } else {
+            let w = (self.height as f32 * (WIDTH as f32 / HEIGHT as f32)) as i32;
+            self.gl.viewport(
+                ((self.width as i32 - w) / 2) as i32,
+                0,
+                w,
+                self.height as i32,
+            );
+        }
+        self.draw_rect_notexture(&-Mat3::identity())?;
+        Ok(())
     }
 
-    fn draw_rect(&self, pos: &math::Vec2, mat: &Mat3, tex: TextureId) -> Result<(), ClientError> {
-        self.bind_texture(tex);
-        self.draw_rect_notexture(pos, mat)
+    #[allow(unused_must_use)]
+    fn draw_rect(&self, mat: &Mat3, tex: TextureId) -> Result<Option<()>, ClientError> {
+        if self.bind_texture(tex)?.is_none() {
+            return Ok(None);
+        }
+        self.draw_rect_notexture(mat).map(|v| Some(v))
     }
 }
 
@@ -296,16 +352,13 @@ impl WebGl {
         Ok((vao, vbo))
     }
 
-    fn bind_texture(&self, tex: TextureId) -> Result<(), ClientError> {
+    fn bind_texture(&self, tex: TextureId) -> Result<Option<()>, ClientError> {
         Ok(self
             .texture_handles
             .get(tex as usize)
-            .ok_or_else(|| {
-                ClientError::ResourceError(format!("texture #{} is out of bounds", tex))
-            })?
-            .as_ref()
-            .ok_or_else(|| ClientError::ResourceError(format!("could not get texture #{}", tex)))?
-            .bind(&self.gl))
+            .cloned()
+            .flatten()
+            .map(|tex| tex.bind(&self.gl)))
     }
 
     fn create_program(gl: &Gl2) -> Result<Program, ClientError> {
@@ -341,17 +394,15 @@ impl WebGl {
         }
     }
 
-    fn draw_rect_notexture(&self, pos: &math::Vec2, mat: &Mat3) -> Result<(), ClientError> {
+    fn draw_rect_notexture(&self, mat: &Mat3) -> Result<(), ClientError> {
         self.prog.upload_fransformation(&self.gl, mat);
         self.prog.upload_texture_id(&self.gl, 0);
-        self.gl
-            .vertex_attrib2fv_with_f32_array(1, &[pos.x(), pos.y()]);
         self.gl.draw_arrays(Gl2::TRIANGLES, 0, 6);
         Ok(())
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct WebGlApiTexture(web_sys::WebGlTexture);
 
 impl WebGlApiTexture {
@@ -373,5 +424,9 @@ impl WebGlApiTexture {
             Some(&self.0),
             0,
         )
+    }
+
+    pub fn delete(&self, gl: &Gl2) {
+        gl.delete_texture(Some(&self.0))
     }
 }

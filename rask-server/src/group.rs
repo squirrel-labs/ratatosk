@@ -9,6 +9,7 @@ use ws::Sender;
 
 pub type GroupId = u32;
 
+#[allow(dead_code)]
 /// capacity is never allowed to be above usize::MAX
 pub struct Group {
     pub clients: Vec<Sender>,
@@ -28,9 +29,10 @@ pub struct SendGroup {
     pub capacity: u32,
 }
 
+#[allow(dead_code)]
 pub enum Message {
     // TODO: flatten tuple
-    Data((String, Box<Vec<u8>>)),
+    Data((String, Vec<u8>)),
     Park,
     Kill,
     Add(games::User),
@@ -57,18 +59,22 @@ impl Group {
         self.id
     }
 
+    #[allow(dead_code)]
     pub fn group_type(&self) -> &str {
         &self.group_type
     }
 
+    #[allow(dead_code)]
     pub fn name(&self) -> &str {
         &self.name
     }
 
+    #[allow(dead_code)]
     pub fn park(self) -> Result<(), ServerError> {
         Ok(self.sender.send(Message::Park)?)
     }
 
+    #[allow(dead_code)]
     pub fn unpark(&mut self) {
         self.game_thread.thread().unpark();
     }
@@ -113,16 +119,18 @@ impl Group {
 
         let game = match group_type.as_str() {
             "rask" => RaskGame::new(send_group),
-            name => Err(ServerError::GroupCreation(format!(
-                "The game type {} is not implemented",
-                name
-            )))?,
+            name => {
+                return Err(ServerError::GroupCreation(format!(
+                    "The game type {} is not implemented",
+                    name
+                )))
+            }
         };
 
         Ok(Self {
             clients: Vec::new(),
             sender,
-            id: id,
+            id,
             group_type,
             name,
             capacity,

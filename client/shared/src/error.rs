@@ -47,10 +47,19 @@ impl std::fmt::Display for ClientError {
                 write!(f, "{}", jsvalue_to_string(e))
             }
             ClientError::ResourceError(e)
-            | ClientError::EngineError(e)
-            | ClientError::WebGlError(e) => write!(f, "{}", e),
+            | ClientError::WebGlError(e)
+            | ClientError::EngineError(e) => write!(f, "{}", e),
         }
     }
+}
+macro_rules! derive_from {
+    ($type:ty, $kind:ident) => {
+        impl From<$type> for ClientError {
+            fn from(error: $type) -> Self {
+                ClientError::$kind(format!("{}", error))
+            }
+        }
+    };
 }
 
 impl From<JsValue> for ClientError {
@@ -58,8 +67,4 @@ impl From<JsValue> for ClientError {
         ClientError::JsValueError(error)
     }
 }
-impl From<rask_engine::error::EngineError> for ClientError {
-    fn from(error: rask_engine::error::EngineError) -> Self {
-        ClientError::EngineError(format!("{}", error))
-    }
-}
+derive_from!(rask_engine::error::EngineError, EngineError);

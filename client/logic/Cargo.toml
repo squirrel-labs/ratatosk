@@ -17,6 +17,7 @@ log = "0.4"
 js-sys = "=0.3.36"
 fern = "0.5.9"
 rand = "0.7"
+console_error_panic_hook = "0.1.6"
 
 [dependencies.rask-wasm-shared]
 version = "0.1.0"
@@ -33,6 +34,7 @@ features = [
     "Window",
     "OffscreenCanvas",
     "WebGl2RenderingContext",
+    "DedicatedWorkerGlobalScope",
     "WebGlShader",
     "WebGlProgram",
     "WebGlBuffer",

@@ -1,11 +1,10 @@
 function onwasm(ctx, desc, module) {
-    if (desc.canvas === undefined) {
-        module.initialise();
+    if (typeof desc.canvas === "undefined") {
+        module.run_main_loop();
     } else {
-        module.initialise(desc.canvas);
+        module.initialise_graphics_context(desc.canvas);
+        setInterval(module.draw_frame, desc.deltaTime);
     }
-
-    setInterval(module.frame, desc.deltaTime);
 }
 
 onmessage = async function(e) {

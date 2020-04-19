@@ -156,9 +156,6 @@ impl ops::Mul for Mat3 {
         let m22 = a(3, 1) * b(1, 2);
         let m23 = a(3, 3) * b(3, 3);
 
-        // println!("{:?}", (m12, m15));
-        // println!("{:?}", (-b(3, 1), b(3, 2)));
-
         Self::new(
             m6 + m14 + m19,
             m1 + m4 + m5 + m6 + m12 + m14 + m15,
@@ -303,5 +300,15 @@ impl Mat3 {
 impl convert::AsRef<[f32; 9]> for Mat3 {
     fn as_ref(&self) -> &[f32; 9] {
         &self.data
+    }
+}
+
+impl From<spine::skeleton::SRT> for Mat3 {
+    fn from(srt: spine::skeleton::SRT) -> Self {
+        let mat = srt.to_matrix3();
+        Self::new(
+            mat[0][0], mat[1][0], mat[2][0], mat[0][1], mat[1][1], mat[2][1], mat[0][2], mat[1][2],
+            mat[2][2],
+        )
     }
 }

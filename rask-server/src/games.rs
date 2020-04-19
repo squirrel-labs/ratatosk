@@ -1,5 +1,8 @@
 use crate::error::ServerError;
 use crate::group::{Message, SendGroup};
+use rask_engine::resources::registry;
+use rask_engine::{world, EngineError};
+use std::io::Read;
 use std::thread;
 use std::thread::JoinHandle;
 
@@ -31,8 +34,12 @@ impl Game for RaskGame {
         thread::Builder::new()
             .name(format!("group{}", self.group.id))
             .spawn(move || self.game_loop())
-            .map_err(|e| ServerError::GameCreation(e))
+            .map_err(ServerError::GameCreation)
     }
+}
+
+fn add_u32_to_vec(buf: &mut Vec<u8>, n: u32) {
+    buf.extend_from_slice(&n.to_le_bytes())
 }
 
 impl RaskGame {
@@ -48,14 +55,58 @@ impl RaskGame {
     fn game_loop(mut self) {
         let _messages = self.get_messages();
         while self.will_to_live {
+            let v = registry::IMAGE1.variant as u32;
+            let id = registry::IMAGE1.id;
+            let path = registry::IMAGE1.path;
+
+            self.push_resource(v, id, &[path]).unwrap();
             //game.handle_events(messages);
             //game.tick();
-            let _ = self.game == self.game;
             //let b = game.get_broadcast()
             //self.users.iter().foreach(|u| u.sender.send(b));
             let _messages = self.get_messages();
         }
         info!("thread kiled itself");
+    }
+
+    fn handle_event(event: rask_engine::events::Event) {}
+
+    // supply paths in order of texture, atlas, skeleton
+    fn push_resource(
+        &mut self,
+        res_type: u32,
+        res_id: u32,
+        path: &[&str],
+    ) -> Result<(), ServerError> {
+        let mut buf = Vec::new();
+        add_u32_to_vec(&mut buf, 10);
+        add_u32_to_vec(&mut buf, res_type);
+        add_u32_to_vec(&mut buf, res_id);
+        if res_type == 3 {
+            let mut res = Vec::new();
+            RaskGame::read_to_vec(path[0], &mut res)?;
+            let tex_len = res.len();
+            RaskGame::read_to_vec(path[1], &mut res)?;
+            let atlas_len = res.len() - tex_len;
+            RaskGame::read_to_vec(path[2], &mut res)?;
+            let skeleton_len = res.len() - (atlas_len + tex_len);
+            add_u32_to_vec(&mut buf, tex_len as u32);
+            add_u32_to_vec(&mut buf, atlas_len as u32);
+            add_u32_to_vec(&mut buf, skeleton_len as u32);
+            buf.append(&mut res);
+        } else {
+            RaskGame::read_to_vec(path[0], &mut buf)?;
+        }
+        for u in &self.users {
+            u.sender.send(ws::Message::from(buf.as_slice()))?;
+        }
+        Ok(())
+    }
+
+    fn read_to_vec(path: &str, buf: &mut Vec<u8>) -> Result<(), ServerError> {
+        let mut file = std::fs::File::open(path)?;
+        file.read_to_end(buf)?;
+        Ok(())
     }
 
     fn get_messages(&mut self) -> Vec<Message> {
