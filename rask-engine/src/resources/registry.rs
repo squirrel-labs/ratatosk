@@ -31,8 +31,9 @@ macro_rules! resources {
 
 #[derive(Debug)]
 pub enum ResourceVariant {
-    Texture,
-    Character,
+    Texture = 2,
+    Character = 3,
+    Sound = 4,
     TextureIds,
 }
 

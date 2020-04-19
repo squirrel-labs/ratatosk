@@ -106,9 +106,10 @@ impl GameContext {
     }
     fn dealloc_buffer(&mut self, id: u32) {
         if let Some((ptr, length)) = self.buffer_table.remove(&id) {
-            let layout =
-                unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 4) };
-            unsafe { std::alloc::dealloc(ptr as *mut u8, layout) }
+            unsafe {
+                let layout = std::alloc::Layout::from_size_align_unchecked(length as usize, 4);
+                std::alloc::dealloc(ptr as *mut u8, layout)
+            }
         }
     }
     fn handle_message(&mut self, message: Message) -> Result<Option<Event>, ClientError> {
@@ -131,11 +132,11 @@ impl GameContext {
                     match data[0] as u32 | (data[1] as u32) << 8 {
                         2 => {
                             let img = rask_engine::resources::Texture::from_png_stream(&data[4..])?;
-                            unsafe { self.resource_table.store(img, id as usize) };
+                            unsafe { self.resource_table.store(img, id as usize) }?;
                         }
                         3 => {
                             let chr = rask_engine::resources::Character::from_u8(&data[4..])?;
-                            unsafe { self.resource_table.store(chr, id as usize) };
+                            unsafe { self.resource_table.store(Box::new(chr), id as usize) }?;
                         }
                         _ => {
                             self.dealloc_buffer(id);
