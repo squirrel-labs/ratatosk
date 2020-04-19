@@ -36,7 +36,7 @@ pub use texture::{Texture, TextureIds};
 
 pub enum Resource {
     None,
-    Character(Character),
+    Character(Box<Character>),
     Texture(Texture),
     TextureIds(TextureIds),
     Sound(Sound),
