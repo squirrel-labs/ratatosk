@@ -1,5 +1,5 @@
 #![allow(clippy::unreadable_literal)]
-//! this module contains The game input/output event defeniton
+//! this module contains The game input/output event definiton
 
 #[derive(Debug, Clone, Copy)]
 #[repr(u32)]

@@ -106,9 +106,10 @@ impl GameContext {
     }
     fn dealloc_buffer(&mut self, id: u32) {
         if let Some((ptr, length)) = self.buffer_table.remove(&id) {
-            let layout =
-                unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 4) };
-            unsafe { std::alloc::dealloc(ptr as *mut u8, layout) }
+            unsafe {
+                let layout = std::alloc::Layout::from_size_align_unchecked(length as usize, 4);
+                std::alloc::dealloc(ptr as *mut u8, layout)
+            }
         }
     }
     fn handle_message(&mut self, message: Message) -> Result<Option<Event>, ClientError> {
