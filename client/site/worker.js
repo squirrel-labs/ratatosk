@@ -1,5 +1,5 @@
 function onwasm(ctx, desc, module) {
-    if (desc.canvas === undefined) {
+    if (typeof desc.canvas === "undefined") {
         module.run_main_loop();
     } else {
         module.initialise_graphics_context(desc.canvas);
