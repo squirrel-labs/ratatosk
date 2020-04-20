@@ -38,9 +38,8 @@ impl Game for RaskGame {
     }
 }
 
-fn u32_to_vec(n: u32) -> Vec<u8> {
-    let arr = n.to_le_bytes();
-    unsafe { Vec::from_raw_parts(&arr as *const u8 as *mut u8, arr.len(), arr.len()) }
+fn add_u32_to_vec(buf: &mut Vec<u8>, n: u32) {
+    buf.extend_from_slice(&n.to_le_bytes())
 }
 
 impl RaskGame {
@@ -79,9 +78,10 @@ impl RaskGame {
         res_id: u32,
         path: &[&str],
     ) -> Result<(), ServerError> {
-        let mut buf = u32_to_vec(10);
-        buf.append(&mut u32_to_vec(res_type));
-        buf.append(&mut u32_to_vec(res_id));
+        let mut buf = Vec::new();
+        add_u32_to_vec(&mut buf, 10);
+        add_u32_to_vec(&mut buf, res_type);
+        add_u32_to_vec(&mut buf, res_id);
         if res_type == 3 {
             let mut res = Vec::new();
             RaskGame::read_to_vec(path[0], &mut res)?;
@@ -90,9 +90,9 @@ impl RaskGame {
             let atlas_len = res.len() - tex_len;
             RaskGame::read_to_vec(path[2], &mut res)?;
             let skeleton_len = res.len() - (atlas_len + tex_len);
-            buf.append(&mut u32_to_vec(tex_len as u32));
-            buf.append(&mut u32_to_vec(atlas_len as u32));
-            buf.append(&mut u32_to_vec(skeleton_len as u32));
+            add_u32_to_vec(&mut buf, tex_len as u32);
+            add_u32_to_vec(&mut buf, atlas_len as u32);
+            add_u32_to_vec(&mut buf, skeleton_len as u32);
             buf.append(&mut res);
         } else {
             RaskGame::read_to_vec(path[0], &mut buf)?;

@@ -60,7 +60,7 @@ class MessageQueueWriter {
 queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
 
 function postWorkerDescriptor(worker, desc) {
-    if (desc.canvas === undefined) {
+    if (typeof desc.canvas === "undefined") {
         worker.postMessage(desc);
         worker.addEventListener("message", LogicMessage);
     }
@@ -97,7 +97,7 @@ function throwMissingOffscreenCanvasSupport() {
 
 function createCanvas() {
     let canvas = document.getElementById('c');
-    if (canvas.transferControlToOffscreen === undefined)
+    if (typeof canvas.transferControlToOffscreen !== 'function')
         return throwMissingOffscreenCanvasSupport();
     try {
         canvas = canvas.transferControlToOffscreen();
@@ -173,7 +173,7 @@ function upload_resource(data) {
 }
 
 let canvas = createCanvas();
-if (canvas === undefined) throw Error('canvas creation failed');
+if (typeof canvas === 'undefined') throw Error('canvas creation failed');
 memory = generateMemory();
 let memoryView32 = new Int32Array(memory.buffer);
 let memoryViewU32 = new Uint32Array(memory.buffer);
@@ -237,12 +237,12 @@ function setup_ws() {
     });
 }
 
-String.prototype.hashCode = function() {
+function hashCode(str) {
     var hash = 0;
     if (this.length === 0) {
         return hash;
     }
-    for (var i = 0; i < this.length; i++) {
+    for (var i = 0; i < str.length; i++) {
         var char = this.charCodeAt(i);
         hash = ((hash<<5)-hash)+char;
         hash = hash & hash; // Convert to 32bit integer
@@ -256,7 +256,7 @@ function keyMod(key) {
 
 function evalKey(key) {
     if (key.isComposing && key.repeat) { return 0; }
-    return key.code.hashCode()
+    return hashCode(key.code)
 }
 
 function input(e) {
