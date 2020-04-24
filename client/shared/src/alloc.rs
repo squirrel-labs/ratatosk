@@ -1,5 +1,5 @@
 use settings::AllocSettings;
-use std::alloc::{GlobalAlloc, Layout};
+use std::alloc::{GlobalAlloc, Layout, AllocInit};
 
 pub mod settings {
     use crate::mem::*;
@@ -31,7 +31,7 @@ pub mod settings {
 }
 
 pub trait MutableAlloc {
-    unsafe fn alloc(&mut self, layout: Layout) -> *mut u8;
+    unsafe fn alloc(&mut self, layout: Layout, init: AllocInit) -> *mut u8;
     unsafe fn dealloc(&mut self, ptr: *mut u8, layout: Layout);
 }
 
@@ -52,7 +52,7 @@ impl SimpleAllocator {
 }
 
 impl MutableAlloc for SimpleAllocator {
-    unsafe fn alloc(&mut self, layout: Layout) -> *mut u8 {
+    unsafe fn alloc(&mut self, layout: Layout, init: AllocInit) -> *mut u8 {
         let size = Self::layout_to_size(layout);
         let pos = self.pos;
         self.pos += size;
@@ -101,7 +101,7 @@ unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> 
     for Allocator<M, S, I>
 {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        let out = Self::allocator().alloc(layout);
+        let out = Self::allocator().alloc(layout, AllocInit::Uninitialized);
         let tout = out as usize as u32;
         let size = SimpleAllocator::layout_to_size(layout) as u32;
         let start = S::allocation_start_address::<M>() as usize as u32;
@@ -120,7 +120,7 @@ unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> 
 }
 
 impl<A: GlobalAlloc> MutableAlloc for A {
-    unsafe fn alloc(&mut self, layout: Layout) -> *mut u8 {
+    unsafe fn alloc(&mut self, layout: Layout, init: AllocInit) -> *mut u8 {
         <Self as GlobalAlloc>::alloc(self, layout)
     }
 
