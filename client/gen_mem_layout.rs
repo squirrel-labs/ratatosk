@@ -9,10 +9,12 @@ const fn KiB(n: u32) -> u32 {
 const fn MiB(n: u32) -> u32 {
     n * KiB(1024)
 }
-/// align the given address to the next 32bit
+/// Align the given address to the next 32bit
 const fn align32_up(n: u32) -> u32 {
     (n + 3) & !3
 }
+
+/// Align the given address to the next 64KiB Wasm memory page
 const fn align_page_up(n: u32) -> u32 {
     let x = (1<<16) - 1; 
     (n + x) & !x
@@ -103,14 +105,14 @@ fn main() -> std::io::Result<()> {
     if is_logic {
         write!(
             &mut file,
-            " -Clink-arg=-zstack-size={} -Clink-arg=--max-memory={} -Clink-arg=--global-base={}",
+            "-Clink-arg=-zstack-size={} -Clink-arg=--max-memory={} -Clink-arg=--global-base={}",
             logic_stack, max_mem, logic_global
         )?;
         println!("cargo:rustc-env=WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES={}", LOGIC_HEAP_SIZE);
     } else {
         write!(
             &mut file,
-            " -Clink-arg=-zstack-size={} -Clink-arg=--max-memory={} -Clink-arg=--global-base={}",
+            "-Clink-arg=-zstack-size={} -Clink-arg=--max-memory={} -Clink-arg=--global-base={}",
             graphics_stack, max_mem, graphics_global
         )?;
         println!("cargo:rustc-env=WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES={}", GRAPHICS_HEAP_SIZE);
