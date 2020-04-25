@@ -3,17 +3,17 @@ name: default
 
 steps:
 - name: build
-  image: truedoctor/rust-wasm:nightly-2020-04-19
+  image: truedoctor/rust-wasm:nightly-2020-04-19-1
   pull: if-not-exists
   commands:
   - nix-shell --run 'cargo make all' --arg inCI true # build all projects
 - name: test
-  image: truedoctor/rust-wasm:nightly-2020-04-19
+  image: truedoctor/rust-wasm:nightly-2020-04-19-1
   pull: if-not-exists
   commands:
   - nix-shell --run 'cargo make test' --arg inCI true # test all projects
 - name: doc
-  image: truedoctor/rust-wasm:nightly-2020-04-19
+  image: truedoctor/rust-wasm:nightly-2020-04-19-1
   pull: if-not-exists
   when:
     branch:
@@ -24,7 +24,7 @@ steps:
   commands:
   - nix-shell --run 'cargo doc --no-deps' --arg inCI true # document all projects
 - name: demo
-  image: truedoctor/rust-wasm:nightly-2020-04-19
+  image: truedoctor/rust-wasm:nightly-2020-04-19-1
   pull: if-not-exists
   when:
     branch:
@@ -35,7 +35,7 @@ steps:
   commands:
   - cp -r client /tmp/demo
 - name: format
-  image: truedoctor/rust-wasm:nightly-2020-04-19
+  image: truedoctor/rust-wasm:nightly-2020-04-19-1
   pull: if-not-exists
   commands:
   - nix-shell --run 'cargo make check-format' --arg inCI true # check formatting for all projects
