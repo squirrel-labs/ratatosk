@@ -150,7 +150,7 @@ function LogicMessage(e) {
         let ptr = x[2];
         if (resource_map.has(id)) {
             for (let i of resource_map.get(id).forEach()) {
-                Atomics.store(memoryViewu32, ptr++, i);
+                memoryViewu32[ptr++] = i;
             }
             resource_map.delete(id);
             queue.write_i32([8, id]);
