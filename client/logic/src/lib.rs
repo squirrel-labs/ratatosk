@@ -3,6 +3,7 @@
 
 #![feature(allocator_api)]
 #![feature(type_ascription)]
+#![feature(global_allocator)]
 
 use rask_wasm_shared::{
     alloc::{settings::Logic, Allocator, Initial},

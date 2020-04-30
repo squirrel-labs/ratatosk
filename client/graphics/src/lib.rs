@@ -1,4 +1,5 @@
 #![feature(allocator_api)]
+#![feature(global_allocator)]
 
 use rask_wasm_shared::{
     alloc::{settings::Graphics, Allocator, Initial},
