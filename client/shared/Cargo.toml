@@ -14,7 +14,7 @@ crate-type = ["rlib"]
 [dependencies]
 wasm-bindgen = "0.2.60"
 log = "0.4"
-js-sys = "=0.3.36"
+js-sys = "=0.3.37"
 fern = "0.5.9"
 rand = "0.7"
 image = "0.23"
@@ -44,4 +44,5 @@ features = [
 [dependencies.wee_alloc]
 version = "=0.4.5"
 features = ["size_classes", "static_array_backend", "nightly", "extra_assertions"]
-git = "https://github.com/squirrel-labs/wee_alloc"
+git = "https://github.com/Ma27/wee_alloc"
+branch = "nightly"
