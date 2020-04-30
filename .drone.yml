@@ -3,28 +3,37 @@ name: default
 
 steps:
 - name: build
-  image: truedoctor/rust-wasm:nightly-2020-04-19-1
+  image: truedoctor/rust-wasm:nightly-2020-04-19-2
   pull: if-not-exists
+  volumes:
+  - name: cargo
+    path: /usr/local/cargo
   commands:
   - nix-shell --run 'cargo make all' --arg inCI true # build all projects
 - name: test
-  image: truedoctor/rust-wasm:nightly-2020-04-19-1
+  image: truedoctor/rust-wasm:nightly-2020-04-19-2
   pull: if-not-exists
+  volumes:
+  - name: cargo
+    path: /usr/local/cargo
   commands:
   - nix-shell --run 'cargo make test' --arg inCI true # test all projects
 - name: doc
-  image: truedoctor/rust-wasm:nightly-2020-04-19-1
+  image: truedoctor/rust-wasm:nightly-2020-04-19-2
   pull: if-not-exists
   when:
     branch:
     - master
   volumes:
+  - name: cargo
+    path: /usr/local/cargo
   - name: doc
     path: /drone/src/target/doc
   commands:
+  - source client/gen/mem.sh
   - nix-shell --run 'cargo doc --no-deps' --arg inCI true # document all projects
 - name: demo
-  image: truedoctor/rust-wasm:nightly-2020-04-19-1
+  image: truedoctor/rust-wasm:nightly-2020-04-19-2
   pull: if-not-exists
   when:
     branch:
@@ -32,11 +41,16 @@ steps:
   volumes:
   - name: demo
     path: /tmp/demo
+  - name: cargo
+    path: /usr/local/cargo
   commands:
   - cp -r client /tmp/demo
 - name: format
-  image: truedoctor/rust-wasm:nightly-2020-04-19-1
+  image: truedoctor/rust-wasm:nightly-2020-04-19-2
   pull: if-not-exists
+  volumes:
+  - name: cargo
+    path: /usr/local/cargo
   commands:
   - nix-shell --run 'cargo make check-format' --arg inCI true # check formatting for all projects
 
@@ -47,4 +61,6 @@ volumes:
 - name: doc
   host:
     path: /usr/website/ratatosk/doc
+- name: cargo
+  temp: {}
 
