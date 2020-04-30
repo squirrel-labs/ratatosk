@@ -114,9 +114,7 @@ impl GameContext {
     }
     fn handle_message(&mut self, message: Message) -> Result<Option<Event>, ClientError> {
         match message {
-            Message::KeyDown(modifier, hash) => {
-                Ok(Some(Event::KeyDown(modifier, Key::from(hash))))
-            }
+            Message::KeyDown(modifier, hash) => Ok(Some(Event::KeyDown(modifier, Key::from(hash)))),
             Message::KeyUp(modifier, hash) => Ok(Some(Event::KeyUp(modifier, Key::from(hash)))),
             Message::MouseDown(event) => Ok(Some(Event::MouseDown(event))),
             Message::MouseUp(event) => Ok(Some(Event::MouseUp(event))),
