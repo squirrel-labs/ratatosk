@@ -6,20 +6,16 @@ steps:
   image: truedoctor/rust-wasm:nightly-2020-04-19-2
   pull: if-not-exists
   volumes:
-  - name: git
-    path: ~/.cargo/git
-  - name: registry
-    path: ~/.cargo/registry
+  - name: cargo
+    path: /usr/local/cargo
   commands:
   - nix-shell --run 'cargo make all' --arg inCI true # build all projects
 - name: test
   image: truedoctor/rust-wasm:nightly-2020-04-19-2
   pull: if-not-exists
   volumes:
-  - name: git
-    path: ~/.cargo/git
-  - name: registry
-    path: ~/.cargo/registry
+  - name: cargo
+    path: /usr/local/cargo
   commands:
   - nix-shell --run 'cargo make test' --arg inCI true # test all projects
 - name: doc
@@ -29,10 +25,8 @@ steps:
     branch:
     - master
   volumes:
-  - name: git
-    path: ~/.cargo/git
-  - name: registry
-    path: ~/.cargo/registry
+  - name: cargo
+    path: /usr/local/cargo
   - name: doc
     path: /drone/src/target/doc
   commands:
@@ -47,20 +41,16 @@ steps:
   volumes:
   - name: demo
     path: /tmp/demo
-  - name: git
-    path: ~/.cargo/git
-  - name: registry
-    path: ~/.cargo/registry
+  - name: cargo
+    path: /usr/local/cargo
   commands:
   - cp -r client /tmp/demo
 - name: format
   image: truedoctor/rust-wasm:nightly-2020-04-19-2
   pull: if-not-exists
   volumes:
-  - name: git
-    path: ~/.cargo/git
-  - name: registry
-    path: ~/.cargo/registry
+  - name: cargo
+    path: /usr/local/cargo
   commands:
   - nix-shell --run 'cargo make check-format' --arg inCI true # check formatting for all projects
 
@@ -71,8 +61,6 @@ volumes:
 - name: doc
   host:
     path: /usr/website/ratatosk/doc
-- name: registry
-  temp: {}
-- name: git
+- name: cargo
   temp: {}
 
