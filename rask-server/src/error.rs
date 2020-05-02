@@ -3,6 +3,7 @@ use rask_engine::error;
 use reqwest::Error as ReqError;
 use std::sync::mpsc::SendError;
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub enum ServerError {
     Group(String),

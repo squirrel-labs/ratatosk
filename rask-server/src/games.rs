@@ -1,7 +1,6 @@
 use crate::error::ServerError;
 use crate::group::{Message, SendGroup};
 use rask_engine::resources::registry;
-use rask_engine::{world, EngineError};
 use std::io::Read;
 use std::thread;
 use std::thread::JoinHandle;
@@ -10,6 +9,7 @@ pub trait Game {
     fn run(self) -> Result<JoinHandle<()>, ServerError>;
 }
 
+#[allow(dead_code)]
 pub struct RaskGame {
     game: (),
     group: SendGroup,
@@ -69,8 +69,7 @@ impl RaskGame {
         info!("thread kiled itself");
     }
 
-    fn handle_event(event: rask_engine::events::Event) {}
-
+    #[allow(dead_code)]
     // supply paths in order of texture, atlas, skeleton
     fn push_resource(
         &mut self,

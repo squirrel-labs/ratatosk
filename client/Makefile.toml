@@ -40,7 +40,6 @@ script = [
 	"echo \"export MEMORY_LAYOUT_PARAMETERS=\\\"${MEMORY_LAYOUT_PARAMETERS}\\\"\" > gen/mem.sh",
 	". gen/mem.sh",
 	"cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown",
-	"#mv $(find $CARGO_TARGET_DIR/ -name mem.json | tail -n 1) gen/",
 ]
 
 # TODO cargo doesn't seem to have a post-build hook but it might be nice
@@ -60,6 +59,7 @@ file=$top/target/${CRATE}/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm_${@}.was
 wasm-bindgen $file --out-dir $top/client/gen \
   --no-typescript \
   --remove-producers-section \
+  --keep-debug \
   --target no-modules #\
 wasm-opt $top/client/gen/rask_wasm_${@}_bg.wasm \
   --memory-packing --remove-unused-brs --enable-mutable-globals --enable-threads --enable-bulk-memory \
