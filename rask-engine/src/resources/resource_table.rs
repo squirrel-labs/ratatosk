@@ -10,6 +10,7 @@ macro_rules! character_check_helper {
     };
     ($enum_type: ident, $value: ident) => {};
 }
+
 macro_rules! get_store {
     ($type: ty, $enum_type: ident) => {
         impl GetStore<$type> for ResourceTable {
@@ -19,7 +20,7 @@ macro_rules! get_store {
                     Resource::$enum_type(value) => Ok(&value),
                     Resource::None => Err(EngineError::ResourceMissing(format!(
                         "Could not find requested recource #{}",
-                        id
+                        id,
                     ))),
                     res => {
                         #[allow(unused_variables)]
@@ -30,11 +31,12 @@ macro_rules! get_store {
                         }
                         Err(EngineError::ResourceType(format!(
                             "Wrong resource type, required \"{}\"",
-                            stringify!($type)
+                            stringify!($type),
                         )))
                     }
                 }
             }
+
             unsafe fn store(&mut self, data: $type, id: usize) -> Result<(), EngineError> {
                 self.index_check(id)?;
                 Ok(self.0[id] = Resource::$enum_type(data))
@@ -50,6 +52,7 @@ pub trait GetStore<T> {
     ///
     /// The function is not thread safe.
     unsafe fn get(&self, id: usize) -> Result<&T, EngineError>;
+
     /// Store a resource to the library
     ///
     /// # Safety

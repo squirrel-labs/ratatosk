@@ -18,14 +18,14 @@ macro_rules! parse_resource {
 
 macro_rules! resources {
     ($(($name:ident, $variant:ident, $val:expr)),*) => {
-        resources! {0, $(($name, $variant, $val)),*}
+        resources! { 0, $(($name, $variant, $val)),* }
     };
     ($num:expr, ($name:ident, $variant:ident, $val:expr), $(($name2:ident, $variant2:ident, $val2:expr)),*) => {
-        parse_resource! {$num, $name, $variant, $val}
-        resources! {$num+1, $(($name2, $variant2, $val2)),*}
+        parse_resource! { $num, $name, $variant, $val }
+        resources! { $num+1, $(($name2, $variant2, $val2)),* }
     };
     ($num:expr, ($name:ident, $variant:ident, $val:expr)) => {
-        parse_resource! {$num, $name, $variant, $val}
+        parse_resource! { $num, $name, $variant, $val }
     };
 }
 
