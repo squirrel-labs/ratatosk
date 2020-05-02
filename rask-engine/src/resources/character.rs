@@ -2,10 +2,7 @@ use super::Texture;
 use crate::{math::Mat3, EngineError};
 use spine::atlas::Atlas;
 use spine::atlas::Texture as TextureSegment;
-use spine::skeleton::{
-    animation::{SkinAnimation, Sprite as SpriteState, Sprites as SpriteStates},
-    Skeleton, SRT,
-};
+use spine::skeleton::{Skeleton, SRT};
 use std::convert::TryInto;
 
 use std::collections::HashMap;
@@ -16,6 +13,7 @@ struct OwnedSpriteState {
     srt: SRT,
 }
 
+#[allow(dead_code)]
 pub struct AnimationState {
     /// if true, the image has to be rotated clockwise
     rotated: bool,
