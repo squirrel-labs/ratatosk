@@ -11,10 +11,6 @@ description = "shared crate for WebAssembly frontend of the rask project"
 [lib]
 crate-type = ["rlib"]
 
-[features]
-default = []
-assert_memory = []
-
 [dependencies]
 wasm-bindgen = "0.2.60"
 log = "0.4"

@@ -8,7 +8,7 @@ use const_env::from_env;
 use rask_engine::resources::Resource;
 use std::mem::size_of;
 
-#[cfg(feature = "assert_memory")]
+#[cfg(target_arch = "wasm32")]
 mod asserts {
     macro_rules! assert_env {
         ($var:expr) => {
