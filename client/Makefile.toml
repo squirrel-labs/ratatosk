@@ -40,7 +40,6 @@ script = [
 	"echo \"export MEMORY_LAYOUT_PARAMETERS=\\\"${MEMORY_LAYOUT_PARAMETERS}\\\"\" > gen/mem.sh",
 	". gen/mem.sh",
 	"cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown",
-	"#mv $(find $CARGO_TARGET_DIR/ -name mem.json | tail -n 1) gen/",
 ]
 
 # TODO cargo doesn't seem to have a post-build hook but it might be nice
