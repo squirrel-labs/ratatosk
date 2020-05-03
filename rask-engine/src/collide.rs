@@ -14,6 +14,9 @@ pub trait Collide<Rhs: ?Sized = Self> {
     fn collides(&self, other: &Rhs) -> bool;
 }
 
+/// A trait for common objects to be collidable with other common objects.
+pub trait Collidable: Collide<RBox> + Collide<SRT> + Collide<AABox> + Collide<Vec2> {}
+
 fn left_under(v1: Vec2, v2: Vec2) -> bool {
     v1.x() < v2.x() && v1.y() < v2.y()
 }
@@ -174,6 +177,20 @@ impl Collide<AABox> for SRT {
     }
 }
 
+impl Collide<RBox> for SRT {
+    fn collides(&self, other: &RBox) -> bool {
+        let rbox: RBox = self.into();
+        rbox.collides(other)
+    }
+}
+
+impl Collide for SRT {
+    fn collides(&self, other: &Self) -> bool {
+        let (rbox1, rbox2): (RBox, RBox) = (self.into(), other.into());
+        rbox1.collides(&rbox2)
+    }
+}
+
 impl Collide<AABox> for RBox {
     fn collides(&self, other: &AABox) -> bool {
         let xbound = other.pos.x()..other.pos.x() + other.size.x();
@@ -187,6 +204,13 @@ impl Collide<AABox> for RBox {
                 self.v2,
             )
             || collide_aabox_rbox_segment(xbound, ybound, self.pos + self.v2, self.v1)
+    }
+}
+
+impl Collide<SRT> for RBox {
+    fn collides(&self, other: &SRT) -> bool {
+        let rbox: RBox = other.into();
+        rbox.collides(self)
     }
 }
 
@@ -211,3 +235,8 @@ impl<S, T: Collide<S>> Collide<[T]> for S {
         other.collides(self)
     }
 }
+
+impl Collidable for RBox {}
+impl Collidable for SRT {}
+impl Collidable for AABox {}
+impl Collidable for Vec2 {}
