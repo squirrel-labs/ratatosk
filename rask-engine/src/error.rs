@@ -11,6 +11,7 @@ pub enum EngineError {
     ResourceType(String),
     MathError(String),
     Misc(String),
+    FileError(String),
 }
 
 impl Display for EngineError {
@@ -23,6 +24,7 @@ impl Display for EngineError {
             EngineError::ResourceType(e) => write!(f, "ResourceError: {}", e),
             EngineError::Misc(e) => write!(f, "EngineError: {}", e),
             EngineError::MathError(e) => write!(f, "MathError: {}", e),
+            EngineError::FileError(e) => write!(f, "FileError: {}", e),
         }
     }
 }
@@ -44,3 +46,4 @@ derive_from!(String, Misc);
 derive_from!(image::error::ImageError, ResourceType);
 derive_from!(spine::skeleton::error::SkeletonError, ResourceFormat);
 derive_from!(spine::atlas::AtlasError, ResourceFormat);
+derive_from!(std::io::Error, FileError);

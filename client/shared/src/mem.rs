@@ -108,9 +108,15 @@ pub struct SynchronizationMemory {
 }
 
 impl SynchronizationMemory {
+    /// # Safety
+    /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
+    /// and is only written to using atomic operations
     pub unsafe fn get() -> &'static Self {
         &*(SYNCHRONIZATION_MEMORY as *const Self)
     }
+    /// # Safety
+    /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
+    /// and is only written to using atomic operations
     pub unsafe fn get_mut() -> &'static mut Self {
         &mut *(SYNCHRONIZATION_MEMORY as *mut Self)
     }
@@ -118,7 +124,7 @@ impl SynchronizationMemory {
     pub fn wait_for_main_thread_notify(&mut self) {
         self.last_elapsed_ms = self.elapsed_ms;
         while self.last_elapsed_ms == self.elapsed_ms {
-            wait_until_wake_up_at((&mut self.elapsed_ms) as *mut i32)
+            unsafe { wait_until_wake_up_at((&mut self.elapsed_ms) as *mut i32) }
         }
     }
 }
@@ -146,36 +152,50 @@ unsafe fn llvm_atomic_notify(ptr: *mut i32, cnt: i32) -> i32 {
     -1
 }
 
+/// # Safety
+/// This function is not safe, it is a wrapper around raw pointer operations
 pub unsafe fn atomic_write_u8(ptr: *mut u8, v: u8) {
     (*(ptr as *mut core::sync::atomic::AtomicU8)).store(v, core::sync::atomic::Ordering::SeqCst)
 }
 
+/// # Safety
+/// This function is not safe, it is a wrapper around raw pointer operations
 pub unsafe fn atomic_read_u8(ptr: *const u8) -> u8 {
     (*(ptr as *const core::sync::atomic::AtomicU8)).load(core::sync::atomic::Ordering::SeqCst)
 }
 
+/// # Safety
+/// This function is not safe, it is a wrapper around raw pointer operations
 pub unsafe fn atomic_read_i32(ptr: *const i32) -> i32 {
     (*(ptr as *const core::sync::atomic::AtomicI32)).load(core::sync::atomic::Ordering::SeqCst)
 }
 
+/// # Safety
+/// This function is not safe, it is a wrapper around raw pointer operations
 pub unsafe fn atomic_write_u32(ptr: *mut u32, v: u32) {
     (*(ptr as *mut core::sync::atomic::AtomicU32)).store(v, core::sync::atomic::Ordering::SeqCst)
 }
 
+/// # Safety
+/// This function is not safe, it is a wrapper around raw pointer operations
 pub unsafe fn atomic_read_u32(ptr: *const u32) -> u32 {
     (*(ptr as *const core::sync::atomic::AtomicU32)).load(core::sync::atomic::Ordering::SeqCst)
 }
 
-pub fn wait_until_wake_up_at(ptr: *mut i32) {
-    let res = unsafe { llvm_atomic_wait_i32(ptr, atomic_read_i32(ptr), -1) };
+/// # Safety
+/// This function is safe as long the thread waits at a valid memory address
+pub unsafe fn wait_until_wake_up_at(ptr: *mut i32) {
+    let res = llvm_atomic_wait_i32(ptr, atomic_read_i32(ptr), -1);
     debug_assert!(res == 0)
 }
 
 /// performs a notify at a given address and return the count of waiters
-pub fn wake_up_at(ptr: *mut i32) -> bool {
+/// # Safety
+/// This function is safe as long as a valid memory address is specified
+pub unsafe fn wake_up_at(ptr: *mut i32) -> bool {
     // Documented at https://tc39.es/ecma262/#sec-atomics.notify
     // and https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators.
     // The notify function wakes all waiters up.
 
-    (unsafe { llvm_atomic_notify(ptr, -1) }) > 0
+    (llvm_atomic_notify(ptr, -1)) > 0
 }
