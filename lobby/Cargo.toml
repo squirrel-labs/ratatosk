@@ -1,5 +1,5 @@
 [package]
-default-run = "server"
+default-run = "lobby"
 name = "lobby"
 version = "0.1.0"
 authors = ["ma27"]

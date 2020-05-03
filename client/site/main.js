@@ -141,13 +141,14 @@ function onresize() {
 }
 
 function LogicMessage(e) {
+    return;
     let x = new Uint32Array(e.date);
     let type = x[0] & 255;
     if (type >= 128) {
         ws.post(x.slice(1));
     } else if (type === 0) {
         const id = x[1];
-        let ptr = x[2];
+        let ptr = x[2] / 4;
         if (resource_map.has(id)) {
             for (let i of resource_map.get(id).forEach()) {
                 memoryViewu32[ptr++] = i;
@@ -213,22 +214,22 @@ async function wakeLogic() {
 
 function setup_ws() {
     ws.addEventListener('open',  () => {
-        add_text('ws connection to ' + WS_URL + 'established');
+        console.log('ws connection to ' + WS_URL + 'established');
         connected = true;
     });
     ws.addEventListener('error', event => {
-        add_text('ws error occured: "' + event + '"');
+        console.error('ws error occured: "' + event + '"');
         connected = false;
     });
     ws.addEventListener('close', event => {
-        add_text('ws is closed now: ' + event);
+        console.error('ws is closed now: ' + event);
         connected = false;
     });
     ws.addEventListener('message', event => {
         let data = new UInt32Array(event.data.buffer);
         let type = data[0] & 255;
         if (type === 10) {
-            upload_resource(data);
+            //upload_resource(data);
         } else if (type === 11) {
             Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);

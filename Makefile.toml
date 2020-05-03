@@ -36,6 +36,27 @@ command = "cargo"
 args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "lobby" ]
 
 # dev tools
+[tasks.serve]
+workspace = false
+watch = true
+dependencies = [ "stop",  "backend", "lobby" ]
+script = [ 
+'''
+cargo make serve-lobby &
+#sleep 5 && ./scripts/dev-server &
+cargo make serve-backend
+''']
+
+[tasks.stop]
+workspace = false
+watch = true
+script = [ 
+'''
+#kill $(pgrep ./scripts/dev-server -f) 2>/dev/null || true
+kill $(pgrep target/debug/lobby -f) 2>/dev/null || true
+kill $(pgrep target/debug/rask-server -f) 2>/dev/null || true
+''']
+
 [tasks.serve-frontend]
 command = "./scripts/dev-server"
 workspace = false

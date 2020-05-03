@@ -1,3 +1,6 @@
+use crate::error::EngineError;
+use std::io::Read;
+
 macro_rules! parse_resource {
     ($num:expr, $name:ident, Character, $val: tt) => {
         pub const $name: CharacterInfo = CharacterInfo {
@@ -29,7 +32,11 @@ macro_rules! resources {
     };
 }
 
-#[derive(Debug)]
+pub trait Serialize {
+    fn serialize(&self, res_path: &str) -> Option<Vec<u8>>;
+}
+
+#[derive(Debug, Clone, Copy)]
 pub enum ResourceVariant {
     Texture = 2,
     Character = 3,
@@ -58,13 +65,63 @@ pub struct CharacterInfo {
     pub id: u32,
 }
 
+fn add_u32_to_vec(buf: &mut Vec<u8>, n: u32) {
+    buf.extend_from_slice(&n.to_le_bytes())
+}
+
+fn read_to_vec(path: &str, buf: &mut Vec<u8>) -> Result<(), EngineError> {
+    let mut file = std::fs::File::open(path)?;
+    file.read_to_end(buf)?;
+    Ok(())
+}
+impl Serialize for ResourceInfo {
+    fn serialize(&self, res_path: &str) -> Option<Vec<u8>> {
+        let mut buf = Vec::new();
+        add_u32_to_vec(&mut buf, 10); // TODO Replace magic
+        add_u32_to_vec(&mut buf, self.variant as u32);
+        add_u32_to_vec(&mut buf, self.id);
+        read_to_vec(format!("{}/{}", res_path, self.path).as_str(), &mut buf).ok()?;
+        Some(buf)
+    }
+}
+impl Serialize for CharacterInfo {
+    fn serialize(&self, res_path: &str) -> Option<Vec<u8>> {
+        let mut buf = Vec::new();
+
+        add_u32_to_vec(&mut buf, 10);
+        add_u32_to_vec(&mut buf, ResourceVariant::Character as u32);
+        add_u32_to_vec(&mut buf, self.id);
+
+        let mut res = Vec::new();
+        read_to_vec(format!("{}/{}", res_path, self.texture).as_str(), &mut buf).ok()?;
+        let tex_len = res.len();
+        read_to_vec(format!("{}/{}", res_path, self.atlas).as_str(), &mut buf).ok()?;
+        let atlas_len = res.len() - tex_len;
+        read_to_vec(
+            format!("{}/{}", res_path, self.animation).as_str(),
+            &mut buf,
+        )
+        .ok()?;
+        let skeleton_len = res.len() - (atlas_len + tex_len);
+
+        add_u32_to_vec(&mut buf, tex_len as u32);
+        add_u32_to_vec(&mut buf, atlas_len as u32);
+        add_u32_to_vec(&mut buf, skeleton_len as u32);
+
+        buf.append(&mut res);
+        Some(buf)
+    }
+}
+
 resources! {
     (IMAGE1,            Texture,        "see game_context.rs"    ),
     (IMAGE2,            Texture,        "see game_context.rs"    ),
+    (THIEF,             Texture,        "thief.png"              ),
+    (EMPTY,             Texture,        "empty.png"              ),
     (UNUSED,            Character,      Character {
-                          texture:   "textur.png",
-                          atlas:     "atlas.atlas",
-                          animation: "animation.anim"
+                          texture:   "BoneTest/BoneTest.png",
+                          atlas:     "BoneTest/BoneTest.atlas",
+                          animation: "BoneTest/BoneTest.json"
     }                                                            ),
     (USED_TEXTURE_IDS,  TextureIds,     ""                       )
 }
