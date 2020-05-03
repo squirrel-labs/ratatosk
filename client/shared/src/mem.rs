@@ -8,56 +8,61 @@ use const_env::from_env;
 use rask_engine::resources::Resource;
 use std::mem::size_of;
 
-macro_rules! assert_env {
-    ($var:expr) => {
-        const _: &str = env!($var);
-    };
+#[cfg(target_arch = "wasm32")]
+mod asserts {
+    macro_rules! assert_env {
+        ($var:expr) => {
+            pub const _: &str = env!($var);
+        };
+    }
+
+    assert_env!("WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES");
+    assert_env!("LOGIC_STACK");
+    assert_env!("GRAPHICS_STACK");
+    assert_env!("ALLOCATOR");
+    assert_env!("GRAPHICS_HEAP");
+    assert_env!("SYNCHRONIZATION_MEMORY");
+    assert_env!("RESOURCE_TABLE");
+    assert_env!("RESOURCE_TABLE_SIZE");
+    assert_env!("DOUBLE_BUFFER");
+    assert_env!("DOUBLE_BUFFER_SIZE");
+    assert_env!("MESSAGE_QUEUE");
+    assert_env!("MESSAGE_QUEUE_SIZE");
+    assert_env!("LOGIC_HEAP");
 }
-
-assert_env!("WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES");
-
 #[from_env]
 /// The position of the stack.
 pub const LOGIC_STACK: usize = 0;
-assert_env!("LOGIC_STACK");
 
 #[from_env]
 /// The position of the stack.
 pub const GRAPHICS_STACK: usize = 0;
-assert_env!("GRAPHICS_STACK");
 
 #[from_env]
 /// The address of the Allocator structures
 pub const ALLOCATOR: usize = 0;
-assert_env!("ALLOCATOR");
 
 #[from_env]
 /// The graphics heap address
 pub const GRAPHICS_HEAP: usize = 0;
-assert_env!("GRAPHICS_HEAP");
 
 #[from_env]
 /// The address memory synchronization area.
 /// It contains data needed for synchronization between main thread and logic thread.
 pub const SYNCHRONIZATION_MEMORY: usize = 0;
-assert_env!("SYNCHRONIZATION_MEMORY");
 
 #[from_env]
 /// Address of the internal resource library.
 pub const RESOURCE_TABLE: usize = 0;
-assert_env!("RESOURCE_TABLE");
 #[from_env]
-pub const RESOURCE_TABLE_SIZE: usize = 0;
-assert_env!("RESOURCE_TABLE_SIZE");
+pub const RESOURCE_TABLE_SIZE: usize = 1024;
 pub const RESOURCE_TABLE_ELEMENT_COUNT: usize = RESOURCE_TABLE_SIZE / size_of::<Resource>();
 
 #[from_env]
 /// The address of the double buffer (size: target dependent)
 pub const DOUBLE_BUFFER: usize = 0;
-assert_env!("DOUBLE_BUFFER");
 #[from_env]
-pub const DOUBLE_BUFFER_SIZE: usize = 0;
-assert_env!("DOUBLE_BUFFER_SIZE");
+pub const DOUBLE_BUFFER_SIZE: usize = 1024;
 pub const DOUBLE_BUFFER_SPRITE_COUNT: usize =
     ((DOUBLE_BUFFER_SIZE as i64 - size_of::<DoubleBuffer<()>>() as i64) / 2
         - size_of::<UnspecificState<()>>() as i64) as usize
@@ -66,17 +71,18 @@ pub const DOUBLE_BUFFER_SPRITE_COUNT: usize =
 #[from_env]
 /// Address of the event queue
 pub const MESSAGE_QUEUE: usize = 0;
-assert_env!("MESSAGE_QUEUE");
 #[from_env]
-pub const MESSAGE_QUEUE_SIZE: usize = 0;
-assert_env!("MESSAGE_QUEUE_SIZE");
+pub const MESSAGE_QUEUE_SIZE: usize = 1024;
 pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize =
     MESSAGE_QUEUE_SIZE / size_of::<MessageQueueElement<Message>>();
 
 #[from_env]
 /// The logic heap address (size: 32MiB)
 pub const LOGIC_HEAP: usize = 0;
-assert_env!("LOGIC_HEAP");
+
+#[from_env]
+/// The  heap size (size: 32MiB)
+pub const WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES: usize = 0;
 
 pub fn get_double_buffer() -> &'static mut Buffer {
     unsafe { &mut *(DOUBLE_BUFFER as *mut Buffer) }
@@ -117,6 +123,7 @@ impl SynchronizationMemory {
     }
 }
 
+#[cfg(target_arch = "wasm32")]
 extern "C" {
     #[link_name = "llvm.wasm.atomic.wait.i32"]
     /// see https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators
@@ -125,6 +132,18 @@ extern "C" {
     #[link_name = "llvm.wasm.atomic.notify"]
     /// see https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators
     fn llvm_atomic_notify(ptr: *mut i32, cnt: i32) -> i32;
+}
+
+#[allow(unused_variables)]
+#[cfg(not(target_arch = "wasm32"))]
+unsafe fn llvm_atomic_wait_i32(ptr: *mut i32, exp: i32, timeout: i64) -> i32 {
+    -1
+}
+
+#[allow(unused_variables)]
+#[cfg(not(target_arch = "wasm32"))]
+unsafe fn llvm_atomic_notify(ptr: *mut i32, cnt: i32) -> i32 {
+    -1
 }
 
 pub unsafe fn atomic_write_u8(ptr: *mut u8, v: u8) {
