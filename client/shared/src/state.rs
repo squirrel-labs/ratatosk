@@ -13,7 +13,7 @@ pub type State = UnspecificState<[Sprite; MAX_SPRITES]>;
 
 impl State {
     pub fn sprites(&self) -> &[Sprite] {
-        &self.sprites
+        &self.sprites[..self.sprite_len]
     }
 
     pub fn sprites_mut(&mut self) -> &mut [Sprite] {

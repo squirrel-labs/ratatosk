@@ -80,7 +80,7 @@ impl GameContext {
                 break;
             }
             log::info!("{:?}", msg);
-            self.handle_message(msg: Message)?;
+            self.handle_message(msg)?;
         }
 
         self.state.sprites_mut()[1].transform =
