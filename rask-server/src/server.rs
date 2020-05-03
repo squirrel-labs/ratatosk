@@ -91,7 +91,7 @@ impl Handler for Socket {
                     warn!("failed to remove Client from Game");
                 }
                 if group.clients.is_empty() {
-                    guard.remove(&self.id);
+                    //guard.remove(&self.id); // TODO
                 }
             }
         }

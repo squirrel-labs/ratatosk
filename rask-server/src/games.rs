@@ -1,8 +1,8 @@
 use crate::error::ServerError;
 use crate::group::{Message, SendGroup};
-use rask_engine::resources::registry;
-use rask_engine::{world, EngineError};
-use std::io::Read;
+use rask_engine::error::EngineError;
+use rask_engine::resources::{registry, registry::Serialize};
+use std::collections::HashMap;
 use std::thread;
 use std::thread::JoinHandle;
 
@@ -10,14 +10,16 @@ pub trait Game {
     fn run(self) -> Result<JoinHandle<()>, ServerError>;
 }
 
+#[allow(dead_code)]
 pub struct RaskGame {
     game: (),
     group: SendGroup,
     users: Vec<User>,
     will_to_live: bool,
+    res_cache: HashMap<u32, Vec<u8>>,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct User {
     name: String,
     sender: ws::Sender,
@@ -38,9 +40,7 @@ impl Game for RaskGame {
     }
 }
 
-fn add_u32_to_vec(buf: &mut Vec<u8>, n: u32) {
-    buf.extend_from_slice(&n.to_le_bytes())
-}
+const RES_PATH: &str = "res";
 
 impl RaskGame {
     pub fn new(group: SendGroup) -> Self {
@@ -49,66 +49,74 @@ impl RaskGame {
             group,
             users: Vec::new(),
             will_to_live: true,
+            res_cache: HashMap::new(),
         }
     }
-
+    fn push_buffer(&mut self, buf_id: u32, user_id: usize) -> Result<(), ServerError> {
+        self.users
+            .get_mut(user_id)
+            .ok_or(ServerError::InvalidUser(user_id))?
+            .sender
+            .send(ws::Message::from(
+                self.res_cache
+                    .get(&buf_id)
+                    .ok_or_else(|| {
+                        EngineError::ResourceMissing(format!(
+                            "Ressource {} is not loaded yet",
+                            buf_id
+                        ))
+                    })?
+                    .as_slice(),
+            ))?;
+        Ok(())
+    }
+    fn load_char(&mut self, chr: registry::CharacterInfo) -> Result<(), ServerError> {
+        if self.res_cache.contains_key(&chr.id) {
+            return Ok(());
+        }
+        self.res_cache.insert(
+            chr.id,
+            chr.serialize(RES_PATH).ok_or_else(|| {
+                EngineError::ResourceMissing(format!("Failed to serialize {:?}", chr))
+            })?,
+        );
+        Ok(())
+    }
+    fn load_ressource(&mut self, res: registry::ResourceInfo) -> Result<(), ServerError> {
+        if self.res_cache.contains_key(&res.id) {
+            return Ok(());
+        }
+        self.res_cache.insert(
+            res.id,
+            res.serialize(RES_PATH).ok_or_else(|| {
+                EngineError::ResourceMissing(format!("Failed to serialize {:?}", res))
+            })?,
+        );
+        Ok(())
+    }
+    fn level_one(&mut self) -> Result<(), ServerError> {
+        self.load_ressource(registry::EMPTY)?;
+        self.load_ressource(registry::THIEF)?;
+        self.load_char(registry::UNUSED)?;
+        self.push_buffer(registry::THIEF.id, 0)?;
+        self.push_buffer(registry::EMPTY.id, 0)?;
+        Ok(())
+    }
     fn game_loop(mut self) {
         let _messages = self.get_messages();
         while self.will_to_live {
-            let v = registry::IMAGE1.variant as u32;
-            let id = registry::IMAGE1.id;
-            let path = registry::IMAGE1.path;
-
-            self.push_resource(v, id, &[path]).unwrap();
             //game.handle_events(messages);
             //game.tick();
             //let b = game.get_broadcast()
             //self.users.iter().foreach(|u| u.sender.send(b));
+            if let Err(e) = self.level_one() {
+                error!("Error during ressoure distribution: {}", e);
+            }
             let _messages = self.get_messages();
+            thread::sleep(std::time::Duration::from_secs(5));
         }
-        info!("thread kiled itself");
+        info!("thread killed itself");
     }
-
-    fn handle_event(event: rask_engine::events::Event) {}
-
-    // supply paths in order of texture, atlas, skeleton
-    fn push_resource(
-        &mut self,
-        res_type: u32,
-        res_id: u32,
-        path: &[&str],
-    ) -> Result<(), ServerError> {
-        let mut buf = Vec::new();
-        add_u32_to_vec(&mut buf, 10);
-        add_u32_to_vec(&mut buf, res_type);
-        add_u32_to_vec(&mut buf, res_id);
-        if res_type == 3 {
-            let mut res = Vec::new();
-            RaskGame::read_to_vec(path[0], &mut res)?;
-            let tex_len = res.len();
-            RaskGame::read_to_vec(path[1], &mut res)?;
-            let atlas_len = res.len() - tex_len;
-            RaskGame::read_to_vec(path[2], &mut res)?;
-            let skeleton_len = res.len() - (atlas_len + tex_len);
-            add_u32_to_vec(&mut buf, tex_len as u32);
-            add_u32_to_vec(&mut buf, atlas_len as u32);
-            add_u32_to_vec(&mut buf, skeleton_len as u32);
-            buf.append(&mut res);
-        } else {
-            RaskGame::read_to_vec(path[0], &mut buf)?;
-        }
-        for u in &self.users {
-            u.sender.send(ws::Message::from(buf.as_slice()))?;
-        }
-        Ok(())
-    }
-
-    fn read_to_vec(path: &str, buf: &mut Vec<u8>) -> Result<(), ServerError> {
-        let mut file = std::fs::File::open(path)?;
-        file.read_to_end(buf)?;
-        Ok(())
-    }
-
     fn get_messages(&mut self) -> Vec<Message> {
         //  info!("reciver {:#?} is still aive", self.group.receiver);
         let (mut data, control): (Vec<Message>, Vec<Message>) =

@@ -1,5 +1,5 @@
 use settings::AllocSettings;
-use std::alloc::{GlobalAlloc, Layout};
+use std::alloc::{AllocInit, GlobalAlloc, Layout};
 
 pub mod settings {
     use crate::mem::*;
@@ -31,36 +31,8 @@ pub mod settings {
 }
 
 pub trait MutableAlloc {
-    unsafe fn alloc(&mut self, layout: Layout) -> *mut u8;
+    unsafe fn alloc(&mut self, layout: Layout, init: AllocInit) -> *mut u8;
     unsafe fn dealloc(&mut self, ptr: *mut u8, layout: Layout);
-}
-
-pub struct SimpleAllocator {
-    pos: usize,
-}
-
-impl SimpleAllocator {
-    fn layout_to_size(layout: Layout) -> usize {
-        let (size, align) = (layout.size(), layout.align());
-        let overhead = size % align;
-        size + (if overhead == 0 { 0 } else { align - overhead })
-    }
-
-    pub fn new(pos: usize) -> Self {
-        Self { pos }
-    }
-}
-
-impl MutableAlloc for SimpleAllocator {
-    unsafe fn alloc(&mut self, layout: Layout) -> *mut u8 {
-        let size = Self::layout_to_size(layout);
-        let pos = self.pos;
-        self.pos += size;
-        pos as *mut u8
-    }
-
-    #[allow(unused_variables)]
-    unsafe fn dealloc(&mut self, ptr: *mut u8, layout: Layout) {}
 }
 
 pub trait Initial<T> {
@@ -87,6 +59,11 @@ impl<M: Sized + 'static, S: AllocSettings, I: Initial<M>> Allocator<M, S, I> {
         *Self::allocator() = I::init();
     }
 }
+fn layout_to_size(layout: Layout) -> usize {
+    let (size, align) = (layout.size(), layout.align());
+    let overhead = size % align;
+    size + (if overhead == 0 { 0 } else { align - overhead })
+}
 
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
@@ -101,13 +78,11 @@ unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> 
     for Allocator<M, S, I>
 {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        let out = Self::allocator().alloc(layout);
+        let out = Self::allocator().alloc(layout, AllocInit::Zeroed);
         let tout = out as usize as u32;
-        let size = SimpleAllocator::layout_to_size(layout) as u32;
+        let size = layout_to_size(layout) as u32;
         let start = S::allocation_start_address::<M>() as usize as u32;
-        let heaplen: u32 = env!("WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES")
-            .parse()
-            .unwrap();
+        let heaplen: u32 = crate::mem::WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES as u32;
         if tout + size > start + heaplen || tout < start {
             console_error_u32(size, start, start + heaplen, tout);
         }
@@ -120,7 +95,7 @@ unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> 
 }
 
 impl<A: GlobalAlloc> MutableAlloc for A {
-    unsafe fn alloc(&mut self, layout: Layout) -> *mut u8 {
+    unsafe fn alloc(&mut self, layout: Layout, _init: AllocInit) -> *mut u8 {
         <Self as GlobalAlloc>::alloc(self, layout)
     }
 

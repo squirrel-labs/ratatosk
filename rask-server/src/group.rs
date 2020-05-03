@@ -9,7 +9,7 @@ use ws::Sender;
 
 pub type GroupId = u32;
 
-#[allow(dead_code)]
+#[derive(Debug)]
 /// capacity is never allowed to be above usize::MAX
 pub struct Group {
     pub clients: Vec<Sender>,
@@ -29,7 +29,7 @@ pub struct SendGroup {
     pub capacity: u32,
 }
 
-#[allow(dead_code)]
+#[derive(Debug)]
 pub enum Message {
     // TODO: flatten tuple
     Data((String, Vec<u8>)),
@@ -50,7 +50,8 @@ impl Message {
 
 impl Drop for Group {
     fn drop(&mut self) {
-        self.sender.send(Message::Kill).unwrap();
+        info!("dropping group {:?}", &self);
+        let _ = self.sender.send(Message::Kill);
     }
 }
 

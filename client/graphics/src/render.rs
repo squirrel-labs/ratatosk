@@ -53,7 +53,7 @@ impl<T: GraphicsApi> Render<T> {
     pub fn reset_textures(&mut self, used_textures: &TextureIds) -> Result<(), ClientError> {
         for texture in self.used_texture_ids.clone().iter() {
             if !used_textures.ids.contains(texture) {
-                self.unload_texture(*texture);
+                self.unload_texture(*texture)?;
                 self.used_texture_ids.swap_remove(*texture as usize);
             }
         }
@@ -67,8 +67,8 @@ impl<T: GraphicsApi> Render<T> {
             return Ok(true);
         }
         let used_textures: &TextureIds = used_textures?;
-        if used_textures.reset_notify >= 0 {
-            self.reset_textures(used_textures);
+        if used_textures.reset_notify > 0 {
+            self.reset_textures(used_textures)?;
         }
         if let Some(state) = get_double_buffer().borrow_reader() {
             let state = state.get();
