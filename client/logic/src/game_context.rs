@@ -80,7 +80,7 @@ impl GameContext {
     }
 
     fn alloc_buffer(&mut self, id: u32, length: u32) -> *const u8 {
-        let layout = unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 4) };
+        let layout = unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 1) };
         let ptr = unsafe { std::alloc::alloc(layout) };
         self.buffer_table.insert(id, (ptr, length));
         ptr
@@ -95,7 +95,7 @@ impl GameContext {
     fn dealloc_buffer(&mut self, id: u32) {
         if let Some((ptr, length)) = self.buffer_table.remove(&id) {
             unsafe {
-                let layout = std::alloc::Layout::from_size_align_unchecked(length as usize, 4);
+                let layout = std::alloc::Layout::from_size_align_unchecked(length as usize, 1);
                 std::alloc::dealloc(ptr as *mut u8, layout)
             }
         }
