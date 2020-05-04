@@ -65,8 +65,16 @@ pub struct CharacterInfo {
     pub id: u32,
 }
 
-fn add_u32_to_vec(buf: &mut Vec<u8>, n: u32) {
+pub fn add_u32_to_vec(buf: &mut Vec<u8>, n: u32) {
     buf.extend_from_slice(&n.to_le_bytes())
+}
+
+pub fn u32_from_le(barry: &[u8]) -> Result<u32, EngineError> {
+    use std::convert::TryInto;
+    let arr: [u8; 4] = barry
+        .try_into()
+        .map_err(|_| EngineError::ResourceFormat("invalid index in charakter binary".into()))?;
+    Ok(u32::from_le_bytes(arr))
 }
 
 fn read_to_vec(path: &str, buf: &mut Vec<u8>) -> Result<(), EngineError> {
@@ -81,6 +89,7 @@ impl Serialize for ResourceInfo {
         add_u32_to_vec(&mut buf, self.variant as u32);
         add_u32_to_vec(&mut buf, self.id);
         read_to_vec(format!("{}/{}", res_path, self.path).as_str(), &mut buf).ok()?;
+        buf.push(0x0a);
         Some(buf)
     }
 }
@@ -108,20 +117,19 @@ impl Serialize for CharacterInfo {
         add_u32_to_vec(&mut buf, atlas_len as u32);
         add_u32_to_vec(&mut buf, skeleton_len as u32);
 
+        buf.push(0x0a);
         buf.append(&mut res);
         Some(buf)
     }
 }
 
 resources! {
-    (IMAGE1,            Texture,        "see game_context.rs"    ),
-    (IMAGE2,            Texture,        "see game_context.rs"    ),
-    (THIEF,             Texture,        "thief.png"              ),
+    (USED_TEXTURE_IDS,  TextureIds,     ""                       ),
     (EMPTY,             Texture,        "empty.png"              ),
+    (THIEF,             Texture,        "thief.png"              ),
     (UNUSED,            Character,      Character {
                           texture:   "BoneTest/BoneTest.png",
                           atlas:     "BoneTest/BoneTest.atlas",
                           animation: "BoneTest/BoneTest.json"
-    }                                                            ),
-    (USED_TEXTURE_IDS,  TextureIds,     ""                       )
+    }                                                            )
 }

@@ -39,6 +39,6 @@ pub fn run_main_loop() {
     loop {
         wait_for_main_thread_notify();
         game.tick().map_err(|e| panic!("{}", e)).unwrap();
-        //log::info!("wait_for_main_thread_notify()");
+        log::info!("wait_for_main_thread_notify()");
     }
 }

@@ -16,29 +16,28 @@ const fn align32_up(n: u32) -> u32 {
 
 /// Align the given address to the next 64KiB Wasm memory page
 const fn align_page_up(n: u32) -> u32 {
-    let x = (1<<16) - 1; 
+    let x = (1 << 16) - 1;
     (n + x) & !x
 }
 
 const WORKER_NAME_VAR: &'static str = "CRATE";
 
-
 /// The first page of memory is reserved
 const STACK_ALIGNMENT: u32 = KiB(63);
 
 /// The size of the stack. Its start is at address 0
-const GRAPHICS_STACK_SIZE: u32 = MiB(15);
-const GRAPHICS_HEAP_SIZE: u32 = MiB(15);
-const LOGIC_HEAP_SIZE: u32 = MiB(20);
+const GRAPHICS_STACK_SIZE: u32 = MiB(25);
+const GRAPHICS_HEAP_SIZE: u32 = MiB(25);
+const LOGIC_HEAP_SIZE: u32 = MiB(40);
 const LOGIC_STACK_SIZE: u32 = MiB(20);
 //currently 4MiB are used
-const LOGIC_GLOBAL_SIZE: u32 = MiB(8);
+const LOGIC_GLOBAL_SIZE: u32 = MiB(12);
 //currently 19MiB used
 const GRAPHICS_GLOBAL_SIZE: u32 = MiB(25);
 
 /// The size of the Allocator structures
 /// the size of on of the the wee_alloc structures is 2056 bytes
-const ALLOCATOR_SIZE: u32 = KiB(6);
+const ALLOCATOR_SIZE: u32 = KiB(24);
 
 /// The address memory synchronization area.
 /// It contains data needed for synchronization between main thread and logic thread.
@@ -108,14 +107,20 @@ fn main() -> std::io::Result<()> {
             "-Clink-arg=-zstack-size={} -Clink-arg=--max-memory={} -Clink-arg=--global-base={}",
             logic_stack, max_mem, logic_global
         )?;
-        println!("cargo:rustc-env=WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES={}", LOGIC_HEAP_SIZE);
+        println!(
+            "cargo:rustc-env=WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES={}",
+            LOGIC_HEAP_SIZE
+        );
     } else {
         write!(
             &mut file,
             "-Clink-arg=-zstack-size={} -Clink-arg=--max-memory={} -Clink-arg=--global-base={}",
             graphics_stack, max_mem, graphics_global
         )?;
-        println!("cargo:rustc-env=WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES={}", GRAPHICS_HEAP_SIZE);
+        println!(
+            "cargo:rustc-env=WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES={}",
+            GRAPHICS_HEAP_SIZE
+        );
     }
 
     let mut file = File::create(format!("{}/mem.json", out_dir))?;

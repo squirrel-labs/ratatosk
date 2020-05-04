@@ -82,7 +82,7 @@ impl RaskGame {
         );
         Ok(())
     }
-    fn load_ressource(&mut self, res: registry::ResourceInfo) -> Result<(), ServerError> {
+    fn load_resource(&mut self, res: registry::ResourceInfo) -> Result<(), ServerError> {
         if self.res_cache.contains_key(&res.id) {
             return Ok(());
         }
@@ -94,12 +94,12 @@ impl RaskGame {
         );
         Ok(())
     }
-    fn level_one(&mut self) -> Result<(), ServerError> {
-        self.load_ressource(registry::EMPTY)?;
-        self.load_ressource(registry::THIEF)?;
+    fn level_one(&mut self, uid: usize) -> Result<(), ServerError> {
+        self.load_resource(registry::EMPTY)?;
+        self.load_resource(registry::THIEF)?;
         self.load_char(registry::UNUSED)?;
-        self.push_buffer(registry::THIEF.id, 0)?;
-        self.push_buffer(registry::EMPTY.id, 0)?;
+        self.push_buffer(registry::EMPTY.id, uid)?;
+        self.push_buffer(registry::THIEF.id, uid)?;
         Ok(())
     }
     fn game_loop(mut self) {
@@ -109,13 +109,17 @@ impl RaskGame {
             //game.tick();
             //let b = game.get_broadcast()
             //self.users.iter().foreach(|u| u.sender.send(b));
-            if let Err(e) = self.level_one() {
-                error!("Error during ressoure distribution: {}", e);
-            }
             let _messages = self.get_messages();
             thread::sleep(std::time::Duration::from_secs(5));
         }
         info!("thread killed itself");
+    }
+    fn add_user(&mut self, user: &User) {
+        self.users.push(user.clone());
+        thread::sleep(std::time::Duration::from_secs(2));
+        if let Err(e) = self.level_one(self.users.len() - 1) {
+            error!("Error during ressoure distribution: {}", e);
+        }
     }
     fn get_messages(&mut self) -> Vec<Message> {
         //  info!("reciver {:#?} is still aive", self.group.receiver);
@@ -127,7 +131,7 @@ impl RaskGame {
                 thread::park();
             }
             Message::Kill => self.will_to_live = false,
-            Message::Add(user) => self.users.push(user.clone()),
+            Message::Add(user) => self.add_user(&user),
             Message::Remove(sender) => {
                 if let Some(pos) = self.users.iter().position(|x| x.sender == *sender) {
                     self.users.swap_remove(pos);
