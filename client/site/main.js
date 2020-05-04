@@ -1,11 +1,10 @@
 const WORKER_URI = 'site/worker.js'
-const WEBSOCKET_URI = 'ws://localhost:3000/'
+const WEBSOCKET_URI = 'ws://localhost:5001/'
 // synchronization memory address (read from mem.json, see gen_mem_layout.rs)
 const SYNCHRONIZATION_MEMORY = memoryParameters.sync_area / 4;
 const MESSAGE_QUEUE = memoryParameters.queue_start;
 const MESSAGE_ITEM_SIZE = 32;
 const MESSAGE_QUEUE_LENGTH = memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
-const WS_URL = "ws://127.0.0.1:5001"
 const SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
 const SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
 const SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
@@ -15,7 +14,7 @@ let params = new URLSearchParams(document.location.search.substring(1));
 let token = "Token-63208259";
 let workers = [];
 let memory;  // global for debugging
-let ws = new WebSocket(WS_URL, [token, "tuesday"]);
+let ws = new WebSocket(WEBSOCKET_URI, [token, "tuesday"]);
 ws.binaryType = 'arraybuffer';
 let connected = false
 
@@ -141,24 +140,31 @@ function onresize() {
 }
 
 function LogicMessage(e) {
-    return;
-    let x = new Uint32Array(e.date);
-    let type = x[0] & 255;
-    if (type >= 128) {
-        ws.post(x.slice(1));
-    } else if (type === 0) {
+    let x = new Uint32Array(e.data);
+    let optcode = x[0];
+    if (optcode >= 128) {
+        ws.send(x.slice(1));
+    } else if (optcode === 0) {
         const id = x[1];
         let ptr = x[2] / 4;
         if (resource_map.has(id)) {
-            for (let i of resource_map.get(id).forEach()) {
-                memoryViewu32[ptr++] = i;
+            let buffer = resource_map.get(id);
+            let lenght = buffer.byteLength;
+            let u32 = new Uint32Array(buffer, 0, lenght >> 2);
+            let u8 = new Uint8Array(buffer, lenght & ~3, lenght & 3);
+            for (let i of u32) {
+                memoryViewU32[ptr++] = i;
+            }
+            ptr *= 4;
+            for (let i of u8) {
+                memoryViewU8[ptr++] = i;
             }
             resource_map.delete(id);
             queue.write_i32([8, id]);
         } else {
             console.error("Requested resource not in resource_map, id: " + id)
         }
-    } else if (type === 1) {
+    } else if (optcode === 1) {
         if (x[1] === 0) {
             window.addEventListener('input', input);
         } else {
@@ -169,8 +175,10 @@ function LogicMessage(e) {
 
 resource_map = new Map();
 function upload_resource(data) {
-    resource_map.set(data[0] & 0xff00, data)
-    queue.write_i32(7, data.length);
+    let u32 = new Uint32Array(data, 0, 4);
+    resource_map.set(u32[2], data)
+    console.log("sending request to allocate " + data.byteLength + " bytes");
+    queue.write_i32([7, u32[2], data.byteLength]);
 }
 
 let canvas = createCanvas();
@@ -179,6 +187,7 @@ memory = generateMemory();
 let memoryView32 = new Int32Array(memory.buffer);
 let memoryViewU32 = new Uint32Array(memory.buffer);
 let memoryView8 = new Int8Array(memory.buffer);
+let memoryViewU8 = new Uint8Array(memory.buffer);
 
 spawnModules(canvas, memory);
 
@@ -192,12 +201,12 @@ const fps_sampling_count = 5;
 let fps_sampling_n = 0;
 async function wakeLogic() {
     if (connected) {
-        let x = new UInt32Array(4);
+        let x = new Uint32Array(4);
         x[0] = 128;
-        x[1] = Atomics.read(memoryView32, SYNC_PLAYER_STATE);
-        x[2] = Atomics.read(memoryView32, SYNC_PLAYER_STATE + 1);
-        x[3] = Atomics.read(memoryView32, SYNC_PLAYER_STATE + 2);
-        ws.post(x.buffer);
+        x[1] = Atomics.load(memoryView32, SYNC_PLAYER_STATE);
+        x[2] = Atomics.load(memoryView32, SYNC_PLAYER_STATE + 1);
+        x[3] = Atomics.load(memoryView32, SYNC_PLAYER_STATE + 2);
+        //ws.send(x.buffer); TODO
     }
 
     const t = Date.now() - START_TIME;
@@ -214,7 +223,7 @@ async function wakeLogic() {
 
 function setup_ws() {
     ws.addEventListener('open',  () => {
-        console.log('ws connection to ' + WS_URL + 'established');
+        console.log('ws connection to ' + WEBSOCKET_URI + ' established');
         connected = true;
     });
     ws.addEventListener('error', event => {
@@ -225,18 +234,21 @@ function setup_ws() {
         console.error('ws is closed now: ' + event);
         connected = false;
     });
-    ws.addEventListener('message', event => {
-        let data = new UInt32Array(event.data.buffer);
-        let type = data[0] & 255;
-        if (type === 10) {
-            //upload_resource(data);
-        } else if (type === 11) {
+    ws.addEventListener('message', e => {
+        let data = new Uint32Array(e.data, 0, 1);
+        let optcode = data[0];
+        if (optcode === 10) {
+            upload_resource(e.data);
+        } else if (optcode === 11) {
             Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 2, data[3]);
+        } else {
+            console.error("unknown optcode: " + optcode);
         }
     });
 }
+setup_ws();
 
 function hashCode(str) {
     var hash = 0;

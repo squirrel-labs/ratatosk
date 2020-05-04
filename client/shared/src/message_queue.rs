@@ -6,13 +6,13 @@ use rask_engine::events::{Event, KeyModifier, MouseEvent};
 #[non_exhaustive]
 pub enum Message {
     None,
-    KeyDown(KeyModifier, u32), // 1
-    KeyUp(KeyModifier, u32),
-    KeyPress(u32, u16),
+    KeyDown(KeyModifier, u32) = 1, // 1
+    KeyUp(KeyModifier, u32) = 2,
+    KeyPress(u32, u16) = 3,
     MouseDown(MouseEvent) = 5, //5
-    MouseUp(MouseEvent),
-    ResquestAlloc { id: u32, size: u32 }, //7
-    ResourcePush(u32),                    // id
+    MouseUp(MouseEvent) = 6,
+    RequestAlloc { id: u32, size: u32 } = 7, //7
+    ResourcePush(u32) = 8,                   // id
 }
 
 impl Default for Message {
@@ -28,6 +28,19 @@ pub enum Outbound {
     RescourceAlloc { id: u32, ptr: u32 } = 0, // The event ids from 0 to 128 are reserved for server to client communication
     Textmode(bool),
     EngineEvent(Event) = 129, // Mark the Message as outbound
+}
+impl Outbound {
+    pub fn to_js(&self) -> js_sys::Uint32Array {
+        let len = std::mem::size_of::<Outbound>() as u32;
+        let msg = js_sys::Uint32Array::new_with_length(len);
+        let buf: &[u32] = unsafe {
+            std::slice::from_raw_parts(self as *const Outbound as *const u32, len as usize)
+        };
+        for i in 0..len {
+            msg.set_index(i, buf[i as usize]);
+        }
+        msg
+    }
 }
 
 #[repr(C, align(32))]

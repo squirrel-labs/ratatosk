@@ -107,6 +107,7 @@ pub struct SynchronizationMemory {
     last_elapsed_ms: i32,
 }
 
+#[allow(clippy::while_immutable_condition)]
 impl SynchronizationMemory {
     /// # Safety
     /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
@@ -124,7 +125,7 @@ impl SynchronizationMemory {
     pub fn wait_for_main_thread_notify(&mut self) {
         self.last_elapsed_ms = self.elapsed_ms;
         while self.last_elapsed_ms == self.elapsed_ms {
-            unsafe { wait_until_wake_up_at((&mut self.elapsed_ms) as *mut i32) }
+            unsafe { wait_until_wake_up_at(SYNCHRONIZATION_MEMORY as *mut i32) }
         }
     }
 }
