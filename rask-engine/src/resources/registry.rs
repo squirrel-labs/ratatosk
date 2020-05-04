@@ -36,6 +36,7 @@ pub trait Serialize {
     fn serialize(&self, res_path: &str) -> Option<Vec<u8>>;
 }
 
+#[repr(u32)]
 #[derive(Debug, Clone, Copy)]
 pub enum ResourceVariant {
     Texture = 2,
