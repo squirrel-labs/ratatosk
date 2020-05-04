@@ -11,7 +11,6 @@ use rask_wasm_shared::{
 use std::collections::HashMap;
 
 pub const IMAGE1_DATA: &[u8] = include_bytes!("../../res/empty.png");
-pub const IMAGE2_DATA: &[u8] = include_bytes!("../../res/thief.png");
 
 pub struct GameContext {
     state: State,
@@ -30,17 +29,9 @@ impl GameContext {
                 ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT);
             resource_table.clear();
             resource_table.store(
-                Texture::from_png_stream(IMAGE1_DATA)?,
-                registry::EMPTY.id as usize,
-            )?;
-            resource_table.store(
-                Texture::from_png_stream(IMAGE2_DATA)?,
-                registry::EMPTY.id as usize,
-            )?;
-            resource_table.store(
                 TextureIds {
                     reset_notify: 1,
-                    ids: vec![registry::EMPTY.id, registry::THIEF.id],
+                    ids: vec![registry::EMPTY.id, registry::EMPTY.id],
                 },
                 registry::USED_TEXTURE_IDS.id as usize,
             )?;
@@ -87,7 +78,7 @@ impl GameContext {
     }
 
     fn alloc_buffer(&mut self, id: u32, length: u32) -> *const u8 {
-        let layout = unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 1) };
+        let layout = unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 4) };
         let ptr = unsafe { std::alloc::alloc(layout) };
         self.buffer_table.insert(id, (ptr, length));
         ptr
@@ -102,7 +93,7 @@ impl GameContext {
     fn dealloc_buffer(&mut self, id: u32) {
         if let Some((ptr, length)) = self.buffer_table.remove(&id) {
             unsafe {
-                let layout = std::alloc::Layout::from_size_align_unchecked(length as usize, 1);
+                let layout = std::alloc::Layout::from_size_align_unchecked(length as usize, 4);
                 std::alloc::dealloc(ptr as *mut u8, layout)
             }
         }
@@ -128,8 +119,10 @@ impl GameContext {
             }
             Message::ResourcePush(id) => {
                 if let Some(data) = self.get_buffer(id) {
+                    const TEXTURE: u32 = registry::ResourceVariant::Texture as u32;
+                    const CHARACTER: u32 = registry::ResourceVariant::Character as u32;
                     match registry::u32_from_le(&data[4..8])? {
-                        2 => {
+                        TEXTURE => {
                             log::info!("decoding texture {} len: {}", id, data[12..].len(),);
                             let img =
                                 rask_engine::resources::Texture::from_png_stream(&data[12..])?;
@@ -138,7 +131,6 @@ impl GameContext {
                             sprite.tex_id = id;
                             self.state.append_sprite(&sprite);
                             if self.state.sprites().len() == 2 {
-                                self.state.sprites_mut().reverse();
                                 unsafe {
                                     self.resource_table.store(
                                         TextureIds {
@@ -150,7 +142,7 @@ impl GameContext {
                                 }
                             }
                         }
-                        3 => {
+                        CHARACTER => {
                             let chr = rask_engine::resources::Character::from_u8(&data[12..])?;
                             unsafe { self.resource_table.store(Box::new(chr), id as usize) }?;
                         }
