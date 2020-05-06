@@ -85,6 +85,7 @@ unsafe impl<M: MutableAlloc + Sized + 'static, S: AllocSettings, I: Initial<M>> 
         let heaplen: u32 = crate::mem::WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES as u32;
         if tout + size > start + heaplen || tout < start {
             console_error_u32(size, start, start + heaplen, tout);
+            panic!("help me, the memory is going monkeyz");
         }
         out
     }

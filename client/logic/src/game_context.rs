@@ -10,8 +10,6 @@ use rask_wasm_shared::{
 };
 use std::collections::HashMap;
 
-pub const IMAGE1_DATA: &[u8] = include_bytes!("../../res/empty.png");
-
 pub struct GameContext {
     state: State,
     tick_nr: u64,
@@ -31,7 +29,7 @@ impl GameContext {
             resource_table.store(
                 TextureIds {
                     reset_notify: 1,
-                    ids: vec![registry::EMPTY.id, registry::EMPTY.id],
+                    ids: vec![],
                 },
                 registry::USED_TEXTURE_IDS.id as usize,
             )?;

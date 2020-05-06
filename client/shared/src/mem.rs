@@ -49,7 +49,7 @@ pub const GRAPHICS_HEAP: usize = 0;
 #[from_env]
 /// The address memory synchronization area.
 /// It contains data needed for synchronization between main thread and logic thread.
-pub const SYNCHRONIZATION_MEMORY: usize = 0;
+pub const SYNCHRONIZATION_MEMORY: usize = 666;
 
 #[from_env]
 /// Address of the internal resource library.
@@ -124,7 +124,9 @@ impl SynchronizationMemory {
 
     pub fn wait_for_main_thread_notify(&mut self) {
         self.last_elapsed_ms = self.elapsed_ms;
-        while self.last_elapsed_ms == self.elapsed_ms {
+        while self.last_elapsed_ms
+            == unsafe { atomic_read_i32(SYNCHRONIZATION_MEMORY as *const i32) }
+        {
             unsafe { wait_until_wake_up_at(SYNCHRONIZATION_MEMORY as *mut i32) }
         }
     }
@@ -140,6 +142,17 @@ extern "C" {
     /// see https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators
     fn llvm_atomic_notify(ptr: *mut i32, cnt: i32) -> i32;
 }
+/*#[cfg(target_arch = "wasm32")]
+pub fn llvm_atomic_wait_i32(ptr: *mut i32, exp: i32, timeout: i64) -> i32 {
+    unsafe {
+        std::llvm_asm!("call 0");
+    }
+    0
+}
+#[cfg(target_arch = "wasm32")]
+fn llvm_atomic_notify(ptr: *mut i32, cnt: i32) -> i32 {
+    0
+}*/
 
 #[allow(unused_variables)]
 #[cfg(not(target_arch = "wasm32"))]
@@ -186,8 +199,22 @@ pub unsafe fn atomic_read_u32(ptr: *const u32) -> u32 {
 /// # Safety
 /// This function is safe as long the thread waits at a valid memory address
 pub unsafe fn wait_until_wake_up_at(ptr: *mut i32) {
-    let res = llvm_atomic_wait_i32(ptr, atomic_read_i32(ptr), -1);
-    debug_assert!(res == 0)
+    log::error!("{}", SYNCHRONIZATION_MEMORY);
+    let mut foo = 0i32;
+    let foo = SYNCHRONIZATION_MEMORY as *mut i32;
+    //let res = llvm_atomic_wait_i32(&mut foo, 0, 1000 * 1000 * 100);
+    let res = llvm_atomic_wait_i32(ptr, atomic_read_i32(ptr), 1000 * 1000 * 100);
+    /*
+    let res = llvm_atomic_wait_i32(
+        SYNCHRONIZATION_MEMORY as *mut i32,
+        atomic_read_i32(SYNCHRONIZATION_MEMORY as *const i32),
+        1000 * 1000 * 100,
+    );*/
+    if res != 0 {
+        log::error!("res != 0: res={}", res);
+    }
+    log::debug!("wake up wait");
+    //debug_assert_eq!(res, 0)
 }
 
 /// performs a notify at a given address and return the count of waiters
