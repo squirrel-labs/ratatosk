@@ -39,7 +39,8 @@ script = [
 	"echo $MEMORY_LAYOUT_PARAMETERS",
 	"echo \"export MEMORY_LAYOUT_PARAMETERS=\\\"${MEMORY_LAYOUT_PARAMETERS}\\\"\" > gen/mem.sh",
 	". gen/mem.sh",
-	"cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown",
+	"cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown -Z build-std=std,panic_abort",
+
 ]
 
 # TODO cargo doesn't seem to have a post-build hook but it might be nice

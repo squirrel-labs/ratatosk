@@ -32,10 +32,10 @@ pub fn run_main_loop() {
     log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
     log::info!("buffer count: {}", mem::DOUBLE_BUFFER_SPRITE_COUNT);
     reset_state();
+    return;
     let mut game = GameContext::new()
         .map_err(|e| log::error!("{}", e))
         .unwrap();
-
     loop {
         log::info!("a");
         wait_for_main_thread_notify();
