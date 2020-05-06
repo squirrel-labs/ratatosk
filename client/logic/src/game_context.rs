@@ -57,7 +57,6 @@ impl GameContext {
             worker_scope,
             buffer_table: HashMap::new(),
         });
-        return Err(ClientError::from(rask_engine::EngineError::from("test")));
         a
     }
 

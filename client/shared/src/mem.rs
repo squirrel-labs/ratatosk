@@ -132,6 +132,7 @@ impl SynchronizationMemory {
     }
 }
 
+/*
 #[cfg(target_arch = "wasm32")]
 extern "C" {
     #[link_name = "llvm.wasm.atomic.wait.i32"]
@@ -141,18 +142,15 @@ extern "C" {
     #[link_name = "llvm.wasm.atomic.notify"]
     /// see https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators
     fn llvm_atomic_notify(ptr: *mut i32, cnt: i32) -> i32;
-}
-/*#[cfg(target_arch = "wasm32")]
-pub fn llvm_atomic_wait_i32(ptr: *mut i32, exp: i32, timeout: i64) -> i32 {
-    unsafe {
-        std::llvm_asm!("call 0");
-    }
-    0
+}*/
+#[cfg(target_arch = "wasm32")]
+pub unsafe fn llvm_atomic_wait_i32(ptr: *mut i32, exp: i32, timeout: i64) -> i32 {
+    core::arch::wasm32::i32_atomic_wait(ptr, exp, timeout)
 }
 #[cfg(target_arch = "wasm32")]
-fn llvm_atomic_notify(ptr: *mut i32, cnt: i32) -> i32 {
-    0
-}*/
+unsafe fn llvm_atomic_notify(ptr: *mut i32, cnt: i32) -> u32 {
+    core::arch::wasm32::atomic_notify(ptr, 1024)
+}
 
 #[allow(unused_variables)]
 #[cfg(not(target_arch = "wasm32"))]
