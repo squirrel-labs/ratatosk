@@ -1,5 +1,5 @@
 use rask_engine::events::{Event, Key};
-use rask_engine::resources::{registry, GetStore, ResourceTable, Texture, TextureIds};
+use rask_engine::resources::{registry, GetStore, ResourceTable, TextureIds};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
 use rask_wasm_shared::mem::{RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT};
@@ -9,6 +9,7 @@ use rask_wasm_shared::{
     state::State,
 };
 use std::collections::HashMap;
+use wasm_bindgen::JsCast;
 
 pub struct GameContext {
     state: State,
@@ -35,19 +36,29 @@ impl GameContext {
             )?;
             resource_table
         };
-        use wasm_bindgen::JsCast;
         let worker_scope = js_sys::global()
             .dyn_into::<web_sys::DedicatedWorkerGlobalScope>()
             .unwrap();
 
-        Ok(Self {
+        log::info!(
+            "resource_table: {}",
+            &resource_table as *const ResourceTable as u32
+        );
+        log::info!("worker_scope: {:?}", worker_scope);
+        log::info!(
+            "worker_scope: {}",
+            &worker_scope as *const web_sys::DedicatedWorkerGlobalScope as u32
+        );
+        let a = Ok(Self {
             state: State::default(),
             tick_nr: 0,
             resource_table,
             message_queue: MessageQueueReader::new(),
             worker_scope,
             buffer_table: HashMap::new(),
-        })
+        });
+        return Err(ClientError::from(rask_engine::EngineError::from("test")));
+        a
     }
 
     fn push_state(&mut self) -> Result<(), ClientError> {
