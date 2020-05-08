@@ -13,16 +13,16 @@ args = [ "fmt", "--all" ]
 workspace = false
 env = { CARGO_TARGET_DIR = "../target/logic", CRATE = "logic" }
 script = [
-  "cargo make crate-build wasm-logic",
-  "cargo make wasm logic",
+  "cargo make crate-build wasm-logic --profile production",
+  "cargo make wasm logic --profile production",
 ]
 
 [tasks.graphics]
 workspace = false
 env = { CARGO_TARGET_DIR = "../target/graphics", CRATE = "graphics" }
 script = [
-  "cargo make crate-build wasm-graphics",
-  "cargo make wasm graphics",
+  "cargo make crate-build wasm-graphics --profile production",
+  "cargo make wasm graphics --profile production",
 ]
 
 [tasks.crate-build]
