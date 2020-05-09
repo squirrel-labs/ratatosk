@@ -1464,48 +1464,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "rask-wasm-graphics"
+name = "rask-wasm"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
+ "const_env",
  "fern",
  "js-sys",
  "lazy_static",
  "log 0.4.8",
  "rand 0.7.3",
  "rask-engine",
- "rask-wasm-shared",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "rask-wasm-logic"
-version = "0.1.0"
-dependencies = [
- "console_error_panic_hook",
- "fern",
- "js-sys",
- "log 0.4.8",
- "rand 0.7.3",
- "rask-engine",
- "rask-wasm-shared",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "rask-wasm-shared"
-version = "0.1.0"
-dependencies = [
- "const_env",
- "fern",
- "image",
- "js-sys",
- "log 0.4.8",
- "rand 0.7.3",
- "rask-engine",
- "static_assertions",
  "wasm-bindgen",
  "web-sys",
  "wee_alloc",
@@ -1886,12 +1855,6 @@ name = "state"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7345c971d1ef21ffdbd103a75990a15eb03604fc8b8852ca8cb418ee1a099028"
-
-[[package]]
-name = "static_assertions"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
 name = "string"
@@ -2371,7 +2334,7 @@ dependencies = [
 [[package]]
 name = "wee_alloc"
 version = "0.4.5"
-source = "git+https://github.com/Ma27/wee_alloc?branch=nightly#0f9954eddcbd210a296333f6106c8c492d78ea12"
+source = "git+https://github.com/zshipko/wee_alloc/#ea7c2b88664ad61765ba98b24c18828527ec7c6e"
 dependencies = [
  "cfg-if",
  "libc",

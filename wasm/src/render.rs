@@ -1,8 +1,8 @@
 use crate::context::RESOURCE_TABLE;
+use crate::error::ClientError;
 use crate::graphics::GraphicsApi;
+use crate::{mem::get_double_buffer, mem::SynchronizationMemory};
 use rask_engine::resources::{registry, GetStore, TextureIds};
-use rask_wasm_shared::error::ClientError;
-use rask_wasm_shared::{get_double_buffer, SynchronizationMemory};
 
 pub struct Render<T> {
     graphics: T,

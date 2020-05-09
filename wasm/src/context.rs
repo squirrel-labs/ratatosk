@@ -2,8 +2,8 @@ use crate::graphics::WebGl;
 use crate::render::Render;
 use lazy_static::lazy_static;
 use rask_engine::resources::ResourceTable;
-use rask_wasm_shared::error::ClientError;
-use rask_wasm_shared::mem;
+use crate::error::ClientError;
+use crate::mem;
 
 lazy_static! {
     pub static ref RESOURCE_TABLE: ResourceTable = unsafe {

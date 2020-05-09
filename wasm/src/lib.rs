@@ -8,7 +8,6 @@
 
 mod alloc;
 mod double_buffer;
-mod entries;
 mod error;
 mod game_context;
 mod mem;

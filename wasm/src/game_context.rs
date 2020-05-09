@@ -1,10 +1,10 @@
 use rask_engine::events::{Event, Key};
 use rask_engine::resources::{registry, GetStore, ResourceTable, TextureIds};
-use rask_wasm_shared::error::ClientError;
-use rask_wasm_shared::get_double_buffer;
-use rask_wasm_shared::mem::{RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT};
-use rask_wasm_shared::sprite::*;
-use rask_wasm_shared::{
+use crate::error::ClientError;
+use crate::mem::get_double_buffer;
+use crate::mem::{RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT};
+use crate::sprite::*;
+use crate::{
     message_queue::{Message, MessageQueueReader},
     state::State,
 };
@@ -116,7 +116,7 @@ impl GameContext {
             Message::RequestAlloc { id, size } => {
                 log::info!("allocating {} bytes for resource {}", size, id);
                 let ptr = self.alloc_buffer(id, size);
-                use rask_wasm_shared::message_queue::Outbound;
+                use crate::message_queue::Outbound;
                 let msg = Outbound::RescourceAlloc {
                     id,
                     ptr: ptr as u32,

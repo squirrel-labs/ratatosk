@@ -1,5 +1,5 @@
 use rask_engine::math::Mat3;
-use rask_wasm_shared::error::ClientError;
+use crate::error::ClientError;
 use web_sys::WebGl2RenderingContext as Gl2;
 use web_sys::WebGlShader;
 use web_sys::{WebGlProgram, WebGlUniformLocation};
