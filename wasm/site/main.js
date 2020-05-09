@@ -1,10 +1,10 @@
 const WORKER_URI = 'site/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:5001/'
 // synchronization memory address (read from mem.json, see gen_mem_layout.rs)
-const SYNCHRONIZATION_MEMORY = memoryParameters.sync_area / 4;
-const MESSAGE_QUEUE = memoryParameters.queue_start;
+const SYNCHRONIZATION_MEMORY = 0; //memoryParameters.sync_area / 4;
+const MESSAGE_QUEUE = 0; //memoryParameters.queue_start;
 const MESSAGE_ITEM_SIZE = 32;
-const MESSAGE_QUEUE_LENGTH = memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
+const MESSAGE_QUEUE_LENGTH = 0;//memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
 const SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
 const SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
 const SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
@@ -77,8 +77,8 @@ function spawnModule(type, memory, canvas) {
         module.wasmSourceLocation = '../gen/graphics.wasm';
         module.deltaTime = 10;
     } else if (type === 'logic') {
-        module.jsSourceLocation = '../gen/logic.js';
-        module.wasmSourceLocation = '../gen/logic.wasm';
+        module.jsSourceLocation = '../gen/client.js';
+        module.wasmSourceLocation = '../gen/client.wasm';
     } else return;
     let worker = new Worker(WORKER_URI);
     postWorkerDescriptor(worker, module);
@@ -108,7 +108,7 @@ function createCanvas() {
 function generateMemory() {
     // memory pages of 65,536 bytes = 64 KiB
     const page = 65536;
-    let mem = memoryParameters.max_memory;
+    let mem = 1073741824;//memoryParameters.max_memory;
     let max = Math.floor((mem + page -1 ) / page);
     const memoryDescriptor = {
         initial: max,

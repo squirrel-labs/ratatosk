@@ -28,11 +28,12 @@ fn wait_for_main_thread_notify() {
 /// This function is being exposed to javascript
 #[wasm_bindgen]
 pub fn run_main_loop() {
+    unsafe { wee_alloc::init_ptr(crate::mem::__heap_base as *mut u8, 1024 * 64) };
     panic::set_hook(Box::new(console_error_panic_hook::hook));
 
-    log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
-    log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
-    log::info!("buffer count: {}", mem::DOUBLE_BUFFER_SPRITE_COUNT);
+    //log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
+    //log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
+    //log::info!("buffer count: {}", mem::DOUBLE_BUFFER_SPRITE_COUNT);
     reset_state();
     let mut game = GameContext::new().unwrap_or_else(|e| panic!("{}", e));
     loop {
