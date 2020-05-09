@@ -9,7 +9,7 @@ use wasm_bindgen::JsValue;
 ///
 /// ```should_panic
 /// use wasm_bindgen::JsValue;
-/// use rask_wasm_shared::error::ClientError;
+/// use crate::error::ClientError;
 ///
 /// # fn main() -> Result<(), ClientError> {
 /// let err: Result<(), JsValue> = Err(JsValue::from_str("test error"));

@@ -5,14 +5,15 @@ use std::panic;
 use wasm_bindgen::prelude::*;
 
 use crate::game_context::GameContext;
-use rask_wasm_shared::get_double_buffer;
-use rask_wasm_shared::mem;
-use rask_wasm_shared::state::State;
-use std::panic;
+use crate::mem;
+use crate::mem::get_double_buffer;
+use crate::state::State;
 use wasm_bindgen::prelude::*;
 
 use crate::context;
 
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 fn reset_state() {
     let mut writer = get_double_buffer().borrow_writer();
     writer.set(State::default());
@@ -27,9 +28,6 @@ fn wait_for_main_thread_notify() {
 /// This function is being exposed to javascript
 #[wasm_bindgen]
 pub fn run_main_loop() {
-    unsafe {
-        rask_wasm_shared::alloc::reset_heap(&crate::ALLOCATOR, log::LevelFilter::Debug);
-    }
     panic::set_hook(Box::new(console_error_panic_hook::hook));
 
     log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
@@ -50,9 +48,6 @@ pub fn run_main_loop() {
 /// This function is being exposed to javascript
 #[wasm_bindgen]
 pub fn initialise_graphics_context(canvas: web_sys::OffscreenCanvas) {
-    unsafe {
-        rask_wasm_shared::alloc::reset_heap(&crate::ALLOCATOR, log::LevelFilter::Debug);
-    }
     panic::set_hook(Box::new(console_error_panic_hook::hook));
 
     log::info!("graphics entry reached");
