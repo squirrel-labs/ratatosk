@@ -2,44 +2,27 @@ extend = "../scripts/cargo-helpers.toml"
 
 [tasks.all]
 workspace = false
-dependencies = [ "logic", "graphics" ]
+dependencies = [ "crate-build", "wasm" ]
 
 [tasks.format]
 workspace = false
 command = "cargo"
 args = [ "fmt", "--all" ]
 
-[tasks.logic]
-workspace = false
-env = { CARGO_TARGET_DIR = "../target/logic", CRATE = "logic" }
-script = [
-  "cargo make crate-build wasm-logic --profile production",
-  "cargo make wasm logic --profile production",
-]
-
-[tasks.graphics]
-workspace = false
-env = { CARGO_TARGET_DIR = "../target/graphics", CRATE = "graphics" }
-script = [
-  "cargo make crate-build wasm-graphics --profile production",
-  "cargo make wasm graphics --profile production",
-]
-
 [tasks.crate-build]
 workspace = false
-condition = { env_set = [ "CARGO_TARGET_DIR" ] }
-env = { MEM_GEN = "${PWD}/gen/", RUSTFLAGS = "-Clink-args=--stack-first -Clink-arg=--no-entry -Clink-arg=--import-memory -Clink-arg=--shared-memory  -Clink-arg=--threads -Clink-arg=--export=__wasm_init_memory -Clink-arg=--no-gc-sections -Clink-arg=--features=atomics,bulk-memory -Ctarget-feature=+atomics,+bulk-memory -Clink-arg=--verbose --emit obj -Z print-link-args" }
+env = { CARGO_TARGET_DIR = "../target/rask_wasm", MEM_GEN = "${PWD}/gen/", RUSTFLAGS = " -Ctarget-feature=+atomics,+bulk-memory" }
 script = [
 	"mkdir -p gen",
-	"touch shared/build.rs #triggers the build.rs to be rebuild every time",
-	"rustc gen_mem_layout.rs -o gen/gen_mem_layout",
-	"MEMORY_LAYOUT_PARAMETERS=$(gen/gen_mem_layout)",
-	"RUSTFLAGS=\"$RUSTFLAGS $(cat ${MEM_GEN}/mem.conf)\"",
-	"echo $RUSTFLAGS",
-	"echo $MEMORY_LAYOUT_PARAMETERS",
-	"echo \"export MEMORY_LAYOUT_PARAMETERS=\\\"${MEMORY_LAYOUT_PARAMETERS}\\\"\" > gen/mem.sh",
-	". gen/mem.sh",
-	"cargo make exec-${BUILD_ENV} -- build -p rask-${@} --target wasm32-unknown-unknown -Z build-std=std,panic_abort",
+	"#touch shared/build.rs #triggers the build.rs to be rebuild every time",
+	"#rustc gen_mem_layout.rs -o gen/gen_mem_layout",
+	"#MEMORY_LAYOUT_PARAMETERS=$(gen/gen_mem_layout)",
+	"#RUSTFLAGS=\"$RUSTFLAGS $(cat ${MEM_GEN}/mem.conf)\"",
+	"#echo $RUSTFLAGS",
+	"#echo $MEMORY_LAYOUT_PARAMETERS",
+	"#echo \"export MEMORY_LAYOUT_PARAMETERS=\\\"${MEMORY_LAYOUT_PARAMETERS}\\\"\" > gen/mem.sh",
+	"#. gen/mem.sh",
+	"cargo make exec-${BUILD_ENV} -- build -p rask-wasm --target wasm32-unknown-unknown -Z build-std=std,panic_abort",
 
 ]
 
@@ -47,7 +30,6 @@ script = [
 # to determine if a rebuild happened (otherwise we don't need to rerun wasm-bindgen).
 [tasks.wasm]
 workspace = false
-condition = { env_set = [ "CRATE" ] }
 script = [
 '''
 #!/usr/bin/env bash -ex
@@ -56,14 +38,14 @@ if [ $? -ne 0 ]; then
   echo "Not in a git repo!"
   exit 1
 fi
-file=$top/target/${CRATE}/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm_${@}.wasm
-wasm-bindgen $file --out-dir $top/client/gen \
+file=$top/target/rask_wasm/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm.wasm
+wasm-bindgen $file --out-dir $top/wasm/gen \
   --no-typescript \
-  --remove-producers-section \
   --keep-debug \
   --target no-modules #\
-mv $top/client/gen/rask_wasm_${@}_bg.wasm $top/client/gen/${@}.wasm
-mv $top/client/gen/rask_wasm_${@}.js $top/client/gen/${@}.js
+#  --remove-producers-section \
+mv $top/wasm/gen/rask_wasm_bg.wasm $top/wasm/gen/client.wasm
+mv $top/wasm/gen/rask_wasm.js $top/wasm/gen/client.js
 '''
 ]
 

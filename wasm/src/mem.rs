@@ -15,20 +15,26 @@ mod asserts {
             pub const _: &str = env!($var);
         };
     }
-
-    assert_env!("WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES");
-    assert_env!("LOGIC_STACK");
-    assert_env!("GRAPHICS_STACK");
-    assert_env!("ALLOCATOR");
-    assert_env!("GRAPHICS_HEAP");
-    assert_env!("SYNCHRONIZATION_MEMORY");
-    assert_env!("RESOURCE_TABLE");
-    assert_env!("RESOURCE_TABLE_SIZE");
-    assert_env!("DOUBLE_BUFFER");
-    assert_env!("DOUBLE_BUFFER_SIZE");
-    assert_env!("MESSAGE_QUEUE");
-    assert_env!("MESSAGE_QUEUE_SIZE");
-    assert_env!("LOGIC_HEAP");
+    /*
+        assert_env!("WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES");
+        assert_env!("LOGIC_STACK");
+        assert_env!("GRAPHICS_STACK");
+        assert_env!("ALLOCATOR");
+        assert_env!("GRAPHICS_HEAP");
+        assert_env!("SYNCHRONIZATION_MEMORY");
+        assert_env!("RESOURCE_TABLE");
+        assert_env!("RESOURCE_TABLE_SIZE");
+        assert_env!("DOUBLE_BUFFER");
+        assert_env!("DOUBLE_BUFFER_SIZE");
+        assert_env!("MESSAGE_QUEUE");
+        assert_env!("MESSAGE_QUEUE_SIZE");
+        assert_env!("LOGIC_HEAP");
+    */
+}
+extern "C" {
+    #[no_mangle]
+    /// The logic heap address (size: 32MiB)
+    pub static __heap_base: i32;
 }
 #[from_env]
 /// The position of the stack.
