@@ -16,6 +16,8 @@ onmessage = async function(e) {
     source = await source.arrayBuffer();
 
     wasm_bindgen(source, desc.memory).then(ctx => {
-        onwasm(ctx, desc, wasm_bindgen);
+        this.setTimeout(() => {
+            onwasm(ctx, desc, wasm_bindgen)
+        }, 5000);
     });
 }
