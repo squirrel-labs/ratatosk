@@ -10,8 +10,8 @@ const SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
 const SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
 const SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
 let params = new URLSearchParams(document.location.search.substring(1));
-//let token = params.get("token");
-let token = "Token-42";
+let token = params.get("token");
+token = "Token-42";
 let workers = [];
 let memory;  // global for debugging
 let ws = new WebSocket(WEBSOCKET_URI, [token, "tuesday"]);
@@ -62,32 +62,31 @@ function postWorkerDescriptor(worker, desc) {
     if (typeof desc.canvas === "undefined") {
         worker.postMessage(desc);
         worker.addEventListener("message", LogicMessage);
-    }
-    else
-        worker.postMessage(desc, [desc.canvas]);
+    } else worker.postMessage(desc, [desc.canvas]);
 }
 
-function spawnModule(type, memory, canvas) {
-    let module = {};
-    module.type = type;
-    module.memory = memory;
-    if (type === 'graphics') {
-        module.canvas = canvas;
-        module.jsSourceLocation = '../gen/graphics.js';
-        module.wasmSourceLocation = '../gen/graphics.wasm';
-        module.deltaTime = 10;
-    } else if (type === 'logic') {
-        module.jsSourceLocation = '../gen/client.js';
-        module.wasmSourceLocation = '../gen/client.wasm';
-    } else return;
+function spawnModule(module) {
     let worker = new Worker(WORKER_URI);
     postWorkerDescriptor(worker, module);
     return worker;
 }
 
+function importGlobals(instance) {
+}
+
 function spawnModules(canvas, memory) {
-    workers.push(spawnModule('logic', memory));
-    //workers.push(spawnModule('graphics', memory, canvas));
+    WebAssembly.compileStreaming(fetch('../gen/client.wasm'))
+    .then(compiled => {
+        let module = {
+            memory: memory,
+            compiled: compiled
+        };
+        spawnModule(module);
+        module.canvas = canvas;
+        spawnModule(module);
+        let wasm = WebAssembly.instantiate(compiled, {env:{memory:memory}});
+        importGlobals(instance);
+    }
 }
 
 function throwMissingOffscreenCanvasSupport() {

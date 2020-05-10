@@ -4,89 +4,64 @@ use crate::double_buffer::DoubleBuffer;
 use crate::message_queue::{Message, MessageQueueElement};
 use crate::sprite::Sprite;
 use crate::state::{State, UnspecificState};
-use const_env::from_env;
 use rask_engine::resources::Resource;
 use std::mem::size_of;
 
-#[cfg(target_arch = "wasm32")]
-mod asserts {
-    macro_rules! assert_env {
-        ($var:expr) => {
-            pub const _: &str = env!($var);
-        };
-    }
-    /*
-        assert_env!("WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES");
-        assert_env!("LOGIC_STACK");
-        assert_env!("GRAPHICS_STACK");
-        assert_env!("ALLOCATOR");
-        assert_env!("GRAPHICS_HEAP");
-        assert_env!("SYNCHRONIZATION_MEMORY");
-        assert_env!("RESOURCE_TABLE");
-        assert_env!("RESOURCE_TABLE_SIZE");
-        assert_env!("DOUBLE_BUFFER");
-        assert_env!("DOUBLE_BUFFER_SIZE");
-        assert_env!("MESSAGE_QUEUE");
-        assert_env!("MESSAGE_QUEUE_SIZE");
-        assert_env!("LOGIC_HEAP");
-    */
-}
 extern "C" {
     #[no_mangle]
     /// The logic heap address (size: 32MiB)
     pub static __heap_base: i32;
 }
-#[from_env]
 /// The position of the stack.
 pub const LOGIC_STACK: usize = 0;
 
-#[from_env]
+
 /// The position of the stack.
 pub const GRAPHICS_STACK: usize = 0;
 
-#[from_env]
+
 /// The address of the Allocator structures
 pub const ALLOCATOR: usize = 0;
 
-#[from_env]
+
 /// The graphics heap address
 pub const GRAPHICS_HEAP: usize = 0;
 
-#[from_env]
+
 /// The address memory synchronization area.
 /// It contains data needed for synchronization between main thread and logic thread.
 pub const SYNCHRONIZATION_MEMORY: usize = 0;
 
-#[from_env]
+
 /// Address of the internal resource library.
 pub const RESOURCE_TABLE: usize = 0;
-#[from_env]
+
 pub const RESOURCE_TABLE_SIZE: usize = 1024;
 pub const RESOURCE_TABLE_ELEMENT_COUNT: usize = RESOURCE_TABLE_SIZE / size_of::<Resource>();
 
-#[from_env]
+
 /// The address of the double buffer (size: target dependent)
 pub const DOUBLE_BUFFER: usize = 0;
-#[from_env]
+
 pub const DOUBLE_BUFFER_SIZE: usize = 1024;
 pub const DOUBLE_BUFFER_SPRITE_COUNT: usize =
     ((DOUBLE_BUFFER_SIZE as i64 - size_of::<DoubleBuffer<()>>() as i64) / 2
         - size_of::<UnspecificState<()>>() as i64) as usize
         / size_of::<Sprite>();
 
-#[from_env]
+
 /// Address of the event queue
 pub const MESSAGE_QUEUE: usize = 0;
-#[from_env]
+
 pub const MESSAGE_QUEUE_SIZE: usize = 1024;
 pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize =
     MESSAGE_QUEUE_SIZE / size_of::<MessageQueueElement<Message>>();
 
-#[from_env]
+
 /// The logic heap address (size: 32MiB)
 pub const LOGIC_HEAP: usize = 0;
 
-#[from_env]
+
 /// The  heap size (size: 32MiB)
 pub const WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES: usize = 0;
 
