@@ -55,7 +55,7 @@ pub const GRAPHICS_HEAP: usize = 0;
 #[from_env]
 /// The address memory synchronization area.
 /// It contains data needed for synchronization between main thread and logic thread.
-pub const SYNCHRONIZATION_MEMORY: usize = 666;
+pub const SYNCHRONIZATION_MEMORY: usize = 0;
 
 #[from_env]
 /// Address of the internal resource library.

@@ -21,16 +21,19 @@
             height: 100%;
             cursor: default;
         }
+
         .fps {
             position: fixed;
             font-family: monospace;
             font-size: 20px;
         }
+
         #lfps {
             top: 0;
             right: 0;
             color: red;
         }
+
         #gfps {
             top: 0;
             left: 0;
@@ -47,7 +50,7 @@
             canvas.height = window.innerHeight;
             canvas.contentEditable = "true";
             document.getElementById('body')
-                    .contentEditable = "true";
+                .contentEditable = "true";
         }
     </script>
 </head>
@@ -59,7 +62,6 @@
     <div class='fps' id='lfps' contentEditable='false'></div>
     <div class='fps' id='gfps' contentEditable='false'></div>
     <script>oncanvas();</script>
-    <script src='gen/mem.json'></script>
     <script src='site/main.js'></script>
 </body>
 

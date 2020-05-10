@@ -3,26 +3,20 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace=console, js_name=debug)]
-    fn _log_debug(msg: &str, color1: &str, color2: &str);
+    pub fn _log_debug(msg: &str, color1: &str, color2: &str);
 
     #[wasm_bindgen(js_namespace=console, js_name=info)]
-    fn _log_info(msg: &str, color1: &str, color2: &str);
+    pub fn _log_info(msg: &str, color1: &str, color2: &str);
 
     #[wasm_bindgen(js_namespace=console, js_name=warn)]
-    fn _log_warn(msg: &str, color1: &str, color2: &str);
+    pub fn _log_warn(msg: &str, color1: &str, color2: &str);
 
     #[wasm_bindgen(js_namespace=console, js_name=error)]
-    fn _log_error(msg: &str, color1: &str, color2: &str);
+    pub fn _log_error(msg: &str, color1: &str, color2: &str);
 }
 
 #[derive(Default)]
-pub struct WasmLog();
-
-impl WasmLog {
-    pub fn new() -> Self {
-        WasmLog()
-    }
-}
+pub struct WasmLog;
 
 impl log::Log for WasmLog {
     fn enabled(&self, metadata: &log::Metadata) -> bool {

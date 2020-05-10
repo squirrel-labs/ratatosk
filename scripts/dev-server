@@ -18,7 +18,7 @@ if [ $? -ne 0 ]; then
   echo "Please run this script from the ratatosk git repository!"
   exit 1
 fi
-cd $top/client
+cd $top/wasm
 
 trap 'kill -TERM "$pid" 2>/dev/null' TERM INT
 python3 -m http.server 3000 &

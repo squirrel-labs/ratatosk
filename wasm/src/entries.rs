@@ -23,17 +23,29 @@ fn wait_for_main_thread_notify() {
     unsafe { mem::SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
 }
 
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console, js_name = debug)]
+    fn console_debug_u32(a: u32);
+}
+#[export_name = "init_alloc"]
+extern "C" fn init_alloc() {
+    unsafe { wee_alloc::init_ptr(crate::mem::__heap_base as *mut u8, 1024 * 64 * 16);
+    console_debug_u32(crate::mem::__heap_base as u32);
+    }
+}
+
 /// Initialize the gamestate, communicate with
 /// the graphics worker and set up networking.
 /// This function is being exposed to javascript
 #[wasm_bindgen]
 pub fn run_main_loop() {
-    unsafe { wee_alloc::init_ptr(crate::mem::__heap_base as *mut u8, 1024 * 64) };
+    console_debug_u32(1);
     panic::set_hook(Box::new(console_error_panic_hook::hook));
 
-    //log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
-    //log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
-    //log::info!("buffer count: {}", mem::DOUBLE_BUFFER_SPRITE_COUNT);
+    log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
+    log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
+    log::info!("buffer count: {}", mem::DOUBLE_BUFFER_SPRITE_COUNT);
     reset_state();
     let mut game = GameContext::new().unwrap_or_else(|e| panic!("{}", e));
     loop {
