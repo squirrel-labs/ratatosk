@@ -2,24 +2,16 @@ extend = "../scripts/cargo-helpers.toml"
 
 [tasks.all]
 workspace = false
-dependencies = [ "crate-build", "wasm" ]
+dependencies = [ "wasm" ]
 
 [tasks.format]
 workspace = false
 command = "cargo"
 args = [ "fmt", "--all" ]
 
-[tasks.crate-build]
-workspace = false
-env = { CARGO_TARGET_DIR = "../target/rask_wasm", MEM_GEN = "${PWD}/gen/", RUSTFLAGS = " -Ctarget-feature=+atomics,+bulk-memory" }
-script = [
-	"cargo make exec-${BUILD_ENV} -- build -p rask-wasm --target wasm32-unknown-unknown -Z build-std=std,panic_abort",
-]
-
-# TODO cargo doesn't seem to have a post-build hook but it might be nice
-# to determine if a rebuild happened (otherwise we don't need to rerun wasm-bindgen).
 [tasks.wasm]
 workspace = false
+env = { CARGO_TARGET_DIR = "../target/rask_wasm",  RUSTFLAGS = " -Ctarget-feature=+atomics,+bulk-memory" }
 script = [
 '''
 #!/usr/bin/env bash -ex
@@ -28,30 +20,9 @@ if [ $? -ne 0 ]; then
   echo "Not in a git repo!"
   exit 1
 fi
+cargo make exec-${BUILD_ENV} -- build -p rask-wasm --target wasm32-unknown-unknown -Z build-std=std,panic_abort
 file=$top/target/rask_wasm/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm.wasm
-wasm-bindgen $file --out-dir $top/wasm/gen \
-  --no-typescript \
-  --keep-debug \
-  --target no-modules #\
-#  --remove-producers-section \
-mv $top/wasm/gen/rask_wasm_bg.wasm $top/wasm/gen/client.wasm
-mv $top/wasm/gen/rask_wasm.js $top/wasm/gen/client.js
-#sed -i "/async function load.*/,/^}/d" gen/client.js
-#sed -i "/\s*let memory;/!b;:a;n;/./ba;r site/load.js" gen/client.js
-sed -i "/init.__wbindgen_wasm_module = module;/iwasm.init_alloc();" gen/client.js
-'''
-]
-
-[tasks.disassemble]
-workspace = false
-script = [
-'''
-#!/usr/bin/env bash -e
-top=$(git rev-parse --show-toplevel 2>/dev/null)
-if [ $? -ne 0 ]; then
-  echo "Not in a git repo!"
-  exit 1
-fi
-wasm2wat --enable-threads -f --no-debug-names $top/wasm/gen/client.wasm -o $top/wasm/gen/client.wat --enable-bulk-memory
+wasm-opt --enable-threads --enable-bulk-memory $file -o $top/wasm/gen/client.wasm
+wasm2wat --enable-all -f $top/wasm/gen/client.wasm -o $top/wasm/gen/client.wat
 '''
 ]

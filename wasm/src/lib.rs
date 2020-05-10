@@ -5,8 +5,8 @@
 #![feature(type_ascription)]
 #![feature(stdsimd)]
 #![feature(arbitrary_enum_discriminant)]
+#![feature(panic_info_message)]
 
-//mod alloc;
 mod context;
 mod double_buffer;
 mod entries;
@@ -16,7 +16,7 @@ mod graphics;
 mod mem;
 mod message_queue;
 mod render;
-mod shader;
+//mod shader;
 mod sprite;
 mod state;
 mod wasm_log;

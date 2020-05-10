@@ -4,22 +4,23 @@ use rask_engine::math::Mat3;
 use rask_engine::resources::texture::{ColorType, Texture};
 use crate::error::ClientError;
 use crate::sprite::TextureId;
-use wasm_bindgen::prelude::*;
+/*use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::WebGl2RenderingContext as Gl2;
 use web_sys::WebGlBuffer;
 use web_sys::WebGlVertexArrayObject as Vao;
-
 const WIDTH: u32 = 160;
+*/
 const HEIGHT: u32 = 90;
 
+/*
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace=Float32Array, js_name=of, variadic)]
     fn _create_f32_buffer(args: &[f32]) -> js_sys::Float32Array;
     #[wasm_bindgen(js_namespace=Uint8Array, js_name=of, variadic)]
     fn _create_u8_buffer(args: &[u8]) -> js_sys::Uint8Array;
-}
+}*/
 
 #[derive(Debug)]
 pub enum WebGl2Error {
@@ -31,6 +32,7 @@ pub enum WebGl2Error {
     UnknownError,
 }
 
+/*
 impl From<u32> for WebGl2Error {
     fn from(v: u32) -> Self {
         match v {
@@ -43,6 +45,7 @@ impl From<u32> for WebGl2Error {
         }
     }
 }
+*/
 
 impl std::fmt::Display for WebGl2Error {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -65,7 +68,6 @@ pub trait GraphicsApi: Sized {
     type GraphicsError: std::fmt::Display;
 
     fn new(
-        canvas: web_sys::OffscreenCanvas,
         size_multiplicator: math::vec2::Vec2,
     ) -> Result<Self, ClientError>;
 
@@ -79,7 +81,7 @@ pub trait GraphicsApi: Sized {
     fn update_size(&mut self, w: u32, h: u32);
     fn ok(&self) -> Result<(), Self::GraphicsError>;
 }
-
+/*
 #[allow(dead_code)]
 struct GlFramebuffer {
     fb: web_sys::WebGlFramebuffer,
@@ -156,7 +158,6 @@ impl GlFramebuffer {
         }
     }
 }
-
 #[allow(dead_code)]
 pub struct WebGl {
     gl: Gl2,
@@ -430,3 +431,4 @@ impl WebGlApiTexture {
         gl.delete_texture(Some(&self.0))
     }
 }
+*/

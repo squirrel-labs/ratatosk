@@ -1,18 +1,9 @@
-use wasm_bindgen::prelude::*;
-
-#[wasm_bindgen]
 extern "C" {
-    #[wasm_bindgen(js_namespace=console, js_name=debug)]
-    pub fn _log_debug(msg: &str, color1: &str, color2: &str);
-
-    #[wasm_bindgen(js_namespace=console, js_name=info)]
-    pub fn _log_info(msg: &str, color1: &str, color2: &str);
-
-    #[wasm_bindgen(js_namespace=console, js_name=warn)]
-    pub fn _log_warn(msg: &str, color1: &str, color2: &str);
-
-    #[wasm_bindgen(js_namespace=console, js_name=error)]
-    pub fn _log_error(msg: &str, color1: &str, color2: &str);
+    fn log_debug(msg: *const u8, len: i32);
+    fn log_info(msg: *const u8, len: i32);
+    fn log_warn(msg: *const u8, len: i32);
+    fn log_error(msg: *const u8, len: i32);
+    fn log_panic(msg: *const u8, len: i32, file: *const u8, flen: i32, line: i32, column: i32);
 }
 
 #[derive(Default)]
@@ -24,16 +15,36 @@ impl log::Log for WasmLog {
     }
 
     fn log(&self, record: &log::Record) {
-        let (log, name, color): (fn(&str, &str, &str), &str, &str) = match record.level() {
-            log::Level::Trace => (_log_debug, "trace", "color:plum;"),
-            log::Level::Debug => (_log_debug, "debug", "color:indigo;"),
-            log::Level::Info => (_log_info, "info", "color:forestgreen;"),
-            log::Level::Warn => (_log_warn, "warn", "color:orangered;"),
-            log::Level::Error => (_log_error, "error", "color:firebrick;"),
+        let (log, name): (unsafe extern "C" fn(*const u8, i32), &str) = match record.level() {
+            log::Level::Trace => (log_debug, "trace"),
+            log::Level::Debug => (log_debug, "debug"),
+            log::Level::Warn => (log_warn, "warn"),
+            log::Level::Info => (log_info, "info"),
+            log::Level::Error => (log_error, "error"),
         };
         let msg = &format!("{}", format_args!("%c{}%c\t{}", name, record.args()));
-        log(msg, color, "");
+        log(msg.as_ptr(), msg.len() as i32);
     }
 
     fn flush(&self) {}
+}
+
+pub fn init_panic_handler() {
+    std::panic::set_hook(Box::new(|info| {
+        let (file, line, column) = if let Some(loc) = info.location() {
+            (loc.file(), loc.line() as i32, loc.column() as i32)
+        } else {
+            ("<unknown>", 0, 0)
+        };
+        if let Some(payload) = info.payload().downcast_ref::<&str>() {
+            log_panic(payload.as_ptr(), payload.len() as i32, file.as_ptr(), file.len() as i32, line, column);
+        } else if let Some(message) = info.message() {
+            let msg = format!("{}", message);
+            log_panic(msg.as_ptr(), msg.len() as i32, file.as_ptr(), file.len() as i32, line, column)
+        }
+
+        #[cfg(target_os = "wasm32")]
+        unsafe { core::arch::wasm32::unreachable() }
+        loop{}
+    }));
 }

@@ -1,4 +1,3 @@
-use crate::graphics::WebGl;
 use crate::render::Render;
 use lazy_static::lazy_static;
 use rask_engine::resources::ResourceTable;
@@ -12,16 +11,18 @@ lazy_static! {
 }
 
 pub struct Context {
-    render: Render<WebGl>,
+    //render: Render<WebGl>,
 }
 
 impl Context {
-    pub fn new(canvas: web_sys::OffscreenCanvas) -> Result<Self, ClientError> {
-        Render::new(canvas).map(|render| Self { render })
+    pub fn new() -> Result<Self, ClientError> {
+        //Render::new().map(|render| Self { render })
+        Ok(Self{})
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
-        self.render.render()
+        //self.render.render()
+        Ok(())
     }
 }
 

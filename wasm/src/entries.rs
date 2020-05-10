@@ -1,15 +1,11 @@
 //! This module contains the entry points callable from javascript
 
-extern crate console_error_panic_hook;
-use std::panic;
-use wasm_bindgen::prelude::*;
-
 use crate::game_context::GameContext;
 use crate::mem;
 use crate::mem::get_double_buffer;
 use crate::state::State;
-use wasm_bindgen::prelude::*;
 
+use std::panic;
 use crate::context;
 
 #[global_allocator]
@@ -23,26 +19,17 @@ fn wait_for_main_thread_notify() {
     unsafe { mem::SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
 }
 
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = console, js_name = debug)]
-    fn console_debug_u32(a: u32);
-}
 #[export_name = "init_alloc"]
 extern "C" fn init_alloc() {
-    unsafe { wee_alloc::init_ptr(crate::mem::__heap_base as *mut u8, 1024 * 64 * 16);
-    console_debug_u32(crate::mem::__heap_base as u32);
-    }
+    unsafe { wee_alloc::init_ptr(crate::mem::__heap_base as *mut u8, 1024 * 64 * 16);}
+    log::info!("{}", crate::mem::__heap_base);
 }
 
 /// Initialize the gamestate, communicate with
 /// the graphics worker and set up networking.
 /// This function is being exposed to javascript
-#[wasm_bindgen]
-pub fn run_main_loop() {
-    console_debug_u32(1);
-    panic::set_hook(Box::new(console_error_panic_hook::hook));
-
+#[export_name = "init_alloc"]
+extern fn run_main_loop() {
     log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
     log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
     log::info!("buffer count: {}", mem::DOUBLE_BUFFER_SPRITE_COUNT);
@@ -59,14 +46,12 @@ pub fn run_main_loop() {
 
 #[allow(dead_code)]
 /// This function is being exposed to javascript
-#[wasm_bindgen]
-pub fn initialise_graphics_context(canvas: web_sys::OffscreenCanvas) {
-    panic::set_hook(Box::new(console_error_panic_hook::hook));
-
+#[export_name = "initialise_graphics_context"]
+pub fn initialise_graphics_context() {
     log::info!("graphics entry reached");
 
     context::set_context(
-        context::Context::new(canvas)
+        context::Context::new()
             .map_err(|e| panic!("{}", e))
             .unwrap(),
     );
@@ -74,9 +59,9 @@ pub fn initialise_graphics_context(canvas: web_sys::OffscreenCanvas) {
 
 #[allow(dead_code)]
 /// This function is being exposed to javascript
-#[wasm_bindgen]
+#[export_name = "draw_frame"]
 pub fn draw_frame() {
-    let _ = context::context_mut()
+    context::context_mut()
         .render()
-        .map_err(|e| log::error!("{}", e));
+        .unwrap_or_else(|e| log::error!("{}", e));
 }

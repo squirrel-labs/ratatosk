@@ -39,7 +39,6 @@ rustup install nightly-2020-02-28
 rustup default nightly-2020-02-28
 rustup target add wasm32-unknown-unknown  # for the frontend part
 cargo install cargo-make
-cargo install wasm-bindgen-cli  # for optimizing wasm code
 ```
 
 Please note that we explicitly pin the nightly channel to a certain date to ensure that

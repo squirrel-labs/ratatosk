@@ -107,12 +107,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bumpalo"
-version = "3.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12ae9db68ad7fac5fe51304d20f016c911539251075a214f8e663babefa35187"
-
-[[package]]
 name = "byte-tools"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -198,36 +192,6 @@ dependencies = [
  "atty",
  "lazy_static",
  "winapi 0.3.8",
-]
-
-[[package]]
-name = "console_error_panic_hook"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8d976903543e0c48546a91908f21588a680a8c8f984df9a5d69feccb2b2a211"
-dependencies = [
- "cfg-if",
- "wasm-bindgen",
-]
-
-[[package]]
-name = "const_env"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e9e4f72c6e3398ca6da372abd9affd8f89781fe728869bbf986206e9af9627e"
-dependencies = [
- "const_env_impl",
-]
-
-[[package]]
-name = "const_env_impl"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a4f51209740b5e1589e702b3044cdd4562cef41b6da404904192ffffb852d62"
-dependencies = [
- "proc-macro2 1.0.12",
- "quote 1.0.5",
- "syn 1.0.21",
 ]
 
 [[package]]
@@ -801,15 +765,6 @@ name = "itoa"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b8b7a7c0c47db5545ed3fef7468ee7bb5b74691498139e4b3f6a20685dc6dd8e"
-
-[[package]]
-name = "js-sys"
-version = "0.3.37"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a27d435371a2fa5b6d2b028a74bbdb1234f308da363226a2854ca3ff8ba7055"
-dependencies = [
- "wasm-bindgen",
-]
 
 [[package]]
 name = "kernel32-sys"
@@ -1467,16 +1422,9 @@ dependencies = [
 name = "rask-wasm"
 version = "0.1.0"
 dependencies = [
- "console_error_panic_hook",
- "const_env",
- "fern",
- "js-sys",
  "lazy_static",
  "log 0.4.8",
- "rand 0.7.3",
  "rask-engine",
- "wasm-bindgen",
- "web-sys",
  "wee_alloc",
 ]
 
@@ -2221,73 +2169,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cccddf32554fecc6acb585f82a32a72e28b48f8c4c1883ddfeeeaa96f7d8e519"
 
 [[package]]
-name = "wasm-bindgen"
-version = "0.2.60"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2cc57ce05287f8376e998cbddfb4c8cb43b84a7ec55cf4551d7c00eef317a47f"
-dependencies = [
- "cfg-if",
- "wasm-bindgen-macro",
-]
-
-[[package]]
-name = "wasm-bindgen-backend"
-version = "0.2.60"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d967d37bf6c16cca2973ca3af071d0a2523392e4a594548155d89a678f4237cd"
-dependencies = [
- "bumpalo",
- "lazy_static",
- "log 0.4.8",
- "proc-macro2 1.0.12",
- "quote 1.0.5",
- "syn 1.0.21",
- "wasm-bindgen-shared",
-]
-
-[[package]]
-name = "wasm-bindgen-macro"
-version = "0.2.60"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8bd151b63e1ea881bb742cd20e1d6127cef28399558f3b5d415289bc41eee3a4"
-dependencies = [
- "quote 1.0.5",
- "wasm-bindgen-macro-support",
-]
-
-[[package]]
-name = "wasm-bindgen-macro-support"
-version = "0.2.60"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d68a5b36eef1be7868f668632863292e37739656a80fc4b9acec7b0bd35a4931"
-dependencies = [
- "proc-macro2 1.0.12",
- "quote 1.0.5",
- "syn 1.0.21",
- "wasm-bindgen-backend",
- "wasm-bindgen-shared",
-]
-
-[[package]]
-name = "wasm-bindgen-shared"
-version = "0.2.60"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "daf76fe7d25ac79748a37538b7daeed1c7a6867c92d3245c12c6222e4a20d639"
-
-[[package]]
-name = "web-sys"
-version = "0.3.36"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "721c6263e2c66fd44501cc5efbfa2b7dfa775d13e4ea38c46299646ed1f9c70a"
-dependencies = [
- "js-sys",
- "wasm-bindgen",
-]
-
-[[package]]
 name = "wee_alloc"
 version = "0.4.6"
-source = "git+https://github.com/squirrel-labs/wee_alloc/?branch=std-mutex#802720d7562bb2d8721ff852f6b3992d97b45456"
+source = "git+https://github.com/squirrel-labs/wee_alloc/?branch=std-mutex#c479ca0d934f6f67f9bfe54e19b29f63e62a649d"
 dependencies = [
  "cfg-if",
  "libc",

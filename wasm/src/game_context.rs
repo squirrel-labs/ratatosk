@@ -11,7 +11,6 @@ use rask_engine::network::packet::{u32_from_le, ResourceData};
 use rask_engine::resources::{registry, GetStore, ResourceTable, TextureIds};
 use std::collections::HashMap;
 use std::convert::TryInto;
-use wasm_bindgen::JsCast;
 
 pub struct GameContext {
     state: State,
@@ -19,7 +18,6 @@ pub struct GameContext {
     #[allow(dead_code)]
     resource_table: ResourceTable,
     message_queue: MessageQueueReader,
-    worker_scope: web_sys::DedicatedWorkerGlobalScope,
     buffer_table: HashMap<u32, (*const u8, u32)>,
 }
 
@@ -38,25 +36,15 @@ impl GameContext {
             )?;
             resource_table
         };
-        let worker_scope = js_sys::global()
-            .dyn_into::<web_sys::DedicatedWorkerGlobalScope>()
-            .unwrap();
-
         log::info!(
             "resource_table: {}",
             &resource_table as *const ResourceTable as u32
-        );
-        log::info!("worker_scope: {:?}", worker_scope);
-        log::info!(
-            "worker_scope: {}",
-            &worker_scope as *const web_sys::DedicatedWorkerGlobalScope as u32
         );
         let a = Ok(Self {
             state: State::default(),
             tick_nr: 0,
             resource_table,
             message_queue: MessageQueueReader::new(),
-            worker_scope,
             buffer_table: HashMap::new(),
         });
         a
