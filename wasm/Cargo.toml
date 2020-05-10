@@ -41,6 +41,7 @@ features = [
 ]
 
 [dependencies.wee_alloc]
-version = "=0.4.5"
+version = "=0.4.6"
 features = ["size_classes", "static_ptr_backend"]
-git = "https://github.com/zshipko/wee_alloc/"
+git = "https://github.com/squirrel-labs/wee_alloc/"
+branch = "std-mutex"

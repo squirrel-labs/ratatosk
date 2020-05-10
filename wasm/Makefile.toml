@@ -13,17 +13,7 @@ args = [ "fmt", "--all" ]
 workspace = false
 env = { CARGO_TARGET_DIR = "../target/rask_wasm", MEM_GEN = "${PWD}/gen/", RUSTFLAGS = " -Ctarget-feature=+atomics,+bulk-memory" }
 script = [
-	"mkdir -p gen",
-	"#touch shared/build.rs #triggers the build.rs to be rebuild every time",
-	"#rustc gen_mem_layout.rs -o gen/gen_mem_layout",
-	"#MEMORY_LAYOUT_PARAMETERS=$(gen/gen_mem_layout)",
-	"#RUSTFLAGS=\"$RUSTFLAGS $(cat ${MEM_GEN}/mem.conf)\"",
-	"#echo $RUSTFLAGS",
-	"#echo $MEMORY_LAYOUT_PARAMETERS",
-	"#echo \"export MEMORY_LAYOUT_PARAMETERS=\\\"${MEMORY_LAYOUT_PARAMETERS}\\\"\" > gen/mem.sh",
-	"#. gen/mem.sh",
 	"cargo make exec-${BUILD_ENV} -- build -p rask-wasm --target wasm32-unknown-unknown -Z build-std=std,panic_abort",
-
 ]
 
 # TODO cargo doesn't seem to have a post-build hook but it might be nice
@@ -46,6 +36,9 @@ wasm-bindgen $file --out-dir $top/wasm/gen \
 #  --remove-producers-section \
 mv $top/wasm/gen/rask_wasm_bg.wasm $top/wasm/gen/client.wasm
 mv $top/wasm/gen/rask_wasm.js $top/wasm/gen/client.js
+#sed -i "/async function load.*/,/^}/d" gen/client.js
+#sed -i "/\s*let memory;/!b;:a;n;/./ba;r site/load.js" gen/client.js
+sed -i "/init.__wbindgen_wasm_module = module;/iwasm.init_alloc();" gen/client.js
 '''
 ]
 
@@ -59,6 +52,6 @@ if [ $? -ne 0 ]; then
   echo "Not in a git repo!"
   exit 1
 fi
-wasm2wat --enable-threads -f --no-debug-names gen/${@}.wasm -o gen/${@}.wat --enable-bulk-memory
+wasm2wat --enable-threads -f --no-debug-names $top/wasm/gen/client.wasm -o $top/wasm/gen/client.wat --enable-bulk-memory
 '''
 ]

@@ -6,20 +6,17 @@
 #![feature(stdsimd)]
 #![feature(arbitrary_enum_discriminant)]
 
-mod alloc;
+//mod alloc;
+mod context;
 mod double_buffer;
+mod entries;
 mod error;
 mod game_context;
+mod graphics;
 mod mem;
 mod message_queue;
+mod render;
+mod shader;
 mod sprite;
 mod state;
 mod wasm_log;
-
-use wee_alloc;
-
-mod context;
-mod entries;
-mod graphics;
-mod render;
-mod shader;
