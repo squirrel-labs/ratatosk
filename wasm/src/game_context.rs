@@ -1,5 +1,3 @@
-use rask_engine::events::{Event, Key};
-use rask_engine::resources::{registry, GetStore, ResourceTable, TextureIds};
 use crate::error::ClientError;
 use crate::mem::get_double_buffer;
 use crate::mem::{RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT};
@@ -8,6 +6,8 @@ use crate::{
     message_queue::{Message, MessageQueueReader},
     state::State,
 };
+use rask_engine::events::{Event, Key};
+use rask_engine::resources::{registry, GetStore, ResourceTable, TextureIds};
 use std::collections::HashMap;
 
 pub struct GameContext {
@@ -38,14 +38,13 @@ impl GameContext {
             "resource_table: {}",
             &resource_table as *const ResourceTable as u32
         );
-        let a = Ok(Self {
+        Ok(Self {
             state: State::default(),
             tick_nr: 0,
             resource_table,
             message_queue: MessageQueueReader::new(),
             buffer_table: HashMap::new(),
-        });
-        a
+        })
     }
 
     fn push_state(&mut self) -> Result<(), ClientError> {
@@ -105,12 +104,11 @@ impl GameContext {
                 log::info!("allocating {} bytes for resource {}", size, id);
                 let ptr = self.alloc_buffer(id, size);
                 use crate::message_queue::Outbound;
-                let msg = Outbound::RescourceAlloc {
+                Outbound::RescourceAlloc {
                     id,
                     ptr: ptr as u32,
                 }
-                .to_js();
-                self.worker_scope.post_message(&msg.buffer()).unwrap();
+                .send();
                 Ok(None)
             }
             Message::ResourcePush(id) => {

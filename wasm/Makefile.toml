@@ -11,7 +11,7 @@ args = [ "fmt", "--all" ]
 
 [tasks.wasm]
 workspace = false
-env = { CARGO_TARGET_DIR = "../target/rask_wasm",  RUSTFLAGS = " -Ctarget-feature=+atomics,+bulk-memory" }
+env = { CARGO_TARGET_DIR = "../target/rask_wasm",  RUSTFLAGS = "-Ctarget-feature=+atomics,+bulk-memory -Clink-arg=--demangle" }
 script = [
 '''
 #!/usr/bin/env bash -ex
@@ -20,9 +20,12 @@ if [ $? -ne 0 ]; then
   echo "Not in a git repo!"
   exit 1
 fi
+gen=$top/wasm/gen
 cargo make exec-${BUILD_ENV} -- build -p rask-wasm --target wasm32-unknown-unknown -Z build-std=std,panic_abort
 file=$top/target/rask_wasm/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm.wasm
-wasm-opt --enable-threads --enable-bulk-memory $file -o $top/wasm/gen/client.wasm
-wasm2wat --enable-all -f $top/wasm/gen/client.wasm -o $top/wasm/gen/client.wat
+wasm2wat --enable-all -f $file -o $gen/client.wat
+sed -i '/\s*(export "__heap_base" (global [0-9]*))/i  (export "__sp" (global 0))' $gen/client.wat
+wat2wasm --enable-all $gen/client.wat -o $gen/client.wasm --debug-names
+wasm-opt --enable-threads --enable-bulk-memory --enable-mutable-globals $gen/client.wasm -o $gen/client.wasm -g -Os
 '''
 ]

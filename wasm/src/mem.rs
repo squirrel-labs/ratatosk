@@ -9,36 +9,32 @@ use std::mem::size_of;
 
 extern "C" {
     #[no_mangle]
-    /// The logic heap address (size: 32MiB)
+    /// The heap address
     pub static __heap_base: i32;
+    pub static __data_end: i32;
+    pub static __tls_size: i32;
 }
 /// The position of the stack.
 pub const LOGIC_STACK: usize = 0;
 
-
 /// The position of the stack.
 pub const GRAPHICS_STACK: usize = 0;
-
 
 /// The address of the Allocator structures
 pub const ALLOCATOR: usize = 0;
 
-
 /// The graphics heap address
 pub const GRAPHICS_HEAP: usize = 0;
-
 
 /// The address memory synchronization area.
 /// It contains data needed for synchronization between main thread and logic thread.
 pub const SYNCHRONIZATION_MEMORY: usize = 0;
-
 
 /// Address of the internal resource library.
 pub const RESOURCE_TABLE: usize = 0;
 
 pub const RESOURCE_TABLE_SIZE: usize = 1024;
 pub const RESOURCE_TABLE_ELEMENT_COUNT: usize = RESOURCE_TABLE_SIZE / size_of::<Resource>();
-
 
 /// The address of the double buffer (size: target dependent)
 pub const DOUBLE_BUFFER: usize = 0;
@@ -49,7 +45,6 @@ pub const DOUBLE_BUFFER_SPRITE_COUNT: usize =
         - size_of::<UnspecificState<()>>() as i64) as usize
         / size_of::<Sprite>();
 
-
 /// Address of the event queue
 pub const MESSAGE_QUEUE: usize = 0;
 
@@ -57,10 +52,8 @@ pub const MESSAGE_QUEUE_SIZE: usize = 1024;
 pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize =
     MESSAGE_QUEUE_SIZE / size_of::<MessageQueueElement<Message>>();
 
-
 /// The logic heap address (size: 32MiB)
 pub const LOGIC_HEAP: usize = 0;
-
 
 /// The  heap size (size: 32MiB)
 pub const WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES: usize = 0;
