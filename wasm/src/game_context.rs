@@ -68,7 +68,6 @@ impl GameContext {
             self.handle_message(msg)?;
         }
 
-        return Ok(());
         if self.state.sprites().len() == 2 {
             self.state.sprites_mut()[1].transform =
                 rask_engine::math::Mat3::rotation(0.02) * self.state.sprites_mut()[1].transform;
