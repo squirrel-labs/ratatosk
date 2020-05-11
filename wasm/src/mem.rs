@@ -9,7 +9,7 @@ use parking_lot::RwLock;
 use rask_engine::resources::Resource;
 use std::mem::size_of;
 
-pub static MEM_ADDRS: RwLock<&'static MemoryAdresses> = RwLock::new(&DEFAULT_ADDR);
+pub static MEM_ADDRS: RwLock<MemoryAdresses> = RwLock::new(DEFAULT_ADDR);
 const DEFAULT_ADDR: MemoryAdresses = MemoryAdresses::empty();
 
 extern "C" {
@@ -64,13 +64,7 @@ impl MemoryAdresses {
             resource_table,
             message_queue,
         };
-        unsafe {
-            *(heap_base as *mut u32 as *mut MemoryAdresses) = mem;
-            *(MEM_ADDRS.write()) =
-                std::mem::transmute::<&mut MemoryAdresses, &mut &'static MemoryAdresses>(
-                    &mut *(synchronization_memory as *mut u32 as *mut MemoryAdresses),
-                );
-        }
+        *(MEM_ADDRS.write()) = mem;
         heap
     }
 }
