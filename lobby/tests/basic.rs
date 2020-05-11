@@ -1,9 +1,9 @@
 #![feature(proc_macro_hygiene)]
 use lobby::routes::*;
 
-use rocket::http::{ContentType, Status, Header};
-use rocket::local::Client;
 use rocket::fairing::AdHoc;
+use rocket::http::{ContentType, Header, Status};
+use rocket::local::Client;
 
 #[test]
 fn test_index_route() {
