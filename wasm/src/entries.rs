@@ -60,7 +60,7 @@ extern "C" fn run_main_loop() {
     log::info!("syc: {}", mem::MEM_ADDRS.read().synchronization_memory);
     loop {
         game.tick().map_err(|e| panic!("{}", e)).unwrap();
-        log::info!("wait_for_main_thread_notify()");
+        log::trace!("wait_for_main_thread_notify()");
         wait_for_main_thread_notify();
     }
 }
