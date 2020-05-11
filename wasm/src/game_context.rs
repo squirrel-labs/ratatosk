@@ -67,7 +67,6 @@ impl GameContext {
             log::info!("{:?}", msg);
             self.handle_message(msg)?;
         }
-        return Ok(());
 
         if self.state.sprites().len() == 2 {
             self.state.sprites_mut()[1].transform =

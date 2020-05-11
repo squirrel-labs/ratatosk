@@ -38,7 +38,6 @@ class MessageQueueWriter {
     _write_i32(args) {
         let ptr = (this.pos + MESSAGE_ITEM_SIZE * this.index++) >> 2;
         let iptr = ptr
-        console.log(this.index);
         Atomics.store(memoryView32, ptr, 1);
         for (let i of args) {
             Atomics.store(memoryView32, ++iptr, i);
