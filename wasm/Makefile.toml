@@ -23,10 +23,10 @@ fi
 gen=$top/wasm/gen
 cargo make exec-${BUILD_ENV} -- build -p rask-wasm --target wasm32-unknown-unknown -Z build-std=std,panic_abort
 file=$top/target/rask_wasm/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm.wasm
+mkdir -p $gen
 wasm-dis $file -o $gen/client.wat
 sed -i '/\s*(export "__heap_base" (global $global$[0-9]*))/i  (export "__sp" (global $global$0))' $gen/client.wat
 grep "__sp" $gen/client.wat > /dev/null
 wasm-as --enable-threads --enable-bulk-memory --enable-mutable-globals $gen/client.wat -o $gen/client.wasm -g -pa O@s
-#wasm-opt --enable-threads --enable-bulk-memory --enable-mutable-globals $gen/client.wasm -o $gen/client.wasm -g -Os
 '''
 ]
