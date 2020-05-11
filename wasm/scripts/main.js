@@ -1,14 +1,14 @@
 const WORKER_URI = 'scripts/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:5001/'
-// synchronization memory address (read from mem.json, see gen_mem_layout.rs)
-const SYNCHRONIZATION_MEMORY = 0; //memoryParameters.sync_area / 4;
-const MESSAGE_QUEUE = 0; //memoryParameters.queue_start;
 const MESSAGE_ITEM_SIZE = 32;
-const MESSAGE_QUEUE_LENGTH = 0;//memoryParameters.queue_size / MESSAGE_ITEM_SIZE;
-const SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
-const SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
-const SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
-const SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
+let SYNCHRONIZATION_MEMORY;
+let MESSAGE_QUEUE;
+let MESSAGE_QUEUE_LENGTH;
+let SYNC_MOUSE;
+let SYNC_CANVAS_SIZE;
+let SYNC_PLAYER_STATE;
+let SYNC_OTHER_STATE;
+let queue = null;
 let params = new URLSearchParams(document.location.search.substring(1));
 <<<<<<< HEAD:wasm/site/main.js
 //let token = params.get("token");
@@ -25,6 +25,7 @@ let connected = false
 
 let mousex = 0;
 let mousey = 0;
+
 
 class MessageQueueWriter {
     constructor(pos, elemetSize) {
@@ -61,7 +62,6 @@ class MessageQueueWriter {
     }
 }
 
-queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
 
 function postWorkerDescriptor(worker, desc) {
     if (typeof desc.canvas === "undefined") {
@@ -75,10 +75,7 @@ function spawnModule(module) {
     postWorkerDescriptor(worker, module);
     return worker;
 }
-
-function importGlobals(instance) {
-}
-
+let wasm_module;
 function spawnModules(canvas, memory) {
     WebAssembly.compileStreaming(fetch('../gen/client.wasm'))
     .then(compiled => {
@@ -88,9 +85,7 @@ function spawnModules(canvas, memory) {
         };
         spawnModule(module);
         module.canvas = canvas;
-        spawnModule(module);
-        //let wasm = WebAssembly.instantiate(compiled, {env:{memory:memory}});
-        //importGlobals(instance);
+        wasm_module = module;
     });
 }
 
@@ -169,6 +164,16 @@ function LogicMessage(e) {
             console.error("Requested resource not in resource_map, id: " + id)
         }
     } else if (optcode === 1) {
+        SYNCHRONIZATION_MEMORY = x[1] >> 2;
+        MESSAGE_QUEUE = x[2] >> 2;
+        MESSAGE_QUEUE_LENGTH = (x[3] - x[2]) >> 2;
+        SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
+        SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
+        SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
+        SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
+        spawnModule(wasm_module);
+        queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
+    } else if (optcode === 2) {
         if (x[1] === 0) {
             window.addEventListener('input', input);
         } else {
@@ -195,128 +200,123 @@ let memoryViewU8 = new Uint8Array(memory.buffer);
 
 spawnModules(canvas, memory);
 
-function doSomething() {
-    function wakeUpAt(addr) {
-        Atomics.notify(memory.buffer, addr, +Infinity);
-    }
-
-    const START_TIME = Date.now();
-    let last_time = START_TIME;
-    const fps_sampling_count = 5;
-    let fps_sampling_n = 0;
-    async function wakeLogic() {
-        if (connected) {
-            let x = new Uint32Array(4);
-            x[0] = 128;
-            x[1] = Atomics.load(memoryView32, SYNC_PLAYER_STATE);
-            x[2] = Atomics.load(memoryView32, SYNC_PLAYER_STATE + 1);
-            x[3] = Atomics.load(memoryView32, SYNC_PLAYER_STATE + 2);
-            //ws.send(x.buffer); TODO
-        }
-
-        const t = Date.now() - START_TIME;
-        if (++fps_sampling_n >= fps_sampling_count) {
-            document.getElementById('lfps').textContent = Math.round(100000 / ((t - last_time) / fps_sampling_count)) / 100;
-            last_time = t;
-            fps_sampling_n = 0;
-        }
-        Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, t);
-        Atomics.store(memoryView32, SYNC_MOUSE, Math.floor(mousex));
-        Atomics.store(memoryView32, SYNC_MOUSE + 1, Math.floor(mousey));
-        Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
-    }
-
-    function setup_ws() {
-        ws.addEventListener('open',  () => {
-            console.log('ws connection to ' + WEBSOCKET_URI + ' established');
-            connected = true;
-        });
-        ws.addEventListener('error', event => {
-            console.error('ws error occured: "' + event + '"');
-            connected = false;
-        });
-        ws.addEventListener('close', event => {
-            console.error('ws is closed now: ' + event);
-            connected = false;
-        });
-        ws.addEventListener('message', e => {
-            let data = new Uint32Array(e.data, 0, 1);
-            let optcode = data[0];
-            if (optcode === 10) {
-                upload_resource(e.data);
-            } else if (optcode === 11) {
-                Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
-                Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);
-                Atomics.store(memoryView32, SYNC_OTHER_STATE + 2, data[3]);
-            } else {
-                console.error("unknown optcode: " + optcode);
-            }
-        });
-    }
-    setup_ws();
-
-    function hashCode(str) {
-        var hash = 0;
-        if (this.length === 0) {
-            return hash;
-        }
-        for (var i = 0; i < str.length; i++) {
-            var char = this.charCodeAt(i);
-            hash = ((hash<<5)-hash)+char;
-            hash = hash & hash; // Convert to 32bit integer
-        }
-        return hash;
-    }
-
-    function keyMod(key) {
-        return key.shiftKey + (key.ctrlKey << 1) + (key.altKey << 2) + (key.metaKey << 3);
-    }
-
-    function evalKey(key) {
-        if (key.isComposing && key.repeat) { return 0; }
-        return hashCode(key.code)
-    }
-
-    function input(e) {
-        let str = e.data;
-        if (e.inputType !== "insertText") return;
-        for (var i = 0; i < str.length; i++) {
-            queue.write_i32([3, 1, str.charAt(i)]);
-        }
-        queue.write_i32([1, e.data]);
-    }
-
-    window.addEventListener('resize', onresize);
-
-    window.addEventListener('keydown', e => {
-        const key = evalKey(e);
-        const mod = keyMod(e);
-        if (key !== undefined && mod !== undefined) { queue.write_i32([1, mod, key]); }
-    });
-
-    window.addEventListener('keyup', e => {
-        const key = evalKey(e);
-        const mod = keyMod(e);
-        if (key !== undefined && mod !== undefined) { queue.write_i32([2, mod, key]); }
-    });
-
-    window.addEventListener('mousemove', e => {
-        mousex = e.clientX;
-        mousey = e.clientY;
-    });
-
-    window.addEventListener('mousedown', e => {
-        const mod = keyMod(e);
-        if (mod !== undefined) {queue.write_i32([5, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
-    });
-
-    window.addEventListener('mouseup', e => {
-        const mod = keyMod(e);
-        if (mod !== undefined) {queue.write_i32([6, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
-    });
-
-    window.setInterval(wakeLogic, 50);
+function wakeUpAt(addr) {
+    Atomics.notify(memory.buffer, addr, +Infinity);
 }
 
-//window.setTimeout(doSomething, 3000);
-//doSomething();
+const START_TIME = Date.now();
+let last_time = START_TIME;
+const fps_sampling_count = 5;
+let fps_sampling_n = 0;
+async function wakeLogic() {
+    if (connected) {
+        let x = new Uint32Array(4);
+        x[0] = 128;
+        x[1] = Atomics.load(memoryView32, SYNC_PLAYER_STATE);
+        x[2] = Atomics.load(memoryView32, SYNC_PLAYER_STATE + 1);
+        x[3] = Atomics.load(memoryView32, SYNC_PLAYER_STATE + 2);
+        //ws.send(x.buffer); TODO
+    }
+
+    const t = Date.now() - START_TIME;
+    if (++fps_sampling_n >= fps_sampling_count) {
+        document.getElementById('lfps').textContent = Math.round(100000 / ((t - last_time) / fps_sampling_count)) / 100;
+        last_time = t;
+        fps_sampling_n = 0;
+    }
+    Atomics.store(memoryView32, SYNCHRONIZATION_MEMORY, t);
+    Atomics.store(memoryView32, SYNC_MOUSE, Math.floor(mousex));
+    Atomics.store(memoryView32, SYNC_MOUSE + 1, Math.floor(mousey));
+    Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
+}
+
+function setup_ws() {
+    ws.addEventListener('open',  () => {
+        console.log('ws connection to ' + WEBSOCKET_URI + ' established');
+        connected = true;
+    });
+    ws.addEventListener('error', event => {
+        console.error('ws error occured: "' + event + '"');
+        connected = false;
+    });
+    ws.addEventListener('close', event => {
+        console.error('ws is closed now: ' + event);
+        connected = false;
+    });
+    ws.addEventListener('message', e => {
+        let data = new Uint32Array(e.data, 0, 1);
+        let optcode = data[0];
+        if (optcode === 10) {
+            upload_resource(e.data);
+        } else if (optcode === 11) {
+            Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
+            Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);
+            Atomics.store(memoryView32, SYNC_OTHER_STATE + 2, data[3]);
+        } else {
+            console.error("unknown optcode: " + optcode);
+        }
+    });
+}
+setup_ws();
+
+function hashCode(str) {
+    var hash = 0;
+    if (this.length === 0) {
+        return hash;
+    }
+    for (var i = 0; i < str.length; i++) {
+        var char = this.charCodeAt(i);
+        hash = ((hash<<5)-hash)+char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+}
+
+function keyMod(key) {
+    return key.shiftKey + (key.ctrlKey << 1) + (key.altKey << 2) + (key.metaKey << 3);
+}
+
+function evalKey(key) {
+    if (key.isComposing && key.repeat) { return 0; }
+    return hashCode(key.code)
+}
+
+function input(e) {
+    let str = e.data;
+    if (e.inputType !== "insertText") return;
+    for (var i = 0; i < str.length; i++) {
+        queue.write_i32([3, 1, str.charAt(i)]);
+    }
+    queue.write_i32([1, e.data]);
+}
+
+window.addEventListener('resize', onresize);
+
+window.addEventListener('keydown', e => {
+    const key = evalKey(e);
+    const mod = keyMod(e);
+    if (key !== undefined && mod !== undefined) { queue.write_i32([1, mod, key]); }
+});
+
+window.addEventListener('keyup', e => {
+    const key = evalKey(e);
+    const mod = keyMod(e);
+    if (key !== undefined && mod !== undefined) { queue.write_i32([2, mod, key]); }
+});
+
+window.addEventListener('mousemove', e => {
+    mousex = e.clientX;
+    mousey = e.clientY;
+});
+
+window.addEventListener('mousedown', e => {
+    const mod = keyMod(e);
+    if (mod !== undefined) {queue.write_i32([5, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
+});
+
+window.addEventListener('mouseup', e => {
+    const mod = keyMod(e);
+    if (mod !== undefined) {queue.write_i32([6, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
+});
+
+window.setInterval(wakeLogic, 50);
