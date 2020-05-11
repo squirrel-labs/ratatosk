@@ -4,6 +4,9 @@ let decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 function str_from_mem(ptr, len) {
     return decoder.decode(Uint8Array(mem, ptr, len));
 }
+function arr_from_mem(ptr, len) {
+    return new Int32Array(mem, ptr >> 2, len >> 2);
+}
 
 const imports = {
     log_debug: function(msg, len) {
@@ -21,6 +24,9 @@ const imports = {
     log_panic: function(msg, len, file, flen, line, column) {
         console.error('%cPANIC\tpanic at line ' + line + ' and column ' + column + ' in file "' + str_from_mem(file, flen) + '"\n' + str_from_mem(msg, len), 'color:red');
     },
+    post_to_main: function(msg, len) {
+        this.postMessage(arr_from_mem(msg, len));
+    },
 };
 
 function onwasm(ctx, desc, module) {
@@ -37,5 +43,14 @@ function onwasm(ctx, desc, module) {
 onmessage = async function({ data }) {
     // set global memory for function imports
     mem = data.memory;
-    data.
+    let mod = data.compiled;
+    let imp = {env: imports};
+    imp.env.memory = mem;
+    let wasm = await WebAssembly.instantiate(mod, imp);
+    wasm.exports.__wasm_init_memory();
+    wasm.exports.__wasm_init_tls();
+    wasm.exports.init();
+    wasm.exports.run_logic();
+
+    this.console.log(wasm);
 }

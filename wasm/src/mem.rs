@@ -10,8 +10,10 @@ use std::mem::size_of;
 
 extern "C" {
     #[no_mangle]
-    /// The logic heap address (size: 32MiB)
+    /// The heap address
     pub static __heap_base: i32;
+    pub static __data_end: i32;
+    pub static __tls_size: i32;
 }
 /// The position of the stack.
 pub const LOGIC_STACK: usize = 0;

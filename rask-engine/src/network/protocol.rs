@@ -13,4 +13,3 @@ pub mod resource_types {
     pub const SOUND: u32 = 4;
 }
 pub mod javascript;
-

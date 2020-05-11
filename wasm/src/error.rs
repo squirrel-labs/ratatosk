@@ -1,5 +1,4 @@
 use std::fmt;
-use wasm_bindgen::JsValue;
 
 /// Collection of frontend errors
 /// these can result form Network errors, other javascript errors or concurrency errors
@@ -21,31 +20,14 @@ use wasm_bindgen::JsValue;
 /// ```
 #[derive(Debug)]
 pub enum ClientError {
-    JsValueError(JsValue),
-    WebSocketError(JsValue),
     WebGlError(String),
     ResourceError(String),
     EngineError(String),
 }
 
-fn jsvalue_to_string(v: &JsValue) -> String {
-    // try to parse JsValue as String
-    // on failiure try to parse JsValue as Error
-    v.as_string()
-        .or_else(|| {
-            js_sys::Reflect::get(v, &JsValue::from_str("description"))
-                .ok()
-                .and_then(|x| x.as_string())
-        })
-        .unwrap_or_else(|| format!("error: {:?}", v))
-}
-
 impl std::fmt::Display for ClientError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ClientError::JsValueError(e) | ClientError::WebSocketError(e) => {
-                write!(f, "{}", jsvalue_to_string(e))
-            }
             ClientError::ResourceError(e)
             | ClientError::WebGlError(e)
             | ClientError::EngineError(e) => write!(f, "{}", e),
@@ -62,9 +44,4 @@ macro_rules! derive_from {
     };
 }
 
-impl From<JsValue> for ClientError {
-    fn from(error: JsValue) -> Self {
-        ClientError::JsValueError(error)
-    }
-}
 derive_from!(rask_engine::error::EngineError, EngineError);

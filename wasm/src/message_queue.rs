@@ -21,6 +21,10 @@ impl Default for Message {
     }
 }
 
+extern "C" {
+    pub fn post_to_main(ptr: u32, len: u32);
+}
+
 #[repr(C, u32)]
 #[derive(Debug, Clone)]
 #[non_exhaustive]
@@ -30,16 +34,13 @@ pub enum Outbound {
     EngineEvent(Event) = 129, // Mark the Message as outbound
 }
 impl Outbound {
-    pub fn to_js(&self) -> js_sys::Uint32Array {
+    pub fn to_js(&self) -> &[u32] {
         let len = std::mem::size_of::<Outbound>() as u32;
-        let msg = js_sys::Uint32Array::new_with_length(len);
-        let buf: &[u32] = unsafe {
-            std::slice::from_raw_parts(self as *const Outbound as *const u32, len as usize)
-        };
-        for i in 0..len {
-            msg.set_index(i, buf[i as usize]);
-        }
-        msg
+        unsafe { std::slice::from_raw_parts(self as *const Outbound as *const u32, len as usize) }
+    }
+    pub fn send(&self) {
+        let msg = self.to_js();
+        unsafe { post_to_main(msg.as_ptr() as u32, msg.len() as u32) }
     }
 }
 

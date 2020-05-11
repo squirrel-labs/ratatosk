@@ -23,7 +23,7 @@ impl log::Log for WasmLog {
             log::Level::Error => (log_error, "error"),
         };
         let msg = &format!("{}", format_args!("%c{}%c\t{}", name, record.args()));
-        log(msg.as_ptr(), msg.len() as i32);
+        unsafe { log(msg.as_ptr(), msg.len() as i32) }
     }
 
     fn flush(&self) {}
@@ -37,14 +37,33 @@ pub fn init_panic_handler() {
             ("<unknown>", 0, 0)
         };
         if let Some(payload) = info.payload().downcast_ref::<&str>() {
-            log_panic(payload.as_ptr(), payload.len() as i32, file.as_ptr(), file.len() as i32, line, column);
+            unsafe {
+                log_panic(
+                    payload.as_ptr(),
+                    payload.len() as i32,
+                    file.as_ptr(),
+                    file.len() as i32,
+                    line,
+                    column,
+                )
+            }
         } else if let Some(message) = info.message() {
             let msg = format!("{}", message);
-            log_panic(msg.as_ptr(), msg.len() as i32, file.as_ptr(), file.len() as i32, line, column)
+            unsafe {
+                log_panic(
+                    msg.as_ptr(),
+                    msg.len() as i32,
+                    file.as_ptr(),
+                    file.len() as i32,
+                    line,
+                    column,
+                )
+            }
         }
 
         #[cfg(target_os = "wasm32")]
-        unsafe { core::arch::wasm32::unreachable() }
-        loop{}
+        unsafe {
+            core::arch::wasm32::unreachable()
+        }
     }));
 }

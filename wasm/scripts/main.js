@@ -1,4 +1,4 @@
-const WORKER_URI = 'site/worker.js'
+const WORKER_URI = 'scripts/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:5001/'
 // synchronization memory address (read from mem.json, see gen_mem_layout.rs)
 const SYNCHRONIZATION_MEMORY = 0; //memoryParameters.sync_area / 4;
@@ -89,9 +89,9 @@ function spawnModules(canvas, memory) {
         spawnModule(module);
         module.canvas = canvas;
         spawnModule(module);
-        let wasm = WebAssembly.instantiate(compiled, {env:{memory:memory}});
-        importGlobals(instance);
-    }
+        //let wasm = WebAssembly.instantiate(compiled, {env:{memory:memory}});
+        //importGlobals(instance);
+    });
 }
 
 function throwMissingOffscreenCanvasSupport() {
