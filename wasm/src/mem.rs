@@ -184,8 +184,11 @@ pub unsafe fn atomic_read_u32(ptr: *const u32) -> u32 {
 /// # Safety
 /// This function is safe as long the thread waits at a valid memory address
 pub unsafe fn wait_until_wake_up_at(ptr: *mut i32) {
-    let res = llvm_atomic_wait_i32(ptr, atomic_read_i32(ptr), 1000 * 1000 * 1000 * 5);
-    debug_assert_eq!(res, 0);
+    let timeout = 5;
+    let res = llvm_atomic_wait_i32(ptr, atomic_read_i32(ptr), 1000 * 1000 * 1000 * timeout);
+    if res != 0 {
+        log::trace!("Thread woke up after {}e", timeout);
+    }
 }
 
 /// performs a notify at a given address and return the count of waiters
