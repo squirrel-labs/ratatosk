@@ -1,11 +1,11 @@
 use crate::error::ClientError;
 use crate::mem;
-use crate::mem::get_double_buffer;
 use crate::mem::RESOURCE_TABLE_ELEMENT_COUNT;
 use crate::sprite::*;
 use crate::{
     message_queue::{Message, MessageQueueReader},
     state::State,
+    DOUBLE_BUFFER,
 };
 use rask_engine::events::{Event, Key};
 use rask_engine::resources::{registry, GetStore, ResourceTable, TextureIds};
@@ -14,7 +14,6 @@ use std::collections::HashMap;
 pub struct GameContext {
     state: State,
     tick_nr: u64,
-    #[allow(dead_code)]
     resource_table: ResourceTable,
     message_queue: MessageQueueReader,
     buffer_table: HashMap<u32, (*const u8, u32)>,
@@ -50,10 +49,9 @@ impl GameContext {
         })
     }
 
-    fn push_state(&mut self) -> Result<(), ClientError> {
-        let mut writer = get_double_buffer().borrow_writer();
-        writer.set(self.state);
-        Ok(())
+    fn push_state(&mut self) {
+        let mut writer = DOUBLE_BUFFER.lock();
+        *writer = self.state;
     }
 
     pub fn tick(&mut self) -> Result<(), ClientError> {
@@ -70,7 +68,7 @@ impl GameContext {
             self.state.sprites_mut()[1].transform =
                 rask_engine::math::Mat3::rotation(0.02) * self.state.sprites_mut()[1].transform;
         }
-        self.push_state()?;
+        self.push_state();
         self.tick_nr += 1;
         Ok(())
     }

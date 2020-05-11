@@ -27,14 +27,17 @@ impl State {
             self.sprite_len += 1;
         }
     }
+    pub const fn empty() -> Self {
+        Self {
+            sprite_len: 0,
+            sprites: [Sprite::empty(); MAX_SPRITES],
+        }
+    }
 }
 
 impl Default for State {
     fn default() -> Self {
-        Self {
-            sprite_len: 0,
-            sprites: [Sprite::default(); MAX_SPRITES],
-        }
+        Self::empty()
     }
 }
 

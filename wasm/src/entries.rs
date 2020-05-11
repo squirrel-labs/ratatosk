@@ -3,47 +3,40 @@
 use crate::context;
 use crate::game_context::GameContext;
 use crate::mem;
-use crate::mem::get_double_buffer;
-use crate::state::State;
+use crate::message_queue::Outbound;
 use crate::wasm_log::init_panic_handler;
 use crate::wasm_log::WasmLog;
-use parking_lot::Mutex;
 
-static IS_INIT: Mutex<bool> = Mutex::new(false);
 static LOGGER: WasmLog = WasmLog;
 
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-fn reset_state() {
-    let mut writer = get_double_buffer().borrow_writer();
-    writer.set(State::default());
-}
 
 fn wait_for_main_thread_notify() {
     unsafe { mem::SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
 }
 
+/// This function initializes the heap
+/// #Safety
+/// This function may only be called once at the start of the program
+/// Any call to alloc prior to this functions invocation results in an error
 #[export_name = "init"]
 extern "C" fn init(heap_base: i32) {
-    let mut init = IS_INIT.lock();
-    if !*init {
-        unsafe {
-            let heap_base = mem::MemoryAdresses::init(heap_base as u32);
-            wee_alloc::init_ptr(
-                mem::MEM_ADDRS.read().heap_base as *mut u8,
-                mem::HEAP_SIZE as usize,
-            );
-        }
-        context::set_context(
-            context::Context::new()
-                .map_err(|e| panic!("{}", e))
-                .unwrap(),
+    unsafe {
+        mem::MemoryAdresses::init(heap_base as u32);
+        wee_alloc::init_ptr(
+            mem::MEM_ADDRS.read().heap_base as *mut u8,
+            mem::HEAP_SIZE as usize,
         );
-        log::set_logger(&LOGGER).unwrap();
-        log::set_max_level(log::LevelFilter::Info);
-        init_panic_handler();
-        *init = true;
     }
+    context::set_context(
+        context::Context::new()
+            .map_err(|e| panic!("{}", e))
+            .unwrap(),
+    );
+    log::set_logger(&LOGGER).unwrap();
+    log::set_max_level(log::LevelFilter::Error);
+    init_panic_handler();
 }
 
 /// Initialize the gamestate, communicate with
@@ -51,11 +44,10 @@ extern "C" fn init(heap_base: i32) {
 /// This function is being exposed to javascript
 #[export_name = "run_logic"]
 extern "C" fn run_main_loop() {
-    reset_state();
     let mut game = GameContext::new().unwrap_or_else(|e| panic!("{}", e));
 
     log::info!("send memory offsetst");
-    crate::message_queue::Outbound::Memory((*(mem::MEM_ADDRS.read())).clone()).send();
+    Outbound::Memory((*(mem::MEM_ADDRS.read())).clone()).send();
 
     log::info!("syc: {}", mem::MEM_ADDRS.read().synchronization_memory);
     loop {
