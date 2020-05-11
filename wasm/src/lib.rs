@@ -2,13 +2,11 @@
 //! It interacts with the graphics crate through the shared array buffer
 
 #![feature(allocator_api)]
-#![feature(type_ascription)]
 #![feature(stdsimd)]
 #![feature(arbitrary_enum_discriminant)]
 #![feature(panic_info_message)]
 
 mod context;
-mod double_buffer;
 mod entries;
 mod error;
 mod game_context;
@@ -20,3 +18,7 @@ mod render;
 mod sprite;
 mod state;
 mod wasm_log;
+use crate::state::State;
+use parking_lot::Mutex;
+
+static DOUBLE_BUFFER: Mutex<State> = Mutex::new(State::empty());

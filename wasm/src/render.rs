@@ -1,7 +1,7 @@
 use crate::context::RESOURCE_TABLE;
 use crate::error::ClientError;
 use crate::graphics::GraphicsApi;
-use crate::{mem::get_double_buffer, mem::SynchronizationMemory};
+use crate::mem::SynchronizationMemory;
 use rask_engine::resources::{registry, GetStore, TextureIds};
 
 pub struct Render<T> {
@@ -70,24 +70,20 @@ impl<T: GraphicsApi> Render<T> {
         if used_textures.reset_notify > 0 {
             self.reset_textures(used_textures)?;
         }
-        if let Some(state) = get_double_buffer().borrow_reader() {
-            let state = state.get();
-            let sprites = state.sprites();
-            for sprite in sprites {
-                if self
-                    .graphics
+        let state = *crate::DOUBLE_BUFFER.lock();
+        let sprites = state.sprites();
+        for sprite in sprites {
+            if self
+                .graphics
+                .draw_rect(&sprite.transform, sprite.tex_id)?
+                .is_none()
+            {
+                self.upload_texture(sprite.tex_id)?;
+                self.graphics
                     .draw_rect(&sprite.transform, sprite.tex_id)?
-                    .is_none()
-                {
-                    self.upload_texture(sprite.tex_id)?;
-                    self.graphics
-                        .draw_rect(&sprite.transform, sprite.tex_id)?
-                        .unwrap();
-                }
+                    .unwrap();
             }
-            Ok(true)
-        } else {
-            Ok(false)
         }
+        Ok(true)
     }
 }
