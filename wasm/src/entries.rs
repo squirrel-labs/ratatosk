@@ -28,19 +28,19 @@ extern "C" fn init(heap_base: i32) {
     let mut init = IS_INIT.lock();
     if !*init {
         unsafe {
-            wee_alloc::init_ptr(heap_base as *mut u8, 1024 * 64 * 16);
-            log::set_logger(&LOGGER).unwrap();
-            log::set_max_level(log::LevelFilter::Trace);
-            log::info!("{}", mem::__heap_base);
+            let heap_base = mem::MemoryAdresses::write_at(heap_base as u32);
+            wee_alloc::init_ptr(heap_base as *mut u8, mem::HEAP_SIZE as usize);
         }
         context::set_context(
             context::Context::new()
                 .map_err(|e| panic!("{}", e))
                 .unwrap(),
         );
+        log::set_logger(&LOGGER).unwrap();
+        log::set_max_level(log::LevelFilter::Trace);
+        init_panic_handler();
         *init = true;
     }
-    init_panic_handler();
 }
 
 /// Initialize the gamestate, communicate with
@@ -51,7 +51,6 @@ extern "C" fn run_main_loop() {
     log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
     log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
     log::info!("buffer count: {}", mem::DOUBLE_BUFFER_SPRITE_COUNT);
-    return;
     reset_state();
     let mut game = GameContext::new().unwrap_or_else(|e| panic!("{}", e));
     loop {

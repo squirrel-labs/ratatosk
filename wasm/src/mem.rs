@@ -4,8 +4,12 @@ use crate::double_buffer::DoubleBuffer;
 use crate::message_queue::{Message, MessageQueueElement};
 use crate::sprite::Sprite;
 use crate::state::{State, UnspecificState};
+use parking_lot::RwLock;
 use rask_engine::resources::Resource;
 use std::mem::size_of;
+
+pub static MEM_ADDRS: RwLock<&'static MemoryAdresses> = RwLock::new(&DEFAULT_ADDR);
+const DEFAULT_ADDR: MemoryAdresses = MemoryAdresses::empty();
 
 extern "C" {
     #[no_mangle]
@@ -14,52 +18,73 @@ extern "C" {
     pub static __data_end: i32;
     pub static __tls_size: i32;
 }
-/// The position of the stack.
-pub const LOGIC_STACK: usize = 0;
 
-/// The position of the stack.
-pub const GRAPHICS_STACK: usize = 0;
+pub const RESOURCE_TABLE_SIZE: u32 = 1024;
+pub const DOUBLE_BUFFER_SIZE: u32 = 1024;
+pub const MESSAGE_QUEUE_SIZE: u32 = 1024;
+pub const HEAP_SIZE: u32 = 1024 * 64 * 16;
 
-/// The address of the Allocator structures
-pub const ALLOCATOR: usize = 0;
+fn align_up<T>(addr: u32) -> u32 {
+    let x = std::mem::align_of::<T>() as u32 - 1;
+    (addr + x) & !x
+}
 
-/// The graphics heap address
-pub const GRAPHICS_HEAP: usize = 0;
+#[derive(Debug)]
+pub struct MemoryAdresses {
+    pub synchronization_memory: u32,
+    pub double_buffer: u32,
+    pub resource_table: u32,
+    pub message_queue: u32,
+}
+impl MemoryAdresses {
+    const fn empty() -> Self {
+        Self {
+            synchronization_memory: 0,
+            double_buffer: 0,
+            resource_table: 0,
+            message_queue: 0,
+        }
+    }
+    #[allow(clippy::transmute_ptr_to_ptr)]
+    pub fn write_at(heap_base: u32) -> u32 {
+        let synchronization_memory = align_up::<SynchronizationMemory>(heap_base) as u32;
+        let double_buffer = align_up::<DoubleBuffer<State>>(
+            heap_base + std::mem::size_of::<SynchronizationMemory>() as u32,
+        );
+        let resource_table =
+            align_up::<rask_engine::resources::ResourceTable>(double_buffer + DOUBLE_BUFFER_SIZE);
+        let message_queue =
+            align_up::<MessageQueueElement<Message>>(resource_table + RESOURCE_TABLE_SIZE);
+        let heap = align_up::<SynchronizationMemory>(message_queue + MESSAGE_QUEUE_SIZE);
+        let mem = Self {
+            synchronization_memory,
+            double_buffer,
+            resource_table,
+            message_queue,
+        };
+        unsafe {
+            *(heap_base as *mut u32 as *mut MemoryAdresses) = mem;
+            *(MEM_ADDRS.write()) =
+                std::mem::transmute::<&mut MemoryAdresses, &mut &'static MemoryAdresses>(
+                    &mut *(heap_base as *mut u32 as *mut MemoryAdresses),
+                );
+        }
+        heap
+    }
+}
 
-/// The address memory synchronization area.
-/// It contains data needed for synchronization between main thread and logic thread.
-pub const SYNCHRONIZATION_MEMORY: usize = 0;
-
-/// Address of the internal resource library.
-pub const RESOURCE_TABLE: usize = 0;
-
-pub const RESOURCE_TABLE_SIZE: usize = 1024;
-pub const RESOURCE_TABLE_ELEMENT_COUNT: usize = RESOURCE_TABLE_SIZE / size_of::<Resource>();
-
-/// The address of the double buffer (size: target dependent)
-pub const DOUBLE_BUFFER: usize = 0;
-
-pub const DOUBLE_BUFFER_SIZE: usize = 1024;
+pub const RESOURCE_TABLE_ELEMENT_COUNT: usize =
+    RESOURCE_TABLE_SIZE as usize / size_of::<Resource>();
 pub const DOUBLE_BUFFER_SPRITE_COUNT: usize =
     ((DOUBLE_BUFFER_SIZE as i64 - size_of::<DoubleBuffer<()>>() as i64) / 2
         - size_of::<UnspecificState<()>>() as i64) as usize
         / size_of::<Sprite>();
 
-/// Address of the event queue
-pub const MESSAGE_QUEUE: usize = 0;
-
-pub const MESSAGE_QUEUE_SIZE: usize = 1024;
 pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize =
-    MESSAGE_QUEUE_SIZE / size_of::<MessageQueueElement<Message>>();
-
-/// The logic heap address (size: 32MiB)
-pub const LOGIC_HEAP: usize = 0;
-
-/// The  heap size (size: 32MiB)
-pub const WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES: usize = 0;
+    MESSAGE_QUEUE_SIZE as usize / size_of::<MessageQueueElement<Message>>();
 
 pub fn get_double_buffer() -> &'static mut Buffer {
-    unsafe { &mut *(DOUBLE_BUFFER as *mut Buffer) }
+    unsafe { &mut *(MEM_ADDRS.read().double_buffer as *mut Buffer) }
 }
 
 #[repr(C)]
@@ -87,36 +112,25 @@ impl SynchronizationMemory {
     /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
     /// and is only written to using atomic operations
     pub unsafe fn get() -> &'static Self {
-        &*(SYNCHRONIZATION_MEMORY as *const Self)
+        &*(MEM_ADDRS.read().synchronization_memory as *const Self)
     }
     /// # Safety
     /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
     /// and is only written to using atomic operations
     pub unsafe fn get_mut() -> &'static mut Self {
-        &mut *(SYNCHRONIZATION_MEMORY as *mut Self)
+        &mut *(MEM_ADDRS.read().synchronization_memory as *mut Self)
     }
 
     pub fn wait_for_main_thread_notify(&mut self) {
         self.last_elapsed_ms = self.elapsed_ms;
         while self.last_elapsed_ms
-            == unsafe { atomic_read_i32(SYNCHRONIZATION_MEMORY as *const i32) }
+            == unsafe { atomic_read_i32(MEM_ADDRS.read().synchronization_memory as *const i32) }
         {
-            unsafe { wait_until_wake_up_at(SYNCHRONIZATION_MEMORY as *mut i32) }
+            unsafe { wait_until_wake_up_at(MEM_ADDRS.read().synchronization_memory as *mut i32) }
         }
     }
 }
 
-/*
-#[cfg(target_arch = "wasm32")]
-extern "C" {
-    #[link_name = "llvm.wasm.atomic.wait.i32"]
-    /// see https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators
-    pub fn llvm_atomic_wait_i32(ptr: *mut i32, exp: i32, timeout: i64) -> i32;
-
-    #[link_name = "llvm.wasm.atomic.notify"]
-    /// see https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators
-    fn llvm_atomic_notify(ptr: *mut i32, cnt: i32) -> i32;
-}*/
 #[cfg(target_arch = "wasm32")]
 pub unsafe fn llvm_atomic_wait_i32(ptr: *mut i32, exp: i32, timeout: i64) -> i32 {
     core::arch::wasm32::i32_atomic_wait(ptr, exp, timeout)
@@ -171,21 +185,11 @@ pub unsafe fn atomic_read_u32(ptr: *const u32) -> u32 {
 /// # Safety
 /// This function is safe as long the thread waits at a valid memory address
 pub unsafe fn wait_until_wake_up_at(ptr: *mut i32) {
-    log::error!("{}", SYNCHRONIZATION_MEMORY);
     let mut foo = 0i32;
-    let foo = SYNCHRONIZATION_MEMORY as *mut i32;
-    //let res = llvm_atomic_wait_i32(&mut foo, 0, 1000 * 1000 * 100);
     let res = llvm_atomic_wait_i32(ptr, atomic_read_i32(ptr), 1000 * 1000 * 100);
-    /*
-    let res = llvm_atomic_wait_i32(
-        SYNCHRONIZATION_MEMORY as *mut i32,
-        atomic_read_i32(SYNCHRONIZATION_MEMORY as *const i32),
-        1000 * 1000 * 100,
-    );*/
     if res != 0 {
         log::error!("res != 0: res={}", res);
     }
-    log::debug!("wake up wait");
     //debug_assert_eq!(res, 0)
 }
 

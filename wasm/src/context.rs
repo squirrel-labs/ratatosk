@@ -1,12 +1,15 @@
+use crate::error::ClientError;
+use crate::mem;
 use crate::render::Render;
 use lazy_static::lazy_static;
 use rask_engine::resources::ResourceTable;
-use crate::error::ClientError;
-use crate::mem;
 
 lazy_static! {
     pub static ref RESOURCE_TABLE: ResourceTable = unsafe {
-        ResourceTable::from_memory(mem::RESOURCE_TABLE, mem::RESOURCE_TABLE_ELEMENT_COUNT)
+        ResourceTable::from_memory(
+            mem::MEM_ADDRS.read().resource_table as usize,
+            mem::RESOURCE_TABLE_ELEMENT_COUNT,
+        )
     };
 }
 
@@ -17,7 +20,7 @@ pub struct Context {
 impl Context {
     pub fn new() -> Result<Self, ClientError> {
         //Render::new().map(|render| Self { render })
-        Ok(Self{})
+        Ok(Self {})
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {

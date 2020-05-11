@@ -1,6 +1,7 @@
 use crate::error::ClientError;
+use crate::mem;
 use crate::mem::get_double_buffer;
-use crate::mem::{RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT};
+use crate::mem::RESOURCE_TABLE_ELEMENT_COUNT;
 use crate::sprite::*;
 use crate::{
     message_queue::{Message, MessageQueueReader},
@@ -22,8 +23,10 @@ pub struct GameContext {
 impl GameContext {
     pub fn new() -> Result<Self, ClientError> {
         let resource_table = unsafe {
-            let mut resource_table =
-                ResourceTable::from_memory(RESOURCE_TABLE, RESOURCE_TABLE_ELEMENT_COUNT);
+            let mut resource_table = ResourceTable::from_memory(
+                mem::MEM_ADDRS.read().resource_table as usize,
+                RESOURCE_TABLE_ELEMENT_COUNT,
+            );
             resource_table.clear();
             resource_table.store(
                 TextureIds {
