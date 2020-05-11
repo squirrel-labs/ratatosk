@@ -68,7 +68,7 @@ impl MemoryAdresses {
             *(heap_base as *mut u32 as *mut MemoryAdresses) = mem;
             *(MEM_ADDRS.write()) =
                 std::mem::transmute::<&mut MemoryAdresses, &mut &'static MemoryAdresses>(
-                    &mut *(heap_base as *mut u32 as *mut MemoryAdresses),
+                    &mut *(synchronization_memory as *mut u32 as *mut MemoryAdresses),
                 );
         }
         heap
