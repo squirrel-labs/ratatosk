@@ -17,7 +17,6 @@ mkShell {
     openssl
     cargo-make
     binaryen
-    wasm-bindgen-cli
   ] ++ lib.optionals (!inCI) [
     cargo-audit
     wabt
