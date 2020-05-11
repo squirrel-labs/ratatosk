@@ -2,7 +2,7 @@ const WORKER_URI = 'scripts/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:5001/'
 const MESSAGE_ITEM_SIZE = 32;
 let SYNCHRONIZATION_MEMORY;
-let MESSAGE_QUEUE;
+let MESSAGE_QUEUE = null;
 let MESSAGE_QUEUE_LENGTH;
 let SYNC_MOUSE;
 let SYNC_CANVAS_SIZE;
@@ -48,6 +48,9 @@ class MessageQueueWriter {
         this._dequeue()
     }
     write_i32(task) {
+        if (this.pos === null) {
+            return;
+        }
         this._queue.push(task);
         if(!this._locked) this._dequeue();
     }
@@ -62,6 +65,7 @@ class MessageQueueWriter {
     }
 }
 
+queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
 
 function postWorkerDescriptor(worker, desc) {
     if (typeof desc.canvas === "undefined") {
@@ -165,8 +169,8 @@ function LogicMessage(e) {
         }
     } else if (optcode === 1) {
         SYNCHRONIZATION_MEMORY = x[1] >> 2;
-        MESSAGE_QUEUE = x[2] >> 2;
-        MESSAGE_QUEUE_LENGTH = (x[3] - x[2]) >> 2;
+        MESSAGE_QUEUE = x[2];
+        MESSAGE_QUEUE_LENGTH = (x[3] - x[2]);
         SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
         SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
         SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
