@@ -1,6 +1,7 @@
+use crate::mem::DOUBLE_BUFFER_SPRITE_COUNT;
 use crate::sprite::Sprite;
 
-const MAX_SPRITES: usize = crate::mem::DOUBLE_BUFFER_SPRITE_COUNT;
+const MAX_SPRITES: usize = DOUBLE_BUFFER_SPRITE_COUNT as usize;
 
 #[repr(C)]
 #[derive(Clone, Copy)]

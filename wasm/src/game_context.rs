@@ -27,7 +27,7 @@ impl GameContext {
         let resource_table = unsafe {
             let mut resource_table = ResourceTable::from_memory(
                 mem::MEM_ADDRS.read().resource_table as usize,
-                RESOURCE_TABLE_ELEMENT_COUNT,
+                RESOURCE_TABLE_ELEMENT_COUNT as usize,
             );
             resource_table.clear();
             resource_table.store(
@@ -67,6 +67,7 @@ impl GameContext {
             log::info!("{:?}", msg);
             self.handle_message(msg)?;
         }
+        return Ok(());
 
         if self.state.sprites().len() == 2 {
             self.state.sprites_mut()[1].transform =

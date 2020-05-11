@@ -75,7 +75,7 @@ pub struct MessageQueueReader {
 
 impl MessageQueueReader {
     pub fn length() -> usize {
-        MESSAGE_QUEUE_ELEMENT_COUNT
+        MESSAGE_QUEUE_ELEMENT_COUNT as usize
     }
 
     pub fn new() -> Self {
