@@ -53,14 +53,12 @@ extern "C" fn run_main_loop() {
 
     log::info!("send memory offsetst");
     crate::message_queue::Outbound::Memory((*(mem::MEM_ADDRS.read())).clone()).send();
-    log::info!("send memory offsetst");
 
+    log::info!("syc: {}", mem::MEM_ADDRS.read().synchronization_memory);
     loop {
-        log::info!("a");
-        wait_for_main_thread_notify();
-        log::info!("b");
         game.tick().map_err(|e| panic!("{}", e)).unwrap();
         log::info!("wait_for_main_thread_notify()");
+        wait_for_main_thread_notify();
     }
 }
 
