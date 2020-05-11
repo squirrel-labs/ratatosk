@@ -165,13 +165,13 @@ function LogicMessage(e) {
     } else if (optcode === 1) {
         SYNCHRONIZATION_MEMORY = x[1] >> 2;
         MESSAGE_QUEUE = x[2];
-        MESSAGE_QUEUE_LENGTH = (x[3] - x[2]);
+        MESSAGE_QUEUE_LENGTH = x[3];
         SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
         SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
         SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
         SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
         spawnModule(wasm_module);
-        queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
+        queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_QUEUE_LENGTH);
     } else if (optcode === 2) {
         if (x[1] === 0) {
             window.addEventListener('input', input);

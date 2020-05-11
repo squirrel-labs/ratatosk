@@ -28,8 +28,11 @@ extern "C" fn init(heap_base: i32) {
     let mut init = IS_INIT.lock();
     if !*init {
         unsafe {
-            let heap_base = mem::MemoryAdresses::write_at(heap_base as u32);
-            wee_alloc::init_ptr(heap_base as *mut u8, mem::HEAP_SIZE as usize);
+            let heap_base = mem::MemoryAdresses::init(heap_base as u32);
+            wee_alloc::init_ptr(
+                mem::MEM_ADDRS.read().heap_base as *mut u8,
+                mem::HEAP_SIZE as usize,
+            );
         }
         context::set_context(
             context::Context::new()

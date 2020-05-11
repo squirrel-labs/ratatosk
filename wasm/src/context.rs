@@ -8,7 +8,7 @@ lazy_static! {
     pub static ref RESOURCE_TABLE: ResourceTable = unsafe {
         ResourceTable::from_memory(
             mem::MEM_ADDRS.read().resource_table as usize,
-            mem::RESOURCE_TABLE_ELEMENT_COUNT,
+            mem::RESOURCE_TABLE_ELEMENT_COUNT as usize,
         )
     };
 }

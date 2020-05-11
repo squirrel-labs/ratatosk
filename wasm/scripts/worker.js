@@ -32,17 +32,6 @@ const imports = {
     },
 };
 
-function onwasm(ctx, desc, module) {
-    if (typeof desc.canvas === "undefined") {
-        console.log("starting");
-        module.run_main_loop();
-        console.log("finished");
-    } else {
-        module.initialise_graphics_context(desc.canvas);
-        setInterval(module.draw_frame, desc.deltaTime);
-    }
-}
-
 onmessage = async function({ data }) {
     // set global memory for function imports
     mem = data.memory;

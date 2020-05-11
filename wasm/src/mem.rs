@@ -19,64 +19,68 @@ extern "C" {
     pub static __tls_size: i32;
 }
 
-pub const RESOURCE_TABLE_SIZE: u32 = 1024;
-pub const DOUBLE_BUFFER_SIZE: u32 = 1024;
-pub const MESSAGE_QUEUE_SIZE: u32 = 1024;
-pub const HEAP_SIZE: u32 = 1024 * 64 * 16;
+const MIN_RESOURCE_TABLE_ELEMENT_COUNT: usize = 128;
+const MIN_DOUBLE_BUFFER_SPRITE_COUNT: usize = 128;
+const MIN_MESSAGE_QUEUE_ELEMENT_COUNT: usize = 32;
+pub const RESOURCE_TABLE_SIZE: usize =
+    MIN_RESOURCE_TABLE_ELEMENT_COUNT as usize * size_of::<Resource>();
+pub const DOUBLE_BUFFER_SIZE: usize = size_of::<DoubleBuffer<()>>()
+    + 2 * size_of::<UnspecificState<()>>()
+    + MIN_DOUBLE_BUFFER_SPRITE_COUNT * align_up::<Sprite>(size_of::<Sprite>() as u32) as usize;
 
-fn align_up<T>(addr: u32) -> u32 {
+pub const MESSAGE_QUEUE_SIZE: usize =
+    MIN_MESSAGE_QUEUE_ELEMENT_COUNT as usize * size_of::<MessageQueueElement<Message>>();
+
+const fn align_up<T>(addr: u32) -> u32 {
     let x = std::mem::align_of::<T>() as u32 - 1;
     (addr + x) & !x
 }
+pub const RESOURCE_TABLE_ELEMENT_COUNT: u32 = (RESOURCE_TABLE_SIZE / size_of::<Resource>()) as u32;
+pub const DOUBLE_BUFFER_SPRITE_COUNT: u32 = MIN_DOUBLE_BUFFER_SPRITE_COUNT as u32; // TODO improve memory usage
+pub const MESSAGE_QUEUE_ELEMENT_COUNT: u32 = (MESSAGE_QUEUE_SIZE / size_of::<Message>()) as u32;
+pub const HEAP_SIZE: u32 = 1024 * 64 * 16;
 
 #[derive(Debug, Clone)]
 #[repr(C)]
 pub struct MemoryAdresses {
     pub synchronization_memory: u32,
     pub message_queue: u32,
+    pub message_queue_length: u32,
     pub double_buffer: u32,
     pub resource_table: u32,
+    pub heap_base: u32,
 }
 impl MemoryAdresses {
     const fn empty() -> Self {
         Self {
             synchronization_memory: 0,
             message_queue: 0,
+            message_queue_length: 0,
             double_buffer: 0,
             resource_table: 0,
+            heap_base: 0,
         }
     }
-    #[allow(clippy::transmute_ptr_to_ptr)]
-    pub fn write_at(heap_base: u32) -> u32 {
+    pub fn init(heap_base: u32) {
         let synchronization_memory = align_up::<SynchronizationMemory>(heap_base) as u32;
-        let double_buffer = align_up::<DoubleBuffer<State>>(
-            heap_base + std::mem::size_of::<SynchronizationMemory>() as u32,
+        let message_queue = align_up::<MessageQueueElement<Message>>(
+            synchronization_memory + size_of::<SynchronizationMemory>() as u32,
         );
-        let resource_table =
-            align_up::<rask_engine::resources::ResourceTable>(double_buffer + DOUBLE_BUFFER_SIZE);
-        let message_queue =
-            align_up::<MessageQueueElement<Message>>(resource_table + RESOURCE_TABLE_SIZE);
-        let heap = align_up::<SynchronizationMemory>(message_queue + MESSAGE_QUEUE_SIZE);
+        let double_buffer =
+            align_up::<DoubleBuffer<State>>(message_queue + MESSAGE_QUEUE_SIZE as u32);
+        let resource_table = align_up::<Resource>(double_buffer + DOUBLE_BUFFER_SIZE as u32);
+        let heap_base = align_up::<u32>(resource_table + RESOURCE_TABLE_SIZE as u32);
         let mem = Self {
             synchronization_memory,
+            message_queue,
+            message_queue_length: MESSAGE_QUEUE_ELEMENT_COUNT,
             double_buffer,
             resource_table,
-            message_queue,
+            heap_base,
         };
         *(MEM_ADDRS.write()) = mem;
-        heap
     }
 }
-
-pub const RESOURCE_TABLE_ELEMENT_COUNT: usize =
-    RESOURCE_TABLE_SIZE as usize / size_of::<Resource>();
-pub const DOUBLE_BUFFER_SPRITE_COUNT: usize =
-    ((DOUBLE_BUFFER_SIZE as i64 - size_of::<DoubleBuffer<()>>() as i64) / 2
-        - size_of::<UnspecificState<()>>() as i64) as usize
-        / size_of::<Sprite>();
-
-pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize =
-    MESSAGE_QUEUE_SIZE as usize / size_of::<MessageQueueElement<Message>>();
 
 pub fn get_double_buffer() -> &'static mut Buffer {
     unsafe { &mut *(MEM_ADDRS.read().double_buffer as *mut Buffer) }
@@ -181,9 +185,7 @@ pub unsafe fn atomic_read_u32(ptr: *const u32) -> u32 {
 /// This function is safe as long the thread waits at a valid memory address
 pub unsafe fn wait_until_wake_up_at(ptr: *mut i32) {
     let res = llvm_atomic_wait_i32(ptr, atomic_read_i32(ptr), 1000 * 1000 * 1000 * 5);
-    if res != 0 {
-        log::error!("res != 0: res={}", res);
-    }
+    debug_assert_eq!(res, 0);
 }
 
 /// performs a notify at a given address and return the count of waiters
