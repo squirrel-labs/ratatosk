@@ -30,16 +30,18 @@ extern "C" {
 #[non_exhaustive]
 pub enum Outbound {
     RescourceAlloc { id: u32, ptr: u32 } = 0, // The event ids from 0 to 128 are reserved for server to client communication
-    Textmode(bool),
+    Memory(mem::MemoryAdresses) = 1,
+    Textmode(bool) = 2,
     EngineEvent(Event) = 129, // Mark the Message as outbound
 }
 impl Outbound {
-    pub fn to_js(&self) -> &[u32] {
+    pub fn to_slice(&self) -> &[u32] {
         let len = std::mem::size_of::<Outbound>() as u32;
         unsafe { std::slice::from_raw_parts(self as *const Outbound as *const u32, len as usize) }
     }
     pub fn send(&self) {
-        let msg = self.to_js();
+        let msg = self.to_slice();
+        print!("sending {:?}", self);
         unsafe { post_to_main(msg.as_ptr() as u32, msg.len() as u32) }
     }
 }

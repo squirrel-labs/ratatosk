@@ -29,20 +29,21 @@ fn align_up<T>(addr: u32) -> u32 {
     (addr + x) & !x
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
+#[repr(C)]
 pub struct MemoryAdresses {
     pub synchronization_memory: u32,
+    pub message_queue: u32,
     pub double_buffer: u32,
     pub resource_table: u32,
-    pub message_queue: u32,
 }
 impl MemoryAdresses {
     const fn empty() -> Self {
         Self {
             synchronization_memory: 0,
+            message_queue: 0,
             double_buffer: 0,
             resource_table: 0,
-            message_queue: 0,
         }
     }
     #[allow(clippy::transmute_ptr_to_ptr)]
@@ -185,12 +186,10 @@ pub unsafe fn atomic_read_u32(ptr: *const u32) -> u32 {
 /// # Safety
 /// This function is safe as long the thread waits at a valid memory address
 pub unsafe fn wait_until_wake_up_at(ptr: *mut i32) {
-    let mut foo = 0i32;
-    let res = llvm_atomic_wait_i32(ptr, atomic_read_i32(ptr), 1000 * 1000 * 100);
+    let res = llvm_atomic_wait_i32(ptr, atomic_read_i32(ptr), 1000 * 1000 * 1000 * 5);
     if res != 0 {
         log::error!("res != 0: res={}", res);
     }
-    //debug_assert_eq!(res, 0)
 }
 
 /// performs a notify at a given address and return the count of waiters

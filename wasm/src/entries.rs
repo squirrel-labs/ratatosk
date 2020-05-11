@@ -48,11 +48,13 @@ extern "C" fn init(heap_base: i32) {
 /// This function is being exposed to javascript
 #[export_name = "run_logic"]
 extern "C" fn run_main_loop() {
-    log::info!("table count: {}", mem::RESOURCE_TABLE_ELEMENT_COUNT);
-    log::info!("queue count: {}", mem::MESSAGE_QUEUE_ELEMENT_COUNT);
-    log::info!("buffer count: {}", mem::DOUBLE_BUFFER_SPRITE_COUNT);
     reset_state();
     let mut game = GameContext::new().unwrap_or_else(|e| panic!("{}", e));
+
+    log::info!("send memory offsetst");
+    crate::message_queue::Outbound::Memory((*(mem::MEM_ADDRS.read())).clone()).send();
+    log::info!("send memory offsetst");
+
     loop {
         log::info!("a");
         wait_for_main_thread_notify();

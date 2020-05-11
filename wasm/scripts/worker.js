@@ -1,13 +1,14 @@
 let mem;
 let decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 let u8mem;
+let u32mem;
 let wasm;
 
 function str_from_mem(ptr, len) {
     return decoder.decode(u8mem.slice(ptr, ptr + len));
 }
 function arr_from_mem(ptr, len) {
-    return new Int32Array(mem, ptr >> 2, len >> 2);
+    return u32mem.slice(ptr >> 2, (ptr >> 2) + (len >> 2));
 }
 
 const imports = {
@@ -49,6 +50,7 @@ onmessage = async function({ data }) {
     let imp = {env: imports};
     imp.env.memory = mem;
     u8mem = new Uint8Array(mem.buffer);
+    u32mem = new Uint32Array(mem.buffer);
     wasm = await WebAssembly.instantiate(mod, imp);
     if (typeof data.canvas === "undefined") {
         wasm.exports.__sp.value -= 1024 * 64;
@@ -56,9 +58,8 @@ onmessage = async function({ data }) {
         wasm.exports.__wasm_init_tls();
         wasm.exports.init(wasm.exports.__heap_base.value);
         wasm.exports.run_logic();
-    }
 
-    wasm.exports.draw_frame();
-    wasm.exports.run_logic();
-    this.console.log(wasm);
+    } else {
+        this.setInterval(wasm.exports.draw_frame(), 100);
+    }
 }
