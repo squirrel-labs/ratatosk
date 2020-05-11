@@ -41,7 +41,7 @@ impl Outbound {
     }
     pub fn send(&self) {
         let msg = self.to_slice();
-        print!("sending {:?}", self);
+        log::trace!("sending {:?}", self);
         unsafe { post_to_main(msg.as_ptr() as u32, msg.len() as u32) }
     }
 }

@@ -265,11 +265,11 @@ setup_ws();
 
 function hashCode(str) {
     var hash = 0;
-    if (this.length === 0) {
+    if (str.length === 0) {
         return hash;
     }
     for (var i = 0; i < str.length; i++) {
-        var char = this.charCodeAt(i);
+        var char = str.charCodeAt(i);
         hash = ((hash<<5)-hash)+char;
         hash = hash & hash; // Convert to 32bit integer
     }
@@ -299,13 +299,13 @@ window.addEventListener('resize', onresize);
 window.addEventListener('keydown', e => {
     const key = evalKey(e);
     const mod = keyMod(e);
-    if (key !== undefined && mod !== undefined) { queue.write_i32([1, mod, key]); }
+    if (key !== undefined && key !== 0 && mod !== undefined) { queue.write_i32([1, mod, key]); }
 });
 
 window.addEventListener('keyup', e => {
     const key = evalKey(e);
     const mod = keyMod(e);
-    if (key !== undefined && mod !== undefined) { queue.write_i32([2, mod, key]); }
+    if (key !== undefined && key !== 0 && mod !== undefined) { queue.write_i32([2, mod, key]); }
 });
 
 window.addEventListener('mousemove', e => {

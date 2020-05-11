@@ -7,15 +7,10 @@ use std::fmt;
 /// # Examples
 ///
 /// ```should_panic
-/// use wasm_bindgen::JsValue;
 /// use crate::error::ClientError;
 ///
 /// # fn main() -> Result<(), ClientError> {
-/// let err: Result<(), JsValue> = Err(JsValue::from_str("test error"));
-/// if let Err(x) = err {
-///    return Err(ClientError::WebSocketError(x));
-/// }
-/// Ok(())
+///   return Err(ClientError::EngineError(format!("EngineError"));
 /// # }
 /// ```
 #[derive(Debug)]
