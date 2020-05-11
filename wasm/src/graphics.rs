@@ -1,9 +1,9 @@
 //use crate::shader::Program;
+use crate::error::ClientError;
+use crate::sprite::TextureId;
 use rask_engine::math;
 use rask_engine::math::Mat3;
 use rask_engine::resources::texture::{ColorType, Texture};
-use crate::error::ClientError;
-use crate::sprite::TextureId;
 /*use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::WebGl2RenderingContext as Gl2;
@@ -67,9 +67,7 @@ impl std::fmt::Display for WebGl2Error {
 pub trait GraphicsApi: Sized {
     type GraphicsError: std::fmt::Display;
 
-    fn new(
-        size_multiplicator: math::vec2::Vec2,
-    ) -> Result<Self, ClientError>;
+    fn new(size_multiplicator: math::vec2::Vec2) -> Result<Self, ClientError>;
 
     fn start_frame(&mut self, color: &[f32; 3]) -> Result<(), ClientError>;
     fn end_frame(&self) -> Result<(), ClientError>;
