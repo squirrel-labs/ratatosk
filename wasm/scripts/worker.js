@@ -1,8 +1,9 @@
 let mem;
 let decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+let u8mem;
 
 function str_from_mem(ptr, len) {
-    return decoder.decode(Uint8Array(mem, ptr, len));
+    return decoder.decode(u8mem.slice(ptr, ptr + len));
 }
 function arr_from_mem(ptr, len) {
     return new Int32Array(mem, ptr >> 2, len >> 2);
@@ -46,10 +47,11 @@ onmessage = async function({ data }) {
     let mod = data.compiled;
     let imp = {env: imports};
     imp.env.memory = mem;
+    u8mem = new Uint8Array(mem.buffer);
     let wasm = await WebAssembly.instantiate(mod, imp);
     wasm.exports.__wasm_init_memory();
     wasm.exports.__wasm_init_tls();
-    wasm.exports.init();
+    wasm.exports.init(wasm.exports.__heap_base.value);
     wasm.exports.run_logic();
 
     this.console.log(wasm);
