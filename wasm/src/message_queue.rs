@@ -1,4 +1,4 @@
-use crate::mem::{atomic_read_u8, MESSAGE_QUEUE, MESSAGE_QUEUE_ELEMENT_COUNT};
+use crate::{mem, mem::atomic_read_u8, mem::MESSAGE_QUEUE_ELEMENT_COUNT};
 use rask_engine::events::{Event, KeyModifier, MouseEvent};
 
 #[repr(C, u32)]
@@ -85,7 +85,7 @@ impl MessageQueueReader {
         n: usize,
     ) -> Option<&mut MessageQueueElement<T>> {
         core::slice::from_raw_parts_mut(
-            MESSAGE_QUEUE as *mut MessageQueueElement<T>,
+            mem::MEM_ADDRS.read().message_queue as *mut MessageQueueElement<T>,
             Self::length(),
         )
         .get_mut(n)
