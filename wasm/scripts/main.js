@@ -23,23 +23,23 @@ let mousey = 0;
 
 
 class MessageQueueWriter {
-    constructor(pos, elemetSize) {
+    constructor(pos, size) {
         this.pos = pos;
-        this.size = elemetSize;
+        this.size = size;
         this.index = 0;
         this._queue = [];
         this._locked = false;
     }
     _write_i32(args) {
-        let ptr = Math.floor((this.pos + this.size * this.index++) / 4);
+        let ptr = (this.pos + MESSAGE_ITEM_SIZE * this.index++) >> 2;
         let iptr = ptr
-        console.log(args)
+        console.log(this.index);
         Atomics.store(memoryView32, ptr, 1);
         for (let i of args) {
             Atomics.store(memoryView32, ++iptr, i);
         }
         Atomics.store(memoryView32, ptr, 0);
-        this.index = this.index % MESSAGE_QUEUE_LENGTH;
+        this.index %= this.size;
         this._dequeue()
     }
     write_i32(task) {
