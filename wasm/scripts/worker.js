@@ -32,6 +32,7 @@ const imports = {
     },
 };
 
+// handle the initialisation
 onmessage = async function({ data }) {
     // set global memory for function imports
     mem = data.memory;

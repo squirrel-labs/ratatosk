@@ -1,3 +1,7 @@
+//! The message queue handels communication between the main.js and the logic thread
+//!
+//!
+
 use crate::{mem, mem::atomic_read_u8, mem::MESSAGE_QUEUE_ELEMENT_COUNT};
 use rask_engine::events::{Event, KeyModifier, MouseEvent};
 
