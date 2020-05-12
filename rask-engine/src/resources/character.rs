@@ -4,7 +4,6 @@ use crate::{math::Mat3, EngineError};
 use spine::atlas::Atlas;
 use spine::atlas::Texture as TextureSegment;
 use spine::skeleton::{Skeleton, SRT};
-use std::convert::TryInto;
 
 use std::collections::HashMap;
 use std::io::Read;

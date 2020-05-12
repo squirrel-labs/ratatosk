@@ -30,7 +30,7 @@ extern "C" {
 #[non_exhaustive]
 pub enum Outbound {
     RescourceAlloc { id: u32, ptr: u32 } = 0, // The event ids from 0 to 128 are reserved for server to client communication
-    Memory(mem::MemoryAdresses) = 1,
+    Memory(u32, u32, u32) = 1,
     Textmode(bool) = 2,
     EngineEvent(Event) = 129, // Mark the Message as outbound
 }
@@ -87,7 +87,7 @@ impl MessageQueueReader {
         n: usize,
     ) -> Option<&mut MessageQueueElement<T>> {
         core::slice::from_raw_parts_mut(
-            mem::MEM_ADDRS.read().message_queue as *mut MessageQueueElement<T>,
+            *mem::MESSAGE_QUEUE as *mut MessageQueueElement<T>,
             Self::length(),
         )
         .get_mut(n)
