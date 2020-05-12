@@ -1,8 +1,8 @@
-use crate::error::ClientError;
-use crate::mem;
-use crate::mem::RESOURCE_TABLE_ELEMENT_COUNT;
-use crate::sprite::*;
+//! The GameContext contains the logic state and gameengine
+//! Its main purpose is to handle events and execute the game engine
 use crate::{
+    error::ClientError,
+    mem::{self, RESOURCE_TABLE_ELEMENT_COUNT},
     message_queue::{Message, MessageQueueReader},
     state::State,
     DOUBLE_BUFFER,
@@ -30,6 +30,7 @@ impl GameContext {
             );
             resource_table.clear();
             resource_table.store(
+                // TODO move to mutex
                 TextureIds {
                     reset_notify: 1,
                     ids: vec![],
@@ -38,7 +39,7 @@ impl GameContext {
             )?;
             resource_table
         };
-        log::info!(
+        log::debug!(
             "resource_table: {}",
             &resource_table as *const ResourceTable as u32
         );
@@ -66,10 +67,6 @@ impl GameContext {
             self.handle_message(msg)?;
         }
 
-        if self.state.sprites().len() == 2 {
-            self.state.sprites_mut()[1].transform =
-                rask_engine::math::Mat3::rotation(0.02) * self.state.sprites_mut()[1].transform;
-        }
         self.push_state();
         self.tick_nr += 1;
         Ok(())
@@ -104,7 +101,7 @@ impl GameContext {
             Message::MouseUp(event) => Ok(Some(Event::MouseUp(event))),
             Message::KeyPress(t, code) => Ok(Some(Event::KeyPress(t as u16, code))),
             Message::RequestAlloc { id, size } => {
-                log::info!("allocating {} bytes for resource {}", size, id);
+                log::trace!("allocating {} bytes for resource {}", size, id);
                 let ptr = self.alloc_buffer(id, size);
                 use crate::message_queue::Outbound;
                 Outbound::RescourceAlloc {
@@ -114,58 +111,42 @@ impl GameContext {
                 .send();
                 Ok(None)
             }
-            Message::ResourcePush(id) => {
-                if let Some(data) = self.get_buffer(id) {
-                    const TEXTURE: u32 = registry::ResourceVariant::Texture as u32;
-                    const CHARACTER: u32 = registry::ResourceVariant::Character as u32;
-                    match u32_from_le(&data[4..8])? {
-                        TEXTURE => {
-                            log::info!("decoding texture {} len: {}", id, data[12..].len(),);
-                            let img =
-                                rask_engine::resources::Texture::from_png_stream(&data[12..])?;
-                            unsafe { self.resource_table.store(img, id as usize) }?;
-                            let mut sprite = Sprite::default();
-                            sprite.tex_id = id;
-                            self.state.append_sprite(&sprite);
-                            if self.state.sprites().len() == 2 {
-                                unsafe {
-                                    self.resource_table.store(
-                                        TextureIds {
-                                            reset_notify: 1,
-                                            ids: vec![registry::EMPTY.id, registry::THIEF.id],
-                                        },
-                                        registry::USED_TEXTURE_IDS.id as usize,
-                                    )?;
-                                }
-                            }
-                        }
-                        CHARACTER => {
-                            let chr: Result<
-                                rask_engine::resources::Character,
-                                rask_engine::EngineError,
-                            > = ResourceData::deserialize(
-                                &data[12..],
-                                rask_engine::network::protocol::resource_types::CHARACTER,
-                            )?
-                            .try_into();
-                            unsafe { self.resource_table.store(Box::new(chr?), id as usize) }?;
-                        }
-                        _ => {
-                            self.dealloc_buffer(id);
-                            return Err(ClientError::ResourceError(
-                                "unknown RescorceType while parsing".into(),
-                            ));
-                        }
-                    }
+            Message::ResourcePush(id) => self.parse_resource(id).map(|_| None),
+            _ => Err(ClientError::EngineError("Unknown Message Type".into())),
+        }
+    }
+    fn parse_resource(&mut self, id: u32) -> Result<(), ClientError> {
+        if let Some(data) = self.get_buffer(id) {
+            const TEXTURE: u32 = registry::ResourceVariant::Texture as u32;
+            const CHARACTER: u32 = registry::ResourceVariant::Character as u32;
+            match u32_from_le(&data[4..8])? {
+                TEXTURE => {
+                    log::info!("decoding texture {} len: {}", id, data[12..].len(),);
+                    let img = rask_engine::resources::Texture::from_png_stream(&data[12..])?;
+                    unsafe { self.resource_table.store(img, id as usize) }?;
+                }
+                CHARACTER => {
+                    let chr: Result<rask_engine::resources::Character, rask_engine::EngineError> =
+                        ResourceData::deserialize(
+                            &data[12..],
+                            rask_engine::network::protocol::resource_types::CHARACTER,
+                        )?
+                        .try_into();
+                    unsafe { self.resource_table.store(Box::new(chr?), id as usize) }?;
+                }
+                _ => {
                     self.dealloc_buffer(id);
-                    Ok(None)
-                } else {
-                    Err(ClientError::ResourceError(
-                        "Requested Buffer not allocated".into(),
-                    ))
+                    return Err(ClientError::ResourceError(
+                        "unknown RescorceType while parsing".into(),
+                    ));
                 }
             }
-            _ => Err(ClientError::EngineError("Unknown Message Type".into())),
+            self.dealloc_buffer(id);
+            Ok(())
+        } else {
+            Err(ClientError::ResourceError(
+                "Requested Buffer not allocated".into(),
+            ))
         }
     }
 }

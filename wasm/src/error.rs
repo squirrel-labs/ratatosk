@@ -1,18 +1,17 @@
+//! Collection of frontend errors
+//! these can result form Network errors, other javascript errors or concurrency errors
+//!
+//! they implement Display
+//! # Examples
+//!
+//! ```should_panic
+//! use crate::error::ClientError;
+//!
+//! # fn main() -> Result<(), ClientError> {
+//!   return Err(ClientError::EngineError(format!("EngineError"));
+//! # }
+//! ```
 use std::fmt;
-
-/// Collection of frontend errors
-/// these can result form Network errors, other javascript errors or concurrency errors
-///
-/// they implement Display
-/// # Examples
-///
-/// ```should_panic
-/// use crate::error::ClientError;
-///
-/// # fn main() -> Result<(), ClientError> {
-///   return Err(ClientError::EngineError(format!("EngineError"));
-/// # }
-/// ```
 #[derive(Debug)]
 pub enum ClientError {
     WebGlError(String),
