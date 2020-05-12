@@ -18,9 +18,11 @@ pub struct WebsocketPacket<'a> {
 
 #[repr(C)]
 #[derive(Clone, Debug, Copy)]
+/// The GameState contains data to be sent over the network and is read by main.js
 pub struct GameState {
     pub player_x: f32,
     pub player_y: f32,
+    /// Encodes actions the player takes + status effects e.g. poisoned
     pub player_state: i32,
 }
 

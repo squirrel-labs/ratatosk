@@ -25,7 +25,7 @@ impl GameContext {
     pub fn new() -> Result<Self, ClientError> {
         let resource_table = unsafe {
             let mut resource_table = ResourceTable::from_memory(
-                mem::MEM_ADDRS.read().resource_table as usize,
+                *mem::RESOURCE_TABLE,
                 RESOURCE_TABLE_ELEMENT_COUNT as usize,
             );
             resource_table.clear();
