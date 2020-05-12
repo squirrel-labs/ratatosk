@@ -28,6 +28,11 @@ impl std::fmt::Display for ClientError {
         }
     }
 }
+
+/// Derive from implementations
+/// # Example
+///
+/// derive_from!(rask_engine::error::EngineError, EngineError);
 macro_rules! derive_from {
     ($type:ty, $kind:ident) => {
         impl From<$type> for ClientError {
