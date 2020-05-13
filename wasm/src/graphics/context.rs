@@ -1,19 +1,18 @@
 use super::render::Render;
+use super::webgl::WebGl2;
 use crate::error::ClientError;
 
 pub struct Context {
-    //render: Render<WebGl>,
+    render: Render<WebGl2>,
 }
 
 impl Context {
     pub fn new() -> Result<Self, ClientError> {
-        //Render::new().map(|render| Self { render })
-        Ok(Self {})
+        Render::new().map(|render| Self { render })
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
-        //self.render.render()
-        Ok(())
+        self.render.render()
     }
 }
 
