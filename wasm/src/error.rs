@@ -1,5 +1,5 @@
 //! Collection of frontend errors
-//! these can result form Network errors, other javascript errors or concurrency errors
+//! these can result from Network errors, other javascript errors or concurrency errors
 //!
 //! they implement Display
 //! # Examples

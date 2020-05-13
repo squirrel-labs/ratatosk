@@ -69,7 +69,6 @@ pub extern "C" fn run_logic() {
 
     loop {
         game.tick()
-            .map_err(|e| panic!("{}", e))
             .unwrap_or_else(|e| log::error!("Error occured game_context.tick(): {:?}", e));
         log::trace!("wait_for_main_thread_notify()");
         // use wasms atomic wait instruction to sleep until waken by the main thread
@@ -80,7 +79,7 @@ pub extern "C" fn run_logic() {
 /// This function is called to render each frame.
 /// Most of the communication with the graphics api is done thorough calling js functions
 #[export_name = "draw_frame"]
-extern "C" fn draw_frame() {
+pub extern "C" fn draw_frame() {
     context::context_mut()
         .render()
         .unwrap_or_else(|e| log::error!("{}", e));
