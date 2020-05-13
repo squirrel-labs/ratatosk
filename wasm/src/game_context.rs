@@ -1,5 +1,5 @@
-//! The GameContext contains the logic state and gameengine
-//! Its main purpose is to handle events and execute the game engine
+//! The GameContext contains the logic state and game engine.
+//! Its main purpose is to handle events and execute the game engine.
 use crate::{
     error::ClientError,
     mem::{self, RESOURCE_TABLE_ELEMENT_COUNT},

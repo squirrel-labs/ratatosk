@@ -20,6 +20,7 @@ impl Sprite {
     pub fn new(transform: math::Mat3, tex_id: TextureId) -> Self {
         Self { transform, tex_id }
     }
+
     pub const fn empty() -> Self {
         Self {
             transform: math::Mat3::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),

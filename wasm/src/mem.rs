@@ -21,7 +21,7 @@ pub const RESOURCE_TABLE_SIZE: usize =
 pub const MESSAGE_QUEUE_SIZE: usize =
     MIN_MESSAGE_QUEUE_ELEMENT_COUNT as usize * size_of::<MessageQueueElement<Message>>();
 
-/// align given memory address up to the alignment of T
+/// Align given memory address up to the alignment of T
 /// # Example
 /// let a = align_up<u32>(1);
 /// assert_eq!(a, 4);
@@ -36,7 +36,7 @@ pub const DOUBLE_BUFFER_SPRITE_COUNT: u32 = 128;
 /// The number of Messages that can be sent by the main thread befor the logic thread has to pop
 /// messages to avoid data loss
 pub const MESSAGE_QUEUE_ELEMENT_COUNT: u32 = (MESSAGE_QUEUE_SIZE / size_of::<Message>()) as u32;
-/// The size of the wasm heap. This hast to fit into the imported memory to avoit out ouf bound
+/// The size of the wasm heap. This has to fit into the imported memory to avoid out ouf bound
 /// memory access
 pub const HEAP_SIZE: u32 = 1024 * 64 * 16;
 
@@ -136,7 +136,7 @@ pub struct SynchronizationMemory {
     pub elapsed_ms: i32,
     /// Current mouse position
     pub mouse: (i32, i32),
-    /// Canvas size is px
+    /// Canvas size in px
     pub canvas_size: (u32, u32),
     pub player: GameState,
     pub other: GameState,
