@@ -92,4 +92,3 @@ impl ResourceTable {
 get_store!(super::Texture, Texture);
 get_store!(super::Sound, Sound);
 get_store!(Box<super::Character>, Character);
-get_store!(super::TextureIds, TextureIds);

@@ -33,7 +33,6 @@ macro_rules! resources {
 pub const RESOURCE_COUNT: u32 = 4;
 
 resources! {
-    (USED_TEXTURE_IDS,  TextureIds,     ""                       ),
     (EMPTY,             Texture,        "empty.png"              ),
     (THIEF,             Texture,        "thief.png"              ),
     (UNUSED,            Character,      Character {
@@ -49,7 +48,6 @@ pub enum ResourceVariant {
     Texture = resource_types::TEXTURE,
     Character = resource_types::CHARACTER,
     Sound = resource_types::SOUND,
-    TextureIds,
 }
 
 #[derive(Debug)]
