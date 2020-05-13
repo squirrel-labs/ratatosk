@@ -15,6 +15,7 @@ lazy_static = "1.4"
 [dependencies.rask-engine]
 version = "0.2.0"
 path = "../rask-engine"
+features = ["nightly"]
 
 [dependencies.wee_alloc]
 version = "=0.4.6"

@@ -1,5 +1,5 @@
-use super::context::RESOURCE_TABLE;
 use super::GraphicsApi;
+use crate::communication::RESOURCE_TABLE;
 use crate::error::ClientError;
 use crate::mem::SynchronizationMemory;
 use rask_engine::resources::{registry, GetStore, TextureIds};
@@ -34,7 +34,7 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn upload_texture(&mut self, id: u32) -> Result<(), ClientError> {
-        let texture = unsafe { RESOURCE_TABLE.get(id as usize)? };
+        let texture = RESOURCE_TABLE.read().get(id as usize)?;
         self.graphics.resize_texture_pool(id + 1)?;
         self.graphics.upload_texture(texture, id)?;
         if !self.used_texture_ids.contains(&id) {
@@ -44,7 +44,7 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn unload_texture(&mut self, id: u32) -> Result<(), ClientError> {
-        let texture = unsafe { RESOURCE_TABLE.get(id as usize)? };
+        let texture = RESOURCE_TABLE.read().get(id as usize)?;
         self.graphics.resize_texture_pool(id + 1)?;
         self.graphics.upload_texture(texture, id)?;
         Ok(())
@@ -62,7 +62,9 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn draw_sprites(&mut self) -> Result<bool, ClientError> {
-        let used_textures = unsafe { RESOURCE_TABLE.get(registry::USED_TEXTURE_IDS.id as usize) };
+        let used_textures = RESOURCE_TABLE
+            .read()
+            .get(registry::USED_TEXTURE_IDS.id as usize);
         if let Err(rask_engine::EngineError::ResourceMissing(_)) = used_textures {
             return Ok(true);
         }
@@ -70,7 +72,7 @@ impl<T: GraphicsApi> Render<T> {
         if used_textures.reset_notify > 0 {
             self.reset_textures(used_textures)?;
         }
-        let state = *crate::DOUBLE_BUFFER.lock();
+        let state = *crate::communication::DOUBLE_BUFFER.lock();
         let sprites = state.sprites();
         for sprite in sprites {
             if self

@@ -48,17 +48,9 @@ macro_rules! get_store {
 
 pub trait GetStore<T> {
     /// Retrieve a resource from the library.
-    ///
-    /// # Safety
-    ///
-    /// The function is not thread safe.
     fn get(&self, id: usize) -> Result<&T, EngineError>;
 
     /// Store a resource to the library
-    ///
-    /// # Safety
-    ///
-    /// The function is not thread safe.
     fn store(&mut self, data: T, id: usize) -> Result<(), EngineError>;
 }
 
