@@ -11,6 +11,7 @@ use crate::{
 use rask_engine::events::{Event, Key};
 use resource_parser::ResourceParser;
 
+#[derive(Debug)]
 pub struct LogicContext {
     state: State,
     tick_nr: u64,

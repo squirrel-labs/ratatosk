@@ -1,8 +1,9 @@
+use crate::communication::RESOURCE_TABLE;
 use crate::ClientError;
 use rask_engine::resources::{registry, GetStore};
-use crate::communication::RESOURCE_TABLE;
 use std::collections::HashMap;
 
+#[derive(Debug)]
 /// Used to handle the ressoures management with main.js
 pub struct ResourceParser {
     buffer_table: HashMap<u32, (*const u8, u32)>,
@@ -14,7 +15,7 @@ impl ResourceParser {
             buffer_table: HashMap::new(),
         }
     }
-        /// Allocates a new buffer and returns the pointer to it
+    /// Allocates a new buffer and returns the pointer to it
     pub fn alloc(&mut self, id: u32, size: u32) {
         log::trace!("allocating {} bytes for resource {}", size, id);
         let ptr = self.alloc_buffer(id, size);
@@ -25,7 +26,7 @@ impl ResourceParser {
         }
         .send();
     }
-        /// Assumes a resource has been written to the buffer `id` and prases its content
+    /// Assumes a resource has been written to the buffer `id` and prases its content
     pub fn parse(&mut self, id: u32) -> Result<(), ClientError> {
         if let Some(data) = self.get_buffer(id) {
             const TEXTURE: u32 = registry::ResourceVariant::Texture as u32;
