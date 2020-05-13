@@ -6,7 +6,7 @@ use crate::error::EngineError;
 
 pub use image::ColorType;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Texture {
     raw_data: Vec<u8>,
     w: u32,
@@ -14,6 +14,7 @@ pub struct Texture {
     color_type: ColorType,
 }
 
+#[derive(Debug, Clone)]
 pub struct TextureIds {
     pub reset_notify: u8,
     pub ids: Vec<u32>,

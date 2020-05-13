@@ -36,6 +36,7 @@ pub use sound::Sound;
 #[doc(inline)]
 pub use texture::{Texture, TextureIds};
 
+#[cfg_attr(feature = "nightly", repr(C))]
 pub enum Resource {
     None,
     Character(Box<Character>),
