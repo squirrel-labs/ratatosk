@@ -1,11 +1,13 @@
 //! The GameContext contains the logic state and game engine.
 //! Its main purpose is to handle events and execute the game engine.
 use crate::{
+    communication::{
+        message_queue::{Message, MessageQueueReader},
+        state::State,
+        DOUBLE_BUFFER,
+    },
     error::ClientError,
     mem::{self, RESOURCE_TABLE_ELEMENT_COUNT},
-    message_queue::{Message, MessageQueueReader},
-    state::State,
-    DOUBLE_BUFFER,
 };
 use rask_engine::events::{Event, Key};
 use rask_engine::network::packet::{u32_from_le, ResourceData};

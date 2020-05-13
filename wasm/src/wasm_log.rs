@@ -1,3 +1,4 @@
+#[cfg(target_arch = "wasm32")]
 extern "C" {
     fn log_debug(msg: *const u8, len: i32);
     fn log_info(msg: *const u8, len: i32);
@@ -14,6 +15,7 @@ impl log::Log for WasmLog {
         metadata.level() <= log::Level::Info
     }
 
+    #[cfg(target_arch = "wasm32")]
     fn log(&self, record: &log::Record) {
         let (log, name): (unsafe extern "C" fn(*const u8, i32), &str) = match record.level() {
             log::Level::Trace => (log_debug, "trace"),
@@ -25,10 +27,15 @@ impl log::Log for WasmLog {
         let msg = &format!("{}", format_args!("%c{}%c\t{}", name, record.args()));
         unsafe { log(msg.as_ptr(), msg.len() as i32) }
     }
+    #[cfg(not(target_arch = "wasm32"))]
+    fn log(&self, record: &log::Record) {
+        println!("{}", format_args!("{}", record.args()));
+    }
 
     fn flush(&self) {}
 }
 
+#[cfg(target_arch = "wasm32")]
 pub fn init_panic_handler() {
     std::panic::set_hook(Box::new(|info| {
         let (file, line, column) = if let Some(loc) = info.location() {
@@ -59,11 +66,6 @@ pub fn init_panic_handler() {
                     column,
                 )
             }
-        }
-
-        #[cfg(target_os = "wasm32")]
-        unsafe {
-            core::arch::wasm32::unreachable()
         }
     }));
 }

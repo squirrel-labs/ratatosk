@@ -1,6 +1,6 @@
-use crate::context::RESOURCE_TABLE;
+use super::context::RESOURCE_TABLE;
+use super::GraphicsApi;
 use crate::error::ClientError;
-use crate::graphics::GraphicsApi;
 use crate::mem::SynchronizationMemory;
 use rask_engine::resources::{registry, GetStore, TextureIds};
 

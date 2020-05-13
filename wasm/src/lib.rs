@@ -29,19 +29,10 @@
 #[macro_use]
 extern crate lazy_static;
 
-pub mod context;
+pub mod communication;
 pub mod entries;
 pub mod error;
-pub mod game_context;
 pub mod graphics;
+pub mod logic;
 pub mod mem;
-pub mod message_queue;
-pub mod render;
-//mod shader;
-pub mod sprite;
-pub mod state;
 pub mod wasm_log;
-use crate::state::State;
-use parking_lot::Mutex;
-
-static DOUBLE_BUFFER: Mutex<State> = Mutex::new(State::empty());

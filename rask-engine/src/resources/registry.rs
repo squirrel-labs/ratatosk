@@ -30,6 +30,19 @@ macro_rules! resources {
     };
 }
 
+pub const RESOURCE_COUNT: u32 = 4;
+
+resources! {
+    (USED_TEXTURE_IDS,  TextureIds,     ""                       ),
+    (EMPTY,             Texture,        "empty.png"              ),
+    (THIEF,             Texture,        "thief.png"              ),
+    (UNUSED,            Character,      Character {
+                          texture:   "BoneTest/BoneTest.png",
+                          atlas:     "BoneTest/BoneTest.atlas",
+                          animation: "BoneTest/BoneTest.json"
+    }                                                            )
+}
+
 #[repr(u32)]
 #[derive(Debug, Clone, Copy)]
 pub enum ResourceVariant {
@@ -58,15 +71,4 @@ pub struct CharacterInfo {
     pub atlas: &'static str,
     pub animation: &'static str,
     pub id: u32,
-}
-
-resources! {
-    (USED_TEXTURE_IDS,  TextureIds,     ""                       ),
-    (EMPTY,             Texture,        "empty.png"              ),
-    (THIEF,             Texture,        "thief.png"              ),
-    (UNUSED,            Character,      Character {
-                          texture:   "BoneTest/BoneTest.png",
-                          atlas:     "BoneTest/BoneTest.atlas",
-                          animation: "BoneTest/BoneTest.json"
-    }                                                            )
 }

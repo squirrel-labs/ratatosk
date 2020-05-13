@@ -9,18 +9,23 @@
 //! When executing `init()` a message is sent to the main thread, signaling the initiaisation has
 //! finished. This signal is used to start the graphics worker.
 
-use crate::context;
-use crate::game_context::GameContext;
-use crate::mem;
-use crate::message_queue::Outbound;
-use crate::wasm_log::init_panic_handler;
-use crate::wasm_log::WasmLog;
+use crate::graphics::context;
+use crate::logic::GameContext;
+#[cfg(target_arch = "wasm32")]
+use crate::{
+    communication::message_queue::Outbound,
+    mem,
+    wasm_log::{init_panic_handler, WasmLog},
+};
 
+#[cfg(target_arch = "wasm32")]
 static LOGGER: WasmLog = WasmLog;
 
+#[cfg(target_arch = "wasm32")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
+#[cfg(target_arch = "wasm32")]
 fn wait_for_main_thread_notify() {
     unsafe { mem::SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
 }
@@ -32,6 +37,7 @@ fn wait_for_main_thread_notify() {
 /// This function may only be called once at the start of the program
 /// Any call to alloc prior to this functions invocation results in an error
 #[export_name = "init"]
+#[cfg(target_arch = "wasm32")]
 pub extern "C" fn init(heap_base: i32) {
     unsafe {
         // Place the synchronization_memory, message_queue and resource_table at the beginning of

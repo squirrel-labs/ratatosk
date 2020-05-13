@@ -1,5 +1,5 @@
+use crate::communication::Sprite;
 use crate::mem::DOUBLE_BUFFER_SPRITE_COUNT;
-use crate::sprite::Sprite;
 
 const MAX_SPRITES: usize = DOUBLE_BUFFER_SPRITE_COUNT as usize;
 
