@@ -64,14 +64,9 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn draw_sprites(&mut self) -> Result<bool, ClientError> {
-        let guard = RESOURCE_TABLE.read();
-        let used_textures = guard.get(registry::USED_TEXTURE_IDS.id as usize);
-        if let Err(rask_engine::EngineError::ResourceMissing(_)) = used_textures {
-            return Ok(true);
-        }
-        let used_textures: &TextureIds = used_textures?;
+        let used_textures = crate::communication::TEXTURE_IDS.lock();
         if used_textures.reset_notify > 0 {
-            self.reset_textures(used_textures)?;
+            self.reset_textures(&used_textures)?;
         }
         let state = *crate::communication::DOUBLE_BUFFER.lock();
         let sprites = state.sprites();

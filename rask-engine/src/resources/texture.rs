@@ -19,6 +19,14 @@ pub struct TextureIds {
     pub reset_notify: u8,
     pub ids: Vec<u32>,
 }
+impl TextureIds {
+    pub const fn empty() -> Self {
+        Self {
+            reset_notify: 0,
+            ids: vec![],
+        }
+    }
+}
 
 impl Texture {
     pub fn from_png_stream<R: std::io::Read>(r: R) -> Result<Self, EngineError> {

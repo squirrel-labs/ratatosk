@@ -17,3 +17,4 @@ pub use synchronization_memory::{GameState, SynchronizationMemory};
 pub static DOUBLE_BUFFER: Mutex<State> = Mutex::new(State::empty());
 pub static RESOURCE_TABLE: RwLock<resources::ResourceTable> =
     RwLock::new(resources::ResourceTable::new());
+pub static TEXTURE_IDS: Mutex<resources::TextureIds> = Mutex::new(resources::TextureIds::empty());
