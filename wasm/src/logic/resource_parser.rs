@@ -3,6 +3,7 @@ use crate::ClientError;
 use rask_engine::resources::{registry, GetStore};
 use std::collections::HashMap;
 
+#[derive(Debug)]
 /// Used to handle the ressoures management with main.js
 pub struct ResourceParser {
     buffer_table: HashMap<u32, (*const u8, u32)>,

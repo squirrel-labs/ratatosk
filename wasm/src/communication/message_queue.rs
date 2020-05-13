@@ -92,6 +92,7 @@ impl MessageQueueElement<InboundMessage> {
     }
 }
 
+#[derive(Debug)]
 /// Abstracts the communication with the main thread
 pub struct MessageQueue<'a, T: Sized + Clone + Default + std::fmt::Debug> {
     /// the index of the next element to be read

@@ -5,10 +5,10 @@
 //! # Examples
 //!
 //! ```should_panic
-//! use crate::error::ClientError;
+//! use rask_wasm::error::ClientError;
 //!
 //! # fn main() -> Result<(), ClientError> {
-//!   return Err(ClientError::EngineError(format!("EngineError"));
+//!   return Err(ClientError::EngineError(format!("EngineError")));
 //! # }
 //! ```
 use std::fmt;

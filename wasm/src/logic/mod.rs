@@ -18,6 +18,7 @@ use std::convert::TryInto;
 use resource_parser::ResourceParser;
 >>>>>>> a3985e3... Move synchronization_memory simplify LogicContext
 
+#[derive(Debug)]
 pub struct LogicContext {
     state: State,
     tick_nr: u64,
