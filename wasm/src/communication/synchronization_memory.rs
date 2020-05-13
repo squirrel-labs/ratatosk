@@ -29,7 +29,7 @@ pub struct SynchronizationMemory {
     pub elapsed_ms: i32,
     /// Current mouse position
     pub mouse: (i32, i32),
-    /// Canvas size is px
+    /// Canvas size in px
     pub canvas_size: (u32, u32),
     pub player: GameState,
     pub other: GameState,
