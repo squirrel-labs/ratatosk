@@ -13,7 +13,7 @@ use crate::graphics::context;
 use crate::logic::GameContext;
 #[cfg(target_arch = "wasm32")]
 use crate::{
-    communication::message_queue::Outbound,
+    communication::message_queue::OutboundMessage,
     mem,
     wasm_log::{init_panic_handler, WasmLog},
 };

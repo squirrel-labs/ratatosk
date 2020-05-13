@@ -8,7 +8,8 @@ use rask_engine::events::{Event, KeyModifier, MouseEvent};
 #[repr(C, u32)]
 #[derive(Debug, Clone)]
 #[non_exhaustive]
-pub enum Message {
+/// Messeges sent by the main.js
+pub enum InboundMessage {
     None,
     KeyDown(KeyModifier, u32) = 1, // 1
     KeyUp(KeyModifier, u32) = 2,
@@ -19,9 +20,9 @@ pub enum Message {
     ResourcePush(u32) = 8,                   // id
 }
 
-impl Default for Message {
+impl Default for InboundMessage {
     fn default() -> Self {
-        Message::None
+        InboundMessage::None
     }
 }
 
@@ -32,16 +33,19 @@ extern "C" {
 #[repr(C, u32)]
 #[derive(Debug, Clone)]
 #[non_exhaustive]
-pub enum Outbound {
+/// Messages to send to the main.js
+pub enum OutboundMessage {
     RescourceAlloc { id: u32, ptr: u32 } = 0, // The event ids from 0 to 128 are reserved for server to client communication
     Memory(u32, u32, u32) = 1,
     Textmode(bool) = 2,
     EngineEvent(Event) = 129, // Mark the Message as outbound
 }
-impl Outbound {
+impl OutboundMessage {
     pub fn to_slice(&self) -> &[u32] {
-        let len = std::mem::size_of::<Outbound>() as u32;
-        unsafe { std::slice::from_raw_parts(self as *const Outbound as *const u32, len as usize) }
+        let len = std::mem::size_of::<OutboundMessage>() as u32;
+        unsafe {
+            std::slice::from_raw_parts(self as *const OutboundMessage as *const u32, len as usize)
+        }
     }
     pub fn send(&self) {
         let msg = self.to_slice();
@@ -52,6 +56,7 @@ impl Outbound {
 
 #[repr(C, align(32))]
 #[derive(Debug)]
+/// Wrapper for Message Object
 pub struct MessageQueueElement<T: Sized + Clone> {
     writing: u8,
     payload: T,
@@ -78,24 +83,27 @@ impl<T: Sized + Clone + Default> MessageQueueElement<T> {
         }
     }
 }
-impl MessageQueueElement<Message> {
+impl MessageQueueElement<InboundMessage> {
     pub const fn new() -> Self {
         Self {
             writing: 0,
-            payload: Message::None,
+            payload: InboundMessage::None,
         }
     }
 }
 
-pub struct MessageQueueReader<'a, T: Sized + Clone + Default + std::fmt::Debug> {
+/// Abstracts the communication with the main thread
+pub struct MessageQueue<'a, T: Sized + Clone + Default + std::fmt::Debug> {
     /// the index of the next element to be read
     reader_index: u32,
     data: &'a mut [MessageQueueElement<T>],
 }
 
-impl<'a, T: Sized + Clone + Default + std::fmt::Debug> MessageQueueReader<'a, T> {
+impl<'a, T: Sized + Clone + Default + std::fmt::Debug> MessageQueue<'a, T> {
+    /// # Safety
+    /// the memory provided to the function has to be valid and must contain valid messages
     pub unsafe fn from_memory(ptr: *mut MessageQueueElement<T>, len: usize) -> Self {
-        MessageQueueReader {
+        MessageQueue {
             reader_index: 0,
             data: core::slice::from_raw_parts_mut(ptr, len),
         }
@@ -103,7 +111,7 @@ impl<'a, T: Sized + Clone + Default + std::fmt::Debug> MessageQueueReader<'a, T>
 
     // add method to create message_queue with a memory location to make testing easier
     pub fn new(data: &'a mut [MessageQueueElement<T>]) -> Self {
-        MessageQueueReader {
+        MessageQueue {
             reader_index: 0,
             data,
         }
@@ -135,5 +143,9 @@ impl<'a, T: Sized + Clone + Default + std::fmt::Debug> MessageQueueReader<'a, T>
                 Some(msg) => return msg,
             }
         }
+    }
+    /// Push an outbound Message to the main Thread
+    pub fn push(&self, msg: OutboundMessage) {
+        msg.send();
     }
 }
