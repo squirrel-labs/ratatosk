@@ -1,33 +1,47 @@
 //! The GameContext contains the logic state and game engine.
 //! Its main purpose is to handle events and execute the game engine.
+
+#[cfg(target_arch = "wasm32")]
+use crate::mem;
 use crate::{
     communication::{
-        message_queue::{Message, MessageQueueReader},
+        message_queue::{Message, MessageQueueElement, MessageQueueReader},
         state::State,
         DOUBLE_BUFFER, RESOURCE_TABLE,
     },
     error::ClientError,
-    mem,
 };
+
 use rask_engine::events::{Event, Key};
 use rask_engine::network::packet::{u32_from_le, ResourceData};
-use rask_engine::resources::{registry, GetStore, ResourceTable, TextureIds, RESOURCE_COUNT};
+use rask_engine::resources::{registry, GetStore};
 use std::collections::HashMap;
 use std::convert::TryInto;
 
+#[cfg(not(target_arch = "wasm32"))]
+static mut MESSAGES: &mut [MessageQueueElement<Message>] = &mut [MessageQueueElement::new()];
 pub struct GameContext {
     state: State,
     tick_nr: u64,
-    message_queue: MessageQueueReader,
+    message_queue: MessageQueueReader<'static, Message>,
     buffer_table: HashMap<u32, (*const u8, u32)>,
 }
 
 impl GameContext {
     pub fn new() -> Result<Self, ClientError> {
+        #[cfg(target_arch = "wasm32")]
+        let message_queue = unsafe {
+            MessageQueueReader::from_memory(
+                *mem::MESSAGE_QUEUE as *mut MessageQueueElement<Message>,
+                mem::MESSAGE_QUEUE_ELEMENT_COUNT as usize,
+            )
+        };
+        #[cfg(not(target_arch = "wasm32"))]
+        let message_queue = MessageQueueReader::new(unsafe { MESSAGES });
         Ok(Self {
             state: State::default(),
             tick_nr: 0,
-            message_queue: MessageQueueReader::new(),
+            message_queue,
             buffer_table: HashMap::new(),
         })
     }
@@ -39,7 +53,7 @@ impl GameContext {
 
     pub fn tick(&mut self) -> Result<(), ClientError> {
         loop {
-            let msg = self.message_queue.pop::<Message>();
+            let msg = self.message_queue.pop();
             if let Message::None = msg {
                 break;
             }

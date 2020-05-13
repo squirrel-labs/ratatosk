@@ -2,7 +2,7 @@
 //!
 //!
 
-use crate::{mem, mem::atomic_read_u8, mem::MESSAGE_QUEUE_ELEMENT_COUNT};
+use crate::mem::atomic_read_u8;
 use rask_engine::events::{Event, KeyModifier, MouseEvent};
 
 #[repr(C, u32)]
@@ -56,6 +56,14 @@ pub struct MessageQueueElement<T: Sized + Clone> {
     writing: u8,
     payload: T,
 }
+impl<T: Sized + Clone> From<T> for MessageQueueElement<T> {
+    fn from(message: T) -> Self {
+        Self {
+            writing: 0,
+            payload: message,
+        }
+    }
+}
 
 impl<T: Sized + Clone + Default> MessageQueueElement<T> {
     fn get_writing(&self) -> u8 {
@@ -70,35 +78,43 @@ impl<T: Sized + Clone + Default> MessageQueueElement<T> {
         }
     }
 }
-
-#[derive(Default)]
-pub struct MessageQueueReader {
-    /// the index of the next element to be read
-    reader_index: u32,
+impl MessageQueueElement<Message> {
+    pub const fn new() -> Self {
+        Self {
+            writing: 0,
+            payload: Message::None,
+        }
+    }
 }
 
-impl MessageQueueReader {
-    pub fn length() -> usize {
-        MESSAGE_QUEUE_ELEMENT_COUNT as usize
+pub struct MessageQueueReader<'a, T: Sized + Clone + Default + std::fmt::Debug> {
+    /// the index of the next element to be read
+    reader_index: u32,
+    data: &'a mut [MessageQueueElement<T>],
+}
+
+impl<'a, T: Sized + Clone + Default + std::fmt::Debug> MessageQueueReader<'a, T> {
+    pub unsafe fn from_memory(ptr: *mut MessageQueueElement<T>, len: usize) -> Self {
+        MessageQueueReader {
+            reader_index: 0,
+            data: core::slice::from_raw_parts_mut(ptr, len),
+        }
     }
 
-    pub fn new() -> Self {
-        MessageQueueReader { reader_index: 0 }
+    // add method to create message_queue with a memory location to make testing easier
+    pub fn new(data: &'a mut [MessageQueueElement<T>]) -> Self {
+        MessageQueueReader {
+            reader_index: 0,
+            data,
+        }
     }
 
-    unsafe fn get_mut<T: Sized + Clone>(
-        &mut self,
-        n: usize,
-    ) -> Option<&mut MessageQueueElement<T>> {
-        core::slice::from_raw_parts_mut(
-            *mem::MESSAGE_QUEUE as *mut MessageQueueElement<T>,
-            Self::length(),
-        )
-        .get_mut(n)
+    unsafe fn get_mut(&mut self, n: usize) -> Option<&mut MessageQueueElement<T>> {
+        self.data.get_mut(n)
     }
 
     #[allow(clippy::mem_discriminant_non_enum)]
-    pub fn pop<T: Sized + Clone + Default + std::fmt::Debug>(&mut self) -> T {
+    pub fn pop(&mut self) -> T {
         loop {
             let e = unsafe {
                 self.get_mut(self.reader_index as usize)
@@ -111,7 +127,7 @@ impl MessageQueueReader {
                 }
             }
             self.reader_index += 1;
-            if self.reader_index as usize >= Self::length() {
+            if self.reader_index as usize >= self.data.len() {
                 self.reader_index = 0;
             }
             match e {

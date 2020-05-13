@@ -60,13 +60,14 @@ impl Default for ResourceTable {
     }
 }
 impl ResourceTable {
+    #[cfg(not(feature = "nightly"))]
     const BYTE_LEN: usize = RESOURCE_COUNT as usize * std::mem::size_of::<Resource>();
     /// Create a new library initialzed with None resources.
-    #[cfg(nightly)]
+    #[cfg(feature = "nightly")]
     pub const fn new() -> Self {
-        return Self([Resource::None; RESOURCE_COUNT as usize]);
+        Self([Resource::None; RESOURCE_COUNT as usize])
     }
-    #[cfg(not(nightly))]
+    #[cfg(not(feature = "nightly"))]
     pub fn new() -> Self {
         let bytes = [0u8; Self::BYTE_LEN];
         Self(unsafe {

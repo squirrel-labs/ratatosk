@@ -8,7 +8,7 @@ use lazy_static::lazy_static;
 # use rask_engine::resources::*;
 
 lazy_static! {
-    static ref TABLE: ResourceTable = unsafe { ResourceTable::from_memory(0, 0) };
+    static ref TABLE: ResourceTable = unsafe { ResourceTable::new() };
 }
 
 fn test() {

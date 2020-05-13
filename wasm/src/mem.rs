@@ -157,6 +157,8 @@ impl SynchronizationMemory {
         &*(*SYNCHRONIZATION_MEMORY as *const Self)
     }
     #[cfg(not(target_arch = "wasm32"))]
+    /// # Safety
+    /// This function completely safe as it just returns dummy data on non wasm 32 targets
     pub unsafe fn get() -> &'static Self {
         &DUMMY_SYNC
     }
@@ -166,10 +168,6 @@ impl SynchronizationMemory {
     /// and is only written to using atomic operations
     pub unsafe fn get_mut() -> &'static mut Self {
         &mut *(*SYNCHRONIZATION_MEMORY as *mut Self)
-    }
-    #[cfg(not(target_arch = "wasm32"))]
-    pub unsafe fn get_mut() -> &'static mut Self {
-        &mut DUMMY_SYNC
     }
 
     /// This functions lets the thread sleep until it is woken up by the main.js or a timeout is
