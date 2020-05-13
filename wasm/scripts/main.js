@@ -10,13 +10,8 @@ let SYNC_PLAYER_STATE;
 let SYNC_OTHER_STATE;
 let queue = null;
 let params = new URLSearchParams(document.location.search.substring(1));
-<<<<<<< HEAD:wasm/site/main.js
-//let token = params.get("token");
-let token = "Token-63208259";
-=======
 let token = params.get("token");
 token = "Token-42";
->>>>>>> 84ee415... Remove wasm-bindgen:wasm/scripts/main.js
 let workers = [];
 let memory;  // global for debugging
 let ws = new WebSocket(WEBSOCKET_URI, [token, "tuesday"]);

@@ -11,6 +11,7 @@ args = [ "fmt", "--all" ]
 
 [tasks.wasm]
 workspace = false
+env = {RUSTFLAGS = "-Ctarget-feature=+atomics,+bulk-memory -Clink-arg=-zstacksize=131072 -Clink-arg=--demangle" }
 script = [
 '''
 #!/usr/bin/env bash -ex
