@@ -1,0 +1,15 @@
+[alias]
+wasm = "make all"
+
+
+[build]
+#target = "wasm32-unknown-unknown"
+rustdocflags = ["--target", "wasm32-unknown-unknown", "--document-private-items"]
+target-dir = "../target/rask_wasm"
+
+
+[target.wasm32-unknown-unknown]
+runner = "wasm-interp"
+[target.rustflags]
+wasm32-unknown-unknown = "-Ctarget-feature=+atomics,+bulk-memory -Clink-arg=-zstacksize=131072 -Clink-arg=--demangle"
+

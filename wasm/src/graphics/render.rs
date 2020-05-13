@@ -34,7 +34,8 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn upload_texture(&mut self, id: u32) -> Result<(), ClientError> {
-        let texture = RESOURCE_TABLE.read().get(id as usize)?;
+        let guard = RESOURCE_TABLE.read();
+        let texture = guard.get(id as usize)?;
         self.graphics.resize_texture_pool(id + 1)?;
         self.graphics.upload_texture(texture, id)?;
         if !self.used_texture_ids.contains(&id) {
@@ -44,7 +45,8 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn unload_texture(&mut self, id: u32) -> Result<(), ClientError> {
-        let texture = RESOURCE_TABLE.read().get(id as usize)?;
+        let guard = RESOURCE_TABLE.read();
+        let texture = guard.get(id as usize)?;
         self.graphics.resize_texture_pool(id + 1)?;
         self.graphics.upload_texture(texture, id)?;
         Ok(())
@@ -62,9 +64,8 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn draw_sprites(&mut self) -> Result<bool, ClientError> {
-        let used_textures = RESOURCE_TABLE
-            .read()
-            .get(registry::USED_TEXTURE_IDS.id as usize);
+        let guard = RESOURCE_TABLE.read();
+        let used_textures = guard.get(registry::USED_TEXTURE_IDS.id as usize);
         if let Err(rask_engine::EngineError::ResourceMissing(_)) = used_textures {
             return Ok(true);
         }

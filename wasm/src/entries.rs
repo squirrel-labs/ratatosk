@@ -25,8 +25,8 @@ static LOGGER: WasmLog = WasmLog;
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-#[cfg(target_arch = "wasm32")]
 fn wait_for_main_thread_notify() {
+    #[cfg(target_arch = "wasm32")]
     unsafe { mem::SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
 }
 
