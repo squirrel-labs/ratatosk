@@ -9,8 +9,9 @@
 //! When executing `init()` a message is sent to the main thread, signaling the initiaisation has
 //! finished. This signal is used to start the graphics worker.
 
+use crate::communication::{message_queue::MessageQueueElement, InboundMessage, MessageQueue};
 use crate::graphics::context;
-use crate::logic::GameContext;
+use crate::logic::LogicContext;
 #[cfg(target_arch = "wasm32")]
 use crate::{
     communication::{OutboundMessage, SynchronizationMemory},
@@ -65,13 +66,26 @@ pub extern "C" fn init(heap_base: i32) {
     .send();
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+static mut MESSAGES: &mut [MessageQueueElement<InboundMessage>] = &mut [MessageQueueElement::new()];
+
 /// Initialize the gamestate, communicate with
 /// the graphics worker and set up networking.
 /// This function is being exposed to javascript
 #[export_name = "run_logic"]
 pub extern "C" fn run_logic() {
+    #[cfg(target_arch = "wasm32")]
+    let message_queue = unsafe {
+        MessageQueue::from_memory(
+            *mem::MESSAGE_QUEUE as *mut MessageQueueElement<InboundMessage>,
+            mem::MESSAGE_QUEUE_ELEMENT_COUNT as usize,
+        )
+    };
+    #[cfg(not(target_arch = "wasm32"))]
+    let message_queue = MessageQueue::new(unsafe { MESSAGES });
+
     // create the logic game context
-    let mut game = GameContext::new().unwrap_or_else(|e| panic!("{}", e));
+    let mut game = LogicContext::new(message_queue).unwrap_or_else(|e| panic!("{}", e));
 
     loop {
         game.tick()
