@@ -1,7 +1,7 @@
 //! This modle abstracts some of the raw memory interaction and calculates the offsets of shared
 //! memory constructs
 //!
-use crate::communication::message_queue::{Message, MessageQueueElement};
+use crate::communication::message_queue::{InboundMessage, MessageQueueElement};
 use parking_lot::RwLock;
 use rask_engine::resources::Resource;
 use std::mem::size_of;
@@ -19,7 +19,7 @@ pub const RESOURCE_TABLE_SIZE: usize =
     MIN_RESOURCE_TABLE_ELEMENT_COUNT as usize * size_of::<Resource>();
 /// The size of the message_queue in bytes
 pub const MESSAGE_QUEUE_SIZE: usize =
-    MIN_MESSAGE_QUEUE_ELEMENT_COUNT as usize * size_of::<MessageQueueElement<Message>>();
+    MIN_MESSAGE_QUEUE_ELEMENT_COUNT as usize * size_of::<MessageQueueElement<InboundMessage>>();
 
 /// Align given memory address up to the alignment of T
 /// # Example
@@ -35,8 +35,9 @@ pub const RESOURCE_TABLE_ELEMENT_COUNT: u32 = (RESOURCE_TABLE_SIZE / size_of::<R
 pub const DOUBLE_BUFFER_SPRITE_COUNT: u32 = 128;
 /// The number of Messages that can be sent by the main thread befor the logic thread has to pop
 /// messages to avoid data loss
-pub const MESSAGE_QUEUE_ELEMENT_COUNT: u32 = (MESSAGE_QUEUE_SIZE / size_of::<Message>()) as u32;
-/// The size of the wasm heap. This has to fit into the imported memory to avoid out ouf bound
+pub const MESSAGE_QUEUE_ELEMENT_COUNT: u32 =
+    (MESSAGE_QUEUE_SIZE / size_of::<InboundMessage>()) as u32;
+/// The size of the wasm heap. This hast to fit into the imported memory to avoit out ouf bound
 /// memory access
 pub const HEAP_SIZE: u32 = 1024 * 64 * 16;
 
@@ -104,7 +105,7 @@ impl MemoryAdresses {
     /// heap_base
     pub fn init(heap_base: u32) {
         let synchronization_memory = align_up::<SynchronizationMemory>(heap_base as usize);
-        let message_queue = align_up::<MessageQueueElement<Message>>(
+        let message_queue = align_up::<MessageQueueElement<InboundMessage>>(
             synchronization_memory + size_of::<SynchronizationMemory>(),
         );
         let resource_table = align_up::<Resource>(message_queue + MESSAGE_QUEUE_SIZE);

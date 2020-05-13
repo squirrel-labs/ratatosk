@@ -5,7 +5,7 @@
 use crate::mem;
 use crate::{
     communication::{
-        message_queue::{Message, MessageQueueElement, MessageQueueReader},
+        message_queue::{InboundMessage, MessageQueue, MessageQueueElement},
         state::State,
         DOUBLE_BUFFER, RESOURCE_TABLE,
     },
@@ -17,11 +17,11 @@ use rask_engine::resources::{registry, GetStore};
 use std::collections::HashMap;
 
 #[cfg(not(target_arch = "wasm32"))]
-static mut MESSAGES: &mut [MessageQueueElement<Message>] = &mut [MessageQueueElement::new()];
+static mut MESSAGES: &mut [MessageQueueElement<InboundMessage>] = &mut [MessageQueueElement::new()];
 pub struct GameContext {
     state: State,
     tick_nr: u64,
-    message_queue: MessageQueueReader<'static, Message>,
+    message_queue: MessageQueue<'static, InboundMessage>,
     buffer_table: HashMap<u32, (*const u8, u32)>,
 }
 
@@ -29,13 +29,13 @@ impl GameContext {
     pub fn new() -> Result<Self, ClientError> {
         #[cfg(target_arch = "wasm32")]
         let message_queue = unsafe {
-            MessageQueueReader::from_memory(
-                *mem::MESSAGE_QUEUE as *mut MessageQueueElement<Message>,
+            MessageQueue::from_memory(
+                *mem::MESSAGE_QUEUE as *mut MessageQueueElement<InboundMessage>,
                 mem::MESSAGE_QUEUE_ELEMENT_COUNT as usize,
             )
         };
         #[cfg(not(target_arch = "wasm32"))]
-        let message_queue = MessageQueueReader::new(unsafe { MESSAGES });
+        let message_queue = MessageQueue::new(unsafe { MESSAGES });
         Ok(Self {
             state: State::default(),
             tick_nr: 0,
@@ -52,7 +52,7 @@ impl GameContext {
     pub fn tick(&mut self) -> Result<(), ClientError> {
         loop {
             let msg = self.message_queue.pop();
-            if let Message::None = msg {
+            if let InboundMessage::None = msg {
                 break;
             }
             log::info!("{:?}", msg);
@@ -85,17 +85,21 @@ impl GameContext {
             }
         }
     }
-    fn handle_message(&mut self, message: Message) -> Result<Option<Event>, ClientError> {
+    fn handle_message(&mut self, message: InboundMessage) -> Result<Option<Event>, ClientError> {
         match message {
-            Message::KeyDown(modifier, hash) => Ok(Some(Event::KeyDown(modifier, Key::from(hash)))),
-            Message::KeyUp(modifier, hash) => Ok(Some(Event::KeyUp(modifier, Key::from(hash)))),
-            Message::MouseDown(event) => Ok(Some(Event::MouseDown(event))),
-            Message::MouseUp(event) => Ok(Some(Event::MouseUp(event))),
-            Message::KeyPress(t, code) => Ok(Some(Event::KeyPress(t as u16, code))),
-            Message::RequestAlloc { id, size } => {
+            InboundMessage::KeyDown(modifier, hash) => {
+                Ok(Some(Event::KeyDown(modifier, Key::from(hash))))
+            }
+            InboundMessage::KeyUp(modifier, hash) => {
+                Ok(Some(Event::KeyUp(modifier, Key::from(hash))))
+            }
+            InboundMessage::MouseDown(event) => Ok(Some(Event::MouseDown(event))),
+            InboundMessage::MouseUp(event) => Ok(Some(Event::MouseUp(event))),
+            InboundMessage::KeyPress(t, code) => Ok(Some(Event::KeyPress(t as u16, code))),
+            InboundMessage::RequestAlloc { id, size } => {
                 log::trace!("allocating {} bytes for resource {}", size, id);
                 let ptr = self.alloc_buffer(id, size);
-                use crate::communication::message_queue::Outbound;
+                use crate::communication::message_queue::OutboundMessage;
                 Outbound::RescourceAlloc {
                     id,
                     ptr: ptr as u32,
@@ -103,7 +107,7 @@ impl GameContext {
                 .send();
                 Ok(None)
             }
-            Message::ResourcePush(id) => self.parse_resource(id).map(|_| None),
+            InboundMessage::ResourcePush(id) => self.parse_resource(id).map(|_| None),
             _ => Err(ClientError::EngineError("Unknown Message Type".into())),
         }
     }

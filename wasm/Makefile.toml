@@ -11,7 +11,6 @@ args = [ "fmt", "--all" ]
 
 [tasks.wasm]
 workspace = false
-env = { CARGO_TARGET_DIR = "../target/rask_wasm",  RUSTFLAGS = "-Ctarget-feature=+atomics,+bulk-memory -Clink-arg=-zstacksize=131072 -Clink-arg=--demangle" }
 script = [
 '''
 #!/usr/bin/env bash -ex
