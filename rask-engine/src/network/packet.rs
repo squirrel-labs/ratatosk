@@ -26,6 +26,16 @@ pub struct GameState {
     pub player_state: i32,
 }
 
+impl GameState {
+    pub fn new() -> Self {
+        Self {
+            player_x: 0.0,
+            player_y: 0.0,
+            player_state: 0,
+        }
+    }
+}
+
 #[repr(C)]
 pub enum PacketVariant<'a> {
     PushResource(NetworkResource<'a>),

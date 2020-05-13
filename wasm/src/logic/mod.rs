@@ -4,51 +4,29 @@ use crate::{
     communication::{
         message_queue::{Message, MessageQueueReader},
         state::State,
-        DOUBLE_BUFFER,
+        DOUBLE_BUFFER, RESOURCE_TABLE,
     },
     error::ClientError,
-    mem::{self, RESOURCE_TABLE_ELEMENT_COUNT},
+    mem,
 };
 use rask_engine::events::{Event, Key};
 use rask_engine::network::packet::{u32_from_le, ResourceData};
-use rask_engine::resources::{registry, GetStore, ResourceTable, TextureIds};
+use rask_engine::resources::{registry, GetStore, ResourceTable, TextureIds, RESOURCE_COUNT};
 use std::collections::HashMap;
 use std::convert::TryInto;
 
 pub struct GameContext {
     state: State,
     tick_nr: u64,
-    resource_table: ResourceTable,
     message_queue: MessageQueueReader,
     buffer_table: HashMap<u32, (*const u8, u32)>,
 }
 
 impl GameContext {
     pub fn new() -> Result<Self, ClientError> {
-        let resource_table = unsafe {
-            let mut resource_table = ResourceTable::from_memory(
-                *mem::RESOURCE_TABLE,
-                RESOURCE_TABLE_ELEMENT_COUNT as usize,
-            );
-            resource_table.clear();
-            resource_table.store(
-                // TODO move to mutex
-                TextureIds {
-                    reset_notify: 1,
-                    ids: vec![],
-                },
-                registry::USED_TEXTURE_IDS.id as usize,
-            )?;
-            resource_table
-        };
-        log::debug!(
-            "resource_table: {}",
-            &resource_table as *const ResourceTable as u32
-        );
         Ok(Self {
             state: State::default(),
             tick_nr: 0,
-            resource_table,
             message_queue: MessageQueueReader::new(),
             buffer_table: HashMap::new(),
         })
@@ -105,7 +83,7 @@ impl GameContext {
             Message::RequestAlloc { id, size } => {
                 log::trace!("allocating {} bytes for resource {}", size, id);
                 let ptr = self.alloc_buffer(id, size);
-                use crate::message_queue::Outbound;
+                use crate::communication::message_queue::Outbound;
                 Outbound::RescourceAlloc {
                     id,
                     ptr: ptr as u32,
@@ -125,7 +103,7 @@ impl GameContext {
                 TEXTURE => {
                     log::info!("decoding texture {} len: {}", id, data[12..].len(),);
                     let img = rask_engine::resources::Texture::from_png_stream(&data[12..])?;
-                    unsafe { self.resource_table.store(img, id as usize) }?;
+                    RESOURCE_TABLE.write().store(img, id as usize)?;
                 }
                 CHARACTER => {
                     let chr: Result<rask_engine::resources::Character, rask_engine::EngineError> =
@@ -134,7 +112,7 @@ impl GameContext {
                             rask_engine::network::protocol::resource_types::CHARACTER,
                         )?
                         .try_into();
-                    unsafe { self.resource_table.store(Box::new(chr?), id as usize) }?;
+                    RESOURCE_TABLE.write().store(Box::new(chr?), id as usize)?;
                 }
                 _ => {
                     self.dealloc_buffer(id);

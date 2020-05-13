@@ -1,17 +1,5 @@
 use super::render::Render;
 use crate::error::ClientError;
-use crate::mem;
-use lazy_static::lazy_static;
-use rask_engine::resources::ResourceTable;
-
-lazy_static! {
-    pub static ref RESOURCE_TABLE: ResourceTable = unsafe {
-        ResourceTable::from_memory(
-            *mem::RESOURCE_TABLE,
-            mem::RESOURCE_TABLE_ELEMENT_COUNT as usize,
-        )
-    };
-}
 
 pub struct Context {
     //render: Render<WebGl>,

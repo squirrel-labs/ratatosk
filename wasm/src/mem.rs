@@ -136,30 +136,56 @@ pub struct SynchronizationMemory {
     last_elapsed_ms: i32,
 }
 
+const DUMMY_SYNC: SynchronizationMemory = SynchronizationMemory::new();
 #[allow(clippy::while_immutable_condition)]
-#[cfg(target_arch = "wasm32")]
 impl SynchronizationMemory {
+    pub const fn new() -> Self {
+        Self {
+            elapsed_ms: 0,
+            mouse: (0, 0),
+            canvas_size: (0, 0),
+            player: GameState::new(),
+            other: GameState::new(),
+            last_elapsed_ms: 0,
+        }
+    }
+    #[cfg(target_arch = "wasm32")]
     /// # Safety
     /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
     /// and is only written to using atomic operations
     pub unsafe fn get() -> &'static Self {
         &*(*SYNCHRONIZATION_MEMORY as *const Self)
     }
+    #[cfg(not(target_arch = "wasm32"))]
+    pub unsafe fn get() -> &'static Self {
+        &DUMMY_SYNC
+    }
+    #[cfg(target_arch = "wasm32")]
     /// # Safety
     /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
     /// and is only written to using atomic operations
     pub unsafe fn get_mut() -> &'static mut Self {
         &mut *(*SYNCHRONIZATION_MEMORY as *mut Self)
     }
+    #[cfg(not(target_arch = "wasm32"))]
+    pub unsafe fn get_mut() -> &'static mut Self {
+        &mut DUMMY_SYNC
+    }
 
     /// This functions lets the thread sleep until it is woken up by the main.js or a timeout is
     /// reached
     pub fn wait_for_main_thread_notify(&mut self) {
-        self.last_elapsed_ms = self.elapsed_ms;
-        while self.last_elapsed_ms
-            == unsafe { atomic_read_i32(*SYNCHRONIZATION_MEMORY as *const i32) }
+        #[cfg(not(target_arch = "wasm32"))]
+        return log::info!("atomic wait is no supported for non wasm targets");
+
+        #[cfg(target_arch = "wasm32")]
         {
-            unsafe { wait_until_wake_up_at(*SYNCHRONIZATION_MEMORY as *mut i32) }
+            self.last_elapsed_ms = self.elapsed_ms;
+            while self.last_elapsed_ms
+                == unsafe { atomic_read_i32(*SYNCHRONIZATION_MEMORY as *const i32) }
+            {
+                unsafe { wait_until_wake_up_at(*SYNCHRONIZATION_MEMORY as *mut i32) }
+            }
         }
     }
 }
@@ -207,7 +233,7 @@ pub unsafe fn wait_until_wake_up_at(ptr: *mut i32) {
             1000 * 1000 * 1000 * timeout,
         );
         if res != 0 {
-            log::trace!("Thread woke up after {}e", timeout);
+            log::trace!("Thread woke up after {}s", timeout);
         }
     }
     #[cfg(not(target_arch = "wasm32"))]
