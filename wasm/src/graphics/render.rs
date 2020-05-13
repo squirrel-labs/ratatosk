@@ -2,7 +2,7 @@ use super::GraphicsApi;
 use crate::communication::SynchronizationMemory;
 use crate::communication::RESOURCE_TABLE;
 use crate::error::ClientError;
-use rask_engine::resources::{registry, GetStore, TextureIds};
+use rask_engine::resources::{GetStore, TextureIds};
 
 pub struct Render<T> {
     graphics: T,
@@ -12,8 +12,8 @@ pub struct Render<T> {
 
 impl<T: GraphicsApi> Render<T> {
     pub fn new(/*canvas: web_sys::OffscreenCanvas*/) -> Result<Self, ClientError> {
-        let factor = rask_engine::math::vec2::Vec2::new(0.2, 0.2);
-        T::new(factor).map(|api| Self {
+        // TODO: Do not hardcode pixelized framebuffer size
+        T::new(160, 90).map(|api| Self {
             graphics: api,
             frame_nr: 0,
             used_texture_ids: vec![],
@@ -26,7 +26,7 @@ impl<T: GraphicsApi> Render<T> {
             .map_err(|e| ClientError::WebGlError(format!("WebGl2 error: {}", e)))?;
         let size = (unsafe { SynchronizationMemory::get() }).canvas_size;
         self.graphics.update_size(size.0, size.1);
-        self.graphics.start_frame(&[0.0, 0.0, 0.0])?;
+        self.graphics.start_frame()?;
         if self.draw_sprites()? {
             self.frame_nr += 1;
         }
