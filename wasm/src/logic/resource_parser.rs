@@ -1,3 +1,4 @@
+use crate::communication::message_queue::OutboundMessage;
 use crate::communication::RESOURCE_TABLE;
 use crate::ClientError;
 use rask_engine::resources::{registry, GetStore};
@@ -19,7 +20,6 @@ impl ResourceParser {
     pub fn alloc(&mut self, id: u32, size: u32) {
         log::trace!("allocating {} bytes for resource {}", size, id);
         let ptr = self.alloc_buffer(id, size);
-        use crate::communication::message_queue::OutboundMessage;
         OutboundMessage::RescourceAlloc {
             id,
             ptr: ptr as u32,

@@ -118,17 +118,16 @@ impl<'a, T: Sized + Clone + Default + std::fmt::Debug> MessageQueue<'a, T> {
         }
     }
 
-    unsafe fn get_mut(&mut self, n: usize) -> Option<&mut MessageQueueElement<T>> {
+    fn get_mut(&mut self, n: usize) -> Option<&mut MessageQueueElement<T>> {
         self.data.get_mut(n)
     }
 
     #[allow(clippy::mem_discriminant_non_enum)]
     pub fn pop(&mut self) -> T {
         loop {
-            let e = unsafe {
-                self.get_mut(self.reader_index as usize)
-                    .expect("Failed to Read MessageQueue")
-            };
+            let e = self
+                .get_mut(self.reader_index as usize)
+                .expect("Failed to Read MessageQueue");
             let e = e.read();
             if let Some(n) = e.clone() {
                 if std::mem::discriminant(&T::default()) == std::mem::discriminant(&n) {
