@@ -1,7 +1,7 @@
 use super::GraphicsApi;
+use crate::communication::SynchronizationMemory;
 use crate::communication::RESOURCE_TABLE;
 use crate::error::ClientError;
-use crate::mem::SynchronizationMemory;
 use rask_engine::resources::{registry, GetStore, TextureIds};
 
 pub struct Render<T> {

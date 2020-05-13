@@ -13,7 +13,7 @@ use crate::graphics::context;
 use crate::logic::GameContext;
 #[cfg(target_arch = "wasm32")]
 use crate::{
-    communication::message_queue::OutboundMessage,
+    communication::{OutboundMessage, SynchronizationMemory},
     mem,
     wasm_log::{init_panic_handler, WasmLog},
 };
@@ -27,7 +27,7 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 fn wait_for_main_thread_notify() {
     #[cfg(target_arch = "wasm32")]
-    unsafe { mem::SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
+    unsafe { SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
 }
 
 /// This function initializes the heap, logger, panic handler and graphics context
@@ -57,7 +57,7 @@ pub extern "C" fn init(heap_base: i32) {
     // set custom panic handler
     init_panic_handler();
     // send memery offsetst to the main thread -> initialize graphics
-    Outbound::Memory(
+    OutboundMessage::Memory(
         *mem::SYNCHRONIZATION_MEMORY as u32,
         *mem::MESSAGE_QUEUE as u32,
         mem::MESSAGE_QUEUE_ELEMENT_COUNT,

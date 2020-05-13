@@ -100,7 +100,7 @@ impl GameContext {
                 log::trace!("allocating {} bytes for resource {}", size, id);
                 let ptr = self.alloc_buffer(id, size);
                 use crate::communication::message_queue::OutboundMessage;
-                Outbound::RescourceAlloc {
+                OutboundMessage::RescourceAlloc {
                     id,
                     ptr: ptr as u32,
                 }
