@@ -38,6 +38,8 @@ pub struct SynchronizationMemory {
 
 const DUMMY_SYNC: SynchronizationMemory = SynchronizationMemory::new();
 #[allow(clippy::while_immutable_condition)]
+/// The synchronization memory is a direct memory interface to the main.js
+/// It ist uptated before each logic cycle
 impl SynchronizationMemory {
     pub const fn new() -> Self {
         Self {

@@ -20,7 +20,11 @@
 //!
 //!
 //!
-//! It interacts with the graphics crate through the shared array buffer
+//! logic and graphics communicate via the shared array buffer
+//! for more information see `communication` [4],[5],[6]
+//!
+//! Memory layout
+//! our Project uses a custom memory layout. see `mem`
 
 #![feature(allocator_api)]
 #![feature(stdsimd)]
@@ -36,3 +40,5 @@ pub mod graphics;
 pub mod logic;
 pub mod mem;
 pub mod wasm_log;
+#[doc(inline)]
+pub use error::ClientError;
