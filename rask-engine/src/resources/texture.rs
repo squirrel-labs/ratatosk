@@ -19,6 +19,7 @@ pub struct TextureIds {
     pub reset_notify: u8,
     pub ids: Vec<u32>,
 }
+
 impl TextureIds {
     pub const fn empty() -> Self {
         Self {

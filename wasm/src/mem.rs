@@ -168,5 +168,5 @@ pub unsafe fn wait_until_wake_up_at(ptr: *mut i32) {
         }
     }
     #[cfg(not(target_arch = "wasm32"))]
-    log::info!("atomic wait is no supported for non wasm targets");
+    log::info!("atomic wait is not supported for non wasm targets");
 }

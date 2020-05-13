@@ -2,6 +2,7 @@ use super::Resource;
 use super::RESOURCE_COUNT;
 use crate::EngineError;
 
+#[cfg_attr(not(feature = "nightly"), repr(transparent))]
 /// The library is used to store and retrieve resources.
 pub struct ResourceTable([Resource; RESOURCE_COUNT as usize]);
 
@@ -60,8 +61,6 @@ impl Default for ResourceTable {
     }
 }
 impl ResourceTable {
-    #[cfg(not(feature = "nightly"))]
-    const BYTE_LEN: usize = RESOURCE_COUNT as usize * std::mem::size_of::<Resource>();
     /// Create a new library initialzed with None resources.
     #[cfg(feature = "nightly")]
     pub const fn new() -> Self {
@@ -69,12 +68,8 @@ impl ResourceTable {
     }
     #[cfg(not(feature = "nightly"))]
     pub fn new() -> Self {
-        let bytes = [0u8; Self::BYTE_LEN];
-        Self(unsafe {
-            std::mem::transmute_copy::<[u8; Self::BYTE_LEN], [Resource; RESOURCE_COUNT as usize]>(
-                &bytes,
-            )
-        })
+        let bytes = [0u8; std::mem::size_of::<Self>()];
+        unsafe { std::mem::transmute(bytes) }
     }
 
     fn index_check(&self, id: usize) -> Result<(), EngineError> {

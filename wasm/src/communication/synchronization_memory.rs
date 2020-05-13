@@ -76,7 +76,7 @@ impl SynchronizationMemory {
     /// reached
     pub fn wait_for_main_thread_notify(&mut self) {
         #[cfg(not(target_arch = "wasm32"))]
-        return log::info!("atomic wait is no supported for non wasm targets");
+        log::info!("atomic wait is not supported for non wasm targets");
 
         #[cfg(target_arch = "wasm32")]
         {

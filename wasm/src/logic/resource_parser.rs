@@ -1,3 +1,4 @@
+use crate::communication::message_queue::OutboundMessage;
 use crate::communication::RESOURCE_TABLE;
 use crate::ClientError;
 use rask_engine::resources::{registry, GetStore};
@@ -19,7 +20,6 @@ impl ResourceParser {
     pub fn alloc(&mut self, id: u32, size: u32) {
         log::trace!("allocating {} bytes for resource {}", size, id);
         let ptr = self.alloc_buffer(id, size);
-        use crate::communication::message_queue::OutboundMessage;
         OutboundMessage::RescourceAlloc {
             id,
             ptr: ptr as u32,
@@ -57,7 +57,7 @@ impl ResourceParser {
     }
     fn parse_char(id: u32, data: &[u8]) -> Result<(), ClientError> {
         log::info!("decoding char {} len: {}", id, data.len(),);
-        let chr = rask_engine::resources::Character::from_u8(&data[12..])?;
+        let chr = rask_engine::resources::Character::from_u8(data)?;
         RESOURCE_TABLE.write().store(Box::new(chr), id as usize)?;
         Ok(())
     }
