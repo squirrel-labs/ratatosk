@@ -32,6 +32,21 @@ macro_rules! resources {
     };
 }
 
+pub const RESOURCE_COUNT: u32 = 4;
+
+resources! {
+    (USED_TEXTURE_IDS,  TextureIds,     ""                       ),
+    (EMPTY,             Texture,        "empty.png"              ),
+    (THIEF,             Texture,        "thief.png"              ),
+    (UNUSED,            Character,      Character {
+                          texture:   "BoneTest/BoneTest.png",
+                          atlas:     "BoneTest/BoneTest.atlas",
+                          animation: "BoneTest/BoneTest.json"
+    }                                                            )
+}
+
+mod macros {}
+
 pub trait Serialize {
     fn serialize(&self, res_path: &str) -> Option<Vec<u8>>;
 }
@@ -122,15 +137,4 @@ impl Serialize for CharacterInfo {
         buf.append(&mut res);
         Some(buf)
     }
-}
-
-resources! {
-    (USED_TEXTURE_IDS,  TextureIds,     ""                       ),
-    (EMPTY,             Texture,        "empty.png"              ),
-    (THIEF,             Texture,        "thief.png"              ),
-    (UNUSED,            Character,      Character {
-                          texture:   "BoneTest/BoneTest.png",
-                          atlas:     "BoneTest/BoneTest.atlas",
-                          animation: "BoneTest/BoneTest.json"
-    }                                                            )
 }

@@ -1,6 +1,5 @@
 //use crate::shader::Program;
 use crate::error::ClientError;
-use crate::sprite::TextureId;
 use rask_engine::math;
 use rask_engine::math::Mat3;
 use rask_engine::resources::texture::{ColorType, Texture};

@@ -1,6 +1,6 @@
+use super::render::Render;
 use crate::error::ClientError;
 use crate::mem;
-use crate::render::Render;
 use lazy_static::lazy_static;
 use rask_engine::resources::ResourceTable;
 

@@ -28,6 +28,8 @@ pub mod texture;
 #[doc(inline)]
 pub use character::Character;
 #[doc(inline)]
+pub use registry::RESOURCE_COUNT;
+#[doc(inline)]
 pub use resource_table::{GetStore, ResourceTable};
 #[doc(inline)]
 pub use sound::Sound;

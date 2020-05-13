@@ -1,7 +1,7 @@
 //! This modle abstracts some of the raw memory interaction and calculates the offsets of shared
 //! memory constructs
 //!
-use crate::message_queue::{Message, MessageQueueElement};
+use crate::communication::message_queue::{Message, MessageQueueElement};
 use parking_lot::RwLock;
 use rask_engine::resources::Resource;
 use std::mem::size_of;
@@ -40,6 +40,7 @@ pub const MESSAGE_QUEUE_ELEMENT_COUNT: u32 = (MESSAGE_QUEUE_SIZE / size_of::<Mes
 /// memory access
 pub const HEAP_SIZE: u32 = 1024 * 64 * 16;
 
+#[cfg(target_arch = "wasm32")]
 lazy_static! {
     /// Location of the synchronization memory
     /// Only valid if `entries::init()` was called prior to the first acess
@@ -144,6 +145,7 @@ pub struct SynchronizationMemory {
 }
 
 #[allow(clippy::while_immutable_condition)]
+#[cfg(target_arch = "wasm32")]
 impl SynchronizationMemory {
     /// # Safety
     /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
@@ -216,4 +218,6 @@ pub unsafe fn wait_until_wake_up_at(ptr: *mut i32) {
             log::trace!("Thread woke up after {}e", timeout);
         }
     }
+    #[cfg(not(target_arch = "wasm32"))]
+    log::info!("atomic wait is no supported for non wasm targets");
 }
