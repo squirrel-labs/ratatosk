@@ -9,14 +9,7 @@ use crate::{
     error::ClientError,
 };
 use rask_engine::events::{Event, Key};
-<<<<<<< HEAD
-use rask_engine::network::packet::{u32_from_le, ResourceData};
-use rask_engine::resources::{registry, GetStore};
-use std::collections::HashMap;
-use std::convert::TryInto;
-=======
 use resource_parser::ResourceParser;
->>>>>>> a3985e3... Move synchronization_memory simplify LogicContext
 
 #[derive(Debug)]
 pub struct LogicContext {

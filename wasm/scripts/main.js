@@ -139,9 +139,9 @@ function onresize() {
 function LogicMessage(e) {
     let x = new Uint32Array(e.data);
     let optcode = x[0];
-    if (optcode >= 128) {
+    if (optcode === RELAY) {
         ws.send(x.slice(1));
-    } else if (optcode === 0) {
+    } else if (optcode === ALLOCATED_BUFFER) {
         const id = x[1];
         let ptr = x[2] / 4;
         if (resource_map.has(id)) {
@@ -161,7 +161,7 @@ function LogicMessage(e) {
         } else {
             console.error("Requested resource not in resource_map, id: " + id)
         }
-    } else if (optcode === 1) {
+    } else if (optcode === MEMORY_OFFSETS) {
         SYNCHRONIZATION_MEMORY = x[1] >> 2;
         MESSAGE_QUEUE = x[2];
         MESSAGE_QUEUE_LENGTH = x[3];
@@ -283,9 +283,9 @@ function input(e) {
     let str = e.data;
     if (e.inputType !== "insertText") return;
     for (var i = 0; i < str.length; i++) {
-        queue.write_i32([3, 1, str.charAt(i)]);
+        queue.write_i32([KEY_PRESS, 1, str.charAt(i)]);
     }
-    queue.write_i32([1, e.data]);
+    queue.write_i32([KEY_DOWN, e.data]);
 }
 
 window.addEventListener('resize', onresize);
@@ -293,13 +293,13 @@ window.addEventListener('resize', onresize);
 window.addEventListener('keydown', e => {
     const key = evalKey(e);
     const mod = keyMod(e);
-    if (key !== undefined && key !== 0 && mod !== undefined) { queue.write_i32([1, mod, key]); }
+    if (key !== undefined && key !== 0 && mod !== undefined) { queue.write_i32([KEY_DOWN, mod, key]); }
 });
 
 window.addEventListener('keyup', e => {
     const key = evalKey(e);
     const mod = keyMod(e);
-    if (key !== undefined && key !== 0 && mod !== undefined) { queue.write_i32([2, mod, key]); }
+    if (key !== undefined && key !== 0 && mod !== undefined) { queue.write_i32([KEY_UP, mod, key]); }
 });
 
 window.addEventListener('mousemove', e => {
@@ -309,12 +309,12 @@ window.addEventListener('mousemove', e => {
 
 window.addEventListener('mousedown', e => {
     const mod = keyMod(e);
-    if (mod !== undefined) {queue.write_i32([5, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
+    if (mod !== undefined) {queue.write_i32([MOUSE_DOWN, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
 });
 
 window.addEventListener('mouseup', e => {
     const mod = keyMod(e);
-    if (mod !== undefined) {queue.write_i32([6, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
+    if (mod !== undefined) {queue.write_i32([MOUSE_UP, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
 });
 
 window.setInterval(wakeLogic, 50);

@@ -1,8 +1,10 @@
 use crate::communication::message_queue::OutboundMessage;
 use crate::communication::RESOURCE_TABLE;
 use crate::ClientError;
+use rask_engine::network::{packet::u32_from_le, packet::ResourceData};
 use rask_engine::resources::{registry, GetStore};
 use std::collections::HashMap;
+use std::convert::TryInto;
 
 #[derive(Debug)]
 /// Used to handle the ressoures management with main.js
@@ -31,7 +33,7 @@ impl ResourceParser {
         if let Some(data) = self.get_buffer(id) {
             const TEXTURE: u32 = registry::ResourceVariant::Texture as u32;
             const CHARACTER: u32 = registry::ResourceVariant::Character as u32;
-            match registry::u32_from_le(&data[4..8])? {
+            match u32_from_le(&data[4..8])? {
                 TEXTURE => ResourceParser::parse_texture(id, &data[12..])?,
                 CHARACTER => ResourceParser::parse_char(id, &data[12..])?,
                 _ => {
