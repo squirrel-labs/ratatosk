@@ -1,9 +1,10 @@
-use super::registry::u32_from_le;
 use super::Texture;
+use crate::network::packet::ResourceData;
 use crate::{math::Mat3, EngineError};
 use spine::atlas::Atlas;
 use spine::atlas::Texture as TextureSegment;
 use spine::skeleton::{Skeleton, SRT};
+use std::convert::TryFrom;
 use std::convert::TryInto;
 
 use std::collections::HashMap;
@@ -144,14 +145,28 @@ impl Character {
             &self.atlas,
         ))
     }
-    pub fn from_u8(data: &[u8]) -> Result<Self, EngineError> {
-        let tex_data = u32_from_le(data)? as usize;
-        let atlas_data = u32_from_le(&(data[4..8]))? as usize;
-        let animation_data = u32_from_le(&(data[8..12]))? as usize;
-        let texture = Texture::from_png_stream(&data[0..tex_data]);
-        let atlas = spine::atlas::Atlas::from_reader(&data[tex_data..atlas_data]);
-        let skeleton =
-            spine::skeleton::Skeleton::from_reader(&data[(tex_data + atlas_data)..animation_data]);
-        Character::new(texture?, skeleton?, atlas?)
+}
+impl<'a> TryFrom<ResourceData<'a>> for Character {
+    type Error = EngineError;
+    fn try_from(chr_data: ResourceData<'a>) -> Result<Self, Self::Error> {
+        if let ResourceData::CharacterVec {
+            texture_len,
+            atlas_len,
+            animation_len,
+            data,
+        } = chr_data
+        {
+            let texture = Texture::from_png_stream(&data[0..texture_len as usize]);
+            let atlas =
+                spine::atlas::Atlas::from_reader(&data[texture_len as usize..atlas_len as usize]);
+            let skeleton = spine::skeleton::Skeleton::from_reader(
+                &data[(texture_len + atlas_len) as usize..animation_len as usize],
+            );
+            Character::new(texture?, skeleton?, atlas?)
+        } else {
+            Err(EngineError::ResourceFormat(format!(
+                "The given data is not a character variant"
+            )))
+        }
     }
 }

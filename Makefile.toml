@@ -5,7 +5,7 @@ additional_profiles = [ "watch" ]
 
 # component builds
 [tasks.all]
-dependencies = [ "tools", "backend", "frontend", "lobby" ]
+dependencies = ["backend", "frontend", "lobby" ]
 workspace = false
 
 [tasks.frontend]

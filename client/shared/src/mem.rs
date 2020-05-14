@@ -5,6 +5,7 @@ use crate::message_queue::{Message, MessageQueueElement};
 use crate::sprite::Sprite;
 use crate::state::{State, UnspecificState};
 use const_env::from_env;
+use rask_engine::network::packet::GameState;
 use rask_engine::resources::Resource;
 use std::mem::size_of;
 
@@ -86,13 +87,6 @@ pub const WEE_ALLOC_STATIC_ARRAY_BACKEND_BYTES: usize = 0;
 
 pub fn get_double_buffer() -> &'static mut Buffer {
     unsafe { &mut *(DOUBLE_BUFFER as *mut Buffer) }
-}
-
-#[repr(C)]
-pub struct GameState {
-    pub player_x: f32,
-    pub player_y: f32,
-    pub player_state: i32,
 }
 
 #[repr(align(4))]

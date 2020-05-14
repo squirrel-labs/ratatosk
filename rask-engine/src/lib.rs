@@ -8,6 +8,7 @@ pub mod engine;
 pub mod error;
 pub mod events;
 pub mod math;
+pub mod network;
 pub mod resources;
 pub mod world;
 

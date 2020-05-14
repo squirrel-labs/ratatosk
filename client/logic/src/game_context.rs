@@ -1,4 +1,5 @@
 use rask_engine::events::{Event, Key};
+use rask_engine::network::packet::{u32_from_le, ResourceData};
 use rask_engine::resources::{registry, GetStore, ResourceTable, Texture, TextureIds};
 use rask_wasm_shared::error::ClientError;
 use rask_wasm_shared::get_double_buffer;
@@ -9,6 +10,7 @@ use rask_wasm_shared::{
     state::State,
 };
 use std::collections::HashMap;
+use std::convert::TryInto;
 
 pub const IMAGE1_DATA: &[u8] = include_bytes!("../../res/empty.png");
 
@@ -121,7 +123,7 @@ impl GameContext {
                 if let Some(data) = self.get_buffer(id) {
                     const TEXTURE: u32 = registry::ResourceVariant::Texture as u32;
                     const CHARACTER: u32 = registry::ResourceVariant::Character as u32;
-                    match registry::u32_from_le(&data[4..8])? {
+                    match u32_from_le(&data[4..8])? {
                         TEXTURE => {
                             log::info!("decoding texture {} len: {}", id, data[12..].len(),);
                             let img =
@@ -143,8 +145,15 @@ impl GameContext {
                             }
                         }
                         CHARACTER => {
-                            let chr = rask_engine::resources::Character::from_u8(&data[12..])?;
-                            unsafe { self.resource_table.store(Box::new(chr), id as usize) }?;
+                            let chr: Result<
+                                rask_engine::resources::Character,
+                                rask_engine::EngineError,
+                            > = ResourceData::deserialize(
+                                &data[12..],
+                                rask_engine::network::protocol::resource_types::CHARACTER,
+                            )?
+                            .try_into();
+                            unsafe { self.resource_table.store(Box::new(chr?), id as usize) }?;
                         }
                         _ => {
                             self.dealloc_buffer(id);

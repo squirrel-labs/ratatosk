@@ -10,6 +10,7 @@ pub enum EngineError {
     ResourceMissing(String),
     ResourceType(String),
     MathError(String),
+    Network(String),
     Misc(String),
     FileError(String),
 }
@@ -23,6 +24,7 @@ impl Display for EngineError {
             EngineError::ResourceMissing(e) => write!(f, "ResourceError: {}", e),
             EngineError::ResourceType(e) => write!(f, "ResourceError: {}", e),
             EngineError::Misc(e) => write!(f, "EngineError: {}", e),
+            EngineError::Network(e) => write!(f, "NetworkError: {}", e),
             EngineError::MathError(e) => write!(f, "MathError: {}", e),
             EngineError::FileError(e) => write!(f, "FileError: {}", e),
         }

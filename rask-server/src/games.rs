@@ -1,7 +1,8 @@
 use crate::error::ServerError;
 use crate::group::{Message, SendGroup};
 use rask_engine::error::EngineError;
-use rask_engine::resources::{registry, registry::Serialize};
+use rask_engine::network::packet::ReadResource;
+use rask_engine::resources::registry;
 use std::collections::HashMap;
 use std::thread;
 use std::thread::JoinHandle;
@@ -76,7 +77,7 @@ impl RaskGame {
         }
         self.res_cache.insert(
             chr.id,
-            chr.serialize(RES_PATH).ok_or_else(|| {
+            chr.read_from_file(RES_PATH).ok_or_else(|| {
                 EngineError::ResourceMissing(format!("Failed to serialize {:?}", chr))
             })?,
         );
@@ -88,7 +89,7 @@ impl RaskGame {
         }
         self.res_cache.insert(
             res.id,
-            res.serialize(RES_PATH).ok_or_else(|| {
+            res.read_from_file(RES_PATH).ok_or_else(|| {
                 EngineError::ResourceMissing(format!("Failed to serialize {:?}", res))
             })?,
         );
