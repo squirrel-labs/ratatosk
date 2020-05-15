@@ -18,7 +18,7 @@ pub enum InboundMessage {
     MouseDown(MouseEvent) = op_codes::MOUSE_DOWN, //5
     MouseUp(MouseEvent) = op_codes::MOUSE_UP,
     RequestAlloc { id: u32, size: u32 } = op_codes::REQUEST_ALLOCATION, //7
-    ResourcePush(u32) = op_codes::RESOURCE_PUSH,                        // id
+    ResourcePush(u32) = op_codes::PUSH_RESOURCE,                        // id
 }
 
 impl Default for InboundMessage {

@@ -163,9 +163,9 @@ impl<'a> TryFrom<ResourceData<'a>> for Character {
             );
             Character::new(texture?, skeleton?, atlas?)
         } else {
-            Err(EngineError::ResourceFormat(format!(
-                "The given data is not a character variant"
-            )))
+            Err(EngineError::ResourceFormat(
+                "The given data is not a character variant".into(),
+            ))
         }
     }
 }

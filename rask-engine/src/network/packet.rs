@@ -11,6 +11,7 @@ pub trait ReadResource {
 }
 
 #[repr(C)]
+#[derive(Clone, Debug)]
 pub struct WebsocketPacket<'a> {
     pub op_code: Opcode,
     pub payload: PacketVariant<'a>,
@@ -37,11 +38,13 @@ impl GameState {
 }
 
 #[repr(C)]
+#[derive(Clone, Debug)]
 pub enum PacketVariant<'a> {
     PushResource(NetworkResource<'a>),
     PushGameState(GameState),
 }
 #[repr(C)]
+#[derive(Clone, Debug)]
 pub struct NetworkResource<'a> {
     pub res_type: u32,
     pub res_id: u32,
@@ -49,6 +52,7 @@ pub struct NetworkResource<'a> {
 }
 
 #[repr(C)]
+#[derive(Clone, Debug)]
 pub enum ResourceData<'a> {
     ResourceVec(&'a [u8]),
     CharacterVec {
@@ -181,9 +185,9 @@ pub fn add_u32_to_vec(buf: &mut Vec<u8>, n: u32) {
 
 pub fn u32_from_le(barry: &[u8]) -> Result<u32, EngineError> {
     use std::convert::TryInto;
-    let arr: [u8; 4] = barry
+    let arr: [u8; 4] = barry[..4]
         .try_into()
-        .map_err(|_| EngineError::ResourceFormat("invalid index in character binary".into()))?;
+        .map_err(|_| EngineError::ResourceFormat("failed to parse u32 form le bytes".into()))?;
     Ok(u32::from_le_bytes(arr))
 }
 

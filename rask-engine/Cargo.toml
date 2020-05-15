@@ -17,3 +17,6 @@ git = "https://github.com/reeFridge/spine-rs"
 
 [dev-dependencies]
 lazy_static = "1.4.0"
+
+[dependencies]
+log = "0.4"

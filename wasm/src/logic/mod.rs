@@ -42,7 +42,7 @@ impl LogicContext {
                 break;
             }
             log::info!("{:?}", msg);
-            self.handle_message(msg)?;
+            self.handle_message(msg).unwrap();
         }
 
         self.push_state();
