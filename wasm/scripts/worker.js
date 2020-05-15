@@ -33,9 +33,16 @@ const imports = {
     post_to_main: function(msg, len) {
         this.postMessage(arr_from_mem(msg, len));
     },
-};
-
-const gl_imports = {
+    get_canvas_size: function() {
+        return (canvas.width << 16) | canvas.height;
+    },
+    set_canvas_size: function(w, h) {
+        canvas.width = w;
+        canvas.height = h;
+    },
+    gl_get_error: function() {
+        return gl.getError();
+    },
 };
 
 // handle the initialisation
@@ -43,14 +50,12 @@ onmessage = async function({ data }) {
     // set global memory for function imports
     mem = data.memory;
     const is_logic = typeof data.canvas === 'undefined';
-    let imp = {env: imports};
-    if (!is_logic) {
-        imp.env = {...inp.env, ...gl_imports};
-    }
-    imp.env.memory = mem;
     u8mem = new Uint8Array(mem.buffer);
     u32mem = new Uint32Array(mem.buffer);
-    wasm = await WebAssembly.instantiate(data.compiled, imp);
+    wasm = await WebAssembly.instantiate(data.compiled, {env: {
+        ...imports,
+        memory: mem
+    }});
     if (is_logic) {
         wasm.exports.__sp.value -= 1024 * 64;
         wasm.exports.__wasm_init_memory();
@@ -73,7 +78,7 @@ onmessage = async function({ data }) {
             desynchronized: false,
         });
         if (gl instanceof WebGL2RenderingContext) {
-            this.setInterval(wasm.exports.draw_frame(), 100);
+            this.setInterval(wasm.exports.draw_frame, 100);
         } else {
             console.error('failed to create a webgl2 context');
         }

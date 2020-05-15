@@ -46,17 +46,11 @@ pub extern "C" fn init(heap_base: i32) {
         mem::MemoryAdresses::init(heap_base as u32);
         wee_alloc::init_ptr(*mem::HEAP_BASE as *mut u8, mem::HEAP_SIZE as usize);
     }
-    // create a new graphics context, this persists local data across `draw_frame` invocations
-    context::set_context(
-        context::Context::new()
-            .map_err(|e| panic!("{}", e))
-            .unwrap(),
-    );
-    log::set_logger(&LOGGER).unwrap();
-    // change the loglevel to only show certain errors
-    log::set_max_level(log::LevelFilter::Trace);
     // set custom panic handler
+    log::set_logger(&LOGGER).unwrap();
     init_panic_handler();
+    // change the loglevel to only show certain errors
+    log::set_max_level(log::LevelFilter::Info);
     // send memery offsetst to the main thread -> initialize graphics
     Message::Memory(
         *mem::SYNCHRONIZATION_MEMORY as u32,
@@ -100,7 +94,13 @@ pub extern "C" fn run_logic() {
 /// Most of the communication with the graphics api is done thorough calling js functions
 #[export_name = "draw_frame"]
 pub extern "C" fn draw_frame() {
-    context::context_mut()
-        .render()
-        .unwrap_or_else(|e| log::error!("{}", e));
+    match context::context_mut() {
+        // create a new graphics context if there is none, this persists local data across `draw_frame` invocations
+        None => context::set_context(
+            context::Context::new()
+                .map_err(|e| panic!("{}", e))
+                .unwrap(),
+        ),
+        Some(ctx) => ctx.render().unwrap_or_else(|e| log::error!("{}", e)),
+    }
 }
