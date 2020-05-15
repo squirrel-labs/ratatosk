@@ -12,8 +12,8 @@ pub trait ReadResource {
 
 #[repr(C)]
 pub struct WebsocketPacket<'a> {
-    op_code: Opcode,
-    payload: PacketVariant<'a>,
+    pub op_code: Opcode,
+    pub payload: PacketVariant<'a>,
 }
 
 #[repr(C)]
@@ -43,9 +43,9 @@ pub enum PacketVariant<'a> {
 }
 #[repr(C)]
 pub struct NetworkResource<'a> {
-    res_type: u32,
-    res_id: u32,
-    data: ResourceData<'a>,
+    pub res_type: u32,
+    pub res_id: u32,
+    pub data: ResourceData<'a>,
 }
 
 #[repr(C)]

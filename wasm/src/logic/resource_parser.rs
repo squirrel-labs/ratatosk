@@ -1,8 +1,12 @@
 use crate::communication::message_queue::OutboundMessage;
 use crate::communication::RESOURCE_TABLE;
 use crate::ClientError;
-use rask_engine::network::{packet::u32_from_le, packet::ResourceData};
-use rask_engine::resources::{registry, GetStore};
+use rask_engine::network::{
+    packet::{self, ResourceData},
+    protocol::{self, resource_types},
+};
+use rask_engine::resources::{Character, GetStore, Texture};
+use rask_engine::EngineError;
 use std::collections::HashMap;
 use std::convert::TryInto;
 
@@ -31,17 +35,20 @@ impl ResourceParser {
     /// Assumes a resource has been written to the buffer `id` and prases its content
     pub fn parse(&mut self, id: u32) -> Result<(), ClientError> {
         if let Some(data) = self.get_buffer(id) {
-            const TEXTURE: u32 = registry::ResourceVariant::Texture as u32;
-            const CHARACTER: u32 = registry::ResourceVariant::Character as u32;
-            match u32_from_le(&data[4..8])? {
-                TEXTURE => ResourceParser::parse_texture(id, &data[12..])?,
-                CHARACTER => ResourceParser::parse_char(id, &data[12..])?,
-                _ => {
-                    self.dealloc_buffer(id);
-                    return Err(ClientError::ResourceError(
-                        "unknown ResourceType while parsing".into(),
-                    ));
+            let msg = packet::WebsocketPacket::deserialize(&data)?;
+            assert_eq!(msg.op_code, protocol::op_codes::RESOURCE_PUSH);
+            if let packet::PacketVariant::PushResource(data) = msg.payload {
+                match data.res_type {
+                    resource_types::TEXTURE => ResourceParser::parse_texture(data)?,
+                    resource_types::CHARACTER => ResourceParser::parse_char(data)?,
+                    _ => {
+                        self.dealloc_buffer(id);
+                        return Err(ClientError::ResourceError(
+                            "unknown ResourceType while parsing".into(),
+                        ));
+                    }
                 }
+            } else {
             }
             self.dealloc_buffer(id);
             Ok(())
@@ -51,21 +58,25 @@ impl ResourceParser {
             ))
         }
     }
-    fn parse_texture(id: u32, data: &[u8]) -> Result<(), ClientError> {
-        log::info!("decoding texture {} len: {}", id, data.len(),);
-        let img = rask_engine::resources::Texture::from_png_stream(data)?;
-        RESOURCE_TABLE.write().store(img, id as usize)?;
-        Ok(())
+    fn parse_texture(res: packet::NetworkResource) -> Result<(), ClientError> {
+        match res.data {
+            ResourceData::ResourceVec(image) => {
+                log::info!("decoding texture {} len: {}", res.res_id, image.len());
+                let img = Texture::from_png_stream(image)?;
+                RESOURCE_TABLE.write().store(img, res.res_id as usize)?;
+                Ok(())
+            }
+            _ => {
+                Err(EngineError::ResourceType("buffer does not contain texture data".into()).into())
+            }
+        }
     }
-    fn parse_char(id: u32, data: &[u8]) -> Result<(), ClientError> {
-        log::info!("decoding char {} len: {}", id, data.len(),);
-        let chr: Result<rask_engine::resources::Character, rask_engine::EngineError> =
-            ResourceData::deserialize(
-                &data[12..],
-                rask_engine::network::protocol::resource_types::CHARACTER,
-            )?
-            .try_into();
-        RESOURCE_TABLE.write().store(Box::new(chr?), id as usize)?;
+    fn parse_char(res: packet::NetworkResource) -> Result<(), ClientError> {
+        log::info!("decoding char {}", res.res_id);
+        let chr: Character = res.data.try_into()?;
+        RESOURCE_TABLE
+            .write()
+            .store(Box::new(chr), res.res_id as usize)?;
         Ok(())
     }
     fn alloc_buffer(&mut self, id: u32, length: u32) -> *const u8 {
