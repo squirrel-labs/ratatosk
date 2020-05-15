@@ -39,7 +39,7 @@ pub const DOUBLE_BUFFER_SPRITE_COUNT: u32 = 128;
 pub const MESSAGE_QUEUE_ELEMENT_COUNT: u32 = (MESSAGE_QUEUE_SIZE / size_of::<Message>()) as u32;
 /// The size of the wasm heap. This hast to fit into the imported memory to avoit out ouf bound
 /// memory access
-pub const HEAP_SIZE: u32 = 1024 * 64 * 16;
+pub const HEAP_SIZE: u32 = 1024 * 1024 * 20;
 
 #[cfg(target_arch = "wasm32")]
 lazy_static! {

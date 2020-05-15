@@ -36,7 +36,7 @@ impl ResourceParser {
     pub fn parse(&mut self, id: u32) -> Result<(), ClientError> {
         if let Some(data) = self.get_buffer(id) {
             let msg = packet::WebsocketPacket::deserialize(&data)?;
-            log::trace!("parsig: {:?}", msg);
+            log::trace!("parsing: optcode: {}", msg.op_code);
             assert_eq!(msg.op_code, protocol::op_codes::PUSH_RESOURCE);
             if let packet::PacketVariant::PushResource(data) = msg.payload {
                 match data.res_type {
