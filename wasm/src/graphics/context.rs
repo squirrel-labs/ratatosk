@@ -22,6 +22,6 @@ pub fn set_context(context: Context) {
     unsafe { CONTEXT = Some(context) }
 }
 
-pub fn context_mut() -> &'static mut Context {
-    unsafe { CONTEXT.as_mut().unwrap() }
+pub fn context_mut() -> Option<&'static mut Context> {
+    unsafe { CONTEXT.as_mut() }
 }

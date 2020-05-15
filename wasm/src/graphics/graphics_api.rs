@@ -15,17 +15,15 @@ pub trait GraphicsApi: Sized {
     /// Apply drawings on the context
     fn end_frame(&self) -> Result<(), ClientError>;
 
-    /// Draw a rectangle with given transformation and texture
+    /// Try to draw a rectangle with given transformation and texture.
+    /// If the given texture isn't found return `Ok(None)`.
     fn draw_rect(&self, mat: &Mat3, tex: u32) -> Result<Option<()>, ClientError>;
 
     /// Upload a texture to the graphics context
-    fn upload_texture(&mut self, texture: &Texture, n: u32) -> Result<(), ClientError>;
+    fn upload_texture(&mut self, texture: &Texture, id: u32) -> Result<(), ClientError>;
 
     /// Remove a texture from the graphics context
     fn unload_texture(&mut self, id: u32) -> Result<(), ClientError>;
-
-    /// Grow texture pool to given size
-    fn resize_texture_pool(&mut self, n: u32) -> Result<(), ClientError>;
 
     /// Force a canvas resizing to a given resolution
     fn set_size(&mut self, w: u32, h: u32);

@@ -34,29 +34,31 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn upload_texture(&mut self, id: u32) -> Result<(), ClientError> {
-        let guard = RESOURCE_TABLE.read();
-        let texture = guard.get(id as usize)?;
-        self.graphics.resize_texture_pool(id + 1)?;
-        self.graphics.upload_texture(texture, id)?;
         if !self.used_texture_ids.contains(&id) {
+            let guard = RESOURCE_TABLE.read();
+            let texture = guard.get(id as usize)?;
+            self.graphics.upload_texture(texture, id)?;
             self.used_texture_ids.push(id)
         }
         Ok(())
     }
 
     pub fn unload_texture(&mut self, id: u32) -> Result<(), ClientError> {
-        let guard = RESOURCE_TABLE.read();
-        let texture = guard.get(id as usize)?;
-        self.graphics.resize_texture_pool(id + 1)?;
-        self.graphics.upload_texture(texture, id)?;
-        Ok(())
+        if let Some(index) = self.used_texture_ids.iter().position(|&x| x == id) {
+            self.graphics.unload_texture(id)?;
+            self.used_texture_ids.swap_remove(index);
+            Ok(())
+        } else {
+            Err(ClientError::ResourceError(
+                "Tried to remove non-existent texture".to_string(),
+            ))
+        }
     }
 
     pub fn reset_textures(&mut self, used_textures: &TextureIds) -> Result<(), ClientError> {
         for texture in self.used_texture_ids.clone().iter() {
             if !used_textures.ids.contains(texture) {
                 self.unload_texture(*texture)?;
-                self.used_texture_ids.swap_remove(*texture as usize);
             }
         }
         unsafe { *(used_textures.reset_notify as *mut u8) = 0 };
@@ -79,7 +81,7 @@ impl<T: GraphicsApi> Render<T> {
                 self.upload_texture(sprite.tex_id)?;
                 self.graphics
                     .draw_rect(&sprite.transform, sprite.tex_id)?
-                    .unwrap();
+                    .expect("uploaded texture does unexpectedly not exist");
             }
         }
         Ok(true)
