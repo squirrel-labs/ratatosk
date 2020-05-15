@@ -16,6 +16,7 @@ pub enum Message {
     MouseDown(MouseEvent) = op_codes::MOUSE_DOWN, //5
     MouseUp(MouseEvent) = op_codes::MOUSE_UP,
     RequestAlloc { id: u32, size: u32 } = op_codes::REQUEST_ALLOCATION, //7
+    DoneWritingResource(u32) = op_codes::DONE_WRITING_RESOURE,          // id
     ResourcePush(u32) = op_codes::PUSH_RESOURCE,                        // id
     AllocatedBuffer { id: u32, ptr: u32 } = op_codes::ALLOCATED_BUFFER, // The event ids from 0 to 128 are reserved for server to client communication
     Memory(u32, u32, u32) = op_codes::MEMORY_OFFSETS,

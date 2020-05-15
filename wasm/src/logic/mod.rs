@@ -61,7 +61,7 @@ impl LogicContext {
                 self.res_parser.alloc(id, size);
                 Ok(None)
             }
-            Message::ResourcePush(id) => self.res_parser.parse(id).map(|_| None),
+            Message::DoneWritingResource(id) => self.res_parser.parse(id).map(|_| None),
             _ => Err(ClientError::EngineError("Unknown Message Type".into())),
         }
     }

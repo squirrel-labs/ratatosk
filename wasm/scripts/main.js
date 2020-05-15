@@ -157,7 +157,7 @@ function LogicMessage(e) {
                 memoryViewU8[ptr++] = i;
             }
             resource_map.delete(id);
-            queue.write_i32([8, id]);
+            queue.write_i32([DONE_WRITING_RESOURE, id]);
         } else {
             console.error("Requested resource not in resource_map, id: " + id)
         }
@@ -185,7 +185,7 @@ function upload_resource(data) {
     let u32 = new Uint32Array(data, 0, 4);
     resource_map.set(u32[2], data)
     console.log("sending request to allocate " + data.byteLength + " bytes");
-    queue.write_i32([7, u32[2], data.byteLength]);
+    queue.write_i32([REQUEST_ALLOCATION, u32[2], data.byteLength]);
 }
 
 let canvas = createCanvas();
