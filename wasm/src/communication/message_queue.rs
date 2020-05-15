@@ -4,20 +4,21 @@
 
 use crate::mem::atomic_read_u8;
 use rask_engine::events::{Event, KeyModifier, MouseEvent};
+use rask_engine::network::protocol::op_codes;
 
 #[repr(C, u32)]
 #[derive(Debug, Clone)]
 #[non_exhaustive]
 /// Messeges sent by the main.js
 pub enum InboundMessage {
-    None,
-    KeyDown(KeyModifier, u32) = 1, // 1
-    KeyUp(KeyModifier, u32) = 2,
-    KeyPress(u32, u16) = 3,
-    MouseDown(MouseEvent) = 5, //5
-    MouseUp(MouseEvent) = 6,
-    RequestAlloc { id: u32, size: u32 } = 7, //7
-    ResourcePush(u32) = 8,                   // id
+    None = op_codes::NONE,
+    KeyDown(KeyModifier, u32) = op_codes::KEY_DOWN, // 1
+    KeyUp(KeyModifier, u32) = op_codes::KEY_UP,
+    KeyPress(u32, u16) = op_codes::KEY_PRESS,
+    MouseDown(MouseEvent) = op_codes::MOUSE_DOWN, //5
+    MouseUp(MouseEvent) = op_codes::MOUSE_UP,
+    RequestAlloc { id: u32, size: u32 } = op_codes::REQUEST_ALLOCATION, //7
+    ResourcePush(u32) = op_codes::RESOURCE_PUSH,                        // id
 }
 
 impl Default for InboundMessage {
@@ -35,10 +36,10 @@ extern "C" {
 #[non_exhaustive]
 /// Messages to send to the main.js
 pub enum OutboundMessage {
-    RescourceAlloc { id: u32, ptr: u32 } = 0, // The event ids from 0 to 128 are reserved for server to client communication
-    Memory(u32, u32, u32) = 1,
-    Textmode(bool) = 2,
-    EngineEvent(Event) = 129, // Mark the Message as outbound
+    RescourceAlloc { id: u32, ptr: u32 } = op_codes::ALLOCATED_BUFFER, // The event ids from 0 to 128 are reserved for server to client communication
+    Memory(u32, u32, u32) = op_codes::MEMORY_OFFSETS,
+    Textmode(bool) = op_codes::SET_TEXTMODE,
+    EngineEvent(Event) = op_codes::PUSH_ENGINE_EVENT, // Mark the Message as outbound
 }
 impl OutboundMessage {
     pub fn to_slice(&self) -> &[u32] {

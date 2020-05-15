@@ -243,15 +243,15 @@ function setup_ws() {
     });
     ws.addEventListener('message', e => {
         let data = new Uint32Array(e.data, 0, 1);
-        let optcode = data[0];
-        if (optcode === PUSH_RESOURCE) {
+        let opcode = data[0];
+        if (opcode === PUSH_RESOURCE) {
             upload_resource(e.data);
-        } else if (optcode === PUSH_GAMESTATE) {
+        } else if (opcode === PUSH_GAMESTATE) {
             Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 2, data[3]);
         } else {
-            console.error("unknown optcode: " + optcode);
+            console.error("unknown opcode: " + opcode);
         }
     });
 }

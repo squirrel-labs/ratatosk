@@ -27,7 +27,7 @@ mkdir -p $gen
 wasm-dis $file -o $gen/client.wat
 sed -i '/\s*(export "__heap_base" (global $global$[0-9]*))/i  (export "__sp" (global $global$0))' $gen/client.wat
 grep "__sp" $gen/client.wat > /dev/null
-sed "/pub/{ s/pub//; s/:\s*u32//}" $top/rask-engine/src/network/protocol/opt_codes.rs > $gen/main.js
+sed "/pub/{ s/pub//; s/:\s*u32//}" $top/rask-engine/src/network/protocol/op_codes.rs > $gen/main.js
 cat $top/wasm/scripts/main.js >> $gen/main.js
 wasm-as --enable-threads --enable-bulk-memory --enable-mutable-globals $gen/client.wat -o $gen/client.wasm -g -pa O@s
 '''

@@ -1,4 +1,4 @@
-use super::protocol::{opt_codes, resource_types, Optcode};
+use super::protocol::{op_codes, resource_types, Opcode};
 use crate::error::EngineError;
 use crate::resources::registry::{CharacterInfo, ResourceInfo, ResourceVariant};
 use std::io::Read;
@@ -12,7 +12,7 @@ pub trait ReadResource {
 
 #[repr(C)]
 pub struct WebsocketPacket<'a> {
-    opt_code: Optcode,
+    op_code: Opcode,
     payload: PacketVariant<'a>,
 }
 
@@ -96,16 +96,16 @@ impl<'a> ResourceData<'a> {
 }
 impl<'a> Serialize for WebsocketPacket<'a> {
     fn serialize(&self, buf: &mut Vec<u8>) {
-        add_u32_to_vec(buf, self.opt_code);
+        add_u32_to_vec(buf, self.op_code);
         self.payload.serialize(buf);
     }
 }
 impl<'a> WebsocketPacket<'a> {
     pub fn deserialize(buf: &'a [u8]) -> Result<Self, EngineError> {
-        let opt_code = u32_from_le(buf)?;
+        let op_code = u32_from_le(buf)?;
         Ok(Self {
-            opt_code,
-            payload: PacketVariant::deserialize(&buf[4..], opt_code)?,
+            op_code,
+            payload: PacketVariant::deserialize(&buf[4..], op_code)?,
         })
     }
 }
@@ -138,10 +138,10 @@ impl<'a> Serialize for PacketVariant<'a> {
 impl<'a> PacketVariant<'a> {
     fn deserialize(buf: &'a [u8], packet_variant: u32) -> Result<Self, EngineError> {
         match packet_variant {
-            opt_codes::PUSH_RESOURCE => {
+            op_codes::PUSH_RESOURCE => {
                 NetworkResource::deserialize(buf).map(PacketVariant::PushResource)
             }
-            opt_codes::PUSH_GAMESTATE => {
+            op_codes::PUSH_GAMESTATE => {
                 GameState::deserialize(buf).map(PacketVariant::PushGameState)
             }
             _ => Err(EngineError::Network(format!(
@@ -197,19 +197,19 @@ impl ReadResource for ResourceInfo {
     fn read_from_file(&self, res_path: &str) -> Option<Vec<u8>> {
         let mut buf = Vec::new();
         let mut res = Vec::new();
-        read_to_vec(format!("{}/{}", res_path, self.path).as_str(), &mut buf).ok()?;
-        buf.push(0x0a);
+        read_to_vec(format!("{}/{}", res_path, self.path).as_str(), &mut res).ok()?;
+        res.push(0x0a);
         WebsocketPacket {
-            opt_code: opt_codes::PUSH_RESOURCE,
+            op_code: op_codes::PUSH_RESOURCE,
             payload: {
                 PacketVariant::PushResource(NetworkResource {
                     res_type: self.variant as u32,
                     res_id: self.id,
-                    data: ResourceData::ResourceVec(&buf),
+                    data: ResourceData::ResourceVec(&res),
                 })
             },
         }
-        .serialize(&mut res);
+        .serialize(&mut buf);
         Some(buf)
     }
 }
@@ -217,20 +217,20 @@ impl ReadResource for CharacterInfo {
     fn read_from_file(&self, res_path: &str) -> Option<Vec<u8>> {
         let mut buf = Vec::new();
         let mut res = Vec::new();
-        read_to_vec(format!("{}/{}", res_path, self.texture).as_str(), &mut buf).ok()?;
+        read_to_vec(format!("{}/{}", res_path, self.texture).as_str(), &mut res).ok()?;
         let texture_len = buf.len() as u32;
-        read_to_vec(format!("{}/{}", res_path, self.atlas).as_str(), &mut buf).ok()?;
+        read_to_vec(format!("{}/{}", res_path, self.atlas).as_str(), &mut res).ok()?;
         let atlas_len = buf.len() as u32 - texture_len;
         read_to_vec(
             format!("{}/{}", res_path, self.animation).as_str(),
-            &mut buf,
+            &mut res,
         )
         .ok()?;
         buf.push(0x0a);
         let skeleton_len = buf.len() as u32 - (atlas_len + texture_len);
 
         WebsocketPacket {
-            opt_code: opt_codes::PUSH_RESOURCE,
+            op_code: op_codes::PUSH_RESOURCE,
             payload: {
                 PacketVariant::PushResource(NetworkResource {
                     res_type: ResourceVariant::Character as u32,
@@ -239,12 +239,12 @@ impl ReadResource for CharacterInfo {
                         texture_len,
                         atlas_len,
                         animation_len: skeleton_len,
-                        data: &buf,
+                        data: &res,
                     },
                 })
             },
         }
-        .serialize(&mut res);
+        .serialize(&mut buf);
         Some(buf)
     }
 }
