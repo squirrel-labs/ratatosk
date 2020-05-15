@@ -69,6 +69,7 @@ impl ResourceParser {
         Ok(())
     }
     fn alloc_buffer(&mut self, id: u32, length: u32) -> *const u8 {
+        log::trace!("Allocating buffer {} with length of {} bytes", id, length);
         let layout = unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 4) };
         let ptr = unsafe { std::alloc::alloc(layout) };
         self.buffer_table.insert(id, (ptr, length));

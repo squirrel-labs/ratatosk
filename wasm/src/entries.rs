@@ -54,7 +54,7 @@ pub extern "C" fn init(heap_base: i32) {
     );
     log::set_logger(&LOGGER).unwrap();
     // change the loglevel to only show certain errors
-    log::set_max_level(log::LevelFilter::Info);
+    log::set_max_level(log::LevelFilter::Trace);
     // set custom panic handler
     init_panic_handler();
     // send memery offsetst to the main thread -> initialize graphics
