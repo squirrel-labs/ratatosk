@@ -171,7 +171,7 @@ function LogicMessage(e) {
         SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
         spawnModule(wasm_module);
         queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_QUEUE_LENGTH);
-    } else if (optcode === 2) {
+    } else if (optcode === SET_TEXTMODE) {
         if (x[1] === 0) {
             window.addEventListener('input', input);
         } else {
@@ -244,9 +244,9 @@ function setup_ws() {
     ws.addEventListener('message', e => {
         let data = new Uint32Array(e.data, 0, 1);
         let optcode = data[0];
-        if (optcode === 10) {
+        if (optcode === PUSH_RESOURCE) {
             upload_resource(e.data);
-        } else if (optcode === 11) {
+        } else if (optcode === PUSH_GAMESTATE) {
             Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 2, data[3]);
