@@ -1,4 +1,4 @@
-use super::protocol::{resource_types, websocket_opt, WsOptcode};
+use super::protocol::{opt_codes, resource_types, Optcode};
 use crate::error::EngineError;
 use crate::resources::registry::{CharacterInfo, ResourceInfo, ResourceVariant};
 use std::io::Read;
@@ -12,12 +12,12 @@ pub trait ReadResource {
 
 #[repr(C)]
 pub struct WebsocketPacket<'a> {
-    opt_code: WsOptcode,
+    opt_code: Optcode,
     payload: PacketVariant<'a>,
 }
 
 #[repr(C)]
-#[derive(Clone, Debug, Copy)]
+#[derive(Clone, Debug, Copy, Default)]
 /// The GameState contains data to be sent over the network and is read by main.js
 pub struct GameState {
     pub player_x: f32,
@@ -138,10 +138,10 @@ impl<'a> Serialize for PacketVariant<'a> {
 impl<'a> PacketVariant<'a> {
     fn deserialize(buf: &'a [u8], packet_variant: u32) -> Result<Self, EngineError> {
         match packet_variant {
-            websocket_opt::PUSH_RESOURCE => {
+            opt_codes::PUSH_RESOURCE => {
                 NetworkResource::deserialize(buf).map(PacketVariant::PushResource)
             }
-            websocket_opt::PUSH_GAMESTATE => {
+            opt_codes::PUSH_GAMESTATE => {
                 GameState::deserialize(buf).map(PacketVariant::PushGameState)
             }
             _ => Err(EngineError::Network(format!(
@@ -200,7 +200,7 @@ impl ReadResource for ResourceInfo {
         read_to_vec(format!("{}/{}", res_path, self.path).as_str(), &mut buf).ok()?;
         buf.push(0x0a);
         WebsocketPacket {
-            opt_code: websocket_opt::PUSH_RESOURCE,
+            opt_code: opt_codes::PUSH_RESOURCE,
             payload: {
                 PacketVariant::PushResource(NetworkResource {
                     res_type: self.variant as u32,
@@ -230,7 +230,7 @@ impl ReadResource for CharacterInfo {
         let skeleton_len = buf.len() as u32 - (atlas_len + texture_len);
 
         WebsocketPacket {
-            opt_code: websocket_opt::PUSH_RESOURCE,
+            opt_code: opt_codes::PUSH_RESOURCE,
             payload: {
                 PacketVariant::PushResource(NetworkResource {
                     res_type: ResourceVariant::Character as u32,

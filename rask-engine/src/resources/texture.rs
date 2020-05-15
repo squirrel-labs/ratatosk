@@ -20,6 +20,7 @@ pub struct TextureIds {
     pub ids: Vec<u32>,
 }
 
+#[cfg(feature = "nightly")]
 impl TextureIds {
     pub const fn empty() -> Self {
         Self {
