@@ -5,7 +5,7 @@ mod resource_parser;
 #[cfg(target_arch = "wasm32")]
 use crate::mem;
 use crate::{
-    communication::{state::State, InboundMessage, MessageQueue, DOUBLE_BUFFER},
+    communication::{state::State, Message, MessageQueue, DOUBLE_BUFFER},
     error::ClientError,
 };
 use rask_engine::events::{Event, Key};
@@ -15,13 +15,13 @@ use resource_parser::ResourceParser;
 pub struct LogicContext {
     state: State,
     tick_nr: u64,
-    message_queue: MessageQueue<'static, InboundMessage>,
+    message_queue: MessageQueue<'static>,
     res_parser: ResourceParser,
 }
 
 /// The logic context stores everything necessary for event handling and the game engine
 impl LogicContext {
-    pub fn new(message_queue: MessageQueue<'static, InboundMessage>) -> Result<Self, ClientError> {
+    pub fn new(message_queue: MessageQueue<'static>) -> Result<Self, ClientError> {
         Ok(Self {
             state: State::default(),
             tick_nr: 0,
@@ -38,11 +38,11 @@ impl LogicContext {
     pub fn tick(&mut self) -> Result<(), ClientError> {
         loop {
             let msg = self.message_queue.pop();
-            if let InboundMessage::None = msg {
+            if let Message::None = msg {
                 break;
             }
             log::info!("{:?}", msg);
-            self.handle_message(msg).unwrap();
+            self.handle_message(msg)?;
         }
 
         self.push_state();
@@ -50,22 +50,18 @@ impl LogicContext {
         Ok(())
     }
 
-    fn handle_message(&mut self, message: InboundMessage) -> Result<Option<Event>, ClientError> {
+    fn handle_message(&mut self, message: Message) -> Result<Option<Event>, ClientError> {
         match message {
-            InboundMessage::KeyDown(modifier, hash) => {
-                Ok(Some(Event::KeyDown(modifier, Key::from(hash))))
-            }
-            InboundMessage::KeyUp(modifier, hash) => {
-                Ok(Some(Event::KeyUp(modifier, Key::from(hash))))
-            }
-            InboundMessage::MouseDown(event) => Ok(Some(Event::MouseDown(event))),
-            InboundMessage::MouseUp(event) => Ok(Some(Event::MouseUp(event))),
-            InboundMessage::KeyPress(t, code) => Ok(Some(Event::KeyPress(t as u16, code))),
-            InboundMessage::RequestAlloc { id, size } => {
+            Message::KeyDown(modifier, hash) => Ok(Some(Event::KeyDown(modifier, Key::from(hash)))),
+            Message::KeyUp(modifier, hash) => Ok(Some(Event::KeyUp(modifier, Key::from(hash)))),
+            Message::MouseDown(event) => Ok(Some(Event::MouseDown(event))),
+            Message::MouseUp(event) => Ok(Some(Event::MouseUp(event))),
+            Message::KeyPress(t, code) => Ok(Some(Event::KeyPress(t as u16, code))),
+            Message::RequestAlloc { id, size } => {
                 self.res_parser.alloc(id, size);
                 Ok(None)
             }
-            InboundMessage::ResourcePush(id) => self.res_parser.parse(id).map(|_| None),
+            Message::ResourcePush(id) => self.res_parser.parse(id).map(|_| None),
             _ => Err(ClientError::EngineError("Unknown Message Type".into())),
         }
     }

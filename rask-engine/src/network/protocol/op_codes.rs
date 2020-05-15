@@ -11,8 +11,8 @@ pub const REQUEST_ALLOCATION: u32 = 7;
 pub const ALLOCATED_BUFFER: u32 = 9;
 pub const MEMORY_OFFSETS: u32 = 10;
 pub const SET_TEXTMODE: u32 = 11;
-pub const PUSH_RESOURCE: u32 = 11;
-pub const PUSH_GAMESTATE: u32 = 12;
-pub const PUSH_ENGINE_EVENT: u32 = 13;
-pub const PUSH_SERVER_EVENT: u32 = 14;
+pub const PUSH_RESOURCE: u32 = 12;
+pub const PUSH_GAMESTATE: u32 = 13;
+pub const PUSH_ENGINE_EVENT: u32 = 14;
+pub const PUSH_SERVER_EVENT: u32 = 15;
 // The following lines are inserted from `wasm/scripts/main.js`

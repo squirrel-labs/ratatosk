@@ -1401,6 +1401,7 @@ version = "0.2.0"
 dependencies = [
  "image",
  "lazy_static",
+ "log 0.4.8",
  "spine_tiny",
 ]
 

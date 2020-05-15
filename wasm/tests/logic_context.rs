@@ -1,8 +1,8 @@
-use rask_wasm::communication::{message_queue::MessageQueueElement, InboundMessage, MessageQueue};
+use rask_wasm::communication::{message_queue::MessageQueueElement, Message, MessageQueue};
 use rask_wasm::graphics::context;
 use rask_wasm::logic::LogicContext;
 
-static mut MESSAGES: &mut [MessageQueueElement<InboundMessage>] = &mut [MessageQueueElement::new()];
+static mut MESSAGES: &mut [MessageQueueElement] = &mut [MessageQueueElement::new()];
 
 #[test]
 fn create() {

@@ -9,12 +9,12 @@
 //! When executing `init()` a message is sent to the main thread, signaling the initiaisation has
 //! finished. This signal is used to start the graphics worker.
 
-use crate::communication::{message_queue::MessageQueueElement, InboundMessage, MessageQueue};
+use crate::communication::{message_queue::MessageQueueElement, MessageQueue};
 use crate::graphics::context;
 use crate::logic::LogicContext;
 #[cfg(target_arch = "wasm32")]
 use crate::{
-    communication::{OutboundMessage, SynchronizationMemory},
+    communication::{Message, SynchronizationMemory},
     mem,
     wasm_log::{init_panic_handler, WasmLog},
 };
@@ -58,7 +58,7 @@ pub extern "C" fn init(heap_base: i32) {
     // set custom panic handler
     init_panic_handler();
     // send memery offsetst to the main thread -> initialize graphics
-    OutboundMessage::Memory(
+    Message::Memory(
         *mem::SYNCHRONIZATION_MEMORY as u32,
         *mem::MESSAGE_QUEUE as u32,
         mem::MESSAGE_QUEUE_ELEMENT_COUNT,
@@ -67,7 +67,7 @@ pub extern "C" fn init(heap_base: i32) {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-static mut MESSAGES: &mut [MessageQueueElement<InboundMessage>] = &mut [MessageQueueElement::new()];
+static mut MESSAGES: &mut [MessageQueueElement] = &mut [MessageQueueElement::new()];
 
 /// Initialize the gamestate, communicate with
 /// the graphics worker and set up networking.
@@ -77,7 +77,7 @@ pub extern "C" fn run_logic() {
     #[cfg(target_arch = "wasm32")]
     let message_queue = unsafe {
         MessageQueue::from_memory(
-            *mem::MESSAGE_QUEUE as *mut MessageQueueElement<InboundMessage>,
+            *mem::MESSAGE_QUEUE as *mut MessageQueueElement,
             mem::MESSAGE_QUEUE_ELEMENT_COUNT as usize,
         )
     };
