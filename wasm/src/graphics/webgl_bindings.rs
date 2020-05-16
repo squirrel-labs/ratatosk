@@ -1,3 +1,5 @@
+use crate::ClientError;
+
 pub struct Gl2;
 
 impl Gl2 {
@@ -12,8 +14,24 @@ impl Gl2 {
     pub fn get_error(&self) -> u32 {
         unsafe { gl_get_error() }
     }
+
+    pub fn create_vao_with_buffer_data(&self, data: &[f32]) -> Result<(), ClientError> {
+        match unsafe { gl_create_vertex_array_and_buffer_with_data(data.as_ptr(), data.len()) } {
+            0 => Ok(()),
+            1 => Err(ClientError::WebGlError(
+                "glCreateVertexArray returned an unexpected object".to_string(),
+            )),
+            2 => Err(ClientError::WebGlError(
+                "glCreateBuffer returned an unexpected object".to_string(),
+            )),
+            _ => unreachable!("unexpected return value from js function"),
+        }
+    }
 }
 
 extern "C" {
     fn gl_get_error() -> u32;
+    /// # Safety
+    /// The pointer must be 32bit aligned
+    fn gl_create_vertex_array_and_buffer_with_data(data: *const f32, len32: usize) -> u32;
 }

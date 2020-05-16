@@ -2,6 +2,7 @@ let mem;
 let decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 let u8mem;
 let u32mem;
+let f32mem;
 let wasm;
 let canvas;
 let gl;
@@ -43,6 +44,18 @@ const imports = {
     gl_get_error: function() {
         return gl.getError();
     },
+    gl_create_vertex_array_and_buffer_with_data: function(ptr, len) {
+        // ATTENTION: The pointer must be 32-bit aligned.
+        const vao = gl.createVertexArray();
+        if (!(vao instanceof WebGLVertexArrayObject)) { return 1; }
+        gl.bindVertexArray(vao);
+        const vbo = gl.createBuffer();
+        if (!(vbo instanceof WebGLBuffer)) { return 2; }
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        gl.bufferData(gl.ARRAY_BUFFER, f32mem, gl.STATIC_DRAW, ptr >> 2, len);
+        gl.enableVertexAttribArray(0);
+        return 0;
+    }
 };
 
 // handle the initialisation
@@ -52,6 +65,7 @@ onmessage = async function({ data }) {
     const is_logic = typeof data.canvas === 'undefined';
     u8mem = new Uint8Array(mem.buffer);
     u32mem = new Uint32Array(mem.buffer);
+    f32mem = new Float32Array(mem.buffer);
     wasm = await WebAssembly.instantiate(data.compiled, {env: {
         ...imports,
         memory: mem

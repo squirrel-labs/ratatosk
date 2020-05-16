@@ -22,6 +22,12 @@ impl State {
     }
 
     pub fn append_sprite(&mut self, sprite: &Sprite) {
+        log::trace!(
+            "adding sprite ({}/{}): {:?}",
+            self.sprite_len,
+            MAX_SPRITES,
+            sprite
+        );
         if self.sprite_len < MAX_SPRITES {
             self.sprites[self.sprite_len] = *sprite;
             self.sprite_len += 1;
