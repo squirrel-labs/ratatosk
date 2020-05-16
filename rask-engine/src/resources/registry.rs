@@ -27,10 +27,9 @@ macro_rules! resources {
     };
     ($num:expr, ($name:ident, $variant:ident, $val:expr)) => {
         parse_resource! { $num, $name, $variant, $val }
+        pub const RESOURCE_COUNT: u32 = $num + 1;
     };
 }
-
-pub const RESOURCE_COUNT: u32 = 4;
 
 resources! {
     (EMPTY,             Texture,        "empty.png"              ),
