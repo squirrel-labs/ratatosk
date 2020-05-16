@@ -18,10 +18,15 @@ impl Context {
 
 static mut CONTEXT: Option<Context> = None;
 
-pub fn set_context(context: Context) {
-    unsafe { CONTEXT = Some(context) }
+/// # Safety
+/// This function is not thread safe.
+pub unsafe fn set_context(context: Context) -> &'static mut Context {
+    CONTEXT = Some(context);
+    CONTEXT.as_mut().unwrap()
 }
 
-pub fn context_mut() -> Option<&'static mut Context> {
-    unsafe { CONTEXT.as_mut() }
+/// # Safety
+/// This function is not thread safe.
+pub unsafe fn context_mut() -> Option<&'static mut Context> {
+    CONTEXT.as_mut()
 }
