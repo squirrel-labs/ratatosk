@@ -11,7 +11,7 @@ pub struct Render<T> {
 }
 
 impl<T: GraphicsApi> Render<T> {
-    pub fn new(/*canvas: web_sys::OffscreenCanvas*/) -> Result<Self, ClientError> {
+    pub fn new() -> Result<Self, ClientError> {
         // TODO: Do not hardcode pixelized framebuffer size
         T::new(160, 90).map(|api| Self {
             graphics: api,
@@ -34,6 +34,7 @@ impl<T: GraphicsApi> Render<T> {
     }
 
     pub fn upload_texture(&mut self, id: u32) -> Result<(), ClientError> {
+        log::info!("upload texture {} to gpu", id);
         if !self.used_texture_ids.contains(&id) {
             let guard = RESOURCE_TABLE.read();
             let texture = guard.get(id as usize)?;

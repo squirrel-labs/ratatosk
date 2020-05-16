@@ -45,6 +45,41 @@ impl LogicContext {
             self.handle_message(msg)?;
         }
 
+        // TODO: Remove this temporary sprite loading. Replace it with some kind of
+        // "resource complete" event
+        {
+            use rask_engine::resources::GetStore;
+            let res = crate::communication::RESOURCE_TABLE.read();
+            let tex1: Result<&rask_engine::resources::Texture, _> = res.get(0);
+            let tex2: Result<&rask_engine::resources::Texture, _> = res.get(1);
+            let texes = (if tex1.is_ok() { 1 } else { 0 }) + (if tex2.is_ok() { 1 } else { 0 });
+            if self.state.sprites().len() < texes {
+                let (res, id) = match (tex1, tex2) {
+                    (Ok(tex1), Err(_)) => (tex1, 0),
+                    (Ok(tex1), Ok(tex2)) => {
+                        if self.state.sprites().is_empty() {
+                            (tex1, 0)
+                        } else {
+                            (tex2, 1)
+                        }
+                    }
+                    (Err(_), Ok(tex2)) => (tex2, 1),
+                    (Err(_), Err(_)) => unreachable!(),
+                };
+                if res.dimension().0 == 2 {
+                    self.state.append_sprite(&crate::communication::Sprite::new(
+                        rask_engine::math::Mat3::identity(),
+                        id,
+                    ));
+                } else {
+                    self.state.append_sprite(&crate::communication::Sprite::new(
+                        rask_engine::math::Mat3::scaling(0.4, 0.4),
+                        id,
+                    ));
+                }
+            }
+        }
+
         self.push_state();
         self.tick_nr += 1;
         Ok(())

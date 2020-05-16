@@ -72,8 +72,12 @@ impl GraphicsApi for WebGl2 {
     type GraphicsError = WebGl2Error;
 
     fn new(width: u32, height: u32) -> Result<Self, ClientError> {
+        let gl = Gl2;
+        gl.create_vao_with_buffer_data(&[
+            -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0,
+        ])?;
         Ok(Self {
-            gl: Gl2,
+            gl,
             size: (width, height),
             canvas_size: get_canvas_size(),
         })
