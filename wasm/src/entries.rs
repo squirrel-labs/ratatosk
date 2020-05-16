@@ -94,13 +94,17 @@ pub extern "C" fn run_logic() {
 /// Most of the communication with the graphics api is done thorough calling js functions
 #[export_name = "draw_frame"]
 pub extern "C" fn draw_frame() {
-    match context::context_mut() {
+    match unsafe { context::context_mut() } {
         // create a new graphics context if there is none, this persists local data across `draw_frame` invocations
-        None => context::set_context(
-            context::Context::new()
-                .map_err(|e| panic!("{}", e))
-                .unwrap(),
-        ),
-        Some(ctx) => ctx.render().unwrap_or_else(|e| log::error!("{}", e)),
+        None => unsafe {
+            context::set_context(
+                context::Context::new()
+                    .map_err(|e| panic!("{}", e))
+                    .unwrap(),
+            )
+        },
+        Some(ctx) => ctx,
     }
+    .render()
+    .unwrap_or_else(|e| log::error!("{}", e));
 }
