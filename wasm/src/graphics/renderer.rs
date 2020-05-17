@@ -1,16 +1,35 @@
+use super::webgl::WebGl2;
 use super::GraphicsApi;
 use crate::communication::SynchronizationMemory;
 use crate::communication::RESOURCE_TABLE;
 use crate::error::ClientError;
 use rask_engine::resources::{GetStore, TextureIds};
 
-pub struct Render<T> {
+type RenderBackend = WebGl2;
+static mut RENDERER: Option<Renderer<RenderBackend>> = None;
+
+/// # Safety
+/// This function is not thread safe.
+pub unsafe fn set_renderer(
+    renderer: Renderer<RenderBackend>,
+) -> &'static mut Renderer<RenderBackend> {
+    RENDERER = Some(renderer);
+    RENDERER.as_mut().unwrap()
+}
+
+/// # Safety
+/// This function is not thread safe.
+pub unsafe fn renderer_mut() -> Option<&'static mut Renderer<RenderBackend>> {
+    RENDERER.as_mut()
+}
+
+pub struct Renderer<T> {
     graphics: T,
     frame_nr: u64,
     used_texture_ids: Vec<u32>,
 }
 
-impl<T: GraphicsApi> Render<T> {
+impl<T: GraphicsApi> Renderer<T> {
     pub fn new() -> Result<Self, ClientError> {
         // TODO: Do not hardcode pixelized framebuffer size
         T::new(160, 90).map(|api| Self {
