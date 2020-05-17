@@ -41,6 +41,10 @@ resources! {
     }                                                            )
 }
 
+trait RescourceId {
+    fn get_id(&self) -> u32;
+}
+
 #[repr(u32)]
 #[derive(Debug, Clone, Copy)]
 pub enum ResourceVariant {
@@ -56,6 +60,12 @@ pub struct ResourceInfo {
     pub id: u32,
 }
 
+impl RescourceId for ResourceInfo {
+    fn get_id(&self) -> u32 {
+        self.id
+    }
+}
+
 struct Character {
     pub texture: &'static str,
     pub atlas: &'static str,
@@ -68,4 +78,21 @@ pub struct CharacterInfo {
     pub atlas: &'static str,
     pub animation: &'static str,
     pub id: u32,
+}
+
+impl RescourceId for CharacterInfo {
+    fn get_id(&self) -> u32 {
+        self.id
+    }
+}
+
+impl std::convert::From<ResourceInfo> for usize {
+    fn from(a: ResourceInfo) -> Self {
+        a.get_id() as usize
+    }
+}
+impl std::convert::From<CharacterInfo> for usize {
+    fn from(a: CharacterInfo) -> Self {
+        a.get_id() as usize
+    }
 }
