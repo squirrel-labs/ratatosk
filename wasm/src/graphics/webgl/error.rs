@@ -34,3 +34,28 @@ error_variants!(pub WebGl2Error {
     OutOfMemory(Gl2::OUT_OF_MEMORY) -> "out of memory",
     UnknownError(0xff) -> "unknown webgl2 error"
 });
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    macro_rules! assert_enum {
+        ($a:expr, $b:expr) => {
+            assert_eq!(std::mem::discriminant(&$a), std::mem::discriminant(&$b));
+        };
+    }
+    #[test]
+    fn from() {
+        assert_enum!(WebGl2Error::ContextLost, Gl2::CONTEXT_LOST_WEBGL.into());
+        assert_enum!(WebGl2Error::InvalidEnum, Gl2::INVALID_ENUM.into());
+        assert_enum!(WebGl2Error::InvalidValue, Gl2::INVALID_VALUE.into());
+        assert_enum!(WebGl2Error::InvalidOperation, Gl2::INVALID_OPERATION.into());
+        assert_enum!(
+            WebGl2Error::InvalidFramebufferOperation,
+            Gl2::INVALID_FRAMEBUFFER_OPERATION.into()
+        );
+        assert_enum!(WebGl2Error::OutOfMemory, Gl2::OUT_OF_MEMORY.into());
+        assert_enum!(WebGl2Error::UnknownError, 0xff.into());
+        assert_enum!(WebGl2Error::UnknownError, 0xdff.into());
+        assert_enum!(WebGl2Error::UnknownError, 0.into());
+    }
+}
