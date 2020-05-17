@@ -44,3 +44,4 @@ macro_rules! derive_from {
 }
 
 derive_from!(rask_engine::error::EngineError, EngineError);
+derive_from!(crate::graphics::webgl::WebGl2Error, WebGlError);

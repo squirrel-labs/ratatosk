@@ -30,7 +30,13 @@ impl Gl2 {
 }
 
 extern "C" {
+    /// same as `WebGLRenderingContext.getError()`
     fn gl_get_error() -> u32;
+    /// This function creates a vertex array with a vertex buffer.
+    /// It returns an error code:
+    ///     * 0 - success
+    ///     * 1 - failiure, VAO creation failed
+    ///     * 2 - failiure, VBO creation failed
     /// # Safety
     /// The pointer must be 32bit aligned
     fn gl_create_vertex_array_and_buffer_with_data(data: *const f32, len32: usize) -> u32;

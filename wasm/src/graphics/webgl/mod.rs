@@ -2,10 +2,12 @@ mod bindings;
 mod error;
 mod shader;
 
+#[doc(inline)]
+pub use error::WebGl2Error;
+
 use super::GraphicsApi;
 use crate::error::ClientError;
 use bindings::Gl2;
-use error::WebGl2Error;
 use rask_engine::{math::Mat3, resources::Texture};
 
 mod imports {
@@ -20,6 +22,10 @@ fn get_canvas_size() -> (u32, u32) {
     (x >> 16, x & 0xffff)
 }
 
+/// This function is used to initialize the canvas size, because it may not be available at context
+/// creation.
+/// Do not call this function to query size at runtime. This information is already available in
+/// the synchronization memory.
 fn set_canvas_size(w: u32, h: u32) {
     unsafe { imports::set_canvas_size(w, h) }
 }

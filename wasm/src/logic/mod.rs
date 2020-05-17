@@ -50,23 +50,26 @@ impl LogicContext {
         {
             use rask_engine::resources::GetStore;
             let res = crate::communication::RESOURCE_TABLE.read();
-            let tex1: Result<&rask_engine::resources::Texture, _> = res.get(0);
-            let tex2: Result<&rask_engine::resources::Texture, _> = res.get(1);
-            let texes = (if tex1.is_ok() { 1 } else { 0 }) + (if tex2.is_ok() { 1 } else { 0 });
+            let texid1 = rask_engine::resources::registry::EMPTY.id;
+            let texid2 = rask_engine::resources::registry::THIEF.id;
+            let tex1: Result<&rask_engine::resources::Texture, _> = res.get(texid1 as usize);
+            let tex2: Result<&rask_engine::resources::Texture, _> = res.get(texid2 as usize);
+            let (tex1, tex2) = (tex1.is_ok(), tex2.is_ok());
+            let texes = (if tex1 { 1 } else { 0 }) + (if tex2 { 1 } else { 0 });
             if self.state.sprites().len() < texes {
-                let (res, id) = match (tex1, tex2) {
-                    (Ok(tex1), Err(_)) => (tex1, 0),
-                    (Ok(tex1), Ok(tex2)) => {
+                let id = match (tex1, tex2) {
+                    (true, false) => texid1,
+                    (true, true) => {
                         if self.state.sprites().is_empty() {
-                            (tex1, 0)
+                            texid1
                         } else {
-                            (tex2, 1)
+                            texid2
                         }
                     }
-                    (Err(_), Ok(tex2)) => (tex2, 1),
-                    (Err(_), Err(_)) => unreachable!(),
+                    (false, true) => texid2,
+                    (false, false) => unreachable!(),
                 };
-                if res.dimension().0 == 2 {
+                if id == texid1 {
                     self.state.append_sprite(&crate::communication::Sprite::new(
                         rask_engine::math::Mat3::identity(),
                         id,

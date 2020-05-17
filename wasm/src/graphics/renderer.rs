@@ -53,7 +53,6 @@ impl<T: GraphicsApi> Renderer<T> {
     }
 
     pub fn upload_texture(&mut self, id: u32) -> Result<(), ClientError> {
-        log::info!("upload texture {} to gpu", id);
         if !self.used_texture_ids.contains(&id) {
             let guard = RESOURCE_TABLE.read();
             let texture = guard.get(id as usize)?;

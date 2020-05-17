@@ -1,5 +1,5 @@
 mod graphics_api;
 pub mod renderer;
-mod webgl;
+pub mod webgl;
 #[doc(inline)]
 pub use graphics_api::GraphicsApi;
