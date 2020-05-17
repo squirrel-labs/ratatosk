@@ -10,7 +10,7 @@
 //! finished. This signal is used to start the graphics worker.
 
 use crate::communication::{message_queue::MessageQueueElement, MessageQueue};
-use crate::graphics::context;
+use crate::graphics::renderer;
 use crate::logic::LogicContext;
 #[cfg(target_arch = "wasm32")]
 use crate::{
@@ -94,11 +94,11 @@ pub extern "C" fn run_logic() {
 /// Most of the communication with the graphics api is done thorough calling js functions
 #[export_name = "draw_frame"]
 pub extern "C" fn draw_frame() {
-    match unsafe { context::context_mut() } {
+    match unsafe { renderer::renderer_mut() } {
         // create a new graphics context if there is none, this persists local data across `draw_frame` invocations
         None => unsafe {
-            context::set_context(
-                context::Context::new()
+            renderer::set_renderer(
+                renderer::Renderer::new()
                     .map_err(|e| panic!("{}", e))
                     .unwrap(),
             )
