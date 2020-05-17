@@ -117,7 +117,6 @@ impl RaskGame {
     }
     fn add_user(&mut self, user: &User) {
         self.users.push(user.clone());
-        thread::sleep(std::time::Duration::from_secs(2));
         if let Err(e) = self.level_one(self.users.len() - 1) {
             error!("Error during ressoure distribution: {}", e);
         }
