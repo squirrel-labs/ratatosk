@@ -61,17 +61,20 @@ class MessageQueueWriter {
 
 queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
 
+async function responseText(promise) {
+    return await (await promise).text();
+}
+
 function postWorkerDescriptor(worker, desc) {
     if (typeof desc.canvas === "undefined") {
         worker.postMessage(desc);
         worker.addEventListener("message", LogicMessage);
     } else {
-        desc.shader.fragment.then(fragment => {
-            desc.shader.fragment = fragment.arraybuffer;
-            desc.shader.vertex.then(vertex => {
-            desc.shader.vertex = vertex.arraybuffer;
-            worker.postMessage(desc, [desc.canvas]);
-            });
+        Promise.all([responseText(desc.shader.vertex), responseText(desc.shader.fragment)])
+               .then(([vertex, fragment]) => {
+                   desc.shader.vertex = vertex;
+                   desc.shader.fragment = fragment;
+                   worker.postMessage(desc, [desc.canvas]);
         });
     }
 }

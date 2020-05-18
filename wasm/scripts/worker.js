@@ -7,6 +7,7 @@ let wasm;
 let canvas;
 let gl;
 let programs = [];
+let shaders = [];
 // vertex and fragment shader
 let vs, fs;
 
@@ -80,12 +81,26 @@ const imports = {
         if (!(shader instanceof WebGLShader)) return 3;
         gl.shaderSource(shader, source);
         gl.compileShader(shader);
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            const logInfo = gl.getShaderInfoLog(shader) || '<empty message>';
-            console.error(typeName + ' shader compilation failed with\n' + logInfo);
-            return 4;
-        }
         gl.attachShader(prog, shader);
+        shaders.push([typeName, shader]);
+        return 0;
+    },
+    gl_link_program: function(progHandle) {
+        const prog = programs[progHandle];
+        if (typeof prog === 'undefined') return 1;
+        gl.linkProgram(prog);
+        gl.validateProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+            for (const [typeName, shader] of shaders) {
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    const logInfo = gl.getShaderInfoLog(shader) || '<empty message>';
+                    console.error(typeName + ' shader compilation failed with\n' + logInfo);
+                }
+            }
+            const logInfo = gl.getProgramInfoLog(prog) || '<empty message>';
+            console.error('program shader failed with\n' + logInfo);
+            return 2;
+        }
         return 0;
     }
 };
@@ -110,6 +125,8 @@ onmessage = async function({ data }) {
         wasm.exports.run_logic();
     } else {
         canvas = data.canvas;
+        vs = data.shader.vertex;
+        fs = data.shader.fragment;
         // see 'https://www.khronos.org/registry/webgl/specs/latest/1.0/' for documentation
         gl = canvas.getContext('webgl2', {
             alpha: false,

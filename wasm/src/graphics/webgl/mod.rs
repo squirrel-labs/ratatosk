@@ -36,6 +36,7 @@ pub struct WebGl2 {
     gl: Gl2,
     size: (u32, u32),
     canvas_size: (u32, u32),
+    program: shader::ShaderProgram,
 }
 
 impl GraphicsApi for WebGl2 {
@@ -46,10 +47,13 @@ impl GraphicsApi for WebGl2 {
         gl.create_vao_with_buffer_data(&[
             -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0,
         ])?;
+        let program = shader::ShaderProgram::new(&gl)?;
+        log::info!("shaders compiled and linked");
         Ok(Self {
             gl,
             size: (width, height),
             canvas_size: init_canvas_size(),
+            program,
         })
     }
 
