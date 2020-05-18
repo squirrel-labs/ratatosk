@@ -71,6 +71,10 @@ impl SynchronizationMemory {
     pub unsafe fn get_mut() -> &'static mut Self {
         &mut *(*SYNCHRONIZATION_MEMORY as *mut Self)
     }
+    #[cfg(not(target_arch = "wasm32"))]
+    pub unsafe fn get_mut() -> &'static mut Self {
+        panic!("syscronisation memory is no supported for non wasm32 targets")
+    }
 
     /// This functions lets the thread sleep until it is woken up by the main.js or a timeout is
     /// reached
