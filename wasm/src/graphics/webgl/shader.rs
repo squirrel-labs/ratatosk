@@ -20,6 +20,7 @@ impl ShaderProgram {
         let prog = gl.create_program()?;
         gl.attach_new_shader(prog, ShaderType::Vertex)?;
         gl.attach_new_shader(prog, ShaderType::Fragment)?;
+        gl.link_program(prog)?;
         Ok(Self {
             handle: prog,
             transform_loc_index: 0, // TODO

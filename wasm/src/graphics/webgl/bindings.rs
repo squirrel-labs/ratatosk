@@ -56,6 +56,19 @@ impl Gl2 {
             _ => unreachable!("unexpected return value from js function"),
         }
     }
+
+    pub fn link_program(&self, prog: u32) -> Result<(), ClientError> {
+        match unsafe { gl_link_program(prog as i32) } {
+            0 => Ok(()),
+            1 => Err(ClientError::WebGlError(
+                "program linkage failed, invalid program handle".to_string(),
+            )),
+            2 => Err(ClientError::WebGlError(
+                "program linkage failed, linker failed".to_string(),
+            )),
+            _ => unreachable!("unexpected return value from js function"),
+        }
+    }
 }
 
 extern "C" {
@@ -85,4 +98,11 @@ extern "C" {
     ///     * 3 - failiure, shader creation failed
     ///     * 4 - failiure, shader compilation failed
     fn gl_attach_new_shader(prog: i32, shader_type: u32) -> u32;
+
+    /// This function links a shader program.
+    /// Return values are:
+    ///     * 0 - success
+    ///     * 1 - failiure, invalid/unknown program handle
+    ///     * 1 - failiure, program linkage failed
+    fn gl_link_program(prog: i32) -> u32;
 }
