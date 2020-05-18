@@ -17,15 +17,17 @@ mod imports {
     }
 }
 
-fn get_canvas_size() -> (u32, u32) {
-    let x = unsafe { imports::get_canvas_size() };
-    (x >> 16, x & 0xffff)
-}
-
 /// This function is used to initialize the canvas size, because it may not be available at context
 /// creation.
 /// Do not call this function to query size at runtime. This information is already available in
 /// the synchronization memory.
+fn init_canvas_size() -> (u32, u32) {
+    let x = unsafe { imports::get_canvas_size() };
+    let (x, y) = (x >> 16, x & 0xffff);
+    unsafe { crate::communication::SynchronizationMemory::get_mut() }.canvas_size = (x, y);
+    (x, y)
+}
+
 fn set_canvas_size(w: u32, h: u32) {
     unsafe { imports::set_canvas_size(w, h) }
 }
@@ -47,7 +49,7 @@ impl GraphicsApi for WebGl2 {
         Ok(Self {
             gl,
             size: (width, height),
-            canvas_size: get_canvas_size(),
+            canvas_size: init_canvas_size(),
         })
     }
 
