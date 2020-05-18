@@ -6,6 +6,9 @@ let f32mem;
 let wasm;
 let canvas;
 let gl;
+let programs = [];
+// vertex and fragment shader
+let vs, fs;
 
 function str_from_mem(ptr, len) {
     return decoder.decode(u8mem.slice(ptr, ptr + len));
@@ -47,13 +50,42 @@ const imports = {
     gl_create_vertex_array_and_buffer_with_data: function(ptr, len) {
         // ATTENTION: The pointer must be 32-bit aligned.
         const vao = gl.createVertexArray();
-        if (!(vao instanceof WebGLVertexArrayObject)) { return 1; }
+        if (!(vao instanceof WebGLVertexArrayObject)) return 1;
         gl.bindVertexArray(vao);
         const vbo = gl.createBuffer();
-        if (!(vbo instanceof WebGLBuffer)) { return 2; }
+        if (!(vbo instanceof WebGLBuffer)) return 2;
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         gl.bufferData(gl.ARRAY_BUFFER, f32mem, gl.STATIC_DRAW, ptr >> 2, len);
         gl.enableVertexAttribArray(0);
+        return 0;
+    },
+    gl_create_program: function() {
+        const prog = gl.createProgram();
+        if (!(prog instanceof WebGLProgram)) return -1;
+        programs.push(prog);
+        return programs.length - 1;
+    },
+    gl_attach_new_shader: function(progHandle, shaderType) {
+        const prog = programs[progHandle];
+        if (typeof prog === 'undefined') return 1;
+        let source, typeName;
+        if (shaderType === gl.VERTEX_SHADER) {
+            source = vs;
+            typeName = 'vertex';
+        } else if (shaderType === gl.FRAGMENT_SHADER) {
+            source = fs;
+            typeName = 'fragment';
+        } else return 2;
+        const shader = gl.createShader(shaderType);
+        if (!(shader instanceof WebGLShader)) return 3;
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            const logInfo = gl.getShaderInfoLog(shader) || '<empty message>';
+            console.error(typeName + ' shader compilation failed with\n' + logInfo);
+            return 4;
+        }
+        gl.attachShader(prog, shader);
         return 0;
     }
 };
