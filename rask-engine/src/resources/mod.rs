@@ -5,6 +5,7 @@ The resource management system for the ratatosk game engine.
 
 ```
 use lazy_static::lazy_static;
+use rask_engine::resources::registry;
 # use rask_engine::resources::*;
 
 lazy_static! {
@@ -13,7 +14,7 @@ lazy_static! {
 
 fn test() {
     unsafe {
-        let _texture: &Texture = TABLE.get(0).unwrap();
+        let _texture: &Texture = TABLE.get(registry::EMPTY).unwrap();
     }
 }
 ```
