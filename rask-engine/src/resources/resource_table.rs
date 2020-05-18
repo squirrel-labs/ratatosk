@@ -1,6 +1,7 @@
 use super::Resource;
 use super::RESOURCE_COUNT;
 use crate::EngineError;
+use std::fmt::Display;
 
 #[cfg_attr(not(feature = "nightly"), repr(transparent))]
 /// The library is used to store and retrieve resources.
@@ -16,13 +17,13 @@ macro_rules! character_check_helper {
 macro_rules! get_store {
     ($type: ty, $enum_type: ident) => {
         impl GetStore<$type> for ResourceTable {
-            fn get(&self, id: usize) -> Result<&$type, EngineError> {
-                self.index_check(id)?;
-                match &self.0[id] {
+            fn get<U: Into<usize> + Display + Copy>(&self, id: U) -> Result<&$type, EngineError> {
+                self.index_check(id.into())?;
+                match &self.0[id.into()] {
                     Resource::$enum_type(value) => Ok(&value),
                     Resource::None => Err(EngineError::ResourceMissing(format!(
                         "Could not find requested recource #{}",
-                        id,
+                        id.into(),
                     ))),
                     res => {
                         #[allow(unused_variables)]
@@ -49,7 +50,7 @@ macro_rules! get_store {
 
 pub trait GetStore<T> {
     /// Retrieve a resource from the library.
-    fn get(&self, id: usize) -> Result<&T, EngineError>;
+    fn get<U: Into<usize> + Display + Copy>(&self, id: U) -> Result<&T, EngineError>;
 
     /// Store a resource to the library
     fn store(&mut self, data: T, id: usize) -> Result<(), EngineError>;
