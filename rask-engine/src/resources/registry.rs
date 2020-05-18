@@ -53,7 +53,7 @@ pub enum ResourceVariant {
     Sound = resource_types::SOUND,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct ResourceInfo {
     pub variant: ResourceVariant,
     pub path: &'static str,
@@ -72,7 +72,7 @@ struct Character {
     pub animation: &'static str,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct CharacterInfo {
     pub texture: &'static str,
     pub atlas: &'static str,
