@@ -65,7 +65,15 @@ function postWorkerDescriptor(worker, desc) {
     if (typeof desc.canvas === "undefined") {
         worker.postMessage(desc);
         worker.addEventListener("message", LogicMessage);
-    } else worker.postMessage(desc, [desc.canvas]);
+    } else {
+        desc.shader.fragment.then(fragment => {
+            desc.shader.fragment = fragment.arraybuffer;
+            desc.shader.vertex.then(vertex => {
+            desc.shader.vertex = vertex.arraybuffer;
+            worker.postMessage(desc, [desc.canvas]);
+            });
+        });
+    }
 }
 
 function spawnModule(module) {
@@ -83,6 +91,7 @@ function spawnModules(canvas, memory) {
         };
         spawnModule(module);
         module.canvas = canvas;
+        module.shader = {fragment: fetch('scripts/fragment.glsl'), vertex: fetch('scripts/vertex.glsl')};
         wasm_module = module;
     });
 }
