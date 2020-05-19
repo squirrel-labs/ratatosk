@@ -44,10 +44,10 @@ impl GraphicsApi for WebGl2 {
 
     fn new(width: u32, height: u32) -> Result<Self, ClientError> {
         let gl = Gl2;
+        let program = shader::ShaderProgram::new(&gl)?;
         gl.create_vao_with_buffer_data(&[
             -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0,
         ])?;
-        let program = shader::ShaderProgram::new(&gl)?;
         log::info!("shaders compiled and linked");
         Ok(Self {
             gl,

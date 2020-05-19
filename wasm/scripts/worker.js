@@ -8,6 +8,8 @@ let canvas;
 let gl;
 let programs = [];
 let shaders = [];
+let posLoc, matLoc, texBoundLoc, texLayerLoc;  // TODO: Query them
+let matBuffer, texBuffer;
 // vertex and fragment shader
 let vs, fs;
 
@@ -57,8 +59,37 @@ const imports = {
         if (!(vbo instanceof WebGLBuffer)) return 2;
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         gl.bufferData(gl.ARRAY_BUFFER, f32mem, gl.STATIC_DRAW, ptr >> 2, len);
-        gl.enableVertexAttribArray(0);
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
         return 0;
+    },
+    gl_allocate_buffers: function(matPtr, texBoundPtr, texLayerPtr, instances) {
+        // ATTENTION: All pointers must be 32-bit aligned.
+        if (typeof matBuffer === 'undefined') {
+            matBuffer = gl.createBuffer();
+            if (!(matBuffer instanceof WebGLBuffer)) return 1;
+        }
+        gl.bindBuffer(gl.ARRAY_BUFFER, matBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, f32mem, gl.DYNAMIC_DRAW, matPtr >> 2, instances * 3 * 3);
+        for (let i = 0; i < 3; i++) {
+            gl.enableVertexAttribArray(matLoc + i);
+            gl.vertexAttribPointer(matLoc + i, 3, gl.FLOAT, false, 4 * 3 * 3, i * 4 * 3);
+            gl.vertexAttribDivisor(matLoc + i, 1);
+        }
+        if (typeof texBuffer === 'undefined') {
+            texBuffer = gl.createBuffer();
+            if (!(texBuffer instanceof WebGLBuffer)) return 2;
+        }
+        gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, (4 * 4 + 4) * instances, gl.STATIC_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, f32mem, texBoundPtr >> 2, instances * 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, instances * 4 * 4, u32mem, texLayerPtr >> 2, instances);
+        gl.enableVertexAttribArray(texBoundLoc);
+        gl.vertexAttribPointer(texBoundLoc, 4, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribDivisor(texBoundLoc, 1);
+        gl.enableVertexAttribArray(texLayerLoc);
+        gl.vertexAttribIPointer(texLayerLoc, 1, gl.UNSIGNED_INT, 0, 4 * 4 * instances);
+        gl.vertexAttribDivisor(texLayerLoc, 1);
     },
     gl_create_program: function() {
         const prog = gl.createProgram();
