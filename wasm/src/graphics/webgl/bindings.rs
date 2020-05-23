@@ -1,5 +1,6 @@
 use super::shader::ShaderType;
 use crate::ClientError;
+use rask_engine::math::Mat3;
 use std::convert::TryInto;
 
 pub struct Gl2;
@@ -26,6 +27,34 @@ impl Gl2 {
                 "glCreateVertexArray returned an unexpected object".to_string(),
             )),
             2 => Err(ClientError::WebGlError(
+                "glCreateBuffer returned an unexpected object".to_string(),
+            )),
+            _ => unreachable!("unexpected return value from js function"),
+        }
+    }
+
+    pub fn allocate_buffers(
+        &self,
+        matrices: &[f32],
+        texture_bounds: &[f32],
+        texture_layers: &[u32],
+    ) -> Result<(), ClientError> {
+        let n = texture_layers.len();
+        if matrices.len() != n * 9 || texture_bounds.len() != n * 4 {
+            return Err(ClientError::WebGlError(
+                "tried allocating incompatible buffer sizes".to_string(),
+            ));
+        }
+        match unsafe {
+            gl_allocate_buffers(
+                matrices.as_ptr(),
+                texture_bounds.as_ptr(),
+                texture_layers.as_ptr(),
+                n as u32,
+            )
+        } {
+            0 => Ok(()),
+            1 | 2 => Err(ClientError::WebGlError(
                 "glCreateBuffer returned an unexpected object".to_string(),
             )),
             _ => unreachable!("unexpected return value from js function"),
@@ -83,6 +112,21 @@ extern "C" {
     /// # Safety
     /// The pointer must be 32bit aligned
     fn gl_create_vertex_array_and_buffer_with_data(data: *const f32, len32: usize) -> u32;
+
+    /// This function (re)alloates the matrix and texture buffers and initialises them with the
+    /// given memory. If the buffers do not exist, they are created.
+    /// Return values are:
+    ///     * 0 - success
+    ///     * 1 - failiure, matrix buffer creation failed
+    ///     * 2 - failiure, texture buffer creation failed
+    /// # Safety
+    /// All pointers must be 32bit aligned
+    fn gl_allocate_buffers(
+        mat_ptr: *const f32,
+        tex_bound_ptr: *const f32,
+        tex_layer_ptr: *const u32,
+        instances: u32,
+    ) -> u32;
 
     /// This function creates a shader program.
     /// Return values are:

@@ -60,7 +60,7 @@ const imports = {
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         gl.bufferData(gl.ARRAY_BUFFER, f32mem, gl.STATIC_DRAW, ptr >> 2, len);
         gl.enableVertexAttribArray(posLoc);
-        gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
         return 0;
     },
     gl_allocate_buffers: function(matPtr, texBoundPtr, texLayerPtr, instances) {
@@ -90,6 +90,7 @@ const imports = {
         gl.enableVertexAttribArray(texLayerLoc);
         gl.vertexAttribIPointer(texLayerLoc, 1, gl.UNSIGNED_INT, 0, 4 * 4 * instances);
         gl.vertexAttribDivisor(texLayerLoc, 1);
+        return 0;
     },
     gl_create_program: function() {
         const prog = gl.createProgram();

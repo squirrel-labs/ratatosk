@@ -6,9 +6,11 @@ mod shader;
 pub use error::WebGl2Error;
 
 use super::GraphicsApi;
+use crate::communication::Sprite;
 use crate::error::ClientError;
 use bindings::Gl2;
 use rask_engine::{math::Mat3, resources::Texture};
+use std::collections::HashMap;
 
 mod imports {
     extern "C" {
@@ -37,6 +39,10 @@ pub struct WebGl2 {
     size: (u32, u32),
     canvas_size: (u32, u32),
     program: shader::ShaderProgram,
+    textures: HashMap<u32, usize>,
+    texture_range_buffer: Vec<f32>,
+    texture_layer_buffer: Vec<u32>,
+    matrix_buffer: Vec<f32>,
 }
 
 impl GraphicsApi for WebGl2 {
@@ -54,29 +60,24 @@ impl GraphicsApi for WebGl2 {
             size: (width, height),
             canvas_size: init_canvas_size(),
             program,
+            textures: HashMap::new(),
+            texture_range_buffer: vec![],
+            texture_layer_buffer: vec![],
+            matrix_buffer: vec![],
         })
     }
 
-    fn start_frame(&mut self) -> Result<(), ClientError> {
-        log::warn!("do ma warnin'");
+    fn update_sprite_vector(&mut self, sprites: &[Sprite]) {}
+
+    fn upload_textures(&mut self, textures: &[(u32, &Texture)]) -> Result<(), ClientError> {
         Ok(())
     }
 
-    fn end_frame(&self) -> Result<(), ClientError> {
+    fn remove_textures(&mut self) -> Result<(), ClientError> {
         Ok(())
     }
 
-    fn draw_rect(&self, mat: &Mat3, tex: u32) -> Result<Option<()>, ClientError> {
-        log::debug!("render: {:?}", mat);
-        Ok(Some(()))
-    }
-
-    fn upload_texture(&mut self, texture: &Texture, id: u32) -> Result<(), ClientError> {
-        log::debug!("upload texture {}", id);
-        Ok(())
-    }
-
-    fn unload_texture(&mut self, id: u32) -> Result<(), ClientError> {
+    fn draw(&mut self) -> Result<(), ClientError> {
         Ok(())
     }
 
