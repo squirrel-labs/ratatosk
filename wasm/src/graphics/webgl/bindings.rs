@@ -1,6 +1,7 @@
 use super::shader::ShaderType;
 use crate::ClientError;
 use rask_engine::math::Mat3;
+use rask_engine::resources::TextureRange;
 use std::convert::TryInto;
 
 pub struct Gl2;
@@ -58,6 +59,20 @@ impl Gl2 {
                 "glCreateBuffer returned an unexpected object".to_string(),
             )),
             _ => unreachable!("unexpected return value from js function"),
+        }
+    }
+
+    pub fn update_matrix_buffer(&self, matrices: &[Mat3]) {
+        unsafe { gl_update_mat_buffer(matrices.as_ptr() as *const f32, matrices.len() as u32) }
+    }
+
+    pub fn update_texture_buffer(&self, texture_ranges: &[TextureRange], texture_layers: &[u32]) {
+        unsafe {
+            gl_update_tex_buffer(
+                texture_ranges.as_ptr() as *const f32,
+                texture_layers.as_ptr() as *const u32,
+                texture_ranges.len() as u32,
+            )
         }
     }
 
@@ -127,6 +142,16 @@ extern "C" {
         tex_layer_ptr: *const u32,
         instances: u32,
     ) -> u32;
+
+    /// This function updates the matrix buffer with the given values.
+    /// # Safety
+    /// All pointers must be 32bit aligned
+    fn gl_update_mat_buffer(mat_ptr: *const f32, instances: u32);
+
+    /// This function updates the texture buffer with the given values.
+    /// # Safety
+    /// All pointers must be 32bit aligned
+    fn gl_update_tex_buffer(tex_bound_ptr: *const f32, tex_layer_ptr: *const u32, instances: u32);
 
     /// This function creates a shader program.
     /// Return values are:

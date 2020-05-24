@@ -56,7 +56,6 @@ impl<T: GraphicsApi> Renderer<T> {
             self.graphics.upload_textures(&textures)?;
         }
         let state = *crate::communication::DOUBLE_BUFFER.lock();
-        self.graphics.update_sprite_vector(state.sprites());
-        Ok(())
+        self.graphics.update_sprite_vector(state.sprites())
     }
 }

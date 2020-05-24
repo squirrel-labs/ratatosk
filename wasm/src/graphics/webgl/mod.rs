@@ -9,7 +9,7 @@ use super::GraphicsApi;
 use crate::communication::Sprite;
 use crate::error::ClientError;
 use bindings::Gl2;
-use rask_engine::{math::Mat3, resources::Texture};
+use rask_engine::{math::Mat3, resources::Texture, resources::TextureRange};
 use std::collections::HashMap;
 
 mod imports {
@@ -39,10 +39,28 @@ pub struct WebGl2 {
     size: (u32, u32),
     canvas_size: (u32, u32),
     program: shader::ShaderProgram,
-    textures: HashMap<u32, usize>,
-    texture_range_buffer: Vec<f32>,
-    texture_layer_buffer: Vec<u32>,
-    matrix_buffer: Vec<f32>,
+    // mapping from texture id to texture with texture range and texture layer
+    textures: HashMap<u32, (TextureRange, u32)>,
+    sprite_textures: Vec<u32>,
+    matrix_buffer: Vec<Mat3>,
+}
+
+impl WebGl2 {
+    fn generate_texture_buffers(
+        &mut self,
+        sprites: &[Sprite],
+    ) -> Option<(Vec<TextureRange>, Vec<u32>)> {
+        self.sprite_textures = sprites.iter().map(|s| s.tex_id).collect();
+        Some(
+            self.sprite_textures
+                .iter()
+                .map(|i| self.textures.get(i).cloned())
+                .collect::<Option<Vec<_>>>()?
+                .iter()
+                .cloned()
+                .unzip(),
+        )
+    }
 }
 
 impl GraphicsApi for WebGl2 {
@@ -61,13 +79,37 @@ impl GraphicsApi for WebGl2 {
             canvas_size: init_canvas_size(),
             program,
             textures: HashMap::new(),
-            texture_range_buffer: vec![],
-            texture_layer_buffer: vec![],
+            sprite_textures: vec![],
             matrix_buffer: vec![],
         })
     }
 
-    fn update_sprite_vector(&mut self, sprites: &[Sprite]) {}
+    fn update_sprite_vector(&mut self, sprites: &[Sprite]) -> Result<(), ClientError> {
+        if sprites.len() == self.matrix_buffer.len() {
+            let keep_textures = self
+                .sprite_textures
+                .iter()
+                .zip(sprites.iter())
+                .all(|(&t, s)| s.tex_id == t);
+            if !keep_textures {
+                let (texture_ranges, texture_layers) =
+                    self.generate_texture_buffers(sprites).ok_or_else(|| {
+                        ClientError::ResourceError(
+                            "tried to set sprite texture to non-existent texture".to_string(),
+                        )
+                    })?;
+                self.gl
+                    .update_texture_buffer(&texture_ranges, &texture_layers);
+            }
+            for (i, sprite) in sprites.iter().enumerate() {
+                self.matrix_buffer[i] = sprite.transform;
+            }
+            self.gl.update_matrix_buffer(&self.matrix_buffer);
+        } else {
+            // TODO
+        }
+        Ok(())
+    }
 
     fn upload_textures(&mut self, textures: &[(u32, &Texture)]) -> Result<(), ClientError> {
         Ok(())

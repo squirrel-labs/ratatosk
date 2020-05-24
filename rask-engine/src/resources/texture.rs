@@ -20,6 +20,25 @@ pub struct TextureIds {
     pub ids: Vec<u32>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct TextureRange {
+    start: (f32, f32),
+    end: (f32, f32),
+}
+
+impl TextureRange {
+    pub fn new(start: (f32, f32), end: (f32, f32)) -> Self {
+        Self { start, end }
+    }
+
+    pub fn new_from_pixels(start: (u32, u32), end: (u32, u32), w: u32, h: u32) -> Self {
+        Self {
+            start: ((start.0 as f32 / (w as f32)), (start.1 as f32 / (h as f32))),
+            end: ((end.0 as f32 / (w as f32)), (end.1 as f32 / (h as f32))),
+        }
+    }
+}
+
 #[cfg(feature = "nightly")]
 impl TextureIds {
     pub const fn empty() -> Self {
