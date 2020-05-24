@@ -10,7 +10,7 @@ pub trait GraphicsApi: Sized {
     fn new(width: u32, height: u32) -> Result<Self, ClientError>;
 
     /// Update the sprite vector to the given slice of sprites
-    fn update_sprite_vector(&mut self, sprites: &[Sprite]);
+    fn update_sprite_vector(&mut self, sprites: &[Sprite]) -> Result<(), ClientError>;
 
     /// Upload the given id-to-texture mapping to the graphics context
     fn upload_textures(&mut self, textures: &[(u32, &Texture)]) -> Result<(), ClientError>;

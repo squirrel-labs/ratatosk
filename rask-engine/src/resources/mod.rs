@@ -35,7 +35,7 @@ pub use resource_table::{GetStore, ResourceTable};
 #[doc(inline)]
 pub use sound::Sound;
 #[doc(inline)]
-pub use texture::{Texture, TextureIds};
+pub use texture::{Texture, TextureIds, TextureRange};
 
 #[cfg_attr(not(feature = "nightly"), repr(C))]
 pub enum Resource {

@@ -81,7 +81,7 @@ const imports = {
             if (!(texBuffer instanceof WebGLBuffer)) return 2;
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, (4 * 4 + 4) * instances, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, (4 * 4 + 4) * instances, gl.DYNAMIC_DRAW);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, f32mem, texBoundPtr >> 2, instances * 4);
         gl.bufferSubData(gl.ARRAY_BUFFER, instances * 4 * 4, u32mem, texLayerPtr >> 2, instances);
         gl.enableVertexAttribArray(texBoundLoc);
@@ -91,6 +91,17 @@ const imports = {
         gl.vertexAttribIPointer(texLayerLoc, 1, gl.UNSIGNED_INT, 0, 4 * 4 * instances);
         gl.vertexAttribDivisor(texLayerLoc, 1);
         return 0;
+    },
+    gl_update_mat_buffer: function(matPtr, instances) {
+        // ATTENTION: The pointer must be 32-bit aligned.
+        gl.bindBuffer(gl.ARRAY_BUFFER, matBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, f32mem, matPtr >> 2, instances * 3 * 3);
+    },
+    gl_update_tex_buffer: function(texBoundPtr, texLayerPtr, instances) {
+        // ATTENTION: All pointers must be 32-bit aligned.
+        gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, f32mem, texBoundPtr >> 2, instances * 4);
+        gl.bufferSubData(gl.ARRAY_BUFFER, instances * 4 * 4, u32mem, texLayerPtr >> 2, instances);
     },
     gl_create_program: function() {
         const prog = gl.createProgram();
