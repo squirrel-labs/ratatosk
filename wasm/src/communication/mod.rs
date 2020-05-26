@@ -2,6 +2,7 @@ pub mod message_queue;
 pub mod sprite;
 pub mod state;
 pub mod synchronization_memory;
+
 #[doc(inline)]
 pub use message_queue::{Message, MessageQueue};
 use parking_lot::Mutex;

@@ -1,10 +1,12 @@
+use std::convert::TryInto;
+use std::sync::mpsc;
+use std::thread::JoinHandle;
+
 use crate::backend_connection::TokenResponse;
 use crate::error::ServerError;
 use crate::games;
 use crate::games::{Game, RaskGame};
-use std::convert::TryInto;
-use std::sync::mpsc;
-use std::thread::JoinHandle;
+use log::info;
 use ws::Sender;
 
 pub type GroupId = u32;

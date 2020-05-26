@@ -1,4 +1,5 @@
 use crate::network::protocol::resource_types;
+
 macro_rules! parse_resource {
     ($num:expr, $name:ident, Character, $val: tt) => {
         pub const $name: CharacterInfo = CharacterInfo {
@@ -41,7 +42,7 @@ resources! {
     }                                                            )
 }
 
-trait RescourceId {
+trait ResourceId {
     fn get_id(&self) -> u32;
 }
 
@@ -60,7 +61,7 @@ pub struct ResourceInfo {
     pub id: u32,
 }
 
-impl RescourceId for ResourceInfo {
+impl ResourceId for ResourceInfo {
     fn get_id(&self) -> u32 {
         self.id
     }
@@ -80,7 +81,7 @@ pub struct CharacterInfo {
     pub id: u32,
 }
 
-impl RescourceId for CharacterInfo {
+impl ResourceId for CharacterInfo {
     fn get_id(&self) -> u32 {
         self.id
     }

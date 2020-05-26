@@ -1,11 +1,11 @@
 use crate::error::ServerError;
 use crate::group::GroupId;
+use log::warn;
 use serde::{Deserialize, Serialize};
 
 const API_ENDPOINT: &str = "http://localhost:8000/";
 
-/// The group information send as response to
-/// a token request.
+/// The group information sent as response to a token request.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenResponse {
     #[serde(rename = "hasPassword")]
@@ -25,7 +25,7 @@ pub struct TokenResponse {
 }
 
 #[allow(dead_code)]
-/// Make a plaintext get request to API_ENDPOINT/{location}
+/// Make a plaintext get request to API_ENDPOINT/{location}.
 pub fn request(location: &str) -> Option<String> {
     let uri = &format!("{}{}", API_ENDPOINT, location);
     reqwest::get(uri)
@@ -34,7 +34,7 @@ pub fn request(location: &str) -> Option<String> {
         .ok()
 }
 
-/// Verify the token validity
+/// Verify the token validity.
 pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
     let mut res = reqwest::get(&format!("{}api/lobby/tokens/{}", API_ENDPOINT, token))
         .map_err(ServerError::BackendRequest)?;

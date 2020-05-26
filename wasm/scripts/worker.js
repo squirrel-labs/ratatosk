@@ -177,7 +177,7 @@ onmessage = async function({ data }) {
             stencil: true,
             antialias: true,
             premultipliedAlpha: true,
-            preserveDrawingBufferd: true,
+            preserveDrawingBuffered: true,
             powerPreference: "high-performance",
             failIfMajorPerformanceCaveat: false,
             // desynchronized seems to remove multibuffering that reduces latency at cost of extreme tearing effects

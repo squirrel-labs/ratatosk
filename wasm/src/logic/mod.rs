@@ -2,8 +2,6 @@
 //! Its main purpose is to handle events and execute the game engine.
 
 mod resource_parser;
-#[cfg(target_arch = "wasm32")]
-use crate::mem;
 use crate::{
     communication::{state::State, Message, MessageQueue, DOUBLE_BUFFER},
     error::ClientError,
@@ -19,7 +17,7 @@ pub struct LogicContext {
     res_parser: ResourceParser,
 }
 
-/// The logic context stores everything necessary for event handling and the game engine
+/// The logic context stores everything necessary for event handling and the game engine.
 impl LogicContext {
     pub fn new(message_queue: MessageQueue<'static>) -> Result<Self, ClientError> {
         Ok(Self {

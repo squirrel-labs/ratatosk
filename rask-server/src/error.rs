@@ -1,7 +1,8 @@
+use std::sync::mpsc::SendError;
+
 use crate::group;
 use rask_engine::error;
 use reqwest::Error as ReqError;
-use std::sync::mpsc::SendError;
 
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -9,8 +10,8 @@ pub enum ServerError {
     Group(String),
     GroupCreation(String),
     GameCreation(std::io::Error),
-    WebsocketCreation(std::io::Error),
-    WebsocketError(ws::Error),
+    WebSocketCreation(std::io::Error),
+    WebSocketError(ws::Error),
     BackendRequest(ReqError),
     InvalidProtocol,
     InvalidTokenFormat,
@@ -28,14 +29,14 @@ impl std::fmt::Display for ServerError {
             ServerError::Group(e) => write!(f, "GroupError: {}", e),
             ServerError::GroupCreation(e) => write!(f, "GroupCreationError: {}", e),
             ServerError::GameCreation(e) => write!(f, "GameCreationError: {}", e),
-            ServerError::WebsocketCreation(e) => write!(f, "WebsocketCreationError: {}", e),
-            ServerError::WebsocketError(e) => write!(f, "WebsocketError: {}", e),
+            ServerError::WebSocketCreation(e) => write!(f, "WebSocketCreationError: {}", e),
+            ServerError::WebSocketError(e) => write!(f, "WebSocketError: {}", e),
             ServerError::BackendRequest(e) => write!(f, "BackendRequestError: {}", e),
             ServerError::InvalidProtocol => write!(f, "InvalidProtocolError"),
             ServerError::InvalidTokenFormat => write!(f, "InvalidTokenFormat"),
             ServerError::InvalidToken(e) => write!(f, "InvalidTokenError: {}", e),
             ServerError::InvalidUser(e) => {
-                write!(f, "Invalid Userid: {}. User is not in the Game", e)
+                write!(f, "Invalid User id: {}. User is not in the Game", e)
             }
             ServerError::StdErr(e) => write!(f, "StdErrorError: {}", e),
             ServerError::MessageSend(e) => write!(f, "MessageSendError: {}", e),
@@ -54,7 +55,8 @@ macro_rules! derive_from {
         }
     };
 }
-derive_from!(ws::Error, WebsocketError);
+
+derive_from!(ws::Error, WebSocketError);
 derive_from!(std::io::Error, FileError);
 derive_from!(Box<dyn std::error::Error>, StdErr);
 derive_from!(ReqError, BackendRequest);

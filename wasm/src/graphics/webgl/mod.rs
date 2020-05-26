@@ -5,12 +5,13 @@ mod shader;
 #[doc(inline)]
 pub use error::WebGl2Error;
 
+use std::collections::HashMap;
+
 use super::GraphicsApi;
 use crate::communication::Sprite;
 use crate::error::ClientError;
 use bindings::Gl2;
 use rask_engine::{math::Mat3, resources::Texture, resources::TextureRange};
-use std::collections::HashMap;
 
 mod imports {
     extern "C" {

@@ -1,13 +1,14 @@
-//! The message queue handels communication between the main.js and the logic thread
+//! The message queue handles communication between the `main.js` and the logic thread.
+
+use std::sync::atomic::AtomicBool;
 
 use rask_engine::events::{Event, KeyModifier, MouseEvent};
 use rask_engine::network::protocol::op_codes;
-use std::sync::atomic::AtomicBool;
 
 #[repr(C, u32)]
 #[derive(Debug, Clone)]
 #[non_exhaustive]
-/// Messeges sent by the main.js
+/// Messages sent by the `main.js`.
 pub enum Message {
     None = op_codes::NONE,
     KeyDown(KeyModifier, u32) = op_codes::KEY_DOWN, // 1
@@ -16,11 +17,11 @@ pub enum Message {
     MouseDown(MouseEvent) = op_codes::MOUSE_DOWN, //5
     MouseUp(MouseEvent) = op_codes::MOUSE_UP,
     RequestAlloc { id: u32, size: u32 } = op_codes::REQUEST_ALLOCATION, //7
-    DoneWritingResource(u32) = op_codes::DONE_WRITING_RESOURE,          // id
+    DoneWritingResource(u32) = op_codes::DONE_WRITING_RESOURCE,         // id
     ResourcePush(u32) = op_codes::PUSH_RESOURCE,                        // id
     AllocatedBuffer { id: u32, ptr: u32 } = op_codes::ALLOCATED_BUFFER, // The event ids from 0 to 128 are reserved for server to client communication
     Memory(u32, u32, u32) = op_codes::MEMORY_OFFSETS,
-    Textmode(bool) = op_codes::SET_TEXTMODE,
+    TextMode(bool) = op_codes::SET_TEXT_MODE,
     EngineEvent(Event) = op_codes::PUSH_ENGINE_EVENT, // Mark the Message as outbound
 }
 
@@ -35,6 +36,7 @@ impl Message {
         let len = std::mem::size_of::<Message>() as u32;
         unsafe { std::slice::from_raw_parts(self as *const Message as *const u32, len as usize) }
     }
+
     pub fn send(&self) {
         let msg = self.to_slice();
         log::trace!("sending {:?}", self);
@@ -48,11 +50,12 @@ extern "C" {
 
 #[repr(C, align(32))]
 #[derive(Debug)]
-/// Wrapper for Message Object
+/// Wrapper for Message Object.
 pub struct MessageQueueElement {
     writing: AtomicBool,
     payload: Message,
 }
+
 impl From<Message> for MessageQueueElement {
     fn from(message: Message) -> Self {
         Self {
@@ -72,6 +75,7 @@ impl MessageQueueElement {
         }
     }
 }
+
 impl MessageQueueElement {
     pub const fn new() -> Self {
         Self {
@@ -82,16 +86,17 @@ impl MessageQueueElement {
 }
 
 #[derive(Debug)]
-/// Abstracts the communication with the main thread
+/// Abstracts the communication with the main thread.
 pub struct MessageQueue<'a> {
-    /// the index of the next element to be read
+    /// The index of the next element to be read.
     reader_index: u32,
     data: &'a mut [MessageQueueElement],
 }
 
 impl<'a> MessageQueue<'a> {
     /// # Safety
-    /// the memory provided to the function has to be valid and must contain valid messages
+    ///
+    /// The memory provided to the function has to be valid and must contain valid messages.
     pub unsafe fn from_memory(ptr: *mut MessageQueueElement, len: usize) -> Self {
         MessageQueue {
             reader_index: 0,
@@ -130,7 +135,8 @@ impl<'a> MessageQueue<'a> {
             }
         }
     }
-    /// Push an outbound Message to the main Thread
+
+    /// Push an outbound Message to the main thread.
     pub fn push(&self, msg: Message) {
         msg.send();
     }

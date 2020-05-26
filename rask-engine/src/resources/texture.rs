@@ -1,10 +1,7 @@
-use std::convert::TryInto;
-
-use image::{png::PngDecoder, ImageDecoder};
-
 use crate::error::EngineError;
-
 pub use image::ColorType;
+use image::{png::PngDecoder, GenericImageView, ImageDecoder};
+use std::convert::TryInto;
 
 #[derive(Debug, Clone)]
 pub struct Texture {
@@ -57,17 +54,40 @@ impl Texture {
         let e = |_| EngineError::ResourceType("invalid image resolution".to_string());
         let (w, h) = (w.try_into().map_err(e)?, h.try_into().map_err(e)?);
 
-        let colortype = decoder.color_type();
+        let color_type = decoder.color_type();
 
-        let mut bytes = vec![0; w as usize * h as usize * colortype.bytes_per_pixel() as usize];
+        let mut bytes = vec![0; w as usize * h as usize * color_type.bytes_per_pixel() as usize];
         decoder.read_image(&mut bytes)?;
 
         Ok(Self {
             raw_data: bytes,
             w,
             h,
-            color_type: colortype,
+            color_type,
         })
+    }
+
+    pub fn form_raw_parts(
+        raw_data: Vec<u8>,
+        width: u32,
+        height: u32,
+        color_type: ColorType,
+    ) -> Self {
+        Self {
+            raw_data,
+            w: width,
+            h: height,
+            color_type,
+        }
+    }
+    pub fn from_dynamic_image(image: image::DynamicImage) -> Self {
+        let raw_data = image.to_bytes();
+        Self {
+            raw_data,
+            w: image.width(),
+            h: image.height(),
+            color_type: image.color(),
+        }
     }
 
     pub fn dimension(&self) -> (u32, u32) {

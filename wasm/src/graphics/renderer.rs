@@ -9,6 +9,7 @@ type RenderBackend = WebGl2;
 static mut RENDERER: Option<Renderer<RenderBackend>> = None;
 
 /// # Safety
+///
 /// This function is not thread safe.
 pub unsafe fn set_renderer(
     renderer: Renderer<RenderBackend>,
@@ -18,6 +19,7 @@ pub unsafe fn set_renderer(
 }
 
 /// # Safety
+///
 /// This function is not thread safe.
 pub unsafe fn renderer_mut() -> Option<&'static mut Renderer<RenderBackend>> {
     RENDERER.as_mut()
@@ -29,7 +31,7 @@ pub struct Renderer<T> {
 
 impl<T: GraphicsApi> Renderer<T> {
     pub fn new() -> Result<Self, ClientError> {
-        // TODO: Do not hardcode pixelized framebuffer size
+        // TODO: Do not hardcode pixelated framebuffer size
         T::new(160, 90).map(|api| Self { graphics: api })
     }
 
