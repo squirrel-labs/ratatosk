@@ -1,13 +1,14 @@
+use std::collections::HashMap;
+use std::io::Read;
+
 use super::Texture;
 use crate::network::packet::ResourceData;
 use crate::{math::Mat3, EngineError};
+use image::DynamicImage;
 use spine::atlas::Atlas;
-use spine::atlas::Texture as TextureSegment;
 use spine::skeleton::{Skeleton, SRT};
 use std::convert::TryFrom;
-
-use std::collections::HashMap;
-use std::io::Read;
+use std::hash::{Hash, Hasher};
 
 struct OwnedSpriteState {
     attachment: String,
@@ -16,25 +17,21 @@ struct OwnedSpriteState {
 
 #[allow(dead_code)]
 pub struct AnimationState {
-    /// if true, the image has to be rotated clockwise
-    rotated: bool,
-    /// position of the upper left pixel in the texture segment
-    pos: (u16, u16),
-    /// size of the texture segment
-    size: (u16, u16),
     /// transformation matrix for the subsprite
     transform: Mat3,
+    /// attachment id
+    att_id: u64,
 }
 
 pub struct AnimationStates<'a> {
     sprites: std::vec::IntoIter<OwnedSpriteState>,
-    atlas: &'a HashMap<String, TextureSegment>,
+    atlas: &'a HashMap<u64, Texture>,
 }
 
 impl<'a> AnimationStates<'a> {
     fn new(
         sprites: std::vec::IntoIter<OwnedSpriteState>,
-        atlas: &'a HashMap<String, TextureSegment>,
+        atlas: &'a HashMap<u64, Texture>,
     ) -> Self {
         Self { sprites, atlas }
     }
@@ -44,12 +41,13 @@ impl<'a> Iterator for AnimationStates<'a> {
     type Item = Result<AnimationState, EngineError>;
     fn next(&mut self) -> Option<Self::Item> {
         let sprite = self.sprites.next()?;
-        if let Some(region) = self.atlas.get(&sprite.attachment) {
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        sprite.attachment.hash(&mut hasher);
+        let att_id = hasher.finish();
+        if self.atlas.contains_key(&att_id) {
             Some(Ok(AnimationState {
-                rotated: region.rotate,
-                pos: region.xy,
-                size: region.size,
                 transform: Mat3::from(sprite.srt),
+                att_id,
             }))
         } else {
             Some(Err(EngineError::ResourceMissing(format!(
@@ -61,14 +59,13 @@ impl<'a> Iterator for AnimationStates<'a> {
 }
 
 pub struct Character {
-    texture: Texture,
     skeleton: Skeleton,
-    atlas: HashMap<String, TextureSegment>,
+    atlas: HashMap<u64, Texture>,
 }
 
 impl Character {
     pub fn new<R: Read>(
-        texture: Texture,
+        texture: DynamicImage,
         skeleton: Skeleton,
         atlas: Atlas<R>,
     ) -> Result<Self, EngineError> {
@@ -77,52 +74,40 @@ impl Character {
             let segment = segment.map_err(|e| {
                 EngineError::ResourceFormat(format!("Could not parse atlas \"{}\"", e))
             })?;
-            segments.insert(segment.name.clone(), segment);
+            let mut hasher = std::collections::hash_map::DefaultHasher::new();
+            segment.name.hash(&mut hasher);
+            let (x, y) = segment.xy;
+            let (width, height) = segment.size;
+            let tex = texture.crop_imm(x as u32, y as u32, width as u32, height as u32);
+            if segment.rotate {
+                tex.rotate90();
+            }
+            segments.insert(hasher.finish(), Texture::from_dynamic_image(tex));
         }
-        Ok(Self::from_parts(texture, skeleton, segments))
+        Ok(Self::from_parts(skeleton, segments))
     }
 
-    pub fn from_parts(
-        texture: Texture,
-        skeleton: Skeleton,
-        atlas: HashMap<String, TextureSegment>,
-    ) -> Self {
-        Self {
-            texture,
-            skeleton,
-            atlas,
-        }
-    }
-
-    pub fn texture(&self) -> &Texture {
-        &self.texture
+    pub fn from_parts(skeleton: Skeleton, atlas: HashMap<u64, Texture>) -> Self {
+        Self { skeleton, atlas }
     }
 
     pub fn skeleton(&self) -> &Skeleton {
         &self.skeleton
     }
 
-    pub fn atlas(&self) -> &HashMap<String, TextureSegment> {
+    pub fn atlas(&self) -> &HashMap<u64, Texture> {
         &self.atlas
-    }
-
-    pub fn texture_mut(&mut self) -> &mut Texture {
-        &mut self.texture
     }
 
     pub fn skeleton_mut(&mut self) -> &mut Skeleton {
         &mut self.skeleton
     }
 
-    pub fn atlas_mut(&mut self) -> &mut HashMap<String, TextureSegment> {
+    pub fn atlas_mut(&mut self) -> &mut HashMap<u64, Texture> {
         &mut self.atlas
     }
 
-    pub fn interpolate<'a>(
-        &'a self,
-        time: f32,
-        anim_name: &str,
-    ) -> Result<AnimationStates<'a>, EngineError> {
+    pub fn interpolate(&self, time: f32, anim_name: &str) -> Result<AnimationStates, EngineError> {
         let animated_skin = self
             .skeleton
             .get_animated_skin("default", Some(anim_name))?;
@@ -132,7 +117,7 @@ impl Character {
                 .ok_or_else(|| {
                     EngineError::Animation(format!(
                         "Could not interpolate animation at time {}",
-                        time
+                        time,
                     ))
                 })?
                 .map(|s| OwnedSpriteState {
@@ -155,7 +140,10 @@ impl<'a> TryFrom<ResourceData<'a>> for Character {
             data,
         } = chr_data
         {
-            let texture = Texture::from_png_stream(&data[0..texture_len as usize]);
+            let texture = image::load_from_memory_with_format(
+                &data[0..texture_len as usize],
+                image::ImageFormat::Png,
+            );
             let atlas =
                 spine::atlas::Atlas::from_reader(&data[texture_len as usize..atlas_len as usize]);
             let skeleton = spine::skeleton::Skeleton::from_reader(

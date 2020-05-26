@@ -33,6 +33,7 @@ impl State {
             self.sprite_len += 1;
         }
     }
+
     pub const fn empty() -> Self {
         Self {
             sprite_len: 0,

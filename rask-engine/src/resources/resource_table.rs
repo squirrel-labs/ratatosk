@@ -1,18 +1,12 @@
+use std::fmt::Debug;
+
 use super::Resource;
 use super::RESOURCE_COUNT;
 use crate::EngineError;
-use std::fmt::Debug;
 
 #[cfg_attr(not(feature = "nightly"), repr(transparent))]
 /// The library is used to store and retrieve resources.
 pub struct ResourceTable([Resource; RESOURCE_COUNT as usize]);
-
-macro_rules! character_check_helper {
-    (Texture, $value: ident) => {
-        return Ok($value.texture());
-    };
-    ($enum_type: ident, $value: ident) => {};
-}
 
 macro_rules! get_store {
     ($type: ty, $enum_type: ident) => {
@@ -22,21 +16,13 @@ macro_rules! get_store {
                 match &self.0[id.into()] {
                     Resource::$enum_type(value) => Ok(&value),
                     Resource::None => Err(EngineError::ResourceMissing(format!(
-                        "Could not find requested recource #{}",
+                        "Could not find requested resource #{}",
                         id.into(),
                     ))),
-                    res => {
-                        #[allow(unused_variables)]
-                        {
-                            if let Resource::Character(value) = res {
-                                character_check_helper!($enum_type, value);
-                            }
-                        }
-                        Err(EngineError::ResourceType(format!(
-                            "Wrong resource type, required \"{}\"",
-                            stringify!($type),
-                        )))
-                    }
+                    _ => Err(EngineError::ResourceType(format!(
+                        "Wrong resource type, required \"{}\"",
+                        stringify!($type),
+                    ))),
                 }
             }
 
@@ -61,12 +47,15 @@ impl Default for ResourceTable {
         Self::new()
     }
 }
+
 impl ResourceTable {
-    /// Create a new library initialzed with None resources.
+    /// Create a new library initialized with None resources.
     #[cfg(feature = "nightly")]
     pub const fn new() -> Self {
         Self([Resource::None; RESOURCE_COUNT as usize])
     }
+
+    /// Create a new library initialized with None resources.
     #[cfg(not(feature = "nightly"))]
     pub fn new() -> Self {
         let bytes = [0u8; std::mem::size_of::<Self>()];

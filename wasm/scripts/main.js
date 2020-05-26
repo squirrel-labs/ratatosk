@@ -158,9 +158,9 @@ function LogicMessage(e) {
         let ptr = x[2] / 4;
         if (resource_map.has(id)) {
             let buffer = resource_map.get(id);
-            let lenght = buffer.byteLength;
-            let u32 = new Uint32Array(buffer, 0, lenght >> 2);
-            let u8 = new Uint8Array(buffer, lenght & ~3, lenght & 3);
+            let length = buffer.byteLength;
+            let u32 = new Uint32Array(buffer, 0, length >> 2);
+            let u8 = new Uint8Array(buffer, length & ~3, length & 3);
             for (let i of u32) {
                 memoryViewU32[ptr++] = i;
             }
@@ -169,7 +169,7 @@ function LogicMessage(e) {
                 memoryViewU8[ptr++] = i;
             }
             resource_map.delete(id);
-            queue.write_i32([DONE_WRITING_RESOURE, id]);
+            queue.write_i32([DONE_WRITING_RESOURCE, id]);
         } else {
             console.error("Requested resource not in resource_map, id: " + id)
         }
@@ -183,7 +183,7 @@ function LogicMessage(e) {
         SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
         spawnModule(wasm_module);
         queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_QUEUE_LENGTH);
-    } else if (optcode === SET_TEXTMODE) {
+    } else if (optcode === SET_TEXT_MODE) {
         if (x[1] === 0) {
             window.addEventListener('input', input);
         } else {
@@ -246,7 +246,7 @@ function setup_ws() {
         connected = true;
     });
     ws.addEventListener('error', event => {
-        console.error('ws error occured: "' + event + '"');
+        console.error('ws error occurred: "' + event + '"');
         connected = false;
     });
     ws.addEventListener('close', event => {
@@ -258,7 +258,7 @@ function setup_ws() {
         let opcode = data[0];
         if (opcode === PUSH_RESOURCE) {
             upload_resource(e.data);
-        } else if (opcode === PUSH_GAMESTATE) {
+        } else if (opcode === PUSH_GAME_STATE) {
             Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);
             Atomics.store(memoryView32, SYNC_OTHER_STATE + 2, data[3]);
@@ -277,7 +277,7 @@ function hashCode(str) {
     for (var i = 0; i < str.length; i++) {
         var char = str.charCodeAt(i);
         hash = ((hash<<5)-hash)+char;
-        hash = hash & hash; // Convert to 32bit integer
+        hash = hash & hash; // Convert to 32 bit integer
     }
     return hash;
 }

@@ -43,6 +43,7 @@ mod tests {
             assert_eq!(std::mem::discriminant(&$a), std::mem::discriminant(&$b));
         };
     }
+
     #[test]
     fn from() {
         assert_enum!(WebGl2Error::ContextLost, Gl2::CONTEXT_LOST_WEBGL.into());

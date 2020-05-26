@@ -1,8 +1,9 @@
+use std::convert::TryInto;
+
 use super::shader::ShaderType;
 use crate::ClientError;
 use rask_engine::math::Mat3;
 use rask_engine::resources::TextureRange;
-use std::convert::TryInto;
 
 pub struct Gl2;
 
@@ -116,26 +117,30 @@ impl Gl2 {
 }
 
 extern "C" {
-    /// same as `WebGLRenderingContext.getError()`
+    /// Same as `WebGLRenderingContext.getError()`.
     fn gl_get_error() -> u32;
 
     /// This function creates a vertex array with a vertex buffer.
     /// Return values are:
     ///     * 0 - success
-    ///     * 1 - failiure, VAO creation failed
-    ///     * 2 - failiure, VBO creation failed
+    ///     * 1 - failure, VAO creation failed
+    ///     * 2 - failure, VBO creation failed
+    ///
     /// # Safety
-    /// The pointer must be 32bit aligned
+    ///
+    /// The pointer must be 32 bit aligned.
     fn gl_create_vertex_array_and_buffer_with_data(data: *const f32, len32: usize) -> u32;
 
-    /// This function (re)alloates the matrix and texture buffers and initialises them with the
+    /// This function (re)allocates the matrix and texture buffers and initialises them with the
     /// given memory. If the buffers do not exist, they are created.
     /// Return values are:
     ///     * 0 - success
-    ///     * 1 - failiure, matrix buffer creation failed
-    ///     * 2 - failiure, texture buffer creation failed
+    ///     * 1 - failure, matrix buffer creation failed
+    ///     * 2 - failure, texture buffer creation failed
+    ///
     /// # Safety
-    /// All pointers must be 32bit aligned
+    ///
+    /// All pointers must be 32 bit aligned.
     fn gl_allocate_buffers(
         mat_ptr: *const f32,
         tex_bound_ptr: *const f32,
@@ -144,34 +149,38 @@ extern "C" {
     ) -> u32;
 
     /// This function updates the matrix buffer with the given values.
+    ///
     /// # Safety
-    /// All pointers must be 32bit aligned
+    ///
+    /// All pointers must be 32 bit aligned.
     fn gl_update_mat_buffer(mat_ptr: *const f32, instances: u32);
 
     /// This function updates the texture buffer with the given values.
+    ///
     /// # Safety
-    /// All pointers must be 32bit aligned
+    ///
+    /// All pointers must be 32 bit aligned.
     fn gl_update_tex_buffer(tex_bound_ptr: *const f32, tex_layer_ptr: *const u32, instances: u32);
 
     /// This function creates a shader program.
     /// Return values are:
     ///     * positive: success, a program handle was returned
-    ///     * negative: failiure, an error occured
+    ///     * negative: failure, an error occurred
     fn gl_create_program() -> i32;
 
     /// This function compiles a shader and attaches it to a shader program.
     /// Return values are:
     ///     * 0 - success
-    ///     * 1 - failiure, invalid/unknown program handle
-    ///     * 2 - failiure, invalid/unknown shader type
-    ///     * 3 - failiure, shader creation failed
-    ///     * 4 - failiure, shader compilation failed
+    ///     * 1 - failure, invalid/unknown program handle
+    ///     * 2 - failure, invalid/unknown shader type
+    ///     * 3 - failure, shader creation failed
+    ///     * 4 - failure, shader compilation failed
     fn gl_attach_new_shader(prog: i32, shader_type: u32) -> u32;
 
     /// This function links a shader program.
     /// Return values are:
     ///     * 0 - success
-    ///     * 1 - failiure, invalid/unknown program handle
-    ///     * 1 - failiure, program linkage failed
+    ///     * 1 - failure, invalid/unknown program handle
+    ///     * 1 - failure, program linkage failed
     fn gl_link_program(prog: i32) -> u32;
 }

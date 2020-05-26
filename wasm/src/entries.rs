@@ -1,12 +1,14 @@
-//! This module contains the entry points callable from javascript
+//! This module contains the entry points callable from JavaScript.
+//!
 //! # Usage
-//! To initialize the memory correctly, the exports have to be called in the follwing order:
-//! 1. exports.__wasm_init_memory()
-//! 2. exports.__wasm_init_tls()
-//! 3. exports.init()
-//! only now may other fuctions get called.
-//! Calling 1-3 more than once is undefined behavior
-//! When executing `init()` a message is sent to the main thread, signaling the initiaisation has
+//!
+//! To initialize the memory correctly, the exports have to be called in the following order:
+//! 1. `exports.__wasm_init_memory()`
+//! 2. `exports.__wasm_init_tls()`
+//! 3. `exports.init()`
+//! Only now other functions may get called.
+//! Calling 1-3 more than once is undefined behavior.
+//! When executing `init()` a message is sent to the main thread, signaling the initialization has
 //! finished. This signal is used to start the graphics worker.
 
 use crate::communication::{message_queue::MessageQueueElement, MessageQueue};
@@ -31,27 +33,28 @@ fn wait_for_main_thread_notify() {
     unsafe { SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
 }
 
-/// This function initializes the heap, logger, panic handler and graphics context
-/// The sizes of static elements such as the resource_table can be set in crate::mem
+/// This function initializes the heap, logger, panic handler and graphics context.
+/// The sizes of static elements such as the resource_table can be set in `crate::mem`.
 ///
 /// # Safety
-/// This function may only be called once at the start of the program
-/// Any call to alloc prior to this functions invocation results in an error
+///
+/// This function may only be called once at the start of the program.
+/// Any call to alloc prior to this functions invocation results in an error.
 #[export_name = "init"]
 #[cfg(target_arch = "wasm32")]
 pub extern "C" fn init(heap_base: i32) {
     unsafe {
         // Place the synchronization_memory, message_queue and resource_table at the beginning of
         // our heap. This call initializes mem::MEM_ADDRS
-        mem::MemoryAdresses::init(heap_base as u32);
+        mem::MemoryAddresses::init(heap_base as u32);
         wee_alloc::init_ptr(*mem::HEAP_BASE as *mut u8, mem::HEAP_SIZE as usize);
     }
     // set custom panic handler
     log::set_logger(&LOGGER).unwrap();
     init_panic_handler();
-    // change the loglevel to only show certain errors
+    // change the log level to only show certain errors
     log::set_max_level(log::LevelFilter::Info);
-    // send memery offsetst to the main thread -> initialize graphics
+    // send memory offset to the main thread -> initialize graphics
     Message::Memory(
         *mem::SYNCHRONIZATION_MEMORY as u32,
         *mem::MESSAGE_QUEUE as u32,
@@ -63,9 +66,8 @@ pub extern "C" fn init(heap_base: i32) {
 #[cfg(not(target_arch = "wasm32"))]
 static mut MESSAGES: &mut [MessageQueueElement] = &mut [MessageQueueElement::new()];
 
-/// Initialize the gamestate, communicate with
-/// the graphics worker and set up networking.
-/// This function is being exposed to javascript
+/// Initialize the game state, communicate with the graphics worker and set up networking.
+/// This function is being exposed to JavaScript.
 #[export_name = "run_logic"]
 pub extern "C" fn run_logic() {
     #[cfg(target_arch = "wasm32")]
@@ -83,15 +85,15 @@ pub extern "C" fn run_logic() {
 
     loop {
         game.tick()
-            .unwrap_or_else(|e| log::error!("Error occured game_context.tick(): {:?}", e));
+            .unwrap_or_else(|e| log::error!("Error occurred game_context.tick(): {:?}", e));
         log::trace!("wait_for_main_thread_notify()");
-        // use wasms atomic wait instruction to sleep until waken by the main thread
+        // use wasm's atomic wait instruction to sleep until waken by the main thread
         wait_for_main_thread_notify();
     }
 }
 
 /// This function is called to render each frame.
-/// Most of the communication with the graphics api is done thorough calling js functions
+/// Most of the communication with the graphics API is done through calling JS functions.
 #[export_name = "draw_frame"]
 pub extern "C" fn draw_frame() {
     match unsafe { renderer::renderer_mut() } {

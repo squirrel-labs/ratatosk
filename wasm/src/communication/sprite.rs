@@ -1,4 +1,5 @@
 use rask_engine::math;
+
 #[derive(Clone, Copy, Debug)]
 pub struct Sprite {
     pub transform: math::Mat3,
