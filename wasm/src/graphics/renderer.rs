@@ -3,7 +3,7 @@ use super::GraphicsApi;
 use crate::communication::SynchronizationMemory;
 use crate::communication::RESOURCE_TABLE;
 use crate::error::ClientError;
-use rask_engine::resources::{GetStore, Texture};
+use rask_engine::resources::{GetTextures, Texture};
 
 type RenderBackend = WebGl2;
 static mut RENDERER: Option<Renderer<RenderBackend>> = None;
@@ -52,9 +52,17 @@ impl<T: GraphicsApi> Renderer<T> {
             let textures = used_textures
                 .ids
                 .iter()
-                .map(|&id| (id, guard.get(id as usize)))
-                .map(|(id, tex): (_, Result<&Texture, _>)| tex.map(|tex| (id, tex)))
-                .collect::<Result<Vec<(u32, &Texture)>, _>>()?;
+                .map(|&id| (id, guard.get_textures(id as usize)))
+                .map(|(id, tex): (_, Result<Vec<(u64, &Texture)>, _>)| {
+                    tex.map(|tex: Vec<(u64, &Texture)>| {
+                        Ok(tex
+                            .iter()
+                            .map(|(sid, t): &(u64, &Texture)| (id, *sid, *t))
+                            .collect())
+                    })
+                })
+                .flatten()
+                .collect::<Result<Vec<(u32, u64, &Texture)>, _>>()?;
             self.graphics.upload_textures(&textures)?;
         }
         let state = *crate::communication::DOUBLE_BUFFER.lock();

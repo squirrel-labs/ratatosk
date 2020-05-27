@@ -6,8 +6,8 @@ use std::convert::TryInto;
 #[derive(Debug, Clone)]
 pub struct Texture {
     raw_data: Vec<u8>,
-    w: u32,
-    h: u32,
+    width: u32,
+    height: u32,
     color_type: ColorType,
 }
 
@@ -61,8 +61,8 @@ impl Texture {
 
         Ok(Self {
             raw_data: bytes,
-            w,
-            h,
+            width: w,
+            height: h,
             color_type,
         })
     }
@@ -75,8 +75,8 @@ impl Texture {
     ) -> Self {
         Self {
             raw_data,
-            w: width,
-            h: height,
+            width,
+            height,
             color_type,
         }
     }
@@ -84,14 +84,22 @@ impl Texture {
         let raw_data = image.to_bytes();
         Self {
             raw_data,
-            w: image.width(),
-            h: image.height(),
+            width: image.width(),
+            height: image.height(),
             color_type: image.color(),
         }
     }
 
     pub fn dimension(&self) -> (u32, u32) {
-        (self.w, self.h)
+        (self.width, self.height)
+    }
+
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
     }
 
     pub fn color_type(&self) -> ColorType {

@@ -42,6 +42,14 @@ pub trait GetStore<T> {
     fn store(&mut self, data: T, id: usize) -> Result<(), EngineError>;
 }
 
+pub trait GetTextures<T> {
+    /// Retrieve a resource from the library.
+    fn get_textures<U: Into<usize> + Debug + Copy>(
+        &self,
+        id: U,
+    ) -> Result<Vec<(u64, &super::Texture)>, EngineError>;
+}
+
 impl Default for ResourceTable {
     fn default() -> Self {
         Self::new()
@@ -77,3 +85,43 @@ impl ResourceTable {
 get_store!(super::Texture, Texture);
 get_store!(super::Sound, Sound);
 get_store!(Box<super::Character>, Character);
+impl GetTextures<super::Character> for ResourceTable {
+    fn get_textures<U: Into<usize> + Debug + Copy>(
+        &self,
+        id: U,
+    ) -> Result<Vec<(u64, &super::Texture)>, EngineError> {
+        self.index_check(id.into())?;
+        match &self.0[id.into()] {
+            Resource::Character(value) => {
+                Ok(value.atlas().iter().map(|(id, t)| (*id, t)).collect())
+            }
+            Resource::None => Err(EngineError::ResourceMissing(format!(
+                "Could not find requested resource #{}",
+                id.into(),
+            ))),
+            _ => Err(EngineError::ResourceType(format!(
+                "Wrong resource type, required \"{}\"",
+                stringify!($type),
+            ))),
+        }
+    }
+}
+impl GetTextures<super::Texture> for ResourceTable {
+    fn get_textures<U: Into<usize> + Debug + Copy>(
+        &self,
+        id: U,
+    ) -> Result<Vec<(u64, &super::Texture)>, EngineError> {
+        self.index_check(id.into())?;
+        match &self.0[id.into()] {
+            Resource::Texture(value) => Ok(vec![(0, value)]),
+            Resource::None => Err(EngineError::ResourceMissing(format!(
+                "Could not find requested resource #{}",
+                id.into(),
+            ))),
+            _ => Err(EngineError::ResourceType(format!(
+                "Wrong resource type, required \"{}\"",
+                stringify!($type),
+            ))),
+        }
+    }
+}

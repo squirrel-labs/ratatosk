@@ -83,6 +83,14 @@ impl Gl2 {
         })
     }
 
+    pub fn get_max_texture_size(&self) -> Result<(u32, u32), ClientError> {
+        unsafe { gl_query_max_texture_size() }
+            .try_into()
+            .map_err(|_| {
+                ClientError::WebGlError("glCreateProgram returned an unexpected object".to_string())
+            })
+    }
+
     pub fn attach_new_shader(&self, prog: u32, shader_type: ShaderType) -> Result<(), ClientError> {
         match unsafe { gl_attach_new_shader(prog as i32, shader_type as u32) } {
             0 => Ok(()),
@@ -131,7 +139,7 @@ extern "C" {
     /// The pointer must be 32 bit aligned.
     fn gl_create_vertex_array_and_buffer_with_data(data: *const f32, len32: usize) -> u32;
 
-    /// This function (re)allocates the matrix and texture buffers and initialises them with the
+    /// This function (re)allocates the matrix and texture buffers and initializes them with the
     /// given memory. If the buffers do not exist, they are created.
     /// Return values are:
     ///     * 0 - success
@@ -183,4 +191,8 @@ extern "C" {
     ///     * 1 - failure, invalid/unknown program handle
     ///     * 1 - failure, program linkage failed
     fn gl_link_program(prog: i32) -> u32;
+
+    /// This function queries the maximum texture size supported by the gpu.
+    /// Returns the size as width and height
+    fn gl_query_max_texture_size() -> (u32, u32);
 }
