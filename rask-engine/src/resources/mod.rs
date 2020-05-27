@@ -31,7 +31,7 @@ pub use character::Character;
 #[doc(inline)]
 pub use registry::RESOURCE_COUNT;
 #[doc(inline)]
-pub use resource_table::{GetStore, ResourceTable};
+pub use resource_table::{GetStore, GetTextures, ResourceTable};
 #[doc(inline)]
 pub use sound::Sound;
 #[doc(inline)]

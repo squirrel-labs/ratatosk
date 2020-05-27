@@ -12,6 +12,7 @@ use crate::communication::Sprite;
 use crate::error::ClientError;
 use bindings::Gl2;
 use rask_engine::{math::Mat3, resources::Texture, resources::TextureRange};
+use rect_packer::DensePacker;
 
 mod imports {
     extern "C" {
@@ -41,9 +42,12 @@ pub struct WebGl2 {
     canvas_size: (u32, u32),
     program: shader::ShaderProgram,
     // mapping from texture id to texture with texture range and texture layer
-    textures: HashMap<(u32, u32), (TextureRange, u32)>,
-    sprite_textures: Vec<(u32, u32)>,
+    textures: HashMap<(u32, u64), (TextureRange, u32)>,
+    sprite_textures: Vec<(u32, u64)>,
     matrix_buffer: Vec<Mat3>,
+    max_texture_size: (u32, u32),
+    texture_packer: DensePacker,
+    layer_index: i32,
 }
 
 impl WebGl2 {
@@ -51,7 +55,7 @@ impl WebGl2 {
         &mut self,
         sprites: &[Sprite],
     ) -> Option<(Vec<TextureRange>, Vec<u32>)> {
-        self.sprite_textures = sprites.iter().map(|s| (s.tex_id, s.attachment)).collect();
+        self.sprite_textures = sprites.iter().map(|s| (s.tex_id, s.tex_sub_id)).collect();
         Some(
             self.sprite_textures
                 .iter()
@@ -74,6 +78,7 @@ impl GraphicsApi for WebGl2 {
             -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0,
         ])?;
         log::info!("shaders compiled and linked");
+        let tex_size = gl.get_max_texture_size()?;
         Ok(Self {
             gl,
             size: (width, height),
@@ -82,6 +87,9 @@ impl GraphicsApi for WebGl2 {
             textures: HashMap::new(),
             sprite_textures: vec![],
             matrix_buffer: vec![],
+            max_texture_size: tex_size,
+            texture_packer: DensePacker::new(tex_size.0 as i32, tex_size.1 as i32),
+            layer_index: 0,
         })
     }
 
@@ -94,7 +102,7 @@ impl GraphicsApi for WebGl2 {
                 .sprite_textures
                 .iter()
                 .zip(sprites.iter())
-                .all(|(&t, s)| (s.tex_id, s.attachment) == t);
+                .all(|(&t, s)| s.tex_id == t.0 && s.tex_sub_id == t.1);
             if !keep_textures {
                 let (texture_ranges, texture_layers) =
                     self.generate_texture_buffers(sprites).ok_or_else(|| {
@@ -123,12 +131,40 @@ impl GraphicsApi for WebGl2 {
         }
     }
 
-    fn upload_textures(&mut self, textures: &[((u32, u32), &Texture)]) -> Result<(), ClientError> {
-        self.textures = textures.iter().collect();
+    fn upload_textures(&mut self, textures: &[(u32, u64, &Texture)]) -> Result<(), ClientError> {
+        let (width, height) = self.max_texture_size;
+        for texture in textures {
+            if !self.texture_packer.can_pack(
+                texture.2.width() as i32,
+                texture.2.height() as i32,
+                false,
+            ) {
+                self.texture_packer = rect_packer::DensePacker::new(width as i32, height as i32);
+                self.layer_index += 1;
+            }
+            let rect = self
+                .texture_packer
+                .pack(texture.2.width() as i32, texture.2.height() as i32, false)
+                .unwrap();
+            self.textures.insert(
+                (texture.0, texture.1),
+                (
+                    TextureRange::new(
+                        (rect.x as f32, rect.y as f32),
+                        (rect.width as f32, rect.height as f32),
+                    ),
+                    self.layer_index as u32,
+                ),
+            );
+        }
         Ok(())
     }
 
     fn remove_textures(&mut self) -> Result<(), ClientError> {
+        let (width, height) = self.max_texture_size;
+        self.texture_packer = rect_packer::DensePacker::new(width as i32, height as i32);
+        self.layer_index += 1;
+        self.textures.clear();
         Ok(())
     }
 

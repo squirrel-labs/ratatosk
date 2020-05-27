@@ -1427,6 +1427,7 @@ dependencies = [
  "log 0.4.8",
  "parking_lot 0.10.2",
  "rask-engine",
+ "rect_packer",
  "wee_alloc",
 ]
 
@@ -1438,6 +1439,12 @@ checksum = "678054eb77286b51581ba43620cc911abf02758c91f93f479767aed0f90458b2"
 dependencies = [
  "rand_core 0.3.1",
 ]
+
+[[package]]
+name = "rect_packer"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d8ffb4dfda4b01cc420847665dc480760d596ce186f2772a66ed32fe9acb1c45"
 
 [[package]]
 name = "redox_syscall"
