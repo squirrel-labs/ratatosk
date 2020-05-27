@@ -127,12 +127,32 @@ impl Gl2 {
         }
     }
 
-    pub fn realloc_texture_atlas(&self, w: u32, h: u32, layer_count: u32) {
-        todo!()
+    pub fn realloc_texture_atlas(
+        &self,
+        w: u32,
+        h: u32,
+        layer_count: u32,
+    ) -> Result<(), ClientError> {
+        match unsafe { gl_realloc_texture_atlas(w, h, layer_count) } {
+            0 => Ok(()),
+            1 => Err(ClientError::WebGlError(
+                "reallocation of texture buffer failed".to_string(),
+            )),
+            _ => unreachable!("unexpected return value from js function"),
+        }
     }
 
     pub fn upload_texture_to_atlas(&self, range: TextureRange, layer: u32, texture: &Texture) {
-        todo!()
+        unsafe {
+            gl_upload_texture_to_atlas(
+                range.start.0,
+                range.start.1,
+                range.size.0,
+                range.size.1,
+                layer,
+                texture.raw().as_ptr(),
+            )
+        };
     }
 }
 
@@ -212,16 +232,16 @@ extern "C" {
     /// This function (re)allocates the texture storage.
     /// Return values are:
     ///     * 0 - success
-    ///     * 1 - failiure, texture generation failed
+    ///     * 1 - failure, texture generation failed
     fn gl_realloc_texture_atlas(w: u32, h: u32, layer_count: u32) -> u32;
 
-    /// TODO: doc
+    /// This function draws the buffer onto the specified texture layer
     fn gl_upload_texture_to_atlas(
         start_x: u32,
         start_y: u32,
         width: u32,
         height: u32,
         layer: u32,
-        buffer: *const u32,
+        buffer: *const u8,
     );
 }
