@@ -67,7 +67,7 @@ impl ResourceParser {
         match res.data {
             ResourceData::ResourceVec(image) => {
                 log::info!("decoding texture {} len: {}", res.res_id, image.len());
-                let img = Texture::from_png_stream(image)?;
+                let img = Texture::from_memory(image)?;
                 RESOURCE_TABLE.write().store(img, res.res_id as usize)?;
                 Ok(())
             }
