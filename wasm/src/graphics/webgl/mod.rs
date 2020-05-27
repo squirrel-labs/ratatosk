@@ -134,18 +134,20 @@ impl GraphicsApi for WebGl2 {
     fn upload_textures(&mut self, textures: &[(u32, u64, &Texture)]) -> Result<(), ClientError> {
         let (width, height) = self.max_texture_size;
         for texture in textures {
-            if !self.texture_packer.can_pack(
-                texture.2.width() as i32,
-                texture.2.height() as i32,
-                false,
-            ) {
-                self.texture_packer = rect_packer::DensePacker::new(width as i32, height as i32);
-                self.layer_index += 1;
-            }
             let rect = self
                 .texture_packer
                 .pack(texture.2.width() as i32, texture.2.height() as i32, false)
-                .unwrap();
+                .or_else(|| {
+                    self.texture_packer =
+                        rect_packer::DensePacker::new(width as i32, height as i32);
+                    self.layer_index += 1;
+                    self.texture_packer.pack(
+                        texture.2.width() as i32,
+                        texture.2.height() as i32,
+                        false,
+                    )
+                })
+                .ok_or_else(|| ClientError::WebGlError("texture too large for GPU".to_string()))?;
             self.textures.insert(
                 (texture.0, texture.1),
                 (
@@ -163,7 +165,7 @@ impl GraphicsApi for WebGl2 {
     fn remove_textures(&mut self) -> Result<(), ClientError> {
         let (width, height) = self.max_texture_size;
         self.texture_packer = rect_packer::DensePacker::new(width as i32, height as i32);
-        self.layer_index += 1;
+        self.layer_index = 0;
         self.textures.clear();
         Ok(())
     }
