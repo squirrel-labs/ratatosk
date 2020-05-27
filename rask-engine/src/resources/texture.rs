@@ -47,26 +47,6 @@ impl TextureIds {
 }
 
 impl Texture {
-    pub fn from_png_stream<R: std::io::Read>(r: R) -> Result<Self, EngineError> {
-        let decoder = PngDecoder::new(r)?;
-
-        let (w, h) = decoder.dimensions();
-        let e = |_| EngineError::ResourceType("invalid image resolution".to_string());
-        let (w, h) = (w.try_into().map_err(e)?, h.try_into().map_err(e)?);
-
-        let color_type = decoder.color_type();
-
-        let mut bytes = vec![0; w as usize * h as usize * color_type.bytes_per_pixel() as usize];
-        decoder.read_image(&mut bytes)?;
-
-        Ok(Self {
-            raw_data: bytes,
-            width: w,
-            height: h,
-            color_type,
-        })
-    }
-
     pub fn form_raw_parts(
         raw_data: Vec<u8>,
         width: u32,
@@ -80,14 +60,19 @@ impl Texture {
             color_type,
         }
     }
+
     pub fn from_dynamic_image(image: image::DynamicImage) -> Self {
-        let raw_data = image.to_bytes();
+        let raw_data = image.to_rgba().inner().to_vec();
         Self {
             raw_data,
             width: image.width(),
             height: image.height(),
             color_type: image.color(),
         }
+    }
+
+    pub fn from_memory(image: &[u8]) -> Result<Self, EngineError> {
+        Ok(Self::from_dynamic_image(image::load_from_memory(image)?))
     }
 
     pub fn dimension(&self) -> (u32, u32) {
