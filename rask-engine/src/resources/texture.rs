@@ -18,9 +18,9 @@ pub struct TextureIds {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TextureRange {
-    start: (u32, u32),
-    size: (u32, u32),
-    target_size: (u32, u32),
+    pub start: (u32, u32),
+    pub size: (u32, u32),
+    pub target_size: (u32, u32),
 }
 
 impl TextureRange {
