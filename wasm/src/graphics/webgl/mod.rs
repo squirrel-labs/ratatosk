@@ -41,8 +41,8 @@ pub struct WebGl2 {
     canvas_size: (u32, u32),
     program: shader::ShaderProgram,
     // mapping from texture id to texture with texture range and texture layer
-    textures: HashMap<u32, (TextureRange, u32)>,
-    sprite_textures: Vec<u32>,
+    textures: HashMap<(u32, u32), (TextureRange, u32)>,
+    sprite_textures: Vec<(u32, u32)>,
     matrix_buffer: Vec<Mat3>,
 }
 
@@ -51,7 +51,7 @@ impl WebGl2 {
         &mut self,
         sprites: &[Sprite],
     ) -> Option<(Vec<TextureRange>, Vec<u32>)> {
-        self.sprite_textures = sprites.iter().map(|s| s.tex_id).collect();
+        self.sprite_textures = sprites.iter().map(|s| (s.tex_id, s.attachment)).collect();
         Some(
             self.sprite_textures
                 .iter()
@@ -86,12 +86,15 @@ impl GraphicsApi for WebGl2 {
     }
 
     fn update_sprite_vector(&mut self, sprites: &[Sprite]) -> Result<(), ClientError> {
+        if sprites.is_empty() {
+            return Ok(());
+        }
         if sprites.len() == self.matrix_buffer.len() {
             let keep_textures = self
                 .sprite_textures
                 .iter()
                 .zip(sprites.iter())
-                .all(|(&t, s)| s.tex_id == t);
+                .all(|(&t, s)| (s.tex_id, s.attachment) == t);
             if !keep_textures {
                 let (texture_ranges, texture_layers) =
                     self.generate_texture_buffers(sprites).ok_or_else(|| {
@@ -106,13 +109,22 @@ impl GraphicsApi for WebGl2 {
                 self.matrix_buffer[i] = sprite.transform;
             }
             self.gl.update_matrix_buffer(&self.matrix_buffer);
+            Ok(())
         } else {
-            // TODO
+            self.matrix_buffer = sprites.iter().map(|s| s.transform).collect();
+            let (texture_ranges, texture_layers) =
+                self.generate_texture_buffers(sprites).ok_or_else(|| {
+                    ClientError::ResourceError(
+                        "tried to add sprite with non-existent texture".to_string(),
+                    )
+                })?;
+            self.gl
+                .allocate_buffers(&self.matrix_buffer, &texture_ranges, &texture_layers)
         }
-        Ok(())
     }
 
-    fn upload_textures(&mut self, textures: &[(u32, &Texture)]) -> Result<(), ClientError> {
+    fn upload_textures(&mut self, textures: &[((u32, u32), &Texture)]) -> Result<(), ClientError> {
+        self.textures = textures.iter().collect();
         Ok(())
     }
 

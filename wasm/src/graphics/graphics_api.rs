@@ -13,7 +13,7 @@ pub trait GraphicsApi: Sized {
     fn update_sprite_vector(&mut self, sprites: &[Sprite]) -> Result<(), ClientError>;
 
     /// Upload the given id-to-texture mapping to the graphics context.
-    fn upload_textures(&mut self, textures: &[(u32, &Texture)]) -> Result<(), ClientError>;
+    fn upload_textures(&mut self, textures: &[((u32, u32), &Texture)]) -> Result<(), ClientError>;
 
     /// Remove all textures from the graphics context.
     fn remove_textures(&mut self) -> Result<(), ClientError>;

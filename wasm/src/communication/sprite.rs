@@ -4,6 +4,7 @@ use rask_engine::math;
 pub struct Sprite {
     pub transform: math::Mat3,
     pub tex_id: u32,
+    pub attachment: u32,
 }
 
 impl Default for Sprite {
@@ -13,14 +14,19 @@ impl Default for Sprite {
 }
 
 impl Sprite {
-    pub fn new(transform: math::Mat3, tex_id: u32) -> Self {
-        Self { transform, tex_id }
+    pub fn new(transform: math::Mat3, tex_id: u32, attachment: u32) -> Self {
+        Self {
+            transform,
+            tex_id,
+            attachment,
+        }
     }
 
     pub const fn empty() -> Self {
         Self {
             transform: math::Mat3::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
             tex_id: 0,
+            attachment: 0,
         }
     }
 }

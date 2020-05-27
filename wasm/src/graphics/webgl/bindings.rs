@@ -37,8 +37,8 @@ impl Gl2 {
 
     pub fn allocate_buffers(
         &self,
-        matrices: &[f32],
-        texture_bounds: &[f32],
+        matrices: &[Mat3],
+        texture_bounds: &[TextureRange],
         texture_layers: &[u32],
     ) -> Result<(), ClientError> {
         let n = texture_layers.len();
@@ -49,8 +49,8 @@ impl Gl2 {
         }
         match unsafe {
             gl_allocate_buffers(
-                matrices.as_ptr(),
-                texture_bounds.as_ptr(),
+                matrices.as_ptr() as *const f32,
+                texture_bounds.as_ptr() as *const f32,
                 texture_layers.as_ptr(),
                 n as u32,
             )
