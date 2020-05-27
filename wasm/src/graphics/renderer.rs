@@ -49,20 +49,24 @@ impl<T: GraphicsApi> Renderer<T> {
         if used_textures.reset_notify > 0 {
             self.graphics.remove_textures()?;
             let guard = RESOURCE_TABLE.read();
+            let mut err = Ok(());
             let textures = used_textures
                 .ids
                 .iter()
                 .map(|&id| (id, guard.get_textures(id as usize)))
-                .map(|(id, tex): (_, Result<Vec<(u64, &Texture)>, _>)| {
+                .flat_map(|(id, tex): (_, Result<Vec<(u64, &Texture)>, _>)| {
                     tex.map(|tex: Vec<(u64, &Texture)>| {
-                        Ok(tex
-                            .iter()
+                        tex.iter()
                             .map(|(sid, t): &(u64, &Texture)| (id, *sid, *t))
-                            .collect())
+                            .collect::<Vec<(u32, u64, &Texture)>>()
+                    })
+                    .unwrap_or_else(|e| -> Vec<(u32, u64, &Texture)> {
+                        err = Err(e);
+                        vec![]
                     })
                 })
-                .flatten()
-                .collect::<Result<Vec<(u32, u64, &Texture)>, _>>()?;
+                .collect::<Vec<(u32, u64, &Texture)>>();
+            err?;
             self.graphics.upload_textures(&textures)?;
         }
         let state = *crate::communication::DOUBLE_BUFFER.lock();

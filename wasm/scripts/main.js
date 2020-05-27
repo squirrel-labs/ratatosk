@@ -1,3 +1,5 @@
+'use strict';
+
 const WORKER_URI = 'scripts/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:5001/'
 const MESSAGE_ITEM_SIZE = 32;
