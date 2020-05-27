@@ -18,20 +18,27 @@ pub struct TextureIds {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TextureRange {
-    start: (f32, f32),
-    end: (f32, f32),
+    start: (u32, u32),
+    size: (u32, u32),
+    target_size: (u32, u32),
 }
 
 impl TextureRange {
-    pub fn new(start: (f32, f32), end: (f32, f32)) -> Self {
-        Self { start, end }
+    pub fn new(start: (u32, u32), size: (u32, u32), target_size: (u32, u32)) -> Self {
+        Self {
+            start,
+            size,
+            target_size,
+        }
     }
 
-    pub fn new_from_pixels(start: (u32, u32), end: (u32, u32), w: u32, h: u32) -> Self {
-        Self {
-            start: ((start.0 as f32 / (w as f32)), (start.1 as f32 / (h as f32))),
-            end: ((end.0 as f32 / (w as f32)), (end.1 as f32 / (h as f32))),
-        }
+    pub fn into_floats(self) -> (f32, f32, f32, f32) {
+        (
+            (self.start.0 as f32 / (self.target_size.0 as f32)),
+            (self.start.1 as f32 / (self.target_size.1 as f32)),
+            (self.size.0 as f32 / (self.target_size.0 as f32)),
+            (self.size.1 as f32 / (self.target_size.1 as f32)),
+        )
     }
 }
 

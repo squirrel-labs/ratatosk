@@ -3,7 +3,7 @@ use std::convert::TryInto;
 use super::shader::ShaderType;
 use crate::ClientError;
 use rask_engine::math::Mat3;
-use rask_engine::resources::TextureRange;
+use rask_engine::resources::{Texture, TextureRange};
 
 pub struct Gl2;
 
@@ -38,7 +38,7 @@ impl Gl2 {
     pub fn allocate_buffers(
         &self,
         matrices: &[Mat3],
-        texture_bounds: &[TextureRange],
+        texture_bounds: &[(f32, f32, f32, f32)],
         texture_layers: &[u32],
     ) -> Result<(), ClientError> {
         let n = texture_layers.len();
@@ -67,7 +67,11 @@ impl Gl2 {
         unsafe { gl_update_mat_buffer(matrices.as_ptr() as *const f32, matrices.len() as u32) }
     }
 
-    pub fn update_texture_buffer(&self, texture_ranges: &[TextureRange], texture_layers: &[u32]) {
+    pub fn update_texture_buffer(
+        &self,
+        texture_ranges: &[(f32, f32, f32, f32)],
+        texture_layers: &[u32],
+    ) {
         unsafe {
             gl_update_tex_buffer(
                 texture_ranges.as_ptr() as *const f32,
@@ -116,8 +120,19 @@ impl Gl2 {
             2 => Err(ClientError::WebGlError(
                 "program linkage failed, linker failed".to_string(),
             )),
+            3 => Err(ClientError::WebGlError(
+                "program linkage failed, shader attribute location not found".to_string(),
+            )),
             _ => unreachable!("unexpected return value from js function"),
         }
+    }
+
+    pub fn realloc_texture_atlas(&self, w: u32, h: u32, layer_count: u32) {
+        todo!()
+    }
+
+    pub fn upload_texture_to_atlas(&self, range: TextureRange, layer: u32, texture: &Texture) {
+        todo!()
     }
 }
 
@@ -186,10 +201,27 @@ extern "C" {
     /// Return values are:
     ///     * 0 - success
     ///     * 1 - failure, invalid/unknown program handle
-    ///     * 1 - failure, program linkage failed
+    ///     * 2 - failure, program linkage failed
+    ///     * 3 - failure, attribute location not found
     fn gl_link_program(prog: i32) -> u32;
 
     /// This function queries the maximum texture size supported by the gpu.
     /// Returns the size as width and height
     fn gl_query_max_texture_size() -> u32;
+
+    /// This function (re)allocates the texture storage.
+    /// Return values are:
+    ///     * 0 - success
+    ///     * 1 - failiure, texture generation failed
+    fn gl_realloc_texture_atlas(w: u32, h: u32, layer_count: u32) -> u32;
+
+    /// TODO: doc
+    fn gl_upload_texture_to_atlas(
+        start_x: u32,
+        start_y: u32,
+        width: u32,
+        height: u32,
+        layer: u32,
+        buffer: *const u32,
+    );
 }
