@@ -2,17 +2,16 @@
 
 precision mediump float;
 
-out vec4 color;
+uniform mediump sampler2DArray g_texture;
+
+flat in vec4 frag_tex_bounds;
+flat in uint frag_tex_layer;
+
 in vec2 tex_pos;
 
-uniform mediump sampler2D g_texture;
+out vec4 color;
 
 void main() {
-    vec2 tp = tex_pos;
-    tp.y = 1.0 - tp.y;
-    color = texture(g_texture, tp);
-    if (gl_FragCoord.y > 500.0) {
-        color = vec4(vec3(length(color) * 0.4), 1.0);
-    }
+    color = texture(g_texture, vec3(frag_tex_bounds.xy + frag_tex_bounds.zw * vec2(tex_pos.x, 1.0 - tex_pos.y), float(frag_tex_layer)));
     if (color.a == 0.0) discard;
 }

@@ -45,8 +45,9 @@ impl<T: GraphicsApi> Renderer<T> {
     }
 
     pub fn draw_sprites(&mut self) -> Result<(), ClientError> {
-        let used_textures = crate::communication::TEXTURE_IDS.lock();
+        let mut used_textures = crate::communication::TEXTURE_IDS.lock();
         if used_textures.reset_notify > 0 {
+            used_textures.reset_notify = 0;
             self.graphics.remove_textures()?;
             let guard = RESOURCE_TABLE.read();
             let mut err = Ok(());

@@ -38,13 +38,13 @@ impl Gl2 {
     pub fn allocate_buffers(
         &self,
         matrices: &[Mat3],
-        texture_bounds: &[(f32, f32, f32, f32)],
+        texture_bounds: &[[f32; 4]],
         texture_layers: &[u32],
     ) -> Result<(), ClientError> {
         let n = texture_layers.len();
-        if matrices.len() != n * 9 || texture_bounds.len() != n * 4 {
+        if matrices.len() != n || texture_bounds.len() != n {
             return Err(ClientError::WebGlError(
-                "tried allocating incompatible buffer sizes".to_string(),
+                format!("tried allocating incompatible buffer sizes ({} texture layers, {} matrices, {} texture bounds)", n, matrices.len(), texture_bounds.len()),
             ));
         }
         match unsafe {
@@ -67,11 +67,7 @@ impl Gl2 {
         unsafe { gl_update_mat_buffer(matrices.as_ptr() as *const f32, matrices.len() as u32) }
     }
 
-    pub fn update_texture_buffer(
-        &self,
-        texture_ranges: &[(f32, f32, f32, f32)],
-        texture_layers: &[u32],
-    ) {
+    pub fn update_texture_buffer(&self, texture_ranges: &[[f32; 4]], texture_layers: &[u32]) {
         unsafe {
             gl_update_tex_buffer(
                 texture_ranges.as_ptr() as *const f32,

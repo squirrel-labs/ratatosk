@@ -58,6 +58,10 @@ impl LogicContext {
                 let id = match (tex1, tex2) {
                     (true, false) => texid1,
                     (true, true) => {
+                        let mut guard = crate::communication::TEXTURE_IDS.lock();
+                        guard.ids.push(texid1);
+                        guard.ids.push(texid2);
+                        guard.reset_notify += 1;
                         if self.state.sprites().is_empty() {
                             texid1
                         } else {

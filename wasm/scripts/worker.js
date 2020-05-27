@@ -149,8 +149,8 @@ const imports = {
         }
         posLoc = gl.getAttribLocation(prog, 'pos');
         matLoc = gl.getAttribLocation(prog, 'mat');
-        texBoundLoc = gl.getAttribLocation(prog, 'textureBonuds');
-        texLayerLoc = gl.getAttribLocation(prog, 'textureLayer');
+        texBoundLoc = gl.getAttribLocation(prog, 'texture_bounds');
+        texLayerLoc = gl.getAttribLocation(prog, 'texture_layer');
         if (posLoc === -1 || matLoc === -1 || texBoundLoc === -1 || texLayerLoc === -1) {
             return 3;
         }
@@ -165,7 +165,7 @@ const imports = {
             if (typeof texture === 'undefined') return 1;
             gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
         }
-        gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA8, w, h, layer_count);
+        gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, gl.RGBA8, w, h, layer_count);
         return 0;
     },
     gl_upload_texture_to_atlas: function(start_x, start_y, width, height, layer, buffer) {

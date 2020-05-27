@@ -32,13 +32,13 @@ impl TextureRange {
         }
     }
 
-    pub fn into_floats(self) -> (f32, f32, f32, f32) {
-        (
+    pub fn into_floats(self) -> [f32; 4] {
+        [
             (self.start.0 as f32 / (self.target_size.0 as f32)),
             (self.start.1 as f32 / (self.target_size.1 as f32)),
             (self.size.0 as f32 / (self.target_size.0 as f32)),
             (self.size.1 as f32 / (self.target_size.1 as f32)),
-        )
+        ]
     }
 }
 
