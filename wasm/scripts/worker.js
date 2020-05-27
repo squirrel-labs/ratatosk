@@ -1,3 +1,5 @@
+'use strict';
+
 let mem;
 let decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 let u8mem;
@@ -38,7 +40,7 @@ const imports = {
         console.error('%cPANIC\tpanic at line ' + line + ' and column ' + column + ' in file "' + str_from_mem(file, flen) + '"\n' + str_from_mem(msg, len), 'color:red');
     },
     post_to_main: function(msg, len) {
-        this.postMessage(arr_from_mem(msg, len));
+        postMessage(arr_from_mem(msg, len));
     },
     get_canvas_size: function() {
         return (canvas.width << 16) | canvas.height;
@@ -145,7 +147,10 @@ const imports = {
             return 2;
         }
         return 0;
-    }
+    },
+    gl_query_max_texture_size: function() {
+        return gl.getParameter(gl.MAX_TEXTURE_SIZE);
+    },
 };
 
 // handle the initialisation

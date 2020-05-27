@@ -83,12 +83,9 @@ impl Gl2 {
         })
     }
 
-    pub fn get_max_texture_size(&self) -> Result<(u32, u32), ClientError> {
-        unsafe { gl_query_max_texture_size() }
-            .try_into()
-            .map_err(|_| {
-                ClientError::WebGlError("glCreateProgram returned an unexpected object".to_string())
-            })
+    pub fn get_max_texture_size(&self) -> (u32, u32) {
+        let w = unsafe { gl_query_max_texture_size() };
+        (w, w)
     }
 
     pub fn attach_new_shader(&self, prog: u32, shader_type: ShaderType) -> Result<(), ClientError> {
@@ -194,5 +191,5 @@ extern "C" {
 
     /// This function queries the maximum texture size supported by the gpu.
     /// Returns the size as width and height
-    fn gl_query_max_texture_size() -> (u32, u32);
+    fn gl_query_max_texture_size() -> u32;
 }
