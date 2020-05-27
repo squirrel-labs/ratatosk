@@ -1,7 +1,6 @@
 use crate::error::EngineError;
 pub use image::ColorType;
-use image::{png::PngDecoder, GenericImageView, ImageDecoder};
-use std::convert::TryInto;
+use image::GenericImageView;
 
 #[derive(Debug, Clone)]
 pub struct Texture {
