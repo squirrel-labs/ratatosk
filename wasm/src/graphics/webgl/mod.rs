@@ -11,7 +11,10 @@ use super::GraphicsApi;
 use crate::communication::Sprite;
 use crate::error::ClientError;
 use bindings::Gl2;
-use rask_engine::{math::Mat3, resources::Texture, resources::TextureRange};
+use rask_engine::{
+    math::Mat3,
+    resources::{GetTextures, Texture, TextureRange},
+};
 use rect_packer::DensePacker;
 
 mod imports {
@@ -47,19 +50,24 @@ pub struct WebGl2 {
     matrix_buffer: Vec<Mat3>,
     max_texture_size: (u32, u32),
     texture_packer: DensePacker,
-    layer_index: i32,
+    layer_index: u32,
+    allocated_layers: u32,
 }
 
 impl WebGl2 {
     fn generate_texture_buffers(
         &mut self,
         sprites: &[Sprite],
-    ) -> Option<(Vec<TextureRange>, Vec<u32>)> {
+    ) -> Option<(Vec<(f32, f32, f32, f32)>, Vec<u32>)> {
         self.sprite_textures = sprites.iter().map(|s| (s.tex_id, s.tex_sub_id)).collect();
         Some(
             self.sprite_textures
                 .iter()
-                .map(|i| self.textures.get(i).cloned())
+                .map(|i| {
+                    self.textures
+                        .get(i)
+                        .map(|(range, layer)| (range.into_floats(), layer))
+                })
                 .collect::<Option<Vec<_>>>()?
                 .iter()
                 .cloned()
@@ -90,6 +98,7 @@ impl GraphicsApi for WebGl2 {
             max_texture_size: tex_size,
             texture_packer: DensePacker::new(tex_size.0 as i32, tex_size.1 as i32),
             layer_index: 0,
+            allocated_layers: 0,
         })
     }
 
@@ -133,6 +142,7 @@ impl GraphicsApi for WebGl2 {
 
     fn upload_textures(&mut self, textures: &[(u32, u64, &Texture)]) -> Result<(), ClientError> {
         let (width, height) = self.max_texture_size;
+        let mut upload_vec = vec![];
         for texture in textures {
             let rect = self
                 .texture_packer
@@ -148,16 +158,29 @@ impl GraphicsApi for WebGl2 {
                     )
                 })
                 .ok_or_else(|| ClientError::WebGlError("texture too large for GPU".to_string()))?;
-            self.textures.insert(
-                (texture.0, texture.1),
-                (
-                    TextureRange::new(
-                        (rect.x as f32, rect.y as f32),
-                        (rect.width as f32, rect.height as f32),
-                    ),
-                    self.layer_index as u32,
+            let tex = (
+                TextureRange::new(
+                    (rect.x as u32, rect.y as u32),
+                    (rect.width as u32, rect.height as u32),
+                    (width, height),
                 ),
+                self.layer_index,
             );
+            self.textures.insert((texture.0, texture.1), tex);
+            upload_vec.push((tex, texture.2));
+        }
+        if self.layer_index + 1 == self.allocated_layers {
+            for ((range, layer), tex) in upload_vec {
+                self.gl.upload_texture_to_atlas(range, layer, tex);
+            }
+        } else {
+            self.gl
+                .realloc_texture_atlas(width, height, self.layer_index + 1);
+            let guard = crate::communication::RESOURCE_TABLE.read();
+            for (&(id, sid), &(range, layer)) in self.textures.iter() {
+                let tex = guard.get_texture(id as usize, sid)?;
+                self.gl.upload_texture_to_atlas(range, layer, tex);
+            }
         }
         Ok(())
     }

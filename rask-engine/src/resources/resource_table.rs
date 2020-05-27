@@ -48,6 +48,13 @@ pub trait GetTextures {
         &self,
         id: U,
     ) -> Result<Vec<(u64, &super::Texture)>, EngineError>;
+
+    /// Retrieve a texture from the library.
+    fn get_texture<U: Into<usize> + Debug + Copy>(
+        &self,
+        id: U,
+        sid: u64,
+    ) -> Result<&super::Texture, EngineError>;
 }
 
 impl Default for ResourceTable {
@@ -97,6 +104,31 @@ impl GetTextures for ResourceTable {
             Resource::Character(value) => {
                 Ok(value.atlas().iter().map(|(id, t)| (*id, t)).collect())
             }
+            Resource::None => Err(EngineError::ResourceMissing(format!(
+                "Could not find requested resource #{}",
+                id.into(),
+            ))),
+            _ => Err(EngineError::ResourceType(format!(
+                "Wrong resource type, required \"{}\"",
+                stringify!($type),
+            ))),
+        }
+    }
+
+    fn get_texture<U: Into<usize> + Debug + Copy>(
+        &self,
+        id: U,
+        sid: u64,
+    ) -> Result<&super::Texture, EngineError> {
+        self.index_check(id.into())?;
+        match &self.0[id.into()] {
+            Resource::Texture(value) => Ok(value),
+            Resource::Character(value) => value.atlas().get(&sid).ok_or_else(|| {
+                EngineError::ResourceIndex(format!(
+                    "Invalid subtexture id #{} of texture #{:?}",
+                    sid, id
+                ))
+            }),
             Resource::None => Err(EngineError::ResourceMissing(format!(
                 "Could not find requested resource #{}",
                 id.into(),

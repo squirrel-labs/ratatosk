@@ -10,10 +10,11 @@ let canvas;
 let gl;
 let programs = [];
 let shaders = [];
-let posLoc, matLoc, texBoundLoc, texLayerLoc;  // TODO: Query them
+let posLoc, matLoc, texBoundLoc, texLayerLoc;
 let matBuffer, texBuffer;
 // vertex and fragment shader
 let vs, fs;
+let texture;
 
 function str_from_mem(ptr, len) {
     return decoder.decode(u8mem.slice(ptr, ptr + len));
@@ -146,11 +147,30 @@ const imports = {
             console.error('program shader failed with\n' + logInfo);
             return 2;
         }
+        posLoc = gl.getAttribLocation(prog, 'pos');
+        matLoc = gl.getAttribLocation(prog, 'mat');
+        texBoundLoc = gl.getAttribLocation(prog, 'textureBonuds');
+        texLayerLoc = gl.getAttribLocation(prog, 'textureLayer');
+        if (posLoc === -1 || matLoc === -1 || texBoundLoc === -1 || texLayerLoc === -1) {
+            return 3;
+        }
         return 0;
     },
     gl_query_max_texture_size: function() {
         return gl.getParameter(gl.MAX_TEXTURE_SIZE);
     },
+    gl_realloc_texture_atlas: function(w, h, layer_count) {
+        if (typeof texture === 'undefined') {
+            texture = gl.createTexture();
+            if (typeof texture === 'undefined') return 1;
+            gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
+        }
+        gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA8, w, h, layer_count);
+        return 0;
+    },
+    gl_upload_texture_to_atlas: function(start_x, start_y, width, height, layer, buffer) {
+        gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, start_x, start_y, layer, width, height, 1, gl.RGBA, gl.UNSIGNED_BYTE, u8mem, buffer);
+    }
 };
 
 // handle the initialisation
