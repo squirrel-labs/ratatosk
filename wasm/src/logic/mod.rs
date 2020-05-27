@@ -71,11 +71,13 @@ impl LogicContext {
                     self.state.append_sprite(&crate::communication::Sprite::new(
                         rask_engine::math::Mat3::identity(),
                         id,
+                        0,
                     ));
                 } else {
                     self.state.append_sprite(&crate::communication::Sprite::new(
                         rask_engine::math::Mat3::scaling(0.4, 0.4),
                         id,
+                        0,
                     ));
                 }
             }
