@@ -58,7 +58,7 @@ impl WebGl2 {
     fn generate_texture_buffers(
         &mut self,
         sprites: &[Sprite],
-    ) -> Option<(Vec<(f32, f32, f32, f32)>, Vec<u32>)> {
+    ) -> Option<(Vec<[f32; 4]>, Vec<u32>)> {
         self.sprite_textures = sprites.iter().map(|s| (s.tex_id, s.tex_sub_id)).collect();
         Some(
             self.sprite_textures
@@ -175,7 +175,7 @@ impl GraphicsApi for WebGl2 {
             }
         } else {
             self.gl
-                .realloc_texture_atlas(width, height, self.layer_index + 1);
+                .realloc_texture_atlas(width, height, self.layer_index + 1)?;
             let guard = crate::communication::RESOURCE_TABLE.read();
             for (&(id, sid), &(range, layer)) in self.textures.iter() {
                 let tex = guard.get_texture(id as usize, sid)?;
