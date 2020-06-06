@@ -50,6 +50,8 @@ const imports = {
     set_canvas_size: function(w, h) {
         canvas.width = w;
         canvas.height = h;
+        if (typeof gl !== 'undefined')
+            gl.viewport(0, 0, w, h);
     },
     gl_get_error: function() {
         return gl.getError();
@@ -156,6 +158,7 @@ const imports = {
         if (posLoc === -1 || matLoc === -1 || texBoundLoc === -1 || texLayerLoc === -1) {
             return 3;
         }
+        gl.useProgram(prog);
         return 0;
     },
     gl_query_max_texture_size: function() {
@@ -166,17 +169,19 @@ const imports = {
             texture = gl.createTexture();
             if (typeof texture === 'undefined') return 1;
             gl.bindTexture(gl.TEXTURE_2D_ARRAY, texture);
+            gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         }
-        gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, gl.RGBA8, w, h, layer_count);
+        gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, gl.RGBA8, w, h, layer_count, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
         return 0;
     },
     gl_upload_texture_to_atlas: function(start_x, start_y, width, height, layer, buffer) {
         gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, start_x, start_y, layer, width, height, 1, gl.RGBA, gl.UNSIGNED_BYTE, u8mem, buffer);
     },
-    gl_draw_arrays_instanced_with_triangles: function(first, count, instance_count) {
-        gl.useProgram(programs[0]);
-
+    gl_uniform_texture: function() {
         gl.uniform1i(textureLoc, texture);
+    },
+    gl_draw_arrays_instanced_with_triangles: function(first, count, instance_count) {
         gl.drawArraysInstanced(gl.TRIANGLES, first, count, instance_count);
     }
 };
