@@ -150,6 +150,10 @@ impl Gl2 {
             )
         };
     }
+
+    pub fn draw_arrays_instanced(&self, first: u32, count: u32, instance_count: u32) {
+        unsafe { gl_draw_arrays_instanced_with_triangles(first, count, instance_count) }
+    }
 }
 
 extern "C" {
@@ -240,4 +244,14 @@ extern "C" {
         layer: u32,
         buffer: *const u8,
     );
+
+    /// This function draws the specified vertices as triangles
+    /// first:
+    ///     starting index in the array of vector points.
+    /// count:
+    ///     number of indices to be rendered.
+    /// instanceCount:
+    ///     number of instances of the range of elements to execute.
+    fn gl_draw_arrays_instanced_with_triangles(first: u32, count: u32, instance_count: u32);
+
 }
