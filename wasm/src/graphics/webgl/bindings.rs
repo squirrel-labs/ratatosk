@@ -151,6 +151,10 @@ impl Gl2 {
         };
     }
 
+    pub fn uniform_texture(&self) {
+        unsafe { gl_uniform_texture() }
+    }
+
     pub fn draw_arrays_instanced(&self, first: u32, count: u32, instance_count: u32) {
         unsafe { gl_draw_arrays_instanced_with_triangles(first, count, instance_count) }
     }
@@ -245,6 +249,9 @@ extern "C" {
         buffer: *const u8,
     );
 
+    /// This function tells the shader the binding id via uniform.
+    fn gl_uniform_texture();
+
     /// This function draws the specified vertices as triangles
     /// first:
     ///     starting index in the array of vector points.
@@ -253,5 +260,4 @@ extern "C" {
     /// instanceCount:
     ///     number of instances of the range of elements to execute.
     fn gl_draw_arrays_instanced_with_triangles(first: u32, count: u32, instance_count: u32);
-
 }

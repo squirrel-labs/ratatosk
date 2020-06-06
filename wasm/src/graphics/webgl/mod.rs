@@ -182,6 +182,7 @@ impl GraphicsApi for WebGl2 {
                 self.gl.upload_texture_to_atlas(range, layer, tex);
             }
         }
+        self.gl.uniform_texture();
         Ok(())
     }
 
