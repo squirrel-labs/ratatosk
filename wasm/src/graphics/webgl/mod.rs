@@ -194,7 +194,10 @@ impl GraphicsApi for WebGl2 {
     }
 
     fn draw(&mut self) -> Result<(), ClientError> {
+        self.gl
+            .draw_arrays_instanced(0, 6, self.matrix_buffer.len() as u32);
         Ok(())
+        //todo!("draw function is not implemented yet")
     }
 
     fn set_size(&mut self, w: u32, h: u32) {

@@ -15,6 +15,7 @@ let matBuffer, texBuffer;
 // vertex and fragment shader
 let vs, fs;
 let texture;
+let textureLoc;
 
 function str_from_mem(ptr, len) {
     return decoder.decode(u8mem.slice(ptr, ptr + len));
@@ -151,6 +152,7 @@ const imports = {
         matLoc = gl.getAttribLocation(prog, 'mat');
         texBoundLoc = gl.getAttribLocation(prog, 'texture_bounds');
         texLayerLoc = gl.getAttribLocation(prog, 'texture_layer');
+        textureLoc = gl.getUniformLocation(prog, "g_texture");
         if (posLoc === -1 || matLoc === -1 || texBoundLoc === -1 || texLayerLoc === -1) {
             return 3;
         }
@@ -170,6 +172,12 @@ const imports = {
     },
     gl_upload_texture_to_atlas: function(start_x, start_y, width, height, layer, buffer) {
         gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, start_x, start_y, layer, width, height, 1, gl.RGBA, gl.UNSIGNED_BYTE, u8mem, buffer);
+    },
+    gl_draw_arrays_instanced_with_triangles: function(first, count, instance_count) {
+        gl.useProgram(programs[0]);
+
+        gl.uniform1i(textureLoc, texture);
+        gl.drawArraysInstanced(gl.TRIANGLES, first, count, instance_count);
     }
 };
 

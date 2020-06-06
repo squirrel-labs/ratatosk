@@ -32,6 +32,7 @@ pub struct Renderer<T> {
 impl<T: GraphicsApi> Renderer<T> {
     pub fn new() -> Result<Self, ClientError> {
         // TODO: Do not hardcode pixelated framebuffer size
+        log::debug!("Creating graphics buffer");
         T::new(160, 90).map(|api| Self { graphics: api })
     }
 
@@ -40,6 +41,7 @@ impl<T: GraphicsApi> Renderer<T> {
             .ok()
             .map_err(|e| ClientError::WebGlError(format!("WebGl2 error: {}", e)))?;
         let size = (unsafe { SynchronizationMemory::get() }).canvas_size;
+        log::trace!("canvas_size: {}px x {}px", size.0, size.1);
         self.graphics.update_size(size.0, size.1);
         self.draw_sprites()
     }
@@ -47,10 +49,12 @@ impl<T: GraphicsApi> Renderer<T> {
     pub fn draw_sprites(&mut self) -> Result<(), ClientError> {
         let mut used_textures = crate::communication::TEXTURE_IDS.lock();
         if used_textures.reset_notify > 0 {
+            log::debug!("Uploading new textures");
             used_textures.reset_notify = 0;
             self.graphics.remove_textures()?;
             let guard = RESOURCE_TABLE.read();
             let mut err = Ok(());
+            log::trace!("reading new textures");
             let textures = used_textures
                 .ids
                 .iter()
@@ -68,6 +72,7 @@ impl<T: GraphicsApi> Renderer<T> {
                 })
                 .collect::<Vec<(u32, u64, &Texture)>>();
             err?;
+            log::trace!("uploading new textures to gpu");
             self.graphics.upload_textures(&textures)?;
         }
         let state = *crate::communication::DOUBLE_BUFFER.lock();
