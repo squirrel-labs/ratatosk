@@ -172,7 +172,7 @@ const imports = {
             gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         }
-        gl.texStorage3D(gl.TEXTURE_2D_ARRAY, 1, gl.RGBA8, w, h, layer_count, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA8, w, h, layer_count, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
         return 0;
     },
     gl_upload_texture_to_atlas: function(start_x, start_y, width, height, layer, buffer) {
