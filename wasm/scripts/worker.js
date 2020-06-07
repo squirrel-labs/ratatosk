@@ -14,6 +14,9 @@ let posLoc, matLoc, texBoundLoc, texLayerLoc;
 let matBuffer, texBuffer;
 // vertex and fragment shader
 let vs, fs;
+let canvasWidth, canvasHeight;
+let pixeledWidth, pixeledHeight;
+let fb;
 let texture;
 let textureLoc;
 
@@ -45,13 +48,15 @@ const imports = {
         postMessage(arr_from_mem(msg, len));
     },
     get_canvas_size: function() {
+        canvasWidth = canvas.width;
+        canvasHeight = canvas.height;
         return (canvas.width << 16) | canvas.height;
     },
     set_canvas_size: function(w, h) {
         canvas.width = w;
         canvas.height = h;
-        if (typeof gl !== 'undefined')
-            gl.viewport(0, 0, w, h);
+        canvasWidth = w;
+        canvasHeight = h;
     },
     gl_get_error: function() {
         return gl.getError();
@@ -182,7 +187,33 @@ const imports = {
         gl.uniform1i(textureLoc, texture);
     },
     gl_draw_arrays_instanced_with_triangles: function(first, count, instance_count) {
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, fb);
         gl.drawArraysInstanced(gl.TRIANGLES, first, count, instance_count);
+
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+        gl.blitFramebuffer(0, 0, pixeledWidth, pixeledHeight, 0, 0, canvasWidth, canvasHeight, gl.COLOR_BUFFER_BIT, gl.NEAREST);
+    },
+    gl_create_renderbuffer: function(width, height) {
+        gl.disable(gl.CULL_FACE);
+        gl.disable(gl.DEPTH_TEST);
+        gl.disable(gl.POLYGON_OFFSET_FILL);
+        gl.disable(gl.SCISSOR_TEST);
+        gl.disable(gl.STENCIL_TEST);
+        pixeledWidth = width;
+        pixeledHeight = height;
+        fb = gl.createFramebuffer();
+        if (typeof fb === 'undefined') return 1;
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        gl.viewport(0, 0, width, height);
+        const rb = gl.createRenderbuffer();
+        if (typeof rb === 'undefined') return 2;
+        gl.bindRenderbuffer(gl.RENDERBUFFER, rb);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.RGBA8, width, height);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, rb);
+        const state = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+        if (state !== gl.FRAMEBUFFER_COMPLETE) return 3 | (state << 16);
+        return 0;
     }
 };
 
@@ -213,7 +244,7 @@ onmessage = async function({ data }) {
             alpha: false,
             depth: false,
             stencil: true,
-            antialias: true,
+            antialias: false,
             premultipliedAlpha: true,
             preserveDrawingBuffered: true,
             powerPreference: "high-performance",
