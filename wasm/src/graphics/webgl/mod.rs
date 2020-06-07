@@ -41,9 +41,7 @@ fn set_canvas_size(w: u32, h: u32) {
 
 pub struct WebGl2 {
     gl: Gl2,
-    size: (u32, u32),
     canvas_size: (u32, u32),
-    program: shader::ShaderProgram,
     // mapping from texture id to texture with texture range and texture layer
     textures: HashMap<(u32, u64), (TextureRange, u32)>,
     sprite_textures: Vec<(u32, u64)>,
@@ -81,17 +79,16 @@ impl GraphicsApi for WebGl2 {
 
     fn new(width: u32, height: u32) -> Result<Self, ClientError> {
         let gl = Gl2;
-        let program = shader::ShaderProgram::new(&gl)?;
+        shader::ShaderProgram::new(&gl)?;
         gl.create_vao_with_buffer_data(&[
             -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0,
         ])?;
         log::info!("shaders compiled and linked");
         let tex_size = gl.get_max_texture_size();
+        gl.create_renderbuffer(width, height)?;
         Ok(Self {
             gl,
-            size: (width, height),
             canvas_size: init_canvas_size(),
-            program,
             textures: HashMap::new(),
             sprite_textures: vec![],
             matrix_buffer: vec![],

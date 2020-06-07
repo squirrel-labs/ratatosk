@@ -7,6 +7,10 @@ use rask_engine::resources::{Texture, TextureRange};
 
 pub struct Gl2;
 
+fn unexpected_js_return_value() -> ! {
+    unreachable!("unexpected return value from js function")
+}
+
 impl Gl2 {
     pub const CONTEXT_LOST_WEBGL: u32 = 37442;
     pub const INVALID_ENUM: u32 = 1280;
@@ -31,7 +35,7 @@ impl Gl2 {
             2 => Err(ClientError::WebGlError(
                 "glCreateBuffer returned an unexpected object".to_string(),
             )),
-            _ => unreachable!("unexpected return value from js function"),
+            _ => unexpected_js_return_value(),
         }
     }
 
@@ -59,7 +63,7 @@ impl Gl2 {
             1 | 2 => Err(ClientError::WebGlError(
                 "glCreateBuffer returned an unexpected object".to_string(),
             )),
-            _ => unreachable!("unexpected return value from js function"),
+            _ => unexpected_js_return_value(),
         }
     }
 
@@ -103,7 +107,7 @@ impl Gl2 {
             4 => Err(ClientError::WebGlError(
                 "shader compilation failed".to_string(),
             )),
-            _ => unreachable!("unexpected return value from js function"),
+            _ => unexpected_js_return_value(),
         }
     }
 
@@ -119,7 +123,7 @@ impl Gl2 {
             3 => Err(ClientError::WebGlError(
                 "program linkage failed, shader attribute location not found".to_string(),
             )),
-            _ => unreachable!("unexpected return value from js function"),
+            _ => unexpected_js_return_value(),
         }
     }
 
@@ -134,7 +138,7 @@ impl Gl2 {
             1 => Err(ClientError::WebGlError(
                 "reallocation of texture buffer failed".to_string(),
             )),
-            _ => unreachable!("unexpected return value from js function"),
+            _ => unexpected_js_return_value(),
         }
     }
 
@@ -157,6 +161,23 @@ impl Gl2 {
 
     pub fn draw_arrays_instanced(&self, first: u32, count: u32, instance_count: u32) {
         unsafe { gl_draw_arrays_instanced_with_triangles(first, count, instance_count) }
+    }
+
+    pub fn create_renderbuffer(&self, width: u32, height: u32) -> Result<(), ClientError> {
+        match unsafe { gl_create_renderbuffer(width, height) } {
+            0 => Ok(()),
+            1 => Err(ClientError::WebGlError(
+                "creation of framebuffer failed".to_string(),
+            )),
+            2 => Err(ClientError::WebGlError(
+                "creation of renderbuffer failed".to_string(),
+            )),
+            v if (v & 0xffff) == 3 => Err(ClientError::WebGlError(format!(
+                "framebuffer is not complete (status is 0x{:04x})",
+                v >> 16
+            ))),
+            _ => unexpected_js_return_value(),
+        }
     }
 }
 
@@ -260,4 +281,12 @@ extern "C" {
     /// instanceCount:
     ///     number of instances of the range of elements to execute.
     fn gl_draw_arrays_instanced_with_triangles(first: u32, count: u32, instance_count: u32);
+
+    /// This function creates a renderbuffer with the given size.
+    /// Return values are:
+    ///     * 0 - success
+    ///     * 1 - failure, framebuffer creation failed
+    ///     * 2 - failure, renderbuffer creation failed
+    ///     * 3 | (state << 16) - failure, framebuffer not complete
+    fn gl_create_renderbuffer(width: u32, height: u32) -> u32;
 }
