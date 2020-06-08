@@ -50,8 +50,8 @@ pub extern "C" fn init(heap_base: i32) {
         wee_alloc::init_ptr(*mem::HEAP_BASE as *mut u8, mem::HEAP_SIZE as usize);
     }
     // set custom panic handler
-    log::set_logger(&LOGGER).unwrap();
     init_panic_handler();
+    log::set_logger(&LOGGER).unwrap();
     // change the log level to only show certain errors
     log::set_max_level(log::LevelFilter::Info);
     // send memory offset to the main thread -> initialize graphics
