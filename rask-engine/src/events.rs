@@ -1,7 +1,7 @@
 #![allow(clippy::unreadable_literal)]
 //! this module contains The game input/output event definition
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct Key(u32);
 
 impl From<u32> for Key {

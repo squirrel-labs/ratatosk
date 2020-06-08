@@ -15,6 +15,8 @@ pub struct LogicContext {
     tick_nr: u64,
     message_queue: MessageQueue<'static>,
     res_parser: ResourceParser,
+    angle: i32,
+    angle_mod: i32,
 }
 
 /// The logic context stores everything necessary for event handling and the game engine.
@@ -25,6 +27,8 @@ impl LogicContext {
             tick_nr: 0,
             message_queue,
             res_parser: ResourceParser::new(),
+            angle: 0,
+            angle_mod: 0,
         })
     }
 
@@ -34,14 +38,24 @@ impl LogicContext {
     }
 
     pub fn tick(&mut self) -> Result<(), ClientError> {
+        let mut event = None;
         loop {
             let msg = self.message_queue.pop();
             if let Message::None = msg {
                 break;
             }
-            log::info!("{:?}", msg);
-            self.handle_message(msg)?;
+            log::debug!("{:?}", msg);
+            event = self.handle_message(msg)?;
         }
+        match event {
+            Some(Event::KeyDown(_, Key::ARROW_LEFT)) => self.angle_mod = -1,
+            Some(Event::KeyDown(_, Key::ARROW_RIGHT)) => self.angle_mod = 1,
+            Some(Event::KeyUp(_, Key::ARROW_RIGHT)) => self.angle_mod = 0,
+            Some(Event::KeyUp(_, Key::ARROW_LEFT)) => self.angle_mod = 0,
+            Some(Event::KeyDown(_, Key::ENTER)) => self.angle = 0,
+            _ => (),
+        }
+        self.angle += self.angle_mod;
 
         // TODO: Remove this temporary sprite loading. Replace it with some kind of
         // "resource complete" event
@@ -84,6 +98,12 @@ impl LogicContext {
                         0,
                     ));
                 }
+            }
+            log::trace!("angle: {}", self.angle);
+            if self.state.sprites().len() == 2 {
+                self.state.sprites_mut()[1].transform =
+                    rask_engine::math::Mat3::rotation(0.02 * self.angle as f32)
+                        * rask_engine::math::Mat3::scaling(0.4, 0.4);
             }
         }
 

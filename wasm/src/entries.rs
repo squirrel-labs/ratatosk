@@ -53,7 +53,7 @@ pub extern "C" fn init(heap_base: i32) {
     log::set_logger(&LOGGER).unwrap();
     init_panic_handler();
     // change the log level to only show certain errors
-    log::set_max_level(log::LevelFilter::Trace);
+    log::set_max_level(log::LevelFilter::Info);
     // send memory offset to the main thread -> initialize graphics
     Message::Memory(
         *mem::SYNCHRONIZATION_MEMORY as u32,
