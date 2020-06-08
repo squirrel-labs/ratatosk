@@ -1,23 +1,20 @@
 mod backend_connection;
 mod error;
+mod game_logger;
 mod games;
 mod group;
 mod server;
 
-mod game_logger;
-
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate clap;
-use clap::App;
 pub use std::error::Error;
+
+use clap::{load_yaml, App};
+use log::info;
 
 fn main() -> Result<(), error::ServerError> {
     game_logger::init_logger();
 
     // load args
-    let yaml = load_yaml!("cli.yml");
+    let yaml = load_yaml!("cli.yaml");
     let matches = App::from_yaml(yaml).get_matches();
 
     // extract values from args

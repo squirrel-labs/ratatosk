@@ -1,51 +1,85 @@
+use crate::collide::Collidable;
 use crate::math::Vec2;
 
 const GRAVITY: Vec2 = Vec2::new(0.0, -9.81);
 
-pub trait Move {
-    fn gravity() -> bool;
-    fn position(&mut self) -> &mut Vec2;
-    fn velocity(&mut self) -> &mut Vec2;
+pub struct PhysicalEntity {
+    pos: Vec2,
+    vel: Vec2,
+    acc: Vec2,
+    gravity: f32,
+    hit_box: Box<dyn Collidable>,
+}
 
-    fn update(&mut self, dt: f32) {
-        if Self::gravity() {
-            *self.velocity() += dt * GRAVITY;
-        }
-        let vel = *self.velocity();
-        *self.position() += dt * vel;
+impl PhysicalEntity {
+    /// Get the current position vector.
+    pub fn pos(&self) -> &Vec2 {
+        &self.pos
+    }
+
+    /// Get the current mutable position vector.
+    pub fn pos_mut(&mut self) -> &mut Vec2 {
+        &mut self.pos
+    }
+
+    /// Get a multiplication factor for the gravitation acceleration.
+    /// 0.0 stands for no gravity, 1.0 stands for normal gravity.
+    pub fn gravity(&self) -> f32 {
+        self.gravity
+    }
+
+    /// Get the current velocity vector.
+    pub fn vel(&self) -> &Vec2 {
+        &self.vel
+    }
+
+    /// Set the current mutable velocity vector.
+    pub fn vel_mut(&mut self) -> &mut Vec2 {
+        &mut self.vel
+    }
+
+    /// Get the current acceleration vector.
+    pub fn acc(&self) -> &Vec2 {
+        &self.acc
+    }
+
+    /// Set the current acceleration vector.
+    pub fn acc_mut(&mut self) -> &mut Vec2 {
+        &mut self.acc
+    }
+
+    pub fn hit_box(&self) -> &dyn Collidable {
+        self.hit_box.as_ref()
+    }
+
+    pub fn hit_box_mut(&mut self) -> &mut dyn Collidable {
+        self.hit_box.as_mut()
+    }
+
+    /// Recalculate object properties.
+    pub fn update(&mut self, dt: f32) {
+        let acc = self.gravity * GRAVITY + self.acc;
+        self.vel += dt * acc;
+        self.pos += dt * self.vel;
     }
 }
 
 #[allow(dead_code)]
 pub struct World {
+    physical_entities: Vec<PhysicalEntity>,
     players: Vec<Player>,
-    entities: Vec<Entity>,
     ground: Ground,
     background: Background,
 }
 
+impl World {
+    // TODO: pub fn new() -> Self {  }
+}
+
 #[allow(dead_code)]
 pub struct Player {
-    position: Vec2,
-    velocity: Vec2,
     skeleton: Skeleton,
 }
-
-impl Move for Player {
-    fn gravity() -> bool {
-        true
-    }
-
-    fn position(&mut self) -> &mut Vec2 {
-        &mut self.position
-    }
-
-    fn velocity(&mut self) -> &mut Vec2 {
-        &mut self.velocity
-    }
-}
-
-pub struct Entity;
 
 pub struct Skeleton;
 

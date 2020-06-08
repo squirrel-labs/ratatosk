@@ -39,11 +39,10 @@ rustup install nightly-2020-02-28
 rustup default nightly-2020-02-28
 rustup target add wasm32-unknown-unknown  # for the frontend part
 cargo install cargo-make
-cargo install wasm-bindgen-cli  # for optimizing wasm code
 ```
 
 Please note that we explicitly pin the nightly channel to a certain date to ensure that
-each developer uses the same toolchain which helps reproducing compiler issues on multiple setups.
+each developer uses the same toolchain which helps to reproduce compiler issues on multiple setups.
 
 Now you can build the project with [`cargo`](https://doc.rust-lang.org/cargo/):
 
@@ -56,4 +55,11 @@ The following scripts can be used to start test servers
 ```
 cargo make serve-frontend # for the wasm/frontend setup
 cargo make serve-backend  # for the backend/game_server
+```
+
+For development purposes it might be helpful to activate the `watch`-profile in the
+build-system:
+
+```
+cargo make serve-backend -p watch
 ```

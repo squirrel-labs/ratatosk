@@ -1,11 +1,11 @@
 //! The collide module provides the Collide trait for objects that can collide along with several
 //! implementations for various types.
 
-use spine::skeleton::SRT;
+use core::ops::Range;
 
 use crate::boxes::{AABox, RBox};
 use crate::math::Vec2;
-use core::ops::Range;
+use spine::skeleton::SRT;
 
 // For information on the SAT, see: http://www.dyn4j.org/2010/01/sat/.
 
@@ -13,6 +13,9 @@ use core::ops::Range;
 pub trait Collide<Rhs: ?Sized = Self> {
     fn collides(&self, other: &Rhs) -> bool;
 }
+
+/// A trait for common objects to be collidable with other common objects.
+pub trait Collidable: Collide<RBox> + Collide<SRT> + Collide<AABox> + Collide<Vec2> {}
 
 fn left_under(v1: Vec2, v2: Vec2) -> bool {
     v1.x() < v2.x() && v1.y() < v2.y()
@@ -64,7 +67,7 @@ fn calculate_aabox_rbox_component_bounds(
         return (0.0, 1.0);
     }
     // get bounds of s by transforming "g(s) = pos + s * direction"
-    // and applying the inequation g(s) >= bound.start and g(s) <= bound.end
+    // and applying the inequality g(s) >= bound.start and g(s) <= bound.end
     let (s1, s2) = (
         (bound.start - pos) / direction,
         (bound.end - pos) / direction,
@@ -174,6 +177,20 @@ impl Collide<AABox> for SRT {
     }
 }
 
+impl Collide<RBox> for SRT {
+    fn collides(&self, other: &RBox) -> bool {
+        let rbox: RBox = self.into();
+        rbox.collides(other)
+    }
+}
+
+impl Collide for SRT {
+    fn collides(&self, other: &Self) -> bool {
+        let (rbox1, rbox2): (RBox, RBox) = (self.into(), other.into());
+        rbox1.collides(&rbox2)
+    }
+}
+
 impl Collide<AABox> for RBox {
     fn collides(&self, other: &AABox) -> bool {
         let xbound = other.pos.x()..other.pos.x() + other.size.x();
@@ -187,6 +204,13 @@ impl Collide<AABox> for RBox {
                 self.v2,
             )
             || collide_aabox_rbox_segment(xbound, ybound, self.pos + self.v2, self.v1)
+    }
+}
+
+impl Collide<SRT> for RBox {
+    fn collides(&self, other: &SRT) -> bool {
+        let rbox: RBox = other.into();
+        rbox.collides(self)
     }
 }
 
@@ -211,3 +235,8 @@ impl<S, T: Collide<S>> Collide<[T]> for S {
         other.collides(self)
     }
 }
+
+impl Collidable for RBox {}
+impl Collidable for SRT {}
+impl Collidable for AABox {}
+impl Collidable for Vec2 {}
