@@ -42,7 +42,7 @@ cargo install cargo-make
 ```
 
 Please note that we explicitly pin the nightly channel to a certain date to ensure that
-each developer uses the same toolchain which helps reproducing compiler issues on multiple setups.
+each developer uses the same toolchain which helps to reproduce compiler issues on multiple setups.
 
 Now you can build the project with [`cargo`](https://doc.rust-lang.org/cargo/):
 

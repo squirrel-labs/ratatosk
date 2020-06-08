@@ -1,11 +1,13 @@
-use crate::error::ServerError;
-use crate::group::{Message, SendGroup};
-use rask_engine::error::EngineError;
-use rask_engine::network::packet::ReadResource;
-use rask_engine::resources::registry;
 use std::collections::HashMap;
 use std::thread;
 use std::thread::JoinHandle;
+
+use crate::error::ServerError;
+use crate::group::{Message, SendGroup};
+use log::{error, info};
+use rask_engine::error::EngineError;
+use rask_engine::network::packet::ReadResource;
+use rask_engine::resources::registry;
 
 pub trait Game {
     fn run(self) -> Result<JoinHandle<()>, ServerError>;
@@ -53,6 +55,7 @@ impl RaskGame {
             res_cache: HashMap::new(),
         }
     }
+
     fn push_buffer(&mut self, buf_id: u32, user_id: usize) -> Result<(), ServerError> {
         self.users
             .get_mut(user_id)
@@ -63,7 +66,7 @@ impl RaskGame {
                     .get(&buf_id)
                     .ok_or_else(|| {
                         EngineError::ResourceMissing(format!(
-                            "Ressource {} is not loaded yet",
+                            "Resource {} is not loaded yet",
                             buf_id
                         ))
                     })?
@@ -71,6 +74,7 @@ impl RaskGame {
             ))?;
         Ok(())
     }
+
     fn load_char(&mut self, chr: registry::CharacterInfo) -> Result<(), ServerError> {
         if self.res_cache.contains_key(&chr.id) {
             return Ok(());
@@ -83,6 +87,7 @@ impl RaskGame {
         );
         Ok(())
     }
+
     fn load_resource(&mut self, res: registry::ResourceInfo) -> Result<(), ServerError> {
         if self.res_cache.contains_key(&res.id) {
             return Ok(());
@@ -95,6 +100,7 @@ impl RaskGame {
         );
         Ok(())
     }
+
     fn level_one(&mut self, uid: usize) -> Result<(), ServerError> {
         self.load_resource(registry::EMPTY)?;
         self.load_resource(registry::THIEF)?;
@@ -103,6 +109,7 @@ impl RaskGame {
         self.push_buffer(registry::THIEF.id, uid)?;
         Ok(())
     }
+
     fn game_loop(mut self) {
         let _messages = self.get_messages();
         while self.will_to_live {
@@ -115,15 +122,16 @@ impl RaskGame {
         }
         info!("thread killed itself");
     }
+
     fn add_user(&mut self, user: &User) {
         self.users.push(user.clone());
-        thread::sleep(std::time::Duration::from_secs(2));
         if let Err(e) = self.level_one(self.users.len() - 1) {
-            error!("Error during ressoure distribution: {}", e);
+            error!("Error during resoure distribution: {}", e);
         }
     }
+
     fn get_messages(&mut self) -> Vec<Message> {
-        //  info!("reciver {:#?} is still aive", self.group.receiver);
+        //  info!("receiver {:#?} is still alive", self.group.receiver);
         let (mut data, control): (Vec<Message>, Vec<Message>) =
             self.group.receiver.try_iter().partition(Message::is_data);
         control.iter().for_each(|x| match x {

@@ -1,4 +1,5 @@
 use crate::network::protocol::resource_types;
+
 macro_rules! parse_resource {
     ($num:expr, $name:ident, Character, $val: tt) => {
         pub const $name: CharacterInfo = CharacterInfo {
@@ -27,10 +28,9 @@ macro_rules! resources {
     };
     ($num:expr, ($name:ident, $variant:ident, $val:expr)) => {
         parse_resource! { $num, $name, $variant, $val }
+        pub const RESOURCE_COUNT: u32 = $num + 1;
     };
 }
-
-pub const RESOURCE_COUNT: u32 = 4;
 
 resources! {
     (EMPTY,             Texture,        "empty.png"              ),
@@ -42,6 +42,10 @@ resources! {
     }                                                            )
 }
 
+trait ResourceId {
+    fn get_id(&self) -> u32;
+}
+
 #[repr(u32)]
 #[derive(Debug, Clone, Copy)]
 pub enum ResourceVariant {
@@ -50,11 +54,17 @@ pub enum ResourceVariant {
     Sound = resource_types::SOUND,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct ResourceInfo {
     pub variant: ResourceVariant,
     pub path: &'static str,
     pub id: u32,
+}
+
+impl ResourceId for ResourceInfo {
+    fn get_id(&self) -> u32 {
+        self.id
+    }
 }
 
 struct Character {
@@ -63,10 +73,27 @@ struct Character {
     pub animation: &'static str,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct CharacterInfo {
     pub texture: &'static str,
     pub atlas: &'static str,
     pub animation: &'static str,
     pub id: u32,
+}
+
+impl ResourceId for CharacterInfo {
+    fn get_id(&self) -> u32 {
+        self.id
+    }
+}
+
+impl std::convert::From<ResourceInfo> for usize {
+    fn from(a: ResourceInfo) -> Self {
+        a.get_id() as usize
+    }
+}
+impl std::convert::From<CharacterInfo> for usize {
+    fn from(a: CharacterInfo) -> Self {
+        a.get_id() as usize
+    }
 }

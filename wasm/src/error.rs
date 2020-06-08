@@ -1,17 +1,20 @@
-//! Collection of frontend errors
-//! these can result from Network errors, other javascript errors or concurrency errors
+//! Collection of frontend errors.
+//! These can result from network errors, other JavaScript errors or concurrency errors.
 //!
-//! they implement Display
+//! All errors implement (Display)[https://doc.rust-lang.org/std/fmt/trait.Display.html].
+//!
 //! # Examples
 //!
 //! ```should_panic
 //! use rask_wasm::error::ClientError;
 //!
 //! # fn main() -> Result<(), ClientError> {
-//!   return Err(ClientError::EngineError(format!("EngineError")));
+//! return Err(ClientError::EngineError(format!("EngineError")));
 //! # }
 //! ```
+
 use std::fmt;
+
 #[derive(Debug)]
 pub enum ClientError {
     WebGlError(String),
@@ -19,7 +22,7 @@ pub enum ClientError {
     EngineError(String),
 }
 
-impl std::fmt::Display for ClientError {
+impl fmt::Display for ClientError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ClientError::ResourceError(e)
@@ -29,10 +32,13 @@ impl std::fmt::Display for ClientError {
     }
 }
 
-/// Derive from implementations
+/// Derive from implementations.
+///
 /// # Example
 ///
+/// ```
 /// derive_from!(rask_engine::error::EngineError, EngineError);
+/// ```
 macro_rules! derive_from {
     ($type:ty, $kind:ident) => {
         impl From<$type> for ClientError {
@@ -44,3 +50,4 @@ macro_rules! derive_from {
 }
 
 derive_from!(rask_engine::error::EngineError, EngineError);
+derive_from!(crate::graphics::webgl::WebGl2Error, WebGlError);

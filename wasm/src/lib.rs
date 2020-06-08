@@ -13,7 +13,7 @@
 //!         |  Queue[4] | [5]                      A
 //!         V           |                          | draw()
 //!      _________________                  _________________
-//!     |  logic [1]      |                |  grapics [3]    |
+//!     |  logic [1]      |                |  graphics [3]   |
 //!     |---------------- | "double buffer"|-----------------|
 //!     | input handling  |--------------->| manage textures |
 //!     | game engine     |     [6]        | call webgl      |
@@ -31,7 +31,7 @@
 #![feature(stdsimd)]
 #![feature(arbitrary_enum_discriminant)]
 #![feature(panic_info_message)]
-#[macro_use]
+#[cfg_attr(target_arch = "wasm32", macro_use)]
 extern crate lazy_static;
 
 pub mod communication;

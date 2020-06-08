@@ -1,7 +1,7 @@
 #![allow(clippy::unreadable_literal)]
 //! this module contains The game input/output event definition
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct Key(u32);
 
 impl From<u32> for Key {
@@ -21,50 +21,50 @@ impl Key {
     pub const CONTROL_RIGHT: Key = Key(2823983839);
     pub const ARROW_LEFT: Key = Key(977763216);
     pub const ARROW_DOWN: Key = Key(977535019);
-    pub const ARROW_RIGTHT: Key = Key(251549619);
+    pub const ARROW_RIGHT: Key = Key(251549619);
     pub const ARROW_UP: Key = Key(930625636);
     pub const END: Key = Key(69819);
     pub const SHIFT_RIGHT: Key = Key(3915039450);
     pub const SLASH: Key = Key(79966557);
     pub const PERIOD: Key = Key(2387108321);
     pub const COMMA: Key = Key(65290933);
-    pub const KEYM: Key = Key(2335214);
-    pub const KEYN: Key = Key(2335215);
-    pub const KEYB: Key = Key(2335203);
-    pub const KEYV: Key = Key(2335223);
-    pub const KEYC: Key = Key(2335204);
-    pub const KEYX: Key = Key(2335225);
-    pub const KEYZ: Key = Key(2335227);
+    pub const KEY_M: Key = Key(2335214);
+    pub const KEY_N: Key = Key(2335215);
+    pub const KEY_B: Key = Key(2335203);
+    pub const KEY_V: Key = Key(2335223);
+    pub const KEY_C: Key = Key(2335204);
+    pub const KEY_X: Key = Key(2335225);
+    pub const KEY_Z: Key = Key(2335227);
     pub const INTL_BACKSLASH: Key = Key(2691421945);
     pub const SHIFT_LEFT: Key = Key(2897055625);
     pub const CAPSLOCK: Key = Key(12763084);
-    pub const KEYA: Key = Key(2335202);
-    pub const KEYS: Key = Key(2335220);
-    pub const KEYD: Key = Key(2335205);
-    pub const KEYF: Key = Key(2335207);
-    pub const KEYG: Key = Key(2335208);
-    pub const KEYH: Key = Key(2335209);
-    pub const KEYJ: Key = Key(2335211);
-    pub const KEYK: Key = Key(2335212);
-    pub const KEYL: Key = Key(2335213);
+    pub const KEY_A: Key = Key(2335202);
+    pub const KEY_S: Key = Key(2335220);
+    pub const KEY_D: Key = Key(2335205);
+    pub const KEY_F: Key = Key(2335207);
+    pub const KEY_G: Key = Key(2335208);
+    pub const KEY_H: Key = Key(2335209);
+    pub const KEY_J: Key = Key(2335211);
+    pub const KEY_K: Key = Key(2335212);
+    pub const KEY_L: Key = Key(2335213);
     pub const SEMICOLON: Key = Key(1289876625);
     pub const QUOTE: Key = Key(78401116);
     pub const BACKSLASH: Key = Key(3357357270);
     pub const ENTER: Key = Key(67114680);
-    pub const PAGEDOWN: Key = Key(923631601);
-    pub const PAGEUP: Key = Key(2383081898);
+    pub const PAGE_DOWN: Key = Key(923631601);
+    pub const PAGE_UP: Key = Key(2383081898);
     pub const BRACKET_RIGHT: Key = Key(1149837940);
     pub const BRACKET_LEFT: Key = Key(1422382255);
-    pub const KEYP: Key = Key(2335217);
-    pub const KEYO: Key = Key(2335216);
-    pub const KEYI: Key = Key(2335210);
-    pub const KEYU: Key = Key(2335222);
-    pub const KEYY: Key = Key(2335226);
-    pub const KEYT: Key = Key(2335221);
-    pub const KEYR: Key = Key(2335219);
-    pub const KEYE: Key = Key(2335206);
-    pub const KEYW: Key = Key(2335224);
-    pub const KEYQ: Key = Key(2335218);
+    pub const KEY_P: Key = Key(2335217);
+    pub const KEY_O: Key = Key(2335216);
+    pub const KEY_I: Key = Key(2335210);
+    pub const KEY_U: Key = Key(2335222);
+    pub const KEY_Y: Key = Key(2335226);
+    pub const KEY_T: Key = Key(2335221);
+    pub const KEY_R: Key = Key(2335219);
+    pub const KEY_E: Key = Key(2335206);
+    pub const KEY_W: Key = Key(2335224);
+    pub const KEY_Q: Key = Key(2335218);
     pub const TAB: Key = Key(83829);
     pub const DIGIT1: Key = Key(2046924996);
     pub const DIGIT2: Key = Key(2046924997);

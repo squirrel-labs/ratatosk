@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use super::Resource;
 use super::RESOURCE_COUNT;
 use crate::EngineError;
@@ -6,36 +8,21 @@ use crate::EngineError;
 /// The library is used to store and retrieve resources.
 pub struct ResourceTable([Resource; RESOURCE_COUNT as usize]);
 
-macro_rules! character_check_helper {
-    (Texture, $value: ident) => {
-        return Ok($value.texture());
-    };
-    ($enum_type: ident, $value: ident) => {};
-}
-
 macro_rules! get_store {
     ($type: ty, $enum_type: ident) => {
         impl GetStore<$type> for ResourceTable {
-            fn get(&self, id: usize) -> Result<&$type, EngineError> {
-                self.index_check(id)?;
-                match &self.0[id] {
+            fn get<U: Into<usize> + Debug + Copy>(&self, id: U) -> Result<&$type, EngineError> {
+                self.index_check(id.into())?;
+                match &self.0[id.into()] {
                     Resource::$enum_type(value) => Ok(&value),
                     Resource::None => Err(EngineError::ResourceMissing(format!(
-                        "Could not find requested recource #{}",
-                        id,
+                        "Could not find requested resource #{}",
+                        id.into(),
                     ))),
-                    res => {
-                        #[allow(unused_variables)]
-                        {
-                            if let Resource::Character(value) = res {
-                                character_check_helper!($enum_type, value);
-                            }
-                        }
-                        Err(EngineError::ResourceType(format!(
-                            "Wrong resource type, required \"{}\"",
-                            stringify!($type),
-                        )))
-                    }
+                    _ => Err(EngineError::ResourceType(format!(
+                        "Wrong resource type, required \"{}\"",
+                        stringify!($type),
+                    ))),
                 }
             }
 
@@ -49,10 +36,25 @@ macro_rules! get_store {
 
 pub trait GetStore<T> {
     /// Retrieve a resource from the library.
-    fn get(&self, id: usize) -> Result<&T, EngineError>;
+    fn get<U: Into<usize> + Debug + Copy>(&self, id: U) -> Result<&T, EngineError>;
 
     /// Store a resource to the library
     fn store(&mut self, data: T, id: usize) -> Result<(), EngineError>;
+}
+
+pub trait GetTextures {
+    /// Retrieve a resource from the library.
+    fn get_textures<U: Into<usize> + Debug + Copy>(
+        &self,
+        id: U,
+    ) -> Result<Vec<(u64, &super::Texture)>, EngineError>;
+
+    /// Retrieve a texture from the library.
+    fn get_texture<U: Into<usize> + Debug + Copy>(
+        &self,
+        id: U,
+        sid: u64,
+    ) -> Result<&super::Texture, EngineError>;
 }
 
 impl Default for ResourceTable {
@@ -60,12 +62,15 @@ impl Default for ResourceTable {
         Self::new()
     }
 }
+
 impl ResourceTable {
-    /// Create a new library initialzed with None resources.
+    /// Create a new library initialized with None resources.
     #[cfg(feature = "nightly")]
     pub const fn new() -> Self {
         Self([Resource::None; RESOURCE_COUNT as usize])
     }
+
+    /// Create a new library initialized with None resources.
     #[cfg(not(feature = "nightly"))]
     pub fn new() -> Self {
         let bytes = [0u8; std::mem::size_of::<Self>()];
@@ -87,3 +92,51 @@ impl ResourceTable {
 get_store!(super::Texture, Texture);
 get_store!(super::Sound, Sound);
 get_store!(Box<super::Character>, Character);
+
+impl GetTextures for ResourceTable {
+    fn get_textures<U: Into<usize> + Debug + Copy>(
+        &self,
+        id: U,
+    ) -> Result<Vec<(u64, &super::Texture)>, EngineError> {
+        self.index_check(id.into())?;
+        match &self.0[id.into()] {
+            Resource::Texture(value) => Ok(vec![(0, value)]),
+            Resource::Character(value) => {
+                Ok(value.atlas().iter().map(|(id, t)| (*id, t)).collect())
+            }
+            Resource::None => Err(EngineError::ResourceMissing(format!(
+                "Could not find requested resource #{}",
+                id.into(),
+            ))),
+            _ => Err(EngineError::ResourceType(format!(
+                "Wrong resource type, required \"{}\"",
+                stringify!($type),
+            ))),
+        }
+    }
+
+    fn get_texture<U: Into<usize> + Debug + Copy>(
+        &self,
+        id: U,
+        sid: u64,
+    ) -> Result<&super::Texture, EngineError> {
+        self.index_check(id.into())?;
+        match &self.0[id.into()] {
+            Resource::Texture(value) => Ok(value),
+            Resource::Character(value) => value.atlas().get(&sid).ok_or_else(|| {
+                EngineError::ResourceIndex(format!(
+                    "Invalid subtexture id #{} of texture #{:?}",
+                    sid, id
+                ))
+            }),
+            Resource::None => Err(EngineError::ResourceMissing(format!(
+                "Could not find requested resource #{}",
+                id.into(),
+            ))),
+            _ => Err(EngineError::ResourceType(format!(
+                "Wrong resource type, required \"{}\"",
+                stringify!($type),
+            ))),
+        }
+    }
+}
