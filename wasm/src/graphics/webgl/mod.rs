@@ -1,6 +1,5 @@
 mod bindings;
 mod error;
-mod shader;
 
 #[doc(inline)]
 pub use error::WebGl2Error;
@@ -49,7 +48,6 @@ pub struct WebGl2 {
     max_texture_size: (u32, u32),
     texture_packer: DensePacker,
     layer_index: u32,
-    allocated_layers: u32,
 }
 
 impl WebGl2 {
@@ -74,12 +72,21 @@ impl WebGl2 {
     }
 }
 
+#[repr(u32)]
+pub enum ShaderType {
+    Vertex = Gl2::VERTEX_SHADER,
+    Fragment = Gl2::FRAGMENT_SHADER,
+}
+
 impl GraphicsApi for WebGl2 {
     type GraphicsError = WebGl2Error;
 
     fn new(width: u32, height: u32) -> Result<Self, ClientError> {
         let gl = Gl2;
-        shader::ShaderProgram::new(&gl)?;
+        let prog = gl.create_program()?;
+        gl.attach_new_shader(prog, ShaderType::Vertex)?;
+        gl.attach_new_shader(prog, ShaderType::Fragment)?;
+        gl.link_program(prog)?;
         gl.create_vao_with_buffer_data(&[
             -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0,
         ])?;
@@ -95,7 +102,6 @@ impl GraphicsApi for WebGl2 {
             max_texture_size: tex_size,
             texture_packer: DensePacker::new(tex_size.0 as i32, tex_size.1 as i32),
             layer_index: 0,
-            allocated_layers: 0,
         })
     }
 
@@ -140,6 +146,8 @@ impl GraphicsApi for WebGl2 {
     fn upload_textures(&mut self, textures: &[(u32, u64, &Texture)]) -> Result<(), ClientError> {
         let (width, height) = self.max_texture_size;
         let mut upload_vec = vec![];
+        let prev_layer_index = self.layer_index;
+        let empty = self.textures.is_empty();
         for texture in textures {
             let rect = self
                 .texture_packer
@@ -166,7 +174,7 @@ impl GraphicsApi for WebGl2 {
             self.textures.insert((texture.0, texture.1), tex);
             upload_vec.push((tex, texture.2));
         }
-        if self.layer_index + 1 == self.allocated_layers {
+        if !empty && prev_layer_index == self.layer_index {
             for ((range, layer), tex) in upload_vec {
                 self.gl.upload_texture_to_atlas(range, layer, tex);
             }
