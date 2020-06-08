@@ -331,4 +331,4 @@ window.addEventListener('mouseup', e => {
     if (mod !== undefined) {queue.write_i32([MOUSE_UP, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
 });
 
-window.setInterval(wakeLogic, 50);
+window.setInterval(wakeLogic, 10);

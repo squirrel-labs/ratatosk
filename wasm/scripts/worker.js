@@ -253,7 +253,7 @@ onmessage = async function({ data }) {
             desynchronized: false,
         });
         if (gl instanceof WebGL2RenderingContext) {
-            this.setInterval(wasm.exports.draw_frame, 100);
+            this.setInterval(wasm.exports.draw_frame, 16);
         } else {
             console.error('failed to create a webgl2 context');
         }
