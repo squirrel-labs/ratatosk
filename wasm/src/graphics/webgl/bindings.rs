@@ -1,6 +1,6 @@
 use std::convert::TryInto;
 
-use super::shader::ShaderType;
+use super::ShaderType;
 use crate::ClientError;
 use rask_engine::math::Mat3;
 use rask_engine::resources::{Texture, TextureRange};

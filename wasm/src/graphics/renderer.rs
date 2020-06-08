@@ -75,8 +75,8 @@ impl<T: GraphicsApi> Renderer<T> {
             log::trace!("uploading new textures to gpu");
             self.graphics.upload_textures(&textures)?;
         }
-        let state = *crate::communication::DOUBLE_BUFFER.lock();
-        self.graphics.update_sprite_vector(state.sprites())?;
+        let state = crate::communication::DOUBLE_BUFFER.lock();
+        self.graphics.update_sprite_vector(&state)?;
         self.graphics.draw()
     }
 }

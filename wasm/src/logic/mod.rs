@@ -3,7 +3,7 @@
 
 mod resource_parser;
 use crate::{
-    communication::{state::State, Message, MessageQueue, DOUBLE_BUFFER},
+    communication::{Message, MessageQueue, Sprite, DOUBLE_BUFFER},
     error::ClientError,
 };
 use rask_engine::events::{Event, Key};
@@ -11,7 +11,7 @@ use resource_parser::ResourceParser;
 
 #[derive(Debug)]
 pub struct LogicContext {
-    state: State,
+    state: Vec<Sprite>,
     tick_nr: u64,
     message_queue: MessageQueue<'static>,
     res_parser: ResourceParser,
@@ -23,7 +23,7 @@ pub struct LogicContext {
 impl LogicContext {
     pub fn new(message_queue: MessageQueue<'static>) -> Result<Self, ClientError> {
         Ok(Self {
-            state: State::default(),
+            state: Vec::new(),
             tick_nr: 0,
             message_queue,
             res_parser: ResourceParser::new(),
@@ -34,7 +34,7 @@ impl LogicContext {
 
     fn push_state(&mut self) {
         let mut writer = DOUBLE_BUFFER.lock();
-        *writer = self.state;
+        *writer = self.state.clone();
     }
 
     pub fn tick(&mut self) -> Result<(), ClientError> {
@@ -68,7 +68,7 @@ impl LogicContext {
             let tex2: Result<&rask_engine::resources::Texture, _> = res.get(texid2 as usize);
             let (tex1, tex2) = (tex1.is_ok(), tex2.is_ok());
             let texes = (if tex1 { 1 } else { 0 }) + (if tex2 { 1 } else { 0 });
-            if self.state.sprites().len() < texes {
+            if self.state.len() < texes {
                 let id = match (tex1, tex2) {
                     (true, false) => texid1,
                     (true, true) => {
@@ -76,7 +76,7 @@ impl LogicContext {
                         guard.ids.push(texid1);
                         guard.ids.push(texid2);
                         guard.reset_notify += 1;
-                        if self.state.sprites().is_empty() {
+                        if self.state.is_empty() {
                             texid1
                         } else {
                             texid2
@@ -86,13 +86,13 @@ impl LogicContext {
                     (false, false) => unreachable!(),
                 };
                 if id == texid1 {
-                    self.state.append_sprite(&crate::communication::Sprite::new(
+                    self.state.push(crate::communication::Sprite::new(
                         rask_engine::math::Mat3::identity(),
                         id,
                         0,
                     ));
                 } else {
-                    self.state.append_sprite(&crate::communication::Sprite::new(
+                    self.state.push(crate::communication::Sprite::new(
                         rask_engine::math::Mat3::scaling(0.4, 0.4),
                         id,
                         0,
@@ -100,8 +100,8 @@ impl LogicContext {
                 }
             }
             log::trace!("angle: {}", self.angle);
-            if self.state.sprites().len() == 2 {
-                self.state.sprites_mut()[1].transform =
+            if self.state.len() == 2 {
+                self.state[1].transform =
                     rask_engine::math::Mat3::rotation(0.02 * self.angle as f32)
                         * rask_engine::math::Mat3::scaling(0.4, 0.4);
             }
