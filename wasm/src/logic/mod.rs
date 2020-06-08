@@ -59,7 +59,7 @@ impl LogicContext {
 
         // TODO: Remove this temporary sprite loading. Replace it with some kind of
         // "resource complete" event
-        {
+        if self.state.len() < 2 {
             use rask_engine::resources::GetStore;
             let res = crate::communication::RESOURCE_TABLE.read();
             let texid1 = rask_engine::resources::registry::EMPTY.id;
@@ -76,13 +76,13 @@ impl LogicContext {
                     self.state
                         .push(crate::communication::Sprite::new(mat, id, 0));
                 }
+                guard.reset_notify = 1;
             }
-            log::trace!("angle: {}", self.angle);
-            if self.state.len() == 2 {
-                self.state[1].transform =
-                    rask_engine::math::Mat3::rotation(0.02 * self.angle as f32)
-                        * rask_engine::math::Mat3::scaling(0.4, 0.4);
-            }
+        }
+        log::trace!("angle: {}", self.angle);
+        if self.state.len() == 2 {
+            self.state[1].transform = rask_engine::math::Mat3::rotation(0.02 * self.angle as f32)
+                * rask_engine::math::Mat3::scaling(0.4, 0.4);
         }
 
         self.push_state();

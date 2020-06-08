@@ -4,7 +4,7 @@
 use std::mem::size_of;
 
 use crate::communication::message_queue::{Message, MessageQueueElement};
-use crate::communication::{RwLock, SynchronizationMemory};
+use crate::communication::SynchronizationMemory;
 use rask_engine::resources::Resource;
 
 /// All offsets into static memory are stored here.
@@ -12,7 +12,7 @@ use rask_engine::resources::Resource;
 /// # Safety
 ///
 /// This may only be used, once it is initialized by the `crate::entries::init(heap_base: u32)` call.
-static MEM_ADDRS: RwLock<MemoryAddresses> = RwLock::new(DEFAULT_ADDR);
+static mut MEM_ADDRS: MemoryAddresses = DEFAULT_ADDR;
 const DEFAULT_ADDR: MemoryAddresses = MemoryAddresses::empty();
 
 const MIN_RESOURCE_TABLE_ELEMENT_COUNT: usize = 128;
@@ -54,7 +54,7 @@ lazy_static! {
     /// Location of the synchronization memory.
     /// Only valid if `entries::init()` was called prior to the first access.
     pub static ref SYNCHRONIZATION_MEMORY: usize = {
-        let sync = MEM_ADDRS.read().synchronization_memory;
+        let sync = unsafe { MEM_ADDRS.synchronization_memory };
         if sync == 0 {
             panic!("Tried to read from MEM_ADDRS prior to initialisation");
         }
@@ -63,7 +63,7 @@ lazy_static! {
     /// Location of the message queue.
     /// Only valid if `entries::init()` was called prior to the first access.
     pub static ref MESSAGE_QUEUE: usize = {
-        let queue = MEM_ADDRS.read().message_queue;
+        let queue = unsafe { MEM_ADDRS.message_queue };
         if queue == 0 {
             panic!("Tried to read from MEM_ADDRS prior to initialisation");
         }
@@ -72,7 +72,7 @@ lazy_static! {
     /// Location of the resource table.
     /// Only valid if `entries::init()` was called prior to the first access.
     pub static ref RESOURCE_TABLE: usize = {
-        let res = MEM_ADDRS.read().resource_table;
+        let res = unsafe { MEM_ADDRS.resource_table };
         if res == 0 {
             panic!("Tried to read from MEM_ADDRS prior to initialisation");
         }
@@ -81,7 +81,7 @@ lazy_static! {
     /// Location of the heap.
     /// Only valid if `entries::init()` was called prior to the first access.
     pub static ref HEAP_BASE: usize = {
-        let heap = MEM_ADDRS.read().resource_table;
+        let heap = unsafe { MEM_ADDRS.resource_table };
         if heap == 0 {
             panic!("Tried to read from MEM_ADDRS prior to initialisation");
         }
@@ -126,7 +126,7 @@ impl MemoryAddresses {
             resource_table,
             heap_base,
         };
-        *(MEM_ADDRS.write()) = mem;
+        unsafe { MEM_ADDRS = mem };
     }
 }
 
