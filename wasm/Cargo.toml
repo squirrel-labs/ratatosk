@@ -19,11 +19,10 @@ path = "../rask-engine"
 features = ["nightly"]
 
 [dependencies.wee_alloc]
-version = "=0.4.6"
+# version = "=0.4.6"
+version = "=0.4.5"
 features = ["size_classes", "static_ptr_backend"]
-git = "https://github.com/squirrel-labs/wee_alloc/"
-branch = "std-mutex"
-
-[dependencies.parking_lot]
-version = "0.10"
-features = ["nightly"]
+# git = "https://github.com/squirrel-labs/wee_alloc/"
+git = "https://github.com/zshipko/wee_alloc/"
+# branch = "std-mutex"
+branch = "master"

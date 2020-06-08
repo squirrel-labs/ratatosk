@@ -4,8 +4,7 @@
 use std::mem::size_of;
 
 use crate::communication::message_queue::{Message, MessageQueueElement};
-use crate::communication::SynchronizationMemory;
-use parking_lot::RwLock;
+use crate::communication::{RwLock, SynchronizationMemory};
 use rask_engine::resources::Resource;
 
 /// All offsets into static memory are stored here.
