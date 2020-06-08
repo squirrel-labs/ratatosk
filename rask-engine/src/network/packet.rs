@@ -1,42 +1,61 @@
-use super::protocol::{resource_types, websocket_opt, WsOptcode};
+use std::io::Read;
+
+use super::protocol::{op_codes, resource_types, Opcode};
 use crate::error::EngineError;
 use crate::resources::registry::{CharacterInfo, ResourceInfo, ResourceVariant};
-use std::io::Read;
 
 pub trait Serialize {
     fn serialize(&self, buf: &mut Vec<u8>);
 }
+
 pub trait ReadResource {
     fn read_from_file(&self, res_path: &str) -> Option<Vec<u8>>;
 }
 
 #[repr(C)]
-pub struct WebsocketPacket<'a> {
-    opt_code: WsOptcode,
-    payload: PacketVariant<'a>,
+#[derive(Clone, Debug)]
+pub struct WebSocketPacket<'a> {
+    pub op_code: Opcode,
+    pub payload: PacketVariant<'a>,
 }
 
 #[repr(C)]
-#[derive(Clone, Debug, Copy)]
+#[derive(Clone, Debug, Copy, Default)]
+/// The GameState contains data to be sent over the network and is read by `main.js`.
 pub struct GameState {
     pub player_x: f32,
     pub player_y: f32,
+    /// Encodes actions the player takes + status effects e.g. poisoned
     pub player_state: i32,
 }
 
+impl GameState {
+    pub fn new() -> Self {
+        Self {
+            player_x: 0.0,
+            player_y: 0.0,
+            player_state: 0,
+        }
+    }
+}
+
 #[repr(C)]
+#[derive(Clone, Debug)]
 pub enum PacketVariant<'a> {
     PushResource(NetworkResource<'a>),
     PushGameState(GameState),
 }
+
 #[repr(C)]
+#[derive(Clone, Debug)]
 pub struct NetworkResource<'a> {
-    res_type: u32,
-    res_id: u32,
-    data: ResourceData<'a>,
+    pub res_type: u32,
+    pub res_id: u32,
+    pub data: ResourceData<'a>,
 }
 
 #[repr(C)]
+#[derive(Clone, Debug)]
 pub enum ResourceData<'a> {
     ResourceVec(&'a [u8]),
     CharacterVec {
@@ -65,6 +84,7 @@ impl<'a> Serialize for ResourceData<'a> {
         }
     }
 }
+
 impl<'a> ResourceData<'a> {
     pub fn deserialize(buf: &'a [u8], res_type: u32) -> Result<Self, EngineError> {
         match res_type {
@@ -82,21 +102,24 @@ impl<'a> ResourceData<'a> {
         }
     }
 }
-impl<'a> Serialize for WebsocketPacket<'a> {
+
+impl<'a> Serialize for WebSocketPacket<'a> {
     fn serialize(&self, buf: &mut Vec<u8>) {
-        add_u32_to_vec(buf, self.opt_code);
+        add_u32_to_vec(buf, self.op_code);
         self.payload.serialize(buf);
     }
 }
-impl<'a> WebsocketPacket<'a> {
+
+impl<'a> WebSocketPacket<'a> {
     pub fn deserialize(buf: &'a [u8]) -> Result<Self, EngineError> {
-        let opt_code = u32_from_le(buf)?;
+        let op_code = u32_from_le(buf)?;
         Ok(Self {
-            opt_code,
-            payload: PacketVariant::deserialize(&buf[4..], opt_code)?,
+            op_code,
+            payload: PacketVariant::deserialize(&buf[4..], op_code)?,
         })
     }
 }
+
 impl<'a> Serialize for NetworkResource<'a> {
     fn serialize(&self, buf: &mut Vec<u8>) {
         add_u32_to_vec(buf, self.res_type);
@@ -104,6 +127,7 @@ impl<'a> Serialize for NetworkResource<'a> {
         self.data.serialize(buf);
     }
 }
+
 impl<'a> NetworkResource<'a> {
     fn deserialize(buf: &'a [u8]) -> Result<Self, EngineError> {
         let res_type = u32_from_le(buf)?;
@@ -123,13 +147,14 @@ impl<'a> Serialize for PacketVariant<'a> {
         }
     }
 }
+
 impl<'a> PacketVariant<'a> {
     fn deserialize(buf: &'a [u8], packet_variant: u32) -> Result<Self, EngineError> {
         match packet_variant {
-            websocket_opt::PUSH_RESOURCE => {
+            op_codes::PUSH_RESOURCE => {
                 NetworkResource::deserialize(buf).map(PacketVariant::PushResource)
             }
-            websocket_opt::PUSH_GAMESTATE => {
+            op_codes::PUSH_GAME_STATE => {
                 GameState::deserialize(buf).map(PacketVariant::PushGameState)
             }
             _ => Err(EngineError::Network(format!(
@@ -150,6 +175,7 @@ impl Serialize for GameState {
         })
     }
 }
+
 #[allow(clippy::cast_ptr_alignment)]
 impl GameState {
     fn deserialize(buf: &[u8]) -> Result<Self, EngineError> {
@@ -169,9 +195,9 @@ pub fn add_u32_to_vec(buf: &mut Vec<u8>, n: u32) {
 
 pub fn u32_from_le(barry: &[u8]) -> Result<u32, EngineError> {
     use std::convert::TryInto;
-    let arr: [u8; 4] = barry
+    let arr: [u8; 4] = barry[..4]
         .try_into()
-        .map_err(|_| EngineError::ResourceFormat("invalid index in character binary".into()))?;
+        .map_err(|_| EngineError::ResourceFormat("failed to parse u32 form le bytes".into()))?;
     Ok(u32::from_le_bytes(arr))
 }
 
@@ -185,40 +211,41 @@ impl ReadResource for ResourceInfo {
     fn read_from_file(&self, res_path: &str) -> Option<Vec<u8>> {
         let mut buf = Vec::new();
         let mut res = Vec::new();
-        read_to_vec(format!("{}/{}", res_path, self.path).as_str(), &mut buf).ok()?;
-        buf.push(0x0a);
-        WebsocketPacket {
-            opt_code: websocket_opt::PUSH_RESOURCE,
+        read_to_vec(format!("{}/{}", res_path, self.path).as_str(), &mut res).ok()?;
+        res.push(0x0a);
+        WebSocketPacket {
+            op_code: op_codes::PUSH_RESOURCE,
             payload: {
                 PacketVariant::PushResource(NetworkResource {
                     res_type: self.variant as u32,
                     res_id: self.id,
-                    data: ResourceData::ResourceVec(&buf),
+                    data: ResourceData::ResourceVec(&res),
                 })
             },
         }
-        .serialize(&mut res);
+        .serialize(&mut buf);
         Some(buf)
     }
 }
+
 impl ReadResource for CharacterInfo {
     fn read_from_file(&self, res_path: &str) -> Option<Vec<u8>> {
         let mut buf = Vec::new();
         let mut res = Vec::new();
-        read_to_vec(format!("{}/{}", res_path, self.texture).as_str(), &mut buf).ok()?;
+        read_to_vec(format!("{}/{}", res_path, self.texture).as_str(), &mut res).ok()?;
         let texture_len = buf.len() as u32;
-        read_to_vec(format!("{}/{}", res_path, self.atlas).as_str(), &mut buf).ok()?;
+        read_to_vec(format!("{}/{}", res_path, self.atlas).as_str(), &mut res).ok()?;
         let atlas_len = buf.len() as u32 - texture_len;
         read_to_vec(
             format!("{}/{}", res_path, self.animation).as_str(),
-            &mut buf,
+            &mut res,
         )
         .ok()?;
         buf.push(0x0a);
         let skeleton_len = buf.len() as u32 - (atlas_len + texture_len);
 
-        WebsocketPacket {
-            opt_code: websocket_opt::PUSH_RESOURCE,
+        WebSocketPacket {
+            op_code: op_codes::PUSH_RESOURCE,
             payload: {
                 PacketVariant::PushResource(NetworkResource {
                     res_type: ResourceVariant::Character as u32,
@@ -227,12 +254,12 @@ impl ReadResource for CharacterInfo {
                         texture_len,
                         atlas_len,
                         animation_len: skeleton_len,
-                        data: &buf,
+                        data: &res,
                     },
                 })
             },
         }
-        .serialize(&mut res);
+        .serialize(&mut buf);
         Some(buf)
     }
 }

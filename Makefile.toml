@@ -12,7 +12,7 @@ workspace = false
 workspace = false
 dependencies = [  ]
 command = "cargo"
-args = [ "make", "--cwd", "client/", "--makefile", "Makefile.toml", "all" ]
+args = [ "make", "--cwd", "wasm/", "--makefile", "Makefile.toml", "all" ]
 
 [tasks.backend]
 workspace = false
@@ -40,7 +40,7 @@ args = [ "make", "exec-${BUILD_ENV}", "--", "build", "-p", "lobby" ]
 workspace = false
 watch = true
 dependencies = [ "stop",  "backend", "lobby" ]
-script = [ 
+script = [
 '''
 cargo make serve-lobby &
 #sleep 5 && ./scripts/dev-server &
@@ -50,7 +50,7 @@ cargo make serve-backend
 [tasks.stop]
 workspace = false
 watch = true
-script = [ 
+script = [
 '''
 #kill $(pgrep ./scripts/dev-server -f) 2>/dev/null || true
 kill $(pgrep target/debug/lobby -f) 2>/dev/null || true
@@ -91,4 +91,4 @@ dependencies = [ "cleanup", "all", "check-format", "test" ]
 # testierung
 [tasks.test]
 workspace = false
-env = { CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--all --exclude rask-wasm-logic --exclude rask-wasm-graphics --exclude rask-wasm-shared" }
+env = { CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--all" }

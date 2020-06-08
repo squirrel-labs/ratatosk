@@ -1,0 +1,34 @@
+extend = "../scripts/cargo-helpers.toml"
+
+[tasks.all]
+workspace = false
+dependencies = [ "wasm" ]
+
+[tasks.format]
+workspace = false
+command = "cargo"
+args = [ "fmt", "--all" ]
+
+[tasks.wasm]
+workspace = false
+env = {RUSTFLAGS = "-Ctarget-feature=+atomics,+bulk-memory -Clink-arg=-zstacksize=131072 -Clink-arg=--demangle" }
+script = [
+'''
+#!/usr/bin/env bash -ex
+top=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ $? -ne 0 ]; then
+  echo "Not in a git repo!"
+  exit 1
+fi
+gen=$top/wasm/gen
+cargo make exec-${BUILD_ENV} -- build -p rask-wasm --target wasm32-unknown-unknown -Z build-std=std,panic_abort
+file=$top/target/rask_wasm/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm.wasm
+mkdir -p $gen
+wasm-dis $file -o $gen/client.wat
+sed -i '/\s*(export "__heap_base" (global $global$[0-9]*))/i  (export "__sp" (global $global$0))' $gen/client.wat
+grep "__sp" $gen/client.wat > /dev/null
+sed "/pub/{ s/pub//; s/:\s*u32//}" $top/rask-engine/src/network/protocol/op_codes.rs > $gen/main.js
+cat $top/wasm/scripts/main.js >> $gen/main.js
+wasm-as --enable-threads --enable-bulk-memory --enable-mutable-globals $gen/client.wat -o $gen/client.wasm -g -pa O@s
+'''
+]

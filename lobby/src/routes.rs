@@ -4,7 +4,7 @@ use serde_derive::Serialize;
 use rocket::get;
 
 // this is just here for a POC.
-// TODO move those into their own file
+// TODO: move those into their own file
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct GameType {

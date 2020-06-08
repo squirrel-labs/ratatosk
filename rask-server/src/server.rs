@@ -1,14 +1,14 @@
-use crate::backend_connection::*;
-use crate::group::{Group, GroupId, Message as GroupMessage};
 use std::collections::HashMap;
 use std::sync::mpsc;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::thread::JoinHandle;
 
-use ws::{listen, CloseCode, Handler, Handshake, Message, Request, Response, Sender};
-
+use crate::backend_connection::*;
 use crate::error::ServerError;
+use crate::group::{Group, GroupId, Message as GroupMessage};
+use log::{error, info, warn};
+use ws::{listen, CloseCode, Handler, Handshake, Message, Request, Response, Sender};
 
 const PROTOCOL: &str = "tuesday";
 // WebSocket connection handler for the server connection
@@ -36,7 +36,7 @@ pub fn run(address: &str, port: &str) -> Result<JoinHandle<()>, ServerError> {
             })
             .unwrap()
         })
-        .map_err(ServerError::WebsocketCreation)
+        .map_err(ServerError::WebSocketCreation)
 }
 
 impl Handler for Socket {
@@ -46,26 +46,6 @@ impl Handler for Socket {
             self.ip = ip;
         }
         Ok(())
-    }
-
-    // low-level handling of requests
-    fn on_request(&mut self, req: &Request) -> ws::Result<Response> {
-        let (res, token) = handshake(req);
-        Ok(
-            match token
-                .and_then(|token| {
-                    info!("recived token: {}", token);
-                    crate::backend_connection::verify_token(token)
-                })
-                .and_then(move |response| self.handle_token(response))
-            {
-                Ok(()) => res,
-                Err(err) => fail_response(
-                    res,
-                    format!("Client {:?}: {:?}", req.client_addr(), err).as_str(),
-                ),
-            },
-        )
     }
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
@@ -96,6 +76,26 @@ impl Handler for Socket {
             }
         }
     }
+
+    // low-level handling of requests
+    fn on_request(&mut self, req: &Request) -> ws::Result<Response> {
+        let (res, token) = handshake(req);
+        Ok(
+            match token
+                .and_then(|token| {
+                    info!("received token: {}", token);
+                    crate::backend_connection::verify_token(token)
+                })
+                .and_then(move |response| self.handle_token(response))
+            {
+                Ok(()) => res,
+                Err(err) => fail_response(
+                    res,
+                    format!("Client {:?}: {:?}", req.client_addr(), err).as_str(),
+                ),
+            },
+        )
+    }
 }
 
 impl Socket {
@@ -109,7 +109,7 @@ impl Socket {
                     guard.insert(group.id(), group);
                 }
 
-                // panics if any thread paniced while using the mutex
+                // panics if any thread panicked while using the mutex
                 let group = &mut self.group;
                 guard
                     .get_mut(&self.id)
@@ -162,7 +162,7 @@ fn handshake(req: &Request) -> (Response, Result<i32, ServerError>) {
         }
     } else {
         (
-            fail_response(res, "failed to retrive protocols"),
+            fail_response(res, "failed to retrieve protocols"),
             Err(ServerError::InvalidProtocol),
         )
     }

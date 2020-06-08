@@ -1,11 +1,11 @@
 //! The collide module provides the Collide trait for objects that can collide along with several
 //! implementations for various types.
 
-use spine::skeleton::SRT;
+use core::ops::Range;
 
 use crate::boxes::{AABox, RBox};
 use crate::math::Vec2;
-use core::ops::Range;
+use spine::skeleton::SRT;
 
 // For information on the SAT, see: http://www.dyn4j.org/2010/01/sat/.
 
@@ -67,7 +67,7 @@ fn calculate_aabox_rbox_component_bounds(
         return (0.0, 1.0);
     }
     // get bounds of s by transforming "g(s) = pos + s * direction"
-    // and applying the inequation g(s) >= bound.start and g(s) <= bound.end
+    // and applying the inequality g(s) >= bound.start and g(s) <= bound.end
     let (s1, s2) = (
         (bound.start - pos) / direction,
         (bound.end - pos) / direction,
