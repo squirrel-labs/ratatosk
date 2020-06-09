@@ -20,6 +20,7 @@ pub struct LogicContext {
     res_parser: ResourceParser,
     angle: i32,
     angle_mod: i32,
+    anim_tick_nr: u32,
 }
 
 /// The logic context stores everything necessary for event handling and the game engine.
@@ -32,6 +33,7 @@ impl LogicContext {
             res_parser: ResourceParser::new(),
             angle: 0,
             angle_mod: 0,
+            anim_tick_nr: 0,
         })
     }
 

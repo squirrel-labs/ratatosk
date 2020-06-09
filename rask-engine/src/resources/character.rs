@@ -155,8 +155,9 @@ impl<'a> TryFrom<ResourceData<'a>> for Character {
         {
             Character::from_memory(
                 &data[0..texture_len as usize],
-                &data[(texture_len + atlas_len) as usize..animation_len as usize],
-                &data[texture_len as usize..atlas_len as usize],
+                &data[(texture_len + atlas_len) as usize
+                    ..(texture_len + atlas_len + animation_len) as usize],
+                &data[texture_len as usize..(atlas_len + texture_len) as usize],
             )
         } else {
             Err(EngineError::ResourceFormat(
