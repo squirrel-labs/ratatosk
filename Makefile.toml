@@ -12,7 +12,7 @@ workspace = false
 workspace = false
 dependencies = [  ]
 command = "cargo"
-args = [ "make", "--cwd", "wasm/", "--makefile", "Makefile.toml", "all" ]
+args = [ "make", "--cwd", "wasm/", "--makefile", "Makefile.toml", "all", "--profile", "production" ]
 
 [tasks.backend]
 workspace = false
