@@ -111,6 +111,7 @@ impl Character {
         let animated_skin = self
             .skeleton
             .get_animated_skin("default", Some(anim_name))?;
+        let time = time.rem_euclid(animated_skin.get_duration());
         Ok(AnimationStates::new(
             animated_skin
                 .interpolate(time)
