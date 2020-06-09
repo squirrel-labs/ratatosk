@@ -17,7 +17,6 @@ pub struct LogicContext {
     res_parser: ResourceParser,
     angle: i32,
     angle_mod: i32,
-    anim_tick_nr: u32,
 }
 
 /// The logic context stores everything necessary for event handling and the game engine.
@@ -30,7 +29,6 @@ impl LogicContext {
             res_parser: ResourceParser::new(),
             angle: 0,
             angle_mod: 0,
-            anim_tick_nr: 0,
         })
     }
 
@@ -101,14 +99,7 @@ impl LogicContext {
             let res = crate::communication::RESOURCE_TABLE.read();
             let charid = rask_engine::resources::registry::CHAR.id;
             let charc: &Box<rask_engine::resources::Character> = res.get(charid as usize).unwrap();
-            let mut sprites =
-                charc.interpolate(self.anim_tick_nr as f32 * 0.04, "testTranslateBody");
-            if sprites.is_err() {
-                self.anim_tick_nr = 0;
-                sprites = charc.interpolate(0.0, "testTranslateBody");
-            }
-            let sprites = sprites.unwrap();
-            self.anim_tick_nr += 1;
+            let mut sprites = charc.interpolate(self.tick_nr as f32 * 0.04, "testTranslateBody")?;
             for (i, sprite) in sprites.enumerate() {
                 let mut sprite = sprite?;
                 sprite.transform = sprite.transform * rask_engine::math::Mat3::scaling(0.1, 0.1);
