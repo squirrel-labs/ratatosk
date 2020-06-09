@@ -76,12 +76,6 @@ impl<'a> Serialize for ResourceData<'a> {
                 animation_len,
                 data,
             } => {
-                log::info!(
-                    "i am lens {}, {}, {}",
-                    texture_len,
-                    atlas_len,
-                    animation_len
-                );
                 add_u32_to_vec(buf, *texture_len);
                 add_u32_to_vec(buf, *atlas_len);
                 add_u32_to_vec(buf, *animation_len);
