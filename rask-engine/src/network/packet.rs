@@ -76,6 +76,12 @@ impl<'a> Serialize for ResourceData<'a> {
                 animation_len,
                 data,
             } => {
+                log::info!(
+                    "i am lens {}, {}, {}",
+                    texture_len,
+                    atlas_len,
+                    animation_len
+                );
                 add_u32_to_vec(buf, *texture_len);
                 add_u32_to_vec(buf, *atlas_len);
                 add_u32_to_vec(buf, *animation_len);
@@ -93,7 +99,7 @@ impl<'a> ResourceData<'a> {
                 texture_len: u32_from_le(buf)?,
                 atlas_len: u32_from_le(&buf[4..])?,
                 animation_len: u32_from_le(&buf[8..])?,
-                data: buf,
+                data: &buf[12..],
             }),
             _ => Err(EngineError::ResourceType(format!(
                 "failed to parse resource type {}",
@@ -230,20 +236,20 @@ impl ReadResource for ResourceInfo {
 
 impl ReadResource for CharacterInfo {
     fn read_from_file(&self, res_path: &str) -> Option<Vec<u8>> {
-        let mut buf = Vec::new();
         let mut res = Vec::new();
         read_to_vec(format!("{}/{}", res_path, self.texture).as_str(), &mut res).ok()?;
-        let texture_len = buf.len() as u32;
+        let texture_len = res.len() as u32;
         read_to_vec(format!("{}/{}", res_path, self.atlas).as_str(), &mut res).ok()?;
-        let atlas_len = buf.len() as u32 - texture_len;
+        let atlas_len = res.len() as u32 - texture_len;
         read_to_vec(
             format!("{}/{}", res_path, self.animation).as_str(),
             &mut res,
         )
         .ok()?;
-        buf.push(0x0a);
-        let skeleton_len = buf.len() as u32 - (atlas_len + texture_len);
+        res.push(0x0a);
+        let skeleton_len = res.len() as u32 - (atlas_len + texture_len);
 
+        let mut buf = Vec::new();
         WebSocketPacket {
             op_code: op_codes::PUSH_RESOURCE,
             payload: {

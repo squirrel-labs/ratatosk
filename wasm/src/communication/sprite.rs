@@ -1,4 +1,4 @@
-use rask_engine::math;
+use rask_engine::{math, resources::character::AnimationState};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Sprite {
@@ -27,6 +27,14 @@ impl Sprite {
             transform: math::Mat3::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
             tex_id: 0,
             tex_sub_id: 0,
+        }
+    }
+
+    pub fn from_animation_state(state: AnimationState, char_id: u32) -> Self {
+        Self {
+            transform: state.transform,
+            tex_id: char_id,
+            tex_sub_id: state.att_id,
         }
     }
 }

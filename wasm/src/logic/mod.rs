@@ -17,6 +17,7 @@ pub struct LogicContext {
     res_parser: ResourceParser,
     angle: i32,
     angle_mod: i32,
+    anim_tick_nr: u32,
 }
 
 /// The logic context stores everything necessary for event handling and the game engine.
@@ -29,6 +30,7 @@ impl LogicContext {
             res_parser: ResourceParser::new(),
             angle: 0,
             angle_mod: 0,
+            anim_tick_nr: 0,
         })
     }
 
@@ -64,9 +66,13 @@ impl LogicContext {
             let res = crate::communication::RESOURCE_TABLE.read();
             let texid1 = rask_engine::resources::registry::EMPTY.id;
             let texid2 = rask_engine::resources::registry::THIEF.id;
+            let charid = rask_engine::resources::registry::CHAR.id;
             let tex1: Result<&rask_engine::resources::Texture, _> = res.get(texid1 as usize);
             let tex2: Result<&rask_engine::resources::Texture, _> = res.get(texid2 as usize);
-            if tex1.is_ok() && tex2.is_ok() {
+            let charc: Result<&Box<rask_engine::resources::Character>, _> =
+                res.get(charid as usize);
+            if let (Ok(_), Ok(_), Ok(charc)) = (tex1, tex2, charc) {
+                log::info!("loaded all resoucres");
                 let mut guard = crate::communication::TEXTURE_IDS.lock();
                 for &(id, mat) in &[
                     (texid1, rask_engine::math::Mat3::identity()),
@@ -76,13 +82,39 @@ impl LogicContext {
                     self.state
                         .push(crate::communication::Sprite::new(mat, id, 0));
                 }
+                let sprites = charc.interpolate(0.0, "testTranslateBody")?;
+                guard.ids.push(charid);
+                for sprite in sprites {
+                    self.state
+                        .push(crate::communication::Sprite::from_animation_state(
+                            sprite?, charid,
+                        ));
+                }
                 guard.reset_notify = 1;
             }
         }
         log::trace!("angle: {}", self.angle);
-        if self.state.len() == 2 {
+        if self.state.len() >= 3 {
+            use rask_engine::resources::GetStore;
             self.state[1].transform = rask_engine::math::Mat3::rotation(0.02 * self.angle as f32)
                 * rask_engine::math::Mat3::scaling(0.4, 0.4);
+            let res = crate::communication::RESOURCE_TABLE.read();
+            let charid = rask_engine::resources::registry::CHAR.id;
+            let charc: &Box<rask_engine::resources::Character> = res.get(charid as usize).unwrap();
+            let mut sprites =
+                charc.interpolate(self.anim_tick_nr as f32 * 0.04, "testTranslateBody");
+            if sprites.is_err() {
+                self.anim_tick_nr = 0;
+                sprites = charc.interpolate(0.0, "testTranslateBody");
+            }
+            let sprites = sprites.unwrap();
+            self.anim_tick_nr += 1;
+            for (i, sprite) in sprites.enumerate() {
+                let mut sprite = sprite?;
+                sprite.transform = sprite.transform * rask_engine::math::Mat3::scaling(0.1, 0.1);
+                self.state[2 + i] =
+                    crate::communication::Sprite::from_animation_state(sprite, charid);
+            }
         }
 
         self.push_state();
