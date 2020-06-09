@@ -91,6 +91,17 @@ impl Character {
         Self { skeleton, atlas }
     }
 
+    pub fn from_memory(
+        texture: &[u8],
+        animation: &[u8],
+        atlas: &[u8],
+    ) -> Result<Self, EngineError> {
+        let texture = image::load_from_memory_with_format(texture, image::ImageFormat::Png);
+        let atlas = spine::atlas::Atlas::from_reader(atlas);
+        let skeleton = spine::skeleton::Skeleton::from_reader(animation);
+        Character::new(texture?, skeleton?, atlas?)
+    }
+
     pub fn skeleton(&self) -> &Skeleton {
         &self.skeleton
     }
@@ -142,18 +153,11 @@ impl<'a> TryFrom<ResourceData<'a>> for Character {
             data,
         } = chr_data
         {
-            let texture = image::load_from_memory_with_format(
+            Character::from_memory(
                 &data[0..texture_len as usize],
-                image::ImageFormat::Png,
-            );
-            let atlas = spine::atlas::Atlas::from_reader(
-                &data[texture_len as usize..(texture_len + atlas_len) as usize],
-            );
-            let skeleton = spine::skeleton::Skeleton::from_reader(
-                &data[(texture_len + atlas_len) as usize
-                    ..(texture_len + atlas_len + animation_len) as usize],
-            );
-            Character::new(texture?, skeleton?, atlas?)
+                &data[(texture_len + atlas_len) as usize..animation_len as usize],
+                &data[texture_len as usize..atlas_len as usize],
+            )
         } else {
             Err(EngineError::ResourceFormat(
                 "The given data is not a character variant".into(),
