@@ -18,9 +18,9 @@ struct OwnedSpriteState {
 #[allow(dead_code)]
 pub struct AnimationState {
     /// transformation matrix for the subsprite
-    transform: Mat3,
+    pub transform: Mat3,
     /// attachment id
-    att_id: u64,
+    pub att_id: u64,
 }
 
 pub struct AnimationStates<'a> {
@@ -130,6 +130,7 @@ impl Character {
         ))
     }
 }
+
 impl<'a> TryFrom<ResourceData<'a>> for Character {
     type Error = EngineError;
     fn try_from(chr_data: ResourceData<'a>) -> Result<Self, Self::Error> {
@@ -144,10 +145,12 @@ impl<'a> TryFrom<ResourceData<'a>> for Character {
                 &data[0..texture_len as usize],
                 image::ImageFormat::Png,
             );
-            let atlas =
-                spine::atlas::Atlas::from_reader(&data[texture_len as usize..atlas_len as usize]);
+            let atlas = spine::atlas::Atlas::from_reader(
+                &data[texture_len as usize..(texture_len + atlas_len) as usize],
+            );
             let skeleton = spine::skeleton::Skeleton::from_reader(
-                &data[(texture_len + atlas_len) as usize..animation_len as usize],
+                &data[(texture_len + atlas_len) as usize
+                    ..(texture_len + atlas_len + animation_len) as usize],
             );
             Character::new(texture?, skeleton?, atlas?)
         } else {

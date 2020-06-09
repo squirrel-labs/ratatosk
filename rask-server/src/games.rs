@@ -104,10 +104,10 @@ impl RaskGame {
     fn level_one(&mut self, uid: usize) -> Result<(), ServerError> {
         self.load_resource(registry::EMPTY)?;
         self.load_resource(registry::THIEF)?;
-        self.load_char(registry::UNUSED)?;
+        self.load_char(registry::CHAR)?;
         self.push_buffer(registry::EMPTY.id, uid)?;
         self.push_buffer(registry::THIEF.id, uid)?;
-        Ok(())
+        self.push_buffer(registry::CHAR.id, uid)
     }
 
     fn game_loop(mut self) {
