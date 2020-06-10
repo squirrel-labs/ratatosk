@@ -36,9 +36,9 @@ resources! {
     (EMPTY,             Texture,        "empty.png"              ),
     (THIEF,             Texture,        "thief.png"              ),
     (CHAR,              Character,      Character {
-                          texture:   "BoneTest/BoneTest.png",
-                          atlas:     "BoneTest/BoneTest.atlas",
-                          animation: "BoneTest/BoneTest.json"
+                          texture:   "Thief/Thief.png",
+                          atlas:     "Thief/Thief.atlas",
+                          animation: "Thief/Thief.json"
     }                                                            )
 }
 
