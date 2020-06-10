@@ -80,7 +80,7 @@ impl LogicContext {
                     self.state
                         .push(crate::communication::Sprite::new(mat, id, 0));
                 }
-                let sprites = charc.interpolate(0.0, "testTranslateBody")?;
+                let sprites = charc.interpolate(0.0, "standing")?;
                 guard.ids.push(charid);
                 for sprite in sprites {
                     self.state
@@ -99,10 +99,10 @@ impl LogicContext {
             let res = crate::communication::RESOURCE_TABLE.read();
             let charid = rask_engine::resources::registry::CHAR.id;
             let charc: &Box<rask_engine::resources::Character> = res.get(charid as usize).unwrap();
-            let mut sprites = charc.interpolate(self.tick_nr as f32 * 0.04, "testTranslateBody")?;
+            let mut sprites = charc.interpolate(self.tick_nr as f32 * 0.006, "standing")?;
             for (i, sprite) in sprites.enumerate() {
                 let mut sprite = sprite?;
-                sprite.transform = sprite.transform * rask_engine::math::Mat3::scaling(0.1, 0.1);
+                sprite.transform = rask_engine::math::Mat3::scaling(0.1, 0.1) * sprite.transform;
                 self.state[2 + i] =
                     crate::communication::Sprite::from_animation_state(sprite, charid);
             }
