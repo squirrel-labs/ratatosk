@@ -6,7 +6,10 @@ use crate::{
     communication::{Message, MessageQueue, Sprite, DOUBLE_BUFFER},
     error::ClientError,
 };
-use rask_engine::events::{Event, Key};
+use rask_engine::{
+    events::{Event, Key},
+    resources::registry,
+};
 use resource_parser::ResourceParser;
 
 #[derive(Debug)]
@@ -52,7 +55,11 @@ impl LogicContext {
             Some(Event::KeyDown(_, Key::ARROW_RIGHT)) => self.angle_mod = 1,
             Some(Event::KeyUp(_, Key::ARROW_RIGHT)) => self.angle_mod = 0,
             Some(Event::KeyUp(_, Key::ARROW_LEFT)) => self.angle_mod = 0,
-            Some(Event::KeyDown(_, Key::ENTER)) => self.angle = 0,
+            Some(Event::KeyDown(_, Key::ENTER)) => {
+                self.res_parser.fetch_resource(registry::EMPTY);
+                self.res_parser.fetch_resource(registry::THIEF);
+                self.res_parser.fetch_character_resource(registry::CHAR);
+            }
             _ => (),
         }
         self.angle += self.angle_mod;

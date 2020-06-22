@@ -29,9 +29,9 @@ pub enum Message {
     } = op_codes::ALLOCATED_BUFFER,
     /// Send memory offsets to javascript
     Memory(u32, u32, u32) = op_codes::MEMORY_OFFSETS,
-    /// Ask JavaScript to fetch the requested ressource
+    /// Ask JavaScript to fetch the requested resource
     /// in response to this, javascript will fetch the resource and send send a RequestAlloc Event
-    /// The rest follows the standart Resource flow
+    /// The rest follows the standard Resource flow
     FetchResource(u32, &'static str) = op_codes::FETCH_RESOURCE,
     /// Ask javascript to set the TextMode on or off
     TextMode(bool) = op_codes::SET_TEXT_MODE,
