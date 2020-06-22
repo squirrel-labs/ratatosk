@@ -3,6 +3,7 @@
 const WORKER_URI = 'scripts/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:5001/'
 const MESSAGE_ITEM_SIZE = 32;
+let decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 let SYNCHRONIZATION_MEMORY;
 let MESSAGE_QUEUE = null;
 let MESSAGE_QUEUE_LENGTH;
@@ -145,6 +146,10 @@ function mem(addr) {
     return new Uint8Array(memory.buffer.slice(addr, addr + 1))[0];
 }
 
+function str_from_mem(ptr, len) {
+    return decoder.decode(memoryViewU8.slice(ptr, ptr + len));
+}
+
 function onresize() {
     Atomics.store(memoryView32, SYNC_CANVAS_SIZE, window.innerWidth);
     Atomics.store(memoryView32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
@@ -153,8 +158,14 @@ function onresize() {
 function LogicMessage(e) {
     let x = new Uint32Array(e.data);
     let optcode = x[0];
-    if (optcode === RELAY) {
+    if (optcode === PUSH_ENGINE_EVENT) {
         ws.send(x.slice(1));
+    } else if (optcode === FETCH_RESOURCE) {
+        let res = fetch(str_from_mem(x[2], x[3]));
+        res.then( async function(data) {
+            let buffer = await data.arrayBuffer();
+            upload_resource(x[1], buffer);
+        })
     } else if (optcode === ALLOCATED_BUFFER) {
         const id = x[1];
         let ptr = x[2] / 4;
@@ -200,6 +211,12 @@ function upload_resource(data) {
     resource_map.set(u32[2], data)
     console.log("sending request to allocate " + data.byteLength + " bytes");
     queue.write_i32([REQUEST_ALLOCATION, u32[2], data.byteLength]);
+}
+
+function upload_resource(id, data) {
+    resource_map.set(id, data)
+    console.log("sending request to allocate " + data.byteLength + " bytes");
+    queue.write_i32([REQUEST_ALLOCATION, id, data.byteLength]);
 }
 
 let canvas = createCanvas();
