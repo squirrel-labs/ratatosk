@@ -54,7 +54,7 @@ impl ResourceParser {
         );
         Message::FetchResource(self.dyn_resource_id + 2, info.atlas).send();
         self.mapping_table.insert(
-            self.dyn_resource_id + 1,
+            self.dyn_resource_id + 2,
             (info.id, 2, ResourceVariant::Character),
         );
         self.char_parts_table.insert(info.id, [0, 0, 0]);
