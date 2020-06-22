@@ -76,8 +76,7 @@ impl ResourceParser {
     pub fn parse(&mut self, id: u32) -> Result<(), ClientError> {
         let mapping = self.mapping_table.get(&id);
         if self.buffer_table.contains_key(&id) {
-            if let Some(mapping) = mapping {
-                let mapping = *mapping;
+            if let Some(&mapping) = mapping {
                 self.parse_fetched_data(id, mapping)
             } else {
                 self.parse_ws_package(id)
@@ -118,7 +117,12 @@ impl ResourceParser {
         let (parent_id, part_id, variant) = mapping;
         match variant {
             ResourceVariant::Texture => {
-                let data = self.get_buffer(id).unwrap();
+                let data = self.get_buffer(id).ok_or_else(|| {
+                    ClientError::ResourceError(format!(
+                        "Tried to parse resource id {} for wich no buffer is allocated",
+                        id
+                    ))
+                })?;
                 ResourceParser::store_texture(parent_id, data)?
             }
             ResourceVariant::Character => {
