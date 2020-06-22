@@ -6,7 +6,10 @@ use crate::{
     communication::{Message, MessageQueue, Sprite, DOUBLE_BUFFER},
     error::ClientError,
 };
-use rask_engine::events::{Event, Key};
+use rask_engine::{
+    events::{Event, Key},
+    resources::registry,
+};
 use resource_parser::ResourceParser;
 
 #[derive(Debug)]
@@ -17,18 +20,24 @@ pub struct LogicContext {
     res_parser: ResourceParser,
     angle: i32,
     angle_mod: i32,
+    anim_tick_nr: u32,
 }
 
 /// The logic context stores everything necessary for event handling and the game engine.
 impl LogicContext {
     pub fn new(message_queue: MessageQueue<'static>) -> Result<Self, ClientError> {
+        let mut res_parser = ResourceParser::new();
+        res_parser.fetch_resource(registry::EMPTY);
+        res_parser.fetch_resource(registry::THIEF);
+        res_parser.fetch_character_resource(registry::CHAR);
         Ok(Self {
             state: Vec::new(),
             tick_nr: 0,
             message_queue,
-            res_parser: ResourceParser::new(),
+            res_parser,
             angle: 0,
             angle_mod: 0,
+            anim_tick_nr: 0,
         })
     }
 
@@ -52,7 +61,11 @@ impl LogicContext {
             Some(Event::KeyDown(_, Key::ARROW_RIGHT)) => self.angle_mod = 1,
             Some(Event::KeyUp(_, Key::ARROW_RIGHT)) => self.angle_mod = 0,
             Some(Event::KeyUp(_, Key::ARROW_LEFT)) => self.angle_mod = 0,
-            Some(Event::KeyDown(_, Key::ENTER)) => self.angle = 0,
+            Some(Event::KeyDown(_, Key::ENTER)) => {
+                self.res_parser.fetch_resource(registry::EMPTY);
+                self.res_parser.fetch_resource(registry::THIEF);
+                self.res_parser.fetch_character_resource(registry::CHAR);
+            }
             _ => (),
         }
         self.angle += self.angle_mod;
