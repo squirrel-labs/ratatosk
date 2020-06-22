@@ -26,11 +26,15 @@ pub struct LogicContext {
 /// The logic context stores everything necessary for event handling and the game engine.
 impl LogicContext {
     pub fn new(message_queue: MessageQueue<'static>) -> Result<Self, ClientError> {
+        let mut res_parser = ResourceParser::new();
+        res_parser.fetch_resource(registry::EMPTY);
+        res_parser.fetch_resource(registry::THIEF);
+        res_parser.fetch_character_resource(registry::CHAR);
         Ok(Self {
             state: Vec::new(),
             tick_nr: 0,
             message_queue,
-            res_parser: ResourceParser::new(),
+            res_parser,
             angle: 0,
             angle_mod: 0,
             anim_tick_nr: 0,
