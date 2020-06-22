@@ -11,18 +11,32 @@ use rask_engine::network::protocol::op_codes;
 /// Messages sent by the `main.js`.
 pub enum Message {
     None = op_codes::NONE,
-    KeyDown(KeyModifier, u32) = op_codes::KEY_DOWN, // 1
+    KeyDown(KeyModifier, u32) = op_codes::KEY_DOWN,
     KeyUp(KeyModifier, u32) = op_codes::KEY_UP,
     KeyPress(u32, u16) = op_codes::KEY_PRESS,
-    MouseDown(MouseEvent) = op_codes::MOUSE_DOWN, //5
+    MouseDown(MouseEvent) = op_codes::MOUSE_DOWN,
     MouseUp(MouseEvent) = op_codes::MOUSE_UP,
-    RequestAlloc { id: u32, size: u32 } = op_codes::REQUEST_ALLOCATION, //7
-    DoneWritingResource(u32) = op_codes::DONE_WRITING_RESOURCE,         // id
-    ResourcePush(u32) = op_codes::PUSH_RESOURCE,                        // id
-    AllocatedBuffer { id: u32, ptr: u32 } = op_codes::ALLOCATED_BUFFER, // The event ids from 0 to 128 are reserved for server to client communication
+    RequestAlloc {
+        id: u32,
+        size: u32,
+    } = op_codes::REQUEST_ALLOCATION,
+    DoneWritingResource(u32) = op_codes::DONE_WRITING_RESOURCE,
+    PushResource(u32) = op_codes::PUSH_RESOURCE,
+    /// Rust finshed allocating the requested buffer.
+    AllocatedBuffer {
+        id: u32,
+        ptr: u32,
+    } = op_codes::ALLOCATED_BUFFER,
+    /// Send memory offsets to javascript
     Memory(u32, u32, u32) = op_codes::MEMORY_OFFSETS,
+    /// Ask javascript to fetch the requested resource.
+    /// In response to this, javascript will fetch the resource and send a RequestAlloc Event.
+    /// The rest follows the standard resource flow.
+    FetchResource(u32, &'static str) = op_codes::FETCH_RESOURCE,
+    /// Ask javascript to set the TextMode on or off.
     TextMode(bool) = op_codes::SET_TEXT_MODE,
-    EngineEvent(Event) = op_codes::PUSH_ENGINE_EVENT, // Mark the Message as outbound
+    /// Wrapper for game events to be relayed to the server.
+    EngineEvent(Event) = op_codes::PUSH_ENGINE_EVENT,
 }
 
 impl Default for Message {

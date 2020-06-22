@@ -33,8 +33,8 @@ macro_rules! resources {
 }
 
 resources! {
-    (EMPTY,             Texture,        "empty.png"              ),
-    (THIEF,             Texture,        "thief.png"              ),
+    (EMPTY,             Texture,        "../res/empty.png"              ),
+    (THIEF,             Texture,        "../res/thief.png"              ),
     (UNUSED,            Character,      Character {
                           texture:   "BoneTest/BoneTest.png",
                           atlas:     "BoneTest/BoneTest.atlas",
