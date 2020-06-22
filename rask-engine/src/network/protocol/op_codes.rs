@@ -13,7 +13,7 @@ pub const MEMORY_OFFSETS: u32 = 10;
 pub const SET_TEXT_MODE: u32 = 11;
 pub const PUSH_RESOURCE: u32 = 12;
 pub const FETCH_RESOURCE: u32 = 13;
-pub const PUSH_GAME_STATE: u32 = 13;
-pub const PUSH_ENGINE_EVENT: u32 = 15;
-pub const PUSH_SERVER_EVENT: u32 = 16;
+pub const PUSH_GAME_STATE: u32 = 14;
+pub const PUSH_ENGINE_EVENT: u32 = 16;
+pub const PUSH_SERVER_EVENT: u32 = 17;
 // The following lines are inserted from `wasm/scripts/main.js`
