@@ -35,6 +35,7 @@ impl ResourceParser {
 
     /// Fetch resource via javascript
     pub fn fetch_resource(&mut self, info: ResourceInfo) {
+        #[cfg(target_arch = "wasm32")]
         Message::FetchResource(info.id, info.path).send();
         self.mapping_table
             .insert(info.id, (info.id, 0, info.variant));
@@ -42,16 +43,19 @@ impl ResourceParser {
 
     /// Fetch character resource via javascript
     pub fn fetch_character_resource(&mut self, info: CharacterInfo) {
+        #[cfg(target_arch = "wasm32")]
         Message::FetchResource(self.dyn_resource_id, info.texture).send();
         self.mapping_table.insert(
             self.dyn_resource_id,
             (info.id, 0, ResourceVariant::Character),
         );
+        #[cfg(target_arch = "wasm32")]
         Message::FetchResource(self.dyn_resource_id + 1, info.animation).send();
         self.mapping_table.insert(
             self.dyn_resource_id + 1,
             (info.id, 1, ResourceVariant::Character),
         );
+        #[cfg(target_arch = "wasm32")]
         Message::FetchResource(self.dyn_resource_id + 2, info.atlas).send();
         self.mapping_table.insert(
             self.dyn_resource_id + 2,
