@@ -92,6 +92,7 @@ impl GraphicsApi for WebGl2 {
         ])?;
         log::info!("shaders compiled and linked");
         let tex_size = gl.get_max_texture_size();
+        log::debug!("Max Texture size: {:?}", tex_size);
         gl.create_renderbuffer(width, height)?;
         Ok(Self {
             gl,
