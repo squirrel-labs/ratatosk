@@ -5,7 +5,7 @@ use core::ops::Range;
 
 use crate::boxes::{AABox, RBox};
 use crate::math::Vec2;
-use spine::skeleton::SRT;
+use spine::skeleton::srt::SRT;
 
 // For information on the SAT, see: http://www.dyn4j.org/2010/01/sat/.
 

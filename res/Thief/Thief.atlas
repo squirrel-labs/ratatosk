@@ -3,6 +3,7 @@ Thief.png
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
+size: 128,256
 ShoeLeft
   rotate: false
   xy: 1322, 348
