@@ -303,7 +303,7 @@ impl convert::AsRef<[f32; 9]> for Mat3 {
     }
 }
 
-impl From<spine::skeleton::SRT> for Mat3 {
+impl From<spine::skeleton::srt::SRT> for Mat3 {
     fn from(srt: spine::skeleton::SRT) -> Self {
         let s = Self::scaling(srt.scale[0], srt.scale[1]);
         let r = Self::rotation(srt.rotation);

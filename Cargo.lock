@@ -1744,7 +1744,7 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 [[package]]
 name = "spine_tiny"
 version = "0.1.0"
-source = "git+https://github.com/reeFridge/spine-rs#280ae6cbbe24cdfb8374adac583b755395321ac4"
+source = "git+https://github.com/reeFridge/spine-rs?branch=develop#006fc20115c10725fecbe17f920cafe7772a4b6b"
 dependencies = [
  "rustc-hex",
  "serde",

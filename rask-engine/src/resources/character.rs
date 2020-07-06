@@ -6,7 +6,7 @@ use crate::network::packet::ResourceData;
 use crate::{math::Mat3, EngineError};
 use image::DynamicImage;
 use spine::atlas::Atlas;
-use spine::skeleton::{Skeleton, SRT};
+use spine::skeleton::{srt::SRT, Skeleton};
 use std::convert::TryFrom;
 use std::hash::{Hash, Hasher};
 
@@ -15,7 +15,6 @@ struct OwnedSpriteState {
     srt: SRT,
 }
 
-#[allow(dead_code)]
 pub struct AnimationState {
     /// transformation matrix for the subsprite
     pub transform: Mat3,
