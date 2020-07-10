@@ -13,6 +13,7 @@ use std::hash::{Hash, Hasher};
 struct OwnedSpriteState {
     attachment: String,
     srt: SRT,
+    slot_srt: SRT,
 }
 
 pub struct AnimationState {
@@ -25,6 +26,19 @@ pub struct AnimationState {
 pub struct AnimationStates<'a> {
     sprites: std::vec::IntoIter<OwnedSpriteState>,
     atlas: &'a HashMap<u64, Texture>,
+}
+
+impl AnimationState {
+    fn new(srt: SRT, slot_srt: SRT, attachment_id: u64) -> Self {
+        let tscale = Mat3::scaling(1.0 / 500.0, 1.0 / 500.0);
+        Self {
+            transform: tscale
+                * Mat3::from(srt)
+                * Mat3::rotation(core::f32::consts::PI)
+                * Mat3::from(slot_srt),
+            att_id: attachment_id,
+        }
+    }
 }
 
 impl<'a> AnimationStates<'a> {
@@ -44,10 +58,7 @@ impl<'a> Iterator for AnimationStates<'a> {
         sprite.attachment.hash(&mut hasher);
         let att_id = hasher.finish();
         if self.atlas.contains_key(&att_id) {
-            Some(Ok(AnimationState {
-                transform: Mat3::from(sprite.srt),
-                att_id,
-            }))
+            Some(Ok(AnimationState::new(sprite.srt, sprite.slot_srt, att_id)))
         } else {
             Some(Err(EngineError::ResourceMissing(format!(
                 "Could not get sprite attachment \"{}\"",
@@ -134,6 +145,7 @@ impl Character {
                 .map(|s| OwnedSpriteState {
                     attachment: s.attachment.to_owned(),
                     srt: s.srt,
+                    slot_srt: s.slot_srt,
                 })
                 .collect::<Vec<_>>()
                 .into_iter(),

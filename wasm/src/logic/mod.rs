@@ -108,7 +108,7 @@ impl LogicContext {
         if self.state.len() >= 3 {
             use rask_engine::resources::GetStore;
             self.state[1].transform = rask_engine::math::Mat3::rotation(0.02 * self.angle as f32)
-                * rask_engine::math::Mat3::scaling(0.4, 0.4);
+                * rask_engine::math::Mat3::scaling(0.0, 0.0);
             let res = crate::communication::RESOURCE_TABLE.read();
             let charid = rask_engine::resources::registry::CHAR.id;
             let charc: &Box<rask_engine::resources::Character> = res.get(charid as usize).unwrap();

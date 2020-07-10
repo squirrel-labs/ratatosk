@@ -307,7 +307,7 @@ impl From<spine::skeleton::srt::SRT> for Mat3 {
     fn from(srt: spine::skeleton::srt::SRT) -> Self {
         let s = Self::scaling(srt.scale[0], srt.scale[1]);
         let r = Self::rotation(srt.rotation);
-        let t = Self::translation(srt.position[0] * 0.01, srt.position[1] * 0.01);
+        let t = Self::translation(srt.position[0], srt.position[1]);
         t * r * s
     }
 }
