@@ -68,7 +68,7 @@ impl Texture {
     }
 
     pub fn from_dynamic_image(image: image::DynamicImage) -> Self {
-        let raw_data = image.to_rgba().inner().to_vec();
+        let raw_data = image.rotate180().to_rgba().inner().to_vec();
         Self {
             raw_data,
             width: image.width(),

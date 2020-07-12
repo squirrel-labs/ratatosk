@@ -13,8 +13,9 @@ default_features = false
 features = ["png"]
 
 [dependencies.spine_tiny]
-git = "https://github.com/reeFridge/spine-rs"
+git = "https://github.com/squirrel-labs/spine-rs"
 branch = "develop"
+version = "=0.1.1"
 
 [dev-dependencies]
 lazy_static = "1.4.0"
