@@ -3,17 +3,17 @@ use std::io::Read;
 
 use super::Texture;
 use crate::network::packet::ResourceData;
-use crate::{math::Mat3, EngineError};
+use crate::{math::Mat3, math::Vec3, EngineError};
 use image::DynamicImage;
 use spine::atlas::Atlas;
-use spine::skeleton::{srt::SRT, Skeleton};
+use spine::skeleton::Skeleton;
 use std::convert::TryFrom;
 use std::hash::{Hash, Hasher};
 
+#[derive(Debug)]
 struct OwnedSpriteState {
     attachment: String,
-    srt: SRT,
-    slot_srt: SRT,
+    transform: [[f32; 3]; 3],
 }
 
 pub struct AnimationState {
@@ -29,13 +29,15 @@ pub struct AnimationStates<'a> {
 }
 
 impl AnimationState {
-    fn new(srt: SRT, slot_srt: SRT, attachment_id: u64) -> Self {
+    fn new(transform: [[f32; 3]; 3], attachment_id: u64) -> Self {
         let tscale = Mat3::scaling(1.0 / 500.0, 1.0 / 500.0);
+        let mat = Mat3::from_vec3(
+            Vec3::from(transform[0]),
+            Vec3::from(transform[1]),
+            Vec3::from(transform[2]),
+        );
         Self {
-            transform: tscale
-                * Mat3::from(srt)
-                * Mat3::rotation(core::f32::consts::PI)
-                * Mat3::from(slot_srt),
+            transform: tscale * mat,
             att_id: attachment_id,
         }
     }
@@ -58,7 +60,7 @@ impl<'a> Iterator for AnimationStates<'a> {
         sprite.attachment.hash(&mut hasher);
         let att_id = hasher.finish();
         if self.atlas.contains_key(&att_id) {
-            Some(Ok(AnimationState::new(sprite.srt, sprite.slot_srt, att_id)))
+            Some(Ok(AnimationState::new(sprite.transform, att_id)))
         } else {
             Some(Err(EngineError::ResourceMissing(format!(
                 "Could not get sprite attachment \"{}\"",
@@ -144,8 +146,7 @@ impl Character {
                 })?
                 .map(|s| OwnedSpriteState {
                     attachment: s.attachment.to_owned(),
-                    srt: s.srt,
-                    slot_srt: s.slot_srt,
+                    transform: s.to_matrix3(),
                 })
                 .collect::<Vec<_>>()
                 .into_iter(),
