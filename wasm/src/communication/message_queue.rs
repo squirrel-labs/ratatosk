@@ -11,11 +11,19 @@ use rask_engine::network::protocol::op_codes;
 /// Messages sent by the `main.js`.
 pub enum Message {
     None = op_codes::NONE,
+
+    // User interaction handling
     KeyDown(KeyModifier, u32) = op_codes::KEY_DOWN,
     KeyUp(KeyModifier, u32) = op_codes::KEY_UP,
     KeyPress(u32, u16) = op_codes::KEY_PRESS,
     MouseDown(MouseEvent) = op_codes::MOUSE_DOWN,
     MouseUp(MouseEvent) = op_codes::MOUSE_UP,
+    /// Ask javascript to set the TextMode on or off.
+    TextMode(bool) = op_codes::SET_TEXT_MODE,
+    /// Wrapper for game events to be relayed to the server.
+    EngineEvent(Event) = op_codes::PUSH_ENGINE_EVENT,
+
+    // Resorce Handling
     RequestAlloc {
         id: u32,
         size: u32,
@@ -27,16 +35,21 @@ pub enum Message {
         id: u32,
         ptr: u32,
     } = op_codes::ALLOCATED_BUFFER,
-    /// Send memory offsets to javascript
-    Memory(u32, u32, u32) = op_codes::MEMORY_OFFSETS,
     /// Ask javascript to fetch the requested resource.
     /// In response to this, javascript will fetch the resource and send a RequestAlloc Event.
     /// The rest follows the standard resource flow.
     FetchResource(u32, &'static str) = op_codes::FETCH_RESOURCE,
-    /// Ask javascript to set the TextMode on or off.
-    TextMode(bool) = op_codes::SET_TEXT_MODE,
-    /// Wrapper for game events to be relayed to the server.
-    EngineEvent(Event) = op_codes::PUSH_ENGINE_EVENT,
+
+    // Audio
+    /// Ask javascript to fetch the requested sound track
+    PrepareAudio(u32, &'static str) = op_codes::PREPARE_AUDIO,
+    AudioLoaded(u32) = op_codes::AUDIO_LOADED,
+    PlaySound(u32) = op_codes::PLAY_SOUND,
+    StopSound(u32) = op_codes::STOP_SOUND,
+
+    // Misc Management Commands
+    /// Send memory offsets to javascript
+    Memory(u32, u32, u32) = op_codes::MEMORY_OFFSETS,
 }
 
 impl Default for Message {
@@ -53,7 +66,7 @@ impl Message {
 
     pub fn send(&self) {
         let msg = self.to_slice();
-        log::trace!("sending {:?}", self);
+        log::debug!("sending {:?}", self);
         unsafe { post_to_main(msg.as_ptr() as u32, msg.len() as u32) }
     }
 }

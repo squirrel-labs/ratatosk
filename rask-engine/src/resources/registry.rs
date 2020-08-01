@@ -35,6 +35,7 @@ macro_rules! resources {
 resources! {
     (EMPTY,             Texture,        "empty.png"              ),
     (THIEF,             Texture,        "thief.png"              ),
+    (SOUND,             Sound,          "theme_song.mp3"         ),
     (CHAR,              Character,      Character {
                           texture:   "Shmief/Shmief.png",
                           atlas:     "Shmief/Shmief.atlas",
