@@ -3,6 +3,7 @@
 const WORKER_URI = 'scripts/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:5001/'
 const MESSAGE_ITEM_SIZE = 32;
+const RESOURCE_PREFIX = '../../res/'
 let decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
 let SYNCHRONIZATION_MEMORY;
 let MESSAGE_QUEUE = null;
@@ -23,6 +24,7 @@ let connected = false
 
 let mousex = 0;
 let mousey = 0;
+const audio_context = new AudioContext();
 
 
 class MessageQueueWriter {
@@ -155,17 +157,39 @@ function onresize() {
     Atomics.store(memoryView32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
 }
 
+audio_map = new Map();
+
 function LogicMessage(e) {
     let x = new Uint32Array(e.data);
     let optcode = x[0];
     if (optcode === PUSH_ENGINE_EVENT) {
         ws.send(x.slice(1));
     } else if (optcode === FETCH_RESOURCE) {
-        let res = fetch("../../res/" + str_from_mem(x[2], x[3]));
+        let res = fetch(RESOURCE_PREFIX + str_from_mem(x[2], x[3]));
         res.then( async function(data) {
             let buffer = await data.arrayBuffer();
             upload_resource(x[1], buffer);
         })
+    } else if (optcode === PREPARE_AUDIO) {
+        let res = fetch(RESOURCE_PREFIX + str_from_mem(x[2], x[3]));
+        res.then( async function(data) {
+            let buffer = await data.arrayBuffer();
+            let audio_buffer = await audio_context.decodeAudioData(buffer);
+            audio_map.set(x[1], audio_buffer)
+            queue.write_i32([AUDIO_LOADED, x[1]])
+            console.debug("done fetching audio " + x[1])
+        })
+    } else if (optcode === PLAY_SOUND) {
+        let audio_buffer = audio_map.get(x[1])
+        source = audio_context.createBufferSource();
+        source.buffer = audio_buffer;
+        source.connect(audio_context.destination)
+        source.start()
+        console.debug("start playing audio " + x[1])
+    } else if (optcode === STOP_SOUND) {
+        source.stop()
+        source.disconnect(audio_context.destination)
+        console.debug("stop playing audio " + x[1])
     } else if (optcode === ALLOCATED_BUFFER) {
         const id = x[1];
         let ptr = x[2] / 4;

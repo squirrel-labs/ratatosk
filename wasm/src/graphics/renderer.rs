@@ -37,6 +37,7 @@ impl<T: GraphicsApi> Renderer<T> {
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
+        #[cfg(debug_assertions)]
         self.graphics
             .ok()
             .map_err(|e| ClientError::WebGlError(format!("WebGl2 error: {}", e)))?;

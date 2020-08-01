@@ -9,6 +9,7 @@ use crate::{
 use rask_engine::{
     events::{Event, Key},
     resources::registry,
+    resources::GetStore,
 };
 use resource_parser::ResourceParser;
 
@@ -29,6 +30,7 @@ impl LogicContext {
         let mut res_parser = ResourceParser::new();
         res_parser.fetch_resource(registry::EMPTY);
         res_parser.fetch_resource(registry::THIEF);
+        res_parser.fetch_resource(registry::SOUND);
         res_parser.fetch_character_resource(registry::CHAR);
         Ok(Self {
             state: Vec::new(),
@@ -61,6 +63,8 @@ impl LogicContext {
             Some(Event::KeyDown(_, Key::ARROW_RIGHT)) => self.angle_mod = 1,
             Some(Event::KeyUp(_, Key::ARROW_RIGHT)) => self.angle_mod = 0,
             Some(Event::KeyUp(_, Key::ARROW_LEFT)) => self.angle_mod = 0,
+            Some(Event::KeyDown(_, Key::KEY_P)) => Message::PlaySound(registry::SOUND.id).send(),
+            Some(Event::KeyDown(_, Key::KEY_S)) => Message::StopSound(registry::SOUND.id).send(),
             Some(Event::KeyDown(_, Key::ENTER)) => {
                 self.res_parser.fetch_resource(registry::EMPTY);
                 self.res_parser.fetch_resource(registry::THIEF);
@@ -75,9 +79,9 @@ impl LogicContext {
         if self.state.len() < 2 {
             use rask_engine::resources::GetStore;
             let res = crate::communication::RESOURCE_TABLE.read();
-            let texid1 = rask_engine::resources::registry::EMPTY.id;
-            let texid2 = rask_engine::resources::registry::THIEF.id;
-            let charid = rask_engine::resources::registry::CHAR.id;
+            let texid1 = registry::EMPTY.id;
+            let texid2 = registry::THIEF.id;
+            let charid = registry::CHAR.id;
             let tex1: Result<&rask_engine::resources::Texture, _> = res.get(texid1 as usize);
             let tex2: Result<&rask_engine::resources::Texture, _> = res.get(texid2 as usize);
             let charc: Result<&Box<rask_engine::resources::Character>, _> =
@@ -106,7 +110,6 @@ impl LogicContext {
         }
         log::trace!("angle: {}", self.angle);
         if self.state.len() >= 3 {
-            use rask_engine::resources::GetStore;
             self.state[1].transform = rask_engine::math::Mat3::rotation(0.02 * self.angle as f32)
                 * rask_engine::math::Mat3::scaling(0.0, 0.0);
             let res = crate::communication::RESOURCE_TABLE.read();
@@ -133,6 +136,11 @@ impl LogicContext {
             Message::MouseDown(event) => Ok(Some(Event::MouseDown(event))),
             Message::MouseUp(event) => Ok(Some(Event::MouseUp(event))),
             Message::KeyPress(t, code) => Ok(Some(Event::KeyPress(t as u16, code))),
+            Message::AudioLoaded(id) => {
+                let mut res = crate::communication::RESOURCE_TABLE.write();
+                res.store(rask_engine::resources::Sound {}, id as usize);
+                Ok(None)
+            }
             Message::RequestAlloc { id, size } => {
                 self.res_parser.alloc(id, size);
                 Ok(None)
