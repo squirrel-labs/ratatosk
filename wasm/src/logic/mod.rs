@@ -117,7 +117,7 @@ impl LogicContext {
             let charc: &Box<rask_engine::resources::Character> = res.get(charid as usize).unwrap();
             let sprites = charc.interpolate(self.tick_nr as f32 * 0.006, "standing")?;
             for (i, sprite) in sprites.enumerate() {
-                let mut sprite = sprite?;
+                let sprite = sprite?;
                 //sprite.transform = rask_engine::math::Mat3::scaling(0.05, 0.05) * sprite.transform;
                 self.state[2 + i] =
                     crate::communication::Sprite::from_animation_state(sprite, charid);
@@ -138,7 +138,7 @@ impl LogicContext {
             Message::KeyPress(t, code) => Ok(Some(Event::KeyPress(t as u16, code))),
             Message::AudioLoaded(id) => {
                 let mut res = crate::communication::RESOURCE_TABLE.write();
-                res.store(rask_engine::resources::Sound {}, id as usize);
+                res.store(rask_engine::resources::Sound, id as usize)?;
                 Ok(None)
             }
             Message::RequestAlloc { id, size } => {

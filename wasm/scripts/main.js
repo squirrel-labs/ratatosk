@@ -157,7 +157,8 @@ function onresize() {
     Atomics.store(memoryView32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
 }
 
-audio_map = new Map();
+let audio_map = new Map();
+let source_map = new Map();
 
 function LogicMessage(e) {
     let x = new Uint32Array(e.data);
@@ -171,7 +172,7 @@ function LogicMessage(e) {
             upload_resource(x[1], buffer);
         })
     } else if (optcode === PREPARE_AUDIO) {
-        let res = fetch(RESOURCE_PREFIX + str_from_mem(x[2], x[3]));
+        const res = fetch(RESOURCE_PREFIX + str_from_mem(x[2], x[3]));
         res.then( async function(data) {
             let buffer = await data.arrayBuffer();
             let audio_buffer = await audio_context.decodeAudioData(buffer);
@@ -181,12 +182,14 @@ function LogicMessage(e) {
         })
     } else if (optcode === PLAY_SOUND) {
         let audio_buffer = audio_map.get(x[1])
-        source = audio_context.createBufferSource();
+        let source = audio_context.createBufferSource();
         source.buffer = audio_buffer;
         source.connect(audio_context.destination)
         source.start()
+        source_map.set(x[1], source)
         console.debug("start playing audio " + x[1])
     } else if (optcode === STOP_SOUND) {
+        let source = source_map.get(x[1])
         source.stop()
         source.disconnect(audio_context.destination)
         console.debug("stop playing audio " + x[1])
