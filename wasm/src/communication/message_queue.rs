@@ -41,14 +41,14 @@ pub enum Message {
     FetchResource(u32, &'static str) = op_codes::FETCH_RESOURCE,
 
     // Audio
-    /// Ask javascript to fetch the requested sound track
+    /// Ask javascript to fetch the requested sound track.
     PrepareAudio(u32, &'static str) = op_codes::PREPARE_AUDIO,
     AudioLoaded(u32) = op_codes::AUDIO_LOADED,
     PlaySound(u32) = op_codes::PLAY_SOUND,
     StopSound(u32) = op_codes::STOP_SOUND,
 
     // Misc Management Commands
-    /// Send memory offsets to javascript
+    /// Send memory offsets to javascript.
     Memory(u32, u32, u32) = op_codes::MEMORY_OFFSETS,
 }
 
@@ -66,7 +66,7 @@ impl Message {
 
     pub fn send(&self) {
         let msg = self.to_slice();
-        log::debug!("sending {:?}", self);
+        log::trace!("sending {:?}", self);
         unsafe { post_to_main(msg.as_ptr() as u32, msg.len() as u32) }
     }
 }

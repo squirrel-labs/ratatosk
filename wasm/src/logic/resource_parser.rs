@@ -35,7 +35,7 @@ impl ResourceParser {
 
     /// Fetch resource via javascript
     pub fn fetch_resource(&mut self, info: ResourceInfo) {
-        if info.variant as u32 == ResourceVariant::Sound as u32 {
+        if let ResourceVariant::Sound = info.variant {
             #[cfg(target_arch = "wasm32")]
             Message::PrepareAudio(info.id, info.path).send();
             return;
