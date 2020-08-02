@@ -1,49 +1,6 @@
-use rocket_contrib::json::Json;
-use serde_derive::Serialize;
-
+use crate::models::{Game, GameOverview, GameType, TokenResponse};
 use rocket::get;
-
-// this is just here for a POC.
-// TODO: move those into their own file
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-struct GameType {
-    name: String,
-    icon: String,
-    display_name: String,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-struct Game {
-    name: String,
-    #[serde(rename = "type")]
-    type_: String,
-    id: u32,
-    max_users: u32,
-    user_count: u32,
-    has_password: bool,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct TokenResponse {
-    username: String,
-    name: String,
-    user_count: u32,
-    max_users: u32,
-    has_password: bool,
-    #[serde(rename = "type")]
-    type_: String,
-    id: u32,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct GameOverview {
-    game_types: Vec<GameType>,
-    games: Vec<Game>,
-}
+use rocket_contrib::json::Json;
 
 // routes are here for now :)
 #[get("/")]
