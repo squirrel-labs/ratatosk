@@ -2,8 +2,8 @@
 members = [
   "rask-engine",
   "rask-server",
-  "client/graphics",
-  "client/logic",
+  "wasm",
+  "lobby/",
 ]
 
 [profile.release]

@@ -1,41 +1,52 @@
-use super::Texture;
-use crate::{math::Mat3, EngineError};
-use spine::atlas::Atlas;
-use spine::atlas::Texture as TextureSegment;
-use spine::skeleton::{
-    animation::{SkinAnimation, Sprite as SpriteState, Sprites as SpriteStates},
-    Skeleton, SRT,
-};
-use std::convert::TryInto;
-
 use std::collections::HashMap;
 use std::io::Read;
 
+use super::Texture;
+use crate::network::packet::ResourceData;
+use crate::{math::Mat3, math::Vec3, EngineError};
+use image::DynamicImage;
+use spine::atlas::Atlas;
+use spine::skeleton::Skeleton;
+use std::convert::TryFrom;
+use std::hash::{Hash, Hasher};
+
+#[derive(Debug)]
 struct OwnedSpriteState {
     attachment: String,
-    srt: SRT,
+    transform: [[f32; 3]; 3],
 }
 
 pub struct AnimationState {
-    /// if true, the image has to be rotated clockwise
-    rotated: bool,
-    /// position of the upper left pixel in the texture segment
-    pos: (u16, u16),
-    /// size of the texture segment
-    size: (u16, u16),
     /// transformation matrix for the subsprite
-    transform: Mat3,
+    pub transform: Mat3,
+    /// attachment id
+    pub att_id: u64,
 }
 
 pub struct AnimationStates<'a> {
     sprites: std::vec::IntoIter<OwnedSpriteState>,
-    atlas: &'a HashMap<String, TextureSegment>,
+    atlas: &'a HashMap<u64, Texture>,
+}
+
+impl AnimationState {
+    fn new(transform: [[f32; 3]; 3], attachment_id: u64) -> Self {
+        let tscale = Mat3::scaling(1.0 / 500.0, 1.0 / 500.0);
+        let mat = Mat3::from_vec3(
+            Vec3::from(transform[0]),
+            Vec3::from(transform[1]),
+            Vec3::from(transform[2]),
+        );
+        Self {
+            transform: tscale * mat,
+            att_id: attachment_id,
+        }
+    }
 }
 
 impl<'a> AnimationStates<'a> {
     fn new(
         sprites: std::vec::IntoIter<OwnedSpriteState>,
-        atlas: &'a HashMap<String, TextureSegment>,
+        atlas: &'a HashMap<u64, Texture>,
     ) -> Self {
         Self { sprites, atlas }
     }
@@ -45,13 +56,11 @@ impl<'a> Iterator for AnimationStates<'a> {
     type Item = Result<AnimationState, EngineError>;
     fn next(&mut self) -> Option<Self::Item> {
         let sprite = self.sprites.next()?;
-        if let Some(region) = self.atlas.get(&sprite.attachment) {
-            Some(Ok(AnimationState {
-                rotated: region.rotate,
-                pos: region.xy,
-                size: region.size,
-                transform: Mat3::from(sprite.srt),
-            }))
+        let mut hasher = std::collections::hash_map::DefaultHasher::new();
+        sprite.attachment.hash(&mut hasher);
+        let att_id = hasher.finish();
+        if self.atlas.contains_key(&att_id) {
+            Some(Ok(AnimationState::new(sprite.transform, att_id)))
         } else {
             Some(Err(EngineError::ResourceMissing(format!(
                 "Could not get sprite attachment \"{}\"",
@@ -62,14 +71,13 @@ impl<'a> Iterator for AnimationStates<'a> {
 }
 
 pub struct Character {
-    texture: Texture,
     skeleton: Skeleton,
-    atlas: HashMap<String, TextureSegment>,
+    atlas: HashMap<u64, Texture>,
 }
 
 impl Character {
     pub fn new<R: Read>(
-        texture: Texture,
+        texture: DynamicImage,
         skeleton: Skeleton,
         atlas: Atlas<R>,
     ) -> Result<Self, EngineError> {
@@ -78,86 +86,95 @@ impl Character {
             let segment = segment.map_err(|e| {
                 EngineError::ResourceFormat(format!("Could not parse atlas \"{}\"", e))
             })?;
-            segments.insert(segment.name.clone(), segment);
+            let mut hasher = std::collections::hash_map::DefaultHasher::new();
+            segment.name.hash(&mut hasher);
+            let (x, y) = segment.xy;
+            let (width, height) = segment.size;
+            let tex = texture.crop_imm(x as u32, y as u32, width as u32, height as u32);
+            if segment.rotate {
+                tex.rotate90();
+            }
+            segments.insert(hasher.finish(), Texture::from_dynamic_image(tex));
         }
-        Ok(Self::from_parts(texture, skeleton, segments))
+        Ok(Self::from_parts(skeleton, segments))
     }
 
-    pub fn from_parts(
-        texture: Texture,
-        skeleton: Skeleton,
-        atlas: HashMap<String, TextureSegment>,
-    ) -> Self {
-        Self {
-            texture,
-            skeleton,
-            atlas,
-        }
+    pub fn from_parts(skeleton: Skeleton, atlas: HashMap<u64, Texture>) -> Self {
+        Self { skeleton, atlas }
     }
 
-    pub fn texture(&self) -> &Texture {
-        &self.texture
+    pub fn from_memory(
+        texture: &[u8],
+        animation: &[u8],
+        atlas: &[u8],
+    ) -> Result<Self, EngineError> {
+        let texture = image::load_from_memory_with_format(texture, image::ImageFormat::Png);
+        let atlas = spine::atlas::Atlas::from_reader(atlas);
+        let skeleton = spine::skeleton::Skeleton::from_reader(animation);
+        Character::new(texture?, skeleton?, atlas?)
     }
 
     pub fn skeleton(&self) -> &Skeleton {
         &self.skeleton
     }
 
-    pub fn atlas(&self) -> &HashMap<String, TextureSegment> {
+    pub fn atlas(&self) -> &HashMap<u64, Texture> {
         &self.atlas
-    }
-
-    pub fn texture_mut(&mut self) -> &mut Texture {
-        &mut self.texture
     }
 
     pub fn skeleton_mut(&mut self) -> &mut Skeleton {
         &mut self.skeleton
     }
 
-    pub fn atlas_mut(&mut self) -> &mut HashMap<String, TextureSegment> {
+    pub fn atlas_mut(&mut self) -> &mut HashMap<u64, Texture> {
         &mut self.atlas
     }
 
-    pub fn interpolate<'a>(
-        &'a self,
-        time: f32,
-        anim_name: &str,
-    ) -> Result<AnimationStates<'a>, EngineError> {
+    pub fn interpolate(&self, time: f32, anim_name: &str) -> Result<AnimationStates, EngineError> {
         let animated_skin = self
             .skeleton
             .get_animated_skin("default", Some(anim_name))?;
+        let time = time.rem_euclid(animated_skin.get_duration());
         Ok(AnimationStates::new(
             animated_skin
                 .interpolate(time)
                 .ok_or_else(|| {
                     EngineError::Animation(format!(
                         "Could not interpolate animation at time {}",
-                        time
+                        time,
                     ))
                 })?
                 .map(|s| OwnedSpriteState {
                     attachment: s.attachment.to_owned(),
-                    srt: s.srt,
+                    transform: s.to_matrix3(),
                 })
                 .collect::<Vec<_>>()
                 .into_iter(),
             &self.atlas,
         ))
     }
-    pub fn from_u8(data: &[u8]) -> Result<Self, EngineError> {
-        let tex_data = u32::from_le_bytes(pop(data)?) as usize;
-        let atlas_data = u32::from_le_bytes(pop(&(data[4..8]))?) as usize;
-        let animation_data = u32::from_le_bytes(pop(&(data[8..12]))?) as usize;
-        let texture = Texture::from_png_stream(&data[0..tex_data]);
-        let atlas = spine::atlas::Atlas::from_reader(&data[tex_data..atlas_data]);
-        let skeleton =
-            spine::skeleton::Skeleton::from_reader(&data[(tex_data + atlas_data)..animation_data]);
-        Character::new(texture?, skeleton?, atlas?)
-    }
 }
-fn pop(barry: &[u8]) -> Result<[u8; 4], EngineError> {
-    barry
-        .try_into()
-        .map_err(|_| EngineError::ResourceFormat("invalid index in charakter binary".into()))
+
+impl<'a> TryFrom<ResourceData<'a>> for Character {
+    type Error = EngineError;
+    fn try_from(chr_data: ResourceData<'a>) -> Result<Self, Self::Error> {
+        if let ResourceData::CharacterVec {
+            texture_len,
+            atlas_len,
+            animation_len,
+            data,
+        } = chr_data
+        {
+            Character::from_memory(
+                &data[0..texture_len as usize],
+                &data[(texture_len + atlas_len) as usize
+                    ..(texture_len + atlas_len + animation_len) as usize],
+                &data[texture_len as usize..(atlas_len + texture_len) as usize],
+            )
+        } else {
+            Err(EngineError::ResourceFormat(
+                "The given data is not a character variant".into(),
+            ))
+        }
+    }
 }

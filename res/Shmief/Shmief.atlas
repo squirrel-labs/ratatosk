@@ -1,0 +1,146 @@
+
+Schmief.png
+size: 512,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+thief/right_arm_0
+  rotate: false
+  xy: 464, 83
+  size: 39, 60
+  orig: 39, 60
+  offset: 0, 0
+  index: -1
+thief/right_arm
+  rotate: false
+  xy: 196, 92
+  size: 59, 34
+  orig: 59, 34
+  offset: 0, 0
+  index: -1
+thief/right_hand
+  rotate: false
+  xy: 196, 1
+  size: 61, 89
+  orig: 61, 89
+  offset: 0, 0
+  index: -1
+thief/torso
+  rotate: false
+  xy: 1, 1
+  size: 104, 137
+  orig: 104, 137
+  offset: 0, 0
+  index: -1
+thief/hip
+  rotate: false
+  xy: 258, 128
+  size: 80, 83
+  orig: 80, 83
+  offset: 0, 0
+  index: -1
+thief/face
+  rotate: false
+  xy: 464, 1
+  size: 41, 80
+  orig: 41, 80
+  offset: 0, 0
+  index: -1
+thief/eye
+  rotate: false
+  xy: 190, 234
+  size: 11, 14
+  orig: 11, 14
+  offset: 0, 0
+  index: -1
+thief/hair
+  rotate: false
+  xy: 107, 1
+  size: 87, 125
+  orig: 87, 125
+  offset: 0, 0
+  index: -1
+thief/left_strand
+  rotate: false
+  xy: 440, 1
+  size: 19, 57
+  orig: 19, 57
+  offset: 0, 0
+  index: -1
+thief/right_strand
+  rotate: false
+  xy: 311, 213
+  size: 25, 39
+  orig: 25, 39
+  offset: 0, 0
+  index: -1
+thief/right_thigh
+  rotate: false
+  xy: 107, 128
+  size: 81, 107
+  orig: 89, 116
+  offset: 3, 5
+  index: -1
+thief/left_thigh
+  rotate: false
+  xy: 1, 140
+  size: 75, 113
+  orig: 75, 113
+  offset: 0, 0
+  index: -1
+thief/right_shin_0
+  rotate: false
+  xy: 340, 128
+  size: 60, 98
+  orig: 60, 98
+  offset: 0, 0
+  index: -1
+thief/right_shin
+  rotate: false
+  xy: 258, 213
+  size: 51, 33
+  orig: 51, 33
+  offset: 0, 0
+  index: -1
+thief/left_foot_0
+  rotate: false
+  xy: 259, 1
+  size: 75, 55
+  orig: 75, 55
+  offset: 0, 0
+  index: -1
+thief/left_shin_0
+  rotate: false
+  xy: 402, 128
+  size: 60, 98
+  orig: 60, 98
+  offset: 0, 0
+  index: -1
+thief/left_shin
+  rotate: false
+  xy: 387, 1
+  size: 51, 33
+  orig: 51, 33
+  offset: 0, 0
+  index: -1
+thief/left_foot
+  rotate: false
+  xy: 259, 58
+  size: 75, 55
+  orig: 75, 55
+  offset: 0, 0
+  index: -1
+thief/left_arm
+  rotate: false
+  xy: 190, 128
+  size: 66, 104
+  orig: 66, 104
+  offset: 0, 0
+  index: -1
+thief/left_hand
+  rotate: false
+  xy: 336, 1
+  size: 49, 48
+  orig: 49, 48
+  offset: 0, 0
+  index: -1

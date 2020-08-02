@@ -119,8 +119,8 @@ impl From<AABox> for RBox {
     }
 }
 
-impl From<&spine::skeleton::SRT> for RBox {
-    fn from(srt: &spine::skeleton::SRT) -> RBox {
+impl From<&spine::skeleton::srt::SRT> for RBox {
+    fn from(srt: &spine::skeleton::srt::SRT) -> RBox {
         let pos = srt.transform([-1.0, -1.0]).into();
         let v1 = Vec2::from(srt.transform([1.0, -1.0])) - pos;
         let v2 = Vec2::from(srt.transform([-1.0, 1.0])) - pos;

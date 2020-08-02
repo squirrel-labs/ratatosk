@@ -1,1 +1,2 @@
-pub struct Sound {}
+#[derive(Clone)]
+pub struct Sound;
