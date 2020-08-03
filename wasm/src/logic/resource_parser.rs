@@ -70,34 +70,6 @@ impl ResourceParser {
         self.dyn_resource_id += 3;
     }
 
-    /// Fetch resource via javascript
-    pub fn fetch_resource(&mut self, info: ResourceInfo) {
-        Message::FetchResource(info.id, info.path).send();
-        self.mapping_table
-            .insert(info.id, (info.id, 0, info.variant));
-    }
-
-    /// Fetch character resource via javascript
-    pub fn fetch_character_resource(&mut self, info: CharacterInfo) {
-        Message::FetchResource(self.dyn_resource_id, info.texture).send();
-        self.mapping_table.insert(
-            self.dyn_resource_id,
-            (info.id, 0, ResourceVariant::Character),
-        );
-        Message::FetchResource(self.dyn_resource_id + 1, info.animation).send();
-        self.mapping_table.insert(
-            self.dyn_resource_id + 1,
-            (info.id, 1, ResourceVariant::Character),
-        );
-        Message::FetchResource(self.dyn_resource_id + 2, info.atlas).send();
-        self.mapping_table.insert(
-            self.dyn_resource_id + 1,
-            (info.id, 2, ResourceVariant::Character),
-        );
-        self.char_parts_table.insert(info.id, [0, 0, 0]);
-        self.dyn_resource_id += 3;
-    }
-
     /// Allocates a new buffer and returns the pointer to it.
     pub fn alloc(&mut self, id: u32, size: u32) {
         log::trace!("allocating {} bytes for resource {}", size, id);

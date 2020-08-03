@@ -2492,7 +2492,7 @@ checksum = "cccddf32554fecc6acb585f82a32a72e28b48f8c4c1883ddfeeeaa96f7d8e519"
 [[package]]
 name = "wee_alloc"
 version = "0.4.5"
-source = "git+https://github.com/zshipko/wee_alloc/#ea7c2b88664ad61765ba98b24c18828527ec7c6e"
+source = "git+https://github.com/zshipko/wee_alloc/?branch=master#ea7c2b88664ad61765ba98b24c18828527ec7c6e"
 dependencies = [
  "cfg-if",
  "libc",
