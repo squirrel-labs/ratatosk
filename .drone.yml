@@ -43,7 +43,7 @@ steps:
   - name: cargo
     path: /usr/local/cargo
   commands:
-  - cp -r client /tmp/demo
+  - cp -r wasm /tmp/demo
 - name: format
   image: truedoctor/rust-wasm:latest
   pull: if-not-exists
