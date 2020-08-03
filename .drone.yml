@@ -30,7 +30,6 @@ steps:
   - name: doc
     path: /drone/src/target/doc
   commands:
-  - source client/gen/mem.sh
   - nix-shell --run 'cargo doc --no-deps' --arg inCI true # document all projects
 - name: demo
   image: truedoctor/rust-wasm:latest
