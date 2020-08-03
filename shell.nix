@@ -14,6 +14,7 @@ mkShell {
     pkgconfig
     rustc
     cargo
+    postgresql.lib
     openssl
     cargo-make
     binaryen
