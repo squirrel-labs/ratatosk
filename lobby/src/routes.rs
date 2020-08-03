@@ -1,5 +1,6 @@
 use crate::models::{Game, GameOverview, GameType, TokenResponse};
-use rocket::get;
+use rocket::request::Form;
+use rocket::{delete, get, post};
 use rocket_contrib::json::Json;
 
 // routes are here for now :)
@@ -32,6 +33,29 @@ pub fn game_index() -> Json<GameOverview> {
 
     Json(mock_data)
 }
+
+#[get("/api/lobby/types", format = "json")]
+pub fn get_types() -> Json<GameOverview> {
+    unimplemented!()
+}
+
+#[get("/api/lobby/groups/<id>", format = "json")]
+pub fn get_group(id: u32) -> Json<GameOverview> {
+    unimplemented!()
+}
+
+use rocket::response::status::{Accepted, NotFound};
+
+#[post("/api/lobby/groups/<id>", data = "<pw>", format = "json")]
+pub fn create_group(id: u32, pw: Form<crate::models::Password>) -> &'static str {
+    "42"
+}
+
+#[delete("/api/lobby/groups/<id>", format = "json")]
+pub fn delete_group(id: u32) -> Json<GameOverview> {
+    unimplemented!()
+}
+
 use std::time::{SystemTime, UNIX_EPOCH};
 
 #[get("/api/lobby/tokens/<token>", format = "json")]

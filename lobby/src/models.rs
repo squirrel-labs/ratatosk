@@ -40,7 +40,8 @@ pub mod db {
         game_type_id: &'a i32,
     }
 }
-use serde_derive::Serialize;
+use rocket::request::FromForm;
+use serde_derive::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -48,6 +49,11 @@ pub struct GameType {
     pub name: String,
     pub icon: String,
     pub display_name: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, FromForm)]
+pub struct Password {
+    pub password: String,
 }
 
 #[derive(Debug, Serialize)]

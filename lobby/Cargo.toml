@@ -12,6 +12,7 @@ serde_derive = "1.0"
 serde_json = "1.0"
 diesel = { version = "1.4", features = ["postgres"] }
 dotenv = "0.15.0"
+rust-argon2 = "0.8"
 
 [dependencies.rocket_contrib]
 version = "0.4.4"
