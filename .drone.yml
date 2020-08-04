@@ -44,6 +44,7 @@ steps:
     path: /usr/local/cargo
   commands:
   - cp -r wasm /tmp/demo
+  - cp -r res /tmp/demo
 - name: format
   image: truedoctor/rust-wasm:latest
   pull: if-not-exists
