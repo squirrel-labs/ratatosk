@@ -1,8 +1,8 @@
 { inCI ? false }:
 
 with import (fetchTarball {
-  url = https://github.com/NixOS/nixpkgs/archive/0657426ad90f0f940c5e296bd468e529cf159c6a.tar.gz;
-  sha256 = "1aw0d1892nywhj9xvf5rz4l974xw0wv43z9l9bfh28rwqrah73bf";
+  url = https://github.com/NixOS/nixpkgs/archive/d971fd7cbaa7794b4cb632ad17ecbfbe3c17f8ee.tar.gz;
+  sha256 = "19p52y2s9m7hc0z5ngjwj5dy6fm9yz2bn8fxsa0brbfwpw2xbl56";
 }) { };
 
 mkShell {
