@@ -7,6 +7,11 @@ edition = "2018"
 [features]
 nightly = []
 
+[dependencies.specs]
+version = "0.16"
+default_features = false
+features = ["storage-event-control"]
+
 [dependencies.image]
 version = "0.23"
 default_features = false
