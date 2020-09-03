@@ -10,7 +10,7 @@ nightly = []
 [dependencies.specs]
 version = "0.16"
 default_features = false
-features = ["storage-event-control"]
+features = ["storage-event-control", "specs-derive"]
 
 [dependencies.image]
 version = "0.23"

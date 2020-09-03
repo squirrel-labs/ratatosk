@@ -1,11 +1,10 @@
 use crate::events::Event;
+use crate::math::Vec2;
 use crate::resources::ResourceTable;
 use crate::EngineError;
-use crate::math::Vec2;
-use specs::prelude::*;
+use specs::{prelude::*, Component};
 
-pub struct Level {
-}
+pub struct Level {}
 
 /// An interface for the game server to interact with the game.
 pub trait GameEngine {
@@ -31,21 +30,13 @@ pub struct RaskEngine {
 
 // A component contains data
 // which is associated with an entity.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Component)]
+#[storage(VecStorage)]
 struct Vel(Vec2);
 
-impl Component for Vel {
-    type Storage = VecStorage<Self>;
-}
-
-#[derive(Debug, Clone, Copy)]
-
+#[derive(Debug, Clone, Copy, Component)]
+#[storage(VecStorage)]
 struct Pos(Vec2);
-impl Component for Pos {
-    type Storage = VecStorage<Self>;
-}
-
-struct Hitbox()
 
 struct SysA;
 
