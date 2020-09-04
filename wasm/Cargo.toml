@@ -13,8 +13,19 @@ log = "0.4"
 lazy_static = "1.4"
 rect_packer = "0.2"
 linked_list_allocator = "0.8.3"
+rayon = "1.1.0"
 
 [dependencies.rask-engine]
 version = "0.2.0"
 path = "../rask-engine"
 features = ["nightly"]
+
+[dependencies.nobg-web_worker]
+version = "=0.3.2"
+features = ["std_atomics"]
+path = "../../web_worker"
+git = "https://github.com/squirrel-labs/web_worker/"
+branch = "feature/remove-wasm-bindgen"
+
+[dependencies.wasm-sync]
+path = "wasm-sync"

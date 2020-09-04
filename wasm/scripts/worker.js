@@ -1,7 +1,7 @@
 'use strict';
 
 let mem;
-let decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+let decoder = new TextDecoder('utf-8', {ignoreBOM: true, fatal: true});
 let u8mem;
 let u32mem;
 let f32mem;
@@ -19,6 +19,8 @@ let pixeledWidth, pixeledHeight;
 let fb;
 let texture;
 let textureLoc;
+let threadpool = [];
+let graphicsWorker;
 
 function str_from_mem(ptr, len) {
     return decoder.decode(u8mem.slice(ptr, ptr + len));
@@ -29,39 +31,39 @@ function arr_from_mem(ptr, len) {
 }
 
 const imports = {
-    log_debug: function(msg, len) {
+    log_debug: function (msg, len) {
         console.debug(str_from_mem(msg, len), 'color:plum', '');
     },
-    log_info: function(msg, len) {
+    log_info: function (msg, len) {
         console.info(str_from_mem(msg, len), 'color:#1b8', '');
     },
-    log_warn: function(msg, len) {
+    log_warn: function (msg, len) {
         console.warn(str_from_mem(msg, len), 'color:#fa2', '');
     },
-    log_error: function(msg, len) {
+    log_error: function (msg, len) {
         console.error(str_from_mem(msg, len), 'color:red', '');
     },
-    log_panic: function(msg, len, file, flen, line, column) {
+    log_panic: function (msg, len, file, flen, line, column) {
         console.error('%cPANIC\tpanic at line ' + line + ' and column ' + column + ' in file "' + str_from_mem(file, flen) + '"\n' + str_from_mem(msg, len), 'color:red');
     },
-    post_to_main: function(msg, len) {
+    post_to_main: function (msg, len) {
         postMessage(arr_from_mem(msg, len));
     },
-    get_canvas_size: function() {
+    get_canvas_size: function () {
         canvasWidth = canvas.width;
         canvasHeight = canvas.height;
         return (canvas.width << 16) | canvas.height;
     },
-    set_canvas_size: function(w, h) {
+    set_canvas_size: function (w, h) {
         canvas.width = w;
         canvas.height = h;
         canvasWidth = w;
         canvasHeight = h;
     },
-    gl_get_error: function() {
+    gl_get_error: function () {
         return gl.getError();
     },
-    gl_create_vertex_array_and_buffer_with_data: function(ptr, len) {
+    gl_create_vertex_array_and_buffer_with_data: function (ptr, len) {
         // ATTENTION: The pointer must be 32-bit aligned.
         const vao = gl.createVertexArray();
         if (!(vao instanceof WebGLVertexArrayObject)) return 1;
@@ -74,7 +76,7 @@ const imports = {
         gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
         return 0;
     },
-    gl_allocate_buffers: function(matPtr, texBoundPtr, texLayerPtr, instances) {
+    gl_allocate_buffers: function (matPtr, texBoundPtr, texLayerPtr, instances) {
         // ATTENTION: All pointers must be 32-bit aligned.
         if (typeof matBuffer === 'undefined') {
             matBuffer = gl.createBuffer();
@@ -103,24 +105,24 @@ const imports = {
         gl.vertexAttribDivisor(texLayerLoc, 1);
         return 0;
     },
-    gl_update_mat_buffer: function(matPtr, instances) {
+    gl_update_mat_buffer: function (matPtr, instances) {
         // ATTENTION: The pointer must be 32-bit aligned.
         gl.bindBuffer(gl.ARRAY_BUFFER, matBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, f32mem, matPtr >> 2, instances * 3 * 3);
     },
-    gl_update_tex_buffer: function(texBoundPtr, texLayerPtr, instances) {
+    gl_update_tex_buffer: function (texBoundPtr, texLayerPtr, instances) {
         // ATTENTION: All pointers must be 32-bit aligned.
         gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, f32mem, texBoundPtr >> 2, instances * 4);
         gl.bufferSubData(gl.ARRAY_BUFFER, instances * 4 * 4, u32mem, texLayerPtr >> 2, instances);
     },
-    gl_create_program: function() {
+    gl_create_program: function () {
         const prog = gl.createProgram();
         if (!(prog instanceof WebGLProgram)) return -1;
         programs.push(prog);
         return programs.length - 1;
     },
-    gl_attach_new_shader: function(progHandle, shaderType) {
+    gl_attach_new_shader: function (progHandle, shaderType) {
         const prog = programs[progHandle];
         if (typeof prog === 'undefined') return 1;
         let source, typeName;
@@ -139,7 +141,7 @@ const imports = {
         shaders.push([typeName, shader]);
         return 0;
     },
-    gl_link_program: function(progHandle) {
+    gl_link_program: function (progHandle) {
         const prog = programs[progHandle];
         if (typeof prog === 'undefined') return 1;
         gl.linkProgram(prog);
@@ -166,10 +168,10 @@ const imports = {
         gl.useProgram(prog);
         return 0;
     },
-    gl_query_max_texture_size: function() {
+    gl_query_max_texture_size: function () {
         return gl.getParameter(gl.MAX_TEXTURE_SIZE);
     },
-    gl_realloc_texture_atlas: function(w, h, layer_count) {
+    gl_realloc_texture_atlas: function (w, h, layer_count) {
         if (typeof texture === 'undefined') {
             texture = gl.createTexture();
             if (typeof texture === 'undefined') return 1;
@@ -180,20 +182,20 @@ const imports = {
         gl.texImage3D(gl.TEXTURE_2D_ARRAY, 0, gl.RGBA8, w, h, layer_count, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
         return 0;
     },
-    gl_upload_texture_to_atlas: function(start_x, start_y, width, height, layer, buffer) {
+    gl_upload_texture_to_atlas: function (start_x, start_y, width, height, layer, buffer) {
         gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, start_x, start_y, layer, width, height, 1, gl.RGBA, gl.UNSIGNED_BYTE, u8mem, buffer);
     },
-    gl_uniform_texture: function() {
+    gl_uniform_texture: function () {
         gl.uniform1i(textureLoc, texture);
     },
-    gl_draw_arrays_instanced_with_triangles: function(first, count, instance_count) {
+    gl_draw_arrays_instanced_with_triangles: function (first, count, instance_count) {
         gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, fb);
         gl.drawArraysInstanced(gl.TRIANGLES, first, count, instance_count);
 
         gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
         gl.blitFramebuffer(0, 0, pixeledWidth, pixeledHeight, 0, 0, canvasWidth, canvasHeight, gl.COLOR_BUFFER_BIT, gl.NEAREST);
     },
-    gl_create_renderbuffer: function(width, height) {
+    gl_create_renderbuffer: function (width, height) {
         gl.disable(gl.CULL_FACE);
         gl.disable(gl.DEPTH_TEST);
         gl.disable(gl.POLYGON_OFFSET_FILL);
@@ -214,33 +216,50 @@ const imports = {
         const state = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
         if (state !== gl.FRAMEBUFFER_COMPLETE) return 3 | (state << 16);
         return 0;
+    },
+    spawn_pool_worker: function (id, stack_top, ptr, tls) {
+        postMessage({id: id, stack_top: stack_top, work: ptr, tls: tls});
+        console.debug("spawned_pool_worker " + id + " st: " + stack_top);
+    },
+    spawn_graphics_worker: function (stack_top, tls) {
+        postMessage({stack_top: stack_top, tls: tls});
+        console.debug("spawned_graphics_worker st: " + stack_top);
     }
 };
 
 // handle the initialisation
-onmessage = async function({ data }) {
+onmessage = async function ({data}) {
     // set global memory for function imports
     mem = data.memory;
-    const is_logic = typeof data.canvas === 'undefined';
+    const has_canvas = typeof data.canvas !== 'undefined';
+    const has_work = typeof data.work !== 'undefined';
+    const is_subworker = typeof data.stack_top !== 'undefined';
     u8mem = new Uint8Array(mem.buffer);
     u32mem = new Uint32Array(mem.buffer);
     f32mem = new Float32Array(mem.buffer);
-    wasm = await WebAssembly.instantiate(data.compiled, {env: {
-        ...imports,
-        memory: mem
-    }});
-    if (is_logic) {
-        wasm.exports.__sp.value -= 1024 * 64;
+    wasm = await WebAssembly.instantiate(data.compiled, {
+        env: {
+            ...imports,
+            memory: mem
+        }
+    });
+    if (!is_subworker && !has_canvas) {
         wasm.exports.__wasm_init_memory();
-        wasm.exports.__wasm_init_tls();
-        wasm.exports.init(wasm.exports.__heap_base.value);
+        const tls = wasm.exports.init(wasm.exports.__heap_base.value, mem.buffer.byteLength, wasm.exports.__tls_size.value);
+        wasm.exports.__wasm_init_tls(tls);
         wasm.exports.run_logic();
-    } else {
-        canvas = data.canvas;
+    } else if (is_subworker && has_work) {
+        wasm.exports.__sp.value = data.stack_top;
+        wasm.exports.__wasm_init_tls(data.tls);
+        wasm.exports.run_pool(data.work);
+    } else if (has_canvas) {
         vs = data.shader.vertex;
         fs = data.shader.fragment;
+        canvas = data.canvas;
+        wasm.exports.__sp.value = data.stack_top;
+        wasm.exports.__wasm_init_tls(data.tls);
         // see 'https://www.khronos.org/registry/webgl/specs/latest/1.0/' for documentation
-        gl = canvas.getContext('webgl2', {
+        gl =canvas.getContext('webgl2', {
             alpha: false,
             depth: false,
             stencil: true,
@@ -257,5 +276,8 @@ onmessage = async function({ data }) {
         } else {
             console.error('failed to create a webgl2 context');
         }
+    }
+    else {
+        console.error("Unknown worker type")
     }
 }

@@ -31,8 +31,7 @@
 #![feature(stdsimd)]
 #![feature(arbitrary_enum_discriminant)]
 #![feature(panic_info_message)]
-#[cfg_attr(target_arch = "wasm32", macro_use)]
-extern crate lazy_static;
+#![feature(const_in_array_repeat_expressions)]
 
 pub mod communication;
 pub mod entries;

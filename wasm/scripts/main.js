@@ -4,7 +4,8 @@ const WORKER_URI = 'scripts/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:5001/'
 const MESSAGE_ITEM_SIZE = 32;
 const RESOURCE_PREFIX = '../../res/'
-let decoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+const MEMORY_MB = 32;
+let decoder = new TextDecoder('utf-8', {ignoreBOM: true, fatal: true});
 let SYNCHRONIZATION_MEMORY;
 let MESSAGE_QUEUE = null;
 let MESSAGE_QUEUE_LENGTH;
@@ -51,13 +52,13 @@ class MessageQueueWriter {
             return;
         }
         this._queue.push(task);
-        if(!this._locked) this._dequeue();
+        if (!this._locked) this._dequeue();
     }
     _dequeue() {
         this._busy = true;
         let next = this._queue.shift();
 
-        if(next)
+        if (next)
             this._write_i32(next)
         else
             this._busy = false;
@@ -71,16 +72,15 @@ async function responseText(promise) {
 }
 
 function postWorkerDescriptor(worker, desc) {
-    if (typeof desc.canvas === "undefined") {
-        worker.postMessage(desc);
-        worker.addEventListener("message", LogicMessage);
-    } else {
-        Promise.all([responseText(desc.shader.vertex), responseText(desc.shader.fragment)])
-               .then(([vertex, fragment]) => {
-                   desc.shader.vertex = vertex;
-                   desc.shader.fragment = fragment;
-                   worker.postMessage(desc, [desc.canvas]);
+    if (typeof desc.canvas !== "undefined") {
+    Promise.all([responseText(desc.shader.vertex), responseText(desc.shader.fragment)])
+        .then(([vertex, fragment]) => {
+            desc.shader.vertex = vertex;
+            desc.shader.fragment = fragment;
+            worker.postMessage(desc, [desc.canvas]);
         });
+    } else {
+        worker.postMessage(desc);
     }
 }
 
@@ -90,18 +90,20 @@ function spawnModule(module) {
     return worker;
 }
 let wasm_module;
-function spawnModules(canvas, memory) {
+function spawnLogic(memory) {
     WebAssembly.compileStreaming(fetch('../gen/client.wasm'))
-    .then(compiled => {
-        let module = {
-            memory: memory,
-            compiled: compiled
-        };
-        spawnModule(module);
-        module.canvas = canvas;
-        module.shader = {fragment: fetch('scripts/fragment.glsl'), vertex: fetch('scripts/vertex.glsl')};
-        wasm_module = module;
-    });
+        .then(compiled => {
+            compiled_wasm = compiled;
+            let module = {
+                memory: memory,
+                compiled: compiled
+            };
+            let worker = new Worker(WORKER_URI);
+            worker.addEventListener("message", LogicMessage);
+            workers.push(worker);
+            worker.postMessage(module);
+            wasm_module = module;
+        });
 }
 
 function throwMissingOffscreenCanvasSupport() {
@@ -121,9 +123,7 @@ function createCanvas() {
 
 function generateMemory() {
     // memory pages of 65,536 bytes = 64 KiB
-    const page = 65536;
-    let mem = 1073741824;//memoryParameters.max_memory;
-    let max = Math.floor((mem + page -1 ) / page);
+    const max = MEMORY_MB * 16;
     const memoryDescriptor = {
         initial: max,
         maximum: max,
@@ -152,28 +152,38 @@ function str_from_mem(ptr, len) {
     return decoder.decode(memoryViewU8.slice(ptr, ptr + len));
 }
 
-function onresize() {
-    Atomics.store(memoryView32, SYNC_CANVAS_SIZE, window.innerWidth);
-    Atomics.store(memoryView32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
+function resize_canvas() {
+    Atomics.store(memoryViewU32, SYNC_CANVAS_SIZE, window.innerWidth);
+    Atomics.store(memoryViewU32, SYNC_CANVAS_SIZE + 1, window.innerHeight);
 }
 
 let audio_map = new Map();
 let source_map = new Map();
 
 function LogicMessage(e) {
+    if (typeof e.data.stack_top !== "undefined") {
+        let module = Object.assign(e.data, wasm_module);
+        if (typeof module.work === "undefined") {
+            module.canvas = canvas;
+            module.shader = {fragment: fetch('scripts/fragment.glsl'), vertex: fetch('scripts/vertex.glsl')};
+        }
+        workers.push(spawnModule(module));
+        return;
+    }
+
     let x = new Uint32Array(e.data);
     let optcode = x[0];
     if (optcode === PUSH_ENGINE_EVENT) {
         ws.send(x.slice(1));
     } else if (optcode === FETCH_RESOURCE) {
         let res = fetch(RESOURCE_PREFIX + str_from_mem(x[2], x[3]));
-        res.then( async function(data) {
+        res.then(async function (data) {
             let buffer = await data.arrayBuffer();
             upload_resource(x[1], buffer);
         })
     } else if (optcode === PREPARE_AUDIO) {
         const res = fetch(RESOURCE_PREFIX + str_from_mem(x[2], x[3]));
-        res.then( async function(data) {
+        res.then(async function (data) {
             let buffer = await data.arrayBuffer();
             let audio_buffer = await audio_context.decodeAudioData(buffer);
             audio_map.set(x[1], audio_buffer)
@@ -219,9 +229,9 @@ function LogicMessage(e) {
         MESSAGE_QUEUE_LENGTH = x[3];
         SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
         SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
-        SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2
-        SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3
-        spawnModule(wasm_module);
+        SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2;
+        SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3;
+        resize_canvas();
         queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_QUEUE_LENGTH);
     } else if (optcode === SET_TEXT_MODE) {
         if (x[1] === 0) {
@@ -236,13 +246,13 @@ resource_map = new Map();
 function upload_resource(data) {
     let u32 = new Uint32Array(data, 0, 4);
     resource_map.set(u32[2], data)
-    console.log("sending request to allocate " + data.byteLength + " bytes");
+    console.debug("sending request to allocate " + data.byteLength + " bytes");
     queue.write_i32([REQUEST_ALLOCATION, u32[2], data.byteLength]);
 }
 
 function upload_resource(id, data) {
     resource_map.set(id, data)
-    console.log("sending request to allocate " + data.byteLength + " bytes");
+    console.debug("sending request to allocate " + data.byteLength + " bytes");
     queue.write_i32([REQUEST_ALLOCATION, id, data.byteLength]);
 }
 
@@ -254,7 +264,7 @@ let memoryViewU32 = new Uint32Array(memory.buffer);
 let memoryView8 = new Int8Array(memory.buffer);
 let memoryViewU8 = new Uint8Array(memory.buffer);
 
-spawnModules(canvas, memory);
+spawnLogic(memory);
 
 function wakeUpAt(addr) {
     Atomics.notify(memory.buffer, addr, +Infinity);
@@ -287,7 +297,7 @@ async function wakeLogic() {
 }
 
 function setup_ws() {
-    ws.addEventListener('open',  () => {
+    ws.addEventListener('open', () => {
         console.log('ws connection to ' + WEBSOCKET_URI + ' established');
         connected = true;
     });
@@ -322,7 +332,7 @@ function hashCode(str) {
     }
     for (var i = 0; i < str.length; i++) {
         var char = str.charCodeAt(i);
-        hash = ((hash<<5)-hash)+char;
+        hash = ((hash << 5) - hash) + char;
         hash = hash & hash; // Convert to 32 bit integer
     }
     return hash;
@@ -333,7 +343,7 @@ function keyMod(key) {
 }
 
 function evalKey(key) {
-    if (key.isComposing && key.repeat) { return 0; }
+    if (key.isComposing && key.repeat) {return 0;}
     return hashCode(key.code)
 }
 
@@ -346,18 +356,18 @@ function input(e) {
     queue.write_i32([KEY_DOWN, e.data]);
 }
 
-window.addEventListener('resize', onresize);
+window.addEventListener('resize', resize_canvas);
 
 window.addEventListener('keydown', e => {
     const key = evalKey(e);
     const mod = keyMod(e);
-    if (key !== undefined && key !== 0 && mod !== undefined) { queue.write_i32([KEY_DOWN, mod, key]); }
+    if (key !== undefined && key !== 0 && mod !== undefined) {queue.write_i32([KEY_DOWN, mod, key]);}
 });
 
 window.addEventListener('keyup', e => {
     const key = evalKey(e);
     const mod = keyMod(e);
-    if (key !== undefined && key !== 0 && mod !== undefined) { queue.write_i32([KEY_UP, mod, key]); }
+    if (key !== undefined && key !== 0 && mod !== undefined) {queue.write_i32([KEY_UP, mod, key]);}
 });
 
 window.addEventListener('mousemove', e => {
@@ -375,4 +385,4 @@ window.addEventListener('mouseup', e => {
     if (mod !== undefined) {queue.write_i32([MOUSE_UP, (keyMod(e) << 8) | e.buttons, e.clientX, e.clientY]);}
 });
 
-window.setInterval(wakeLogic, 10);
+window.setInterval(wakeLogic, 20);
