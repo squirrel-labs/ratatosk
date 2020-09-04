@@ -3,18 +3,20 @@
 
 mod resource_parser;
 use crate::{
-    communication::{Message, MessageQueue, Sprite, DOUBLE_BUFFER},
+    communication::{Message, MessageQueue, Sprite, DOUBLE_BUFFER, SYNCHRONIZATION_MEMORY},
     error::ClientError,
 };
 use rask_engine::{
+    engine::{GameEngine, RaskEngine},
     events::{Event, Key},
     resources::registry,
     resources::GetStore,
 };
 use resource_parser::ResourceParser;
 
-#[derive(Debug)]
 pub struct LogicContext {
+    engine: RaskEngine,
+    last_timestamp: i32,
     state: Vec<Sprite>,
     tick_nr: u64,
     pub message_queue: MessageQueue,
@@ -33,6 +35,8 @@ impl LogicContext {
         res_parser.fetch_resource(registry::SOUND)?;
         res_parser.fetch_character_resource(registry::CHAR)?;
         Ok(Self {
+            engine: RaskEngine::new(),
+            last_timestamp: unsafe { SYNCHRONIZATION_MEMORY.elapsed_ms },
             state: Vec::new(),
             tick_nr: 0,
             message_queue: MessageQueue::new(),
@@ -57,6 +61,9 @@ impl LogicContext {
             }
             log::debug!("{:?}", msg);
             event = self.handle_message(msg)?;
+        }
+        if let Some(ref event) = event {
+            self.engine.handle_event(event.clone())?;
         }
         match event {
             Some(Event::KeyDown(_, Key::ARROW_LEFT)) => self.angle_mod = -1,
@@ -140,6 +147,12 @@ impl LogicContext {
                 ) * self.state[2 + i].transform;
             }
         }
+
+        let now = unsafe { SYNCHRONIZATION_MEMORY.elapsed_ms };
+        self.engine.tick(core::time::Duration::from_millis(
+            (now - self.last_timestamp) as u64,
+        ));
+        self.last_timestamp = now;
 
         self.push_state();
         self.tick_nr += 1;
