@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use core::arch::wasm32::{atomic_notify, i32_atomic_wait};
+use core::arch::wasm32::{memory_atomic_notify, memory_atomic_wait32};
 use core::cell::UnsafeCell;
 use core::sync::atomic::{AtomicI32, Ordering};
 
@@ -34,7 +34,7 @@ impl<'a, T> MutexGuard<'a, T> {
     pub fn new(mutex: &'a Mutex<T>) -> Self {
         #[cfg(target_arch = "wasm32")]
         unsafe {
-            i32_atomic_wait(mutex.locked_ptr(), 1, -1)
+            memory_atomic_wait32(mutex.locked_ptr(), 1, -1)
         };
         #[cfg(not(target_arch = "wasm32"))]
         {
@@ -50,7 +50,7 @@ impl<'a, T> Drop for MutexGuard<'a, T> {
         (unsafe { &*self.mutex.locked.get() }).store(0, Ordering::SeqCst);
         #[cfg(target_arch = "wasm32")]
         unsafe {
-            atomic_notify(self.mutex.locked_ptr(), 1)
+            memory_atomic_notify(self.mutex.locked_ptr(), 1)
         };
     }
 }
@@ -104,7 +104,7 @@ impl<'a, T> RGuard<'a, T> {
     pub fn new(rw: &'a RwLock<T>) -> Self {
         #[cfg(target_arch = "wasm32")]
         unsafe {
-            i32_atomic_wait(rw.write.get() as *mut i32, 1, -1)
+            memory_atomic_wait32(rw.write.get() as *mut i32, 1, -1)
         };
         #[cfg(not(target_arch = "wasm32"))]
         {
@@ -120,7 +120,7 @@ impl<'a, T> Drop for RGuard<'a, T> {
         if (unsafe { &*self.rw.readers.get() }).fetch_sub(1, Ordering::SeqCst) == 1 {
             #[cfg(target_arch = "wasm32")]
             unsafe {
-                atomic_notify(self.rw.write.get() as *mut i32, 1)
+                memory_atomic_notify(self.rw.write.get() as *mut i32, 1)
             };
         }
     }
@@ -142,9 +142,9 @@ impl<'a, T> RwGuard<'a, T> {
     pub fn new(rw: &'a RwLock<T>) -> Self {
         #[cfg(target_arch = "wasm32")]
         unsafe {
-            i32_atomic_wait(rw.write.get() as *mut i32, 1, -1);
+            memory_atomic_wait32(rw.write.get() as *mut i32, 1, -1);
             (&*rw.write.get()).store(1, Ordering::SeqCst);
-            i32_atomic_wait(rw.readers.get() as *mut i32, 1, -1);
+            memory_atomic_wait32(rw.readers.get() as *mut i32, 1, -1);
         }
         #[cfg(not(target_arch = "wasm32"))]
         {
@@ -161,7 +161,7 @@ impl<'a, T> Drop for RwGuard<'a, T> {
         (unsafe { &*self.rw.write.get() }).store(0, Ordering::SeqCst);
         #[cfg(target_arch = "wasm32")]
         unsafe {
-            atomic_notify(self.rw.write.get() as *mut i32, 1)
+            memory_atomic_notify(self.rw.write.get() as *mut i32, 1)
         };
     }
 }

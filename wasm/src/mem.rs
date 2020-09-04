@@ -173,7 +173,7 @@ pub unsafe fn wait_until_wake_up_at(ptr: *mut i32) {
     let timeout = 5;
     #[cfg(target_arch = "wasm32")]
     {
-        let res = core::arch::wasm32::i32_atomic_wait(
+        let res = core::arch::wasm32::memory_atomic_wait32(
             ptr,
             atomic_read_i32(ptr),
             1000 * 1000 * 1000 * timeout,
