@@ -11,7 +11,7 @@
 //! When executing `init()` a message is sent to the main thread, signaling the initialization has
 //! finished. This signal is used to start the graphics worker.
 
-use crate::communication::{message_queue::MessageQueueElement, MessageQueue};
+use crate::communication::MessageQueue;
 use crate::graphics::renderer;
 use crate::logic::LogicContext;
 #[cfg(target_arch = "wasm32")]

@@ -23,7 +23,6 @@ features = ["nightly"]
 [dependencies.nobg-web_worker]
 version = "=0.3.2"
 features = ["std_atomics"]
-path = "../../web_worker"
 git = "https://github.com/squirrel-labs/web_worker/"
 branch = "feature/remove-wasm-bindgen"
 

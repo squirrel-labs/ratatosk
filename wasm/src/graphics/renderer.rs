@@ -48,7 +48,6 @@ impl<T: GraphicsApi> Renderer<T> {
 
     pub fn draw_sprites(&mut self) -> Result<(), ClientError> {
         let mut used_textures = crate::communication::TEXTURE_IDS.lock();
-        return Ok(());
         if used_textures.reset_notify > 0 {
             log::debug!("Uploading new textures");
             used_textures.reset_notify = 0;

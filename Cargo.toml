@@ -4,6 +4,7 @@ members = [
   "rask-server",
   "wasm",
   "lobby/",
+  "wasm/wasm-processor"
 ]
 
 [profile.release]
