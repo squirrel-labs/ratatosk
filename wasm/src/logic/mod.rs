@@ -77,7 +77,6 @@ impl LogicContext {
         // TODO: Remove this temporary sprite loading. Replace it with some kind of
         // "resource complete" event
         if self.state.len() < 2 {
-            use rask_engine::resources::GetStore;
             let res = crate::communication::RESOURCE_TABLE.read();
             let texid1 = registry::EMPTY.id;
             let texid2 = registry::THIEF.id;

@@ -17,7 +17,7 @@ use rask_engine::EngineError;
 #[derive(Debug)]
 /// Used to handle the resources management with `main.js`.
 pub struct ResourceParser {
-    buffer_table: HashMap<u32, (*const u8, u32)>,
+    buffer_table: HashMap<u32, Vec<u8>>,
     char_parts_table: HashMap<u32, [u32; 3]>,
     mapping_table: HashMap<u32, (u32, u32, ResourceVariant)>,
     dyn_resource_id: u32,
@@ -85,6 +85,10 @@ impl ResourceParser {
     pub fn parse(&mut self, id: u32) -> Result<(), ClientError> {
         let mapping = self.mapping_table.get(&id);
         if self.buffer_table.contains_key(&id) {
+            unsafe {
+                let buffer = self.buffer_table.get_mut(&id).unwrap();
+                buffer.set_len(buffer.capacity())
+            }
             if let Some(&mapping) = mapping {
                 self.parse_fetched_data(id, mapping)
             } else {
@@ -98,8 +102,8 @@ impl ResourceParser {
     }
 
     fn parse_ws_package(&mut self, id: u32) -> Result<(), ClientError> {
-        let data = self.get_buffer(id).unwrap();
-        let msg = packet::WebSocketPacket::deserialize(&data)?;
+        let data = self.pop_buffer(id).unwrap();
+        let msg = packet::WebSocketPacket::deserialize(data.as_slice())?;
         log::trace!("parsing: optcode: {}", msg.op_code);
         assert_eq!(msg.op_code, protocol::op_codes::PUSH_RESOURCE);
         if let packet::PacketVariant::PushResource(data) = msg.payload {
@@ -107,14 +111,12 @@ impl ResourceParser {
                 resource_types::TEXTURE => ResourceParser::parse_texture(data)?,
                 resource_types::CHARACTER => ResourceParser::parse_char(data)?,
                 _ => {
-                    self.dealloc_buffer(id);
                     return Err(ClientError::ResourceError(
                         "unknown ResourceType while parsing".into(),
                     ));
                 }
             }
         }
-        self.dealloc_buffer(id);
         Ok(())
     }
 
@@ -126,13 +128,13 @@ impl ResourceParser {
         let (parent_id, part_id, variant) = mapping;
         match variant {
             ResourceVariant::Texture => {
-                let data = self.get_buffer(id).ok_or_else(|| {
+                let data = self.pop_buffer(id).ok_or_else(|| {
                     ClientError::ResourceError(format!(
                         "Tried to parse resource id {} for wich no buffer is allocated",
                         id
                     ))
                 })?;
-                ResourceParser::store_texture(parent_id, data)?
+                ResourceParser::store_owned_texture(parent_id, data)?
             }
             ResourceVariant::Character => {
                 let parts = self.char_parts_table.get_mut(&parent_id).unwrap();
@@ -140,19 +142,17 @@ impl ResourceParser {
                 let parts = *parts;
 
                 if parts.iter().all(|x| *x != 0) {
-                    let tex = self.get_buffer(parts[0]).unwrap();
-                    let anim = self.get_buffer(parts[1]).unwrap();
-                    let atlas = self.get_buffer(parts[2]).unwrap();
+                    let tex = self.pop_buffer(parts[0]).unwrap();
+                    let anim = self.pop_buffer(parts[1]).unwrap();
+                    let atlas = self.pop_buffer(parts[2]).unwrap();
                     ResourceParser::parse_char_from_parts(parent_id, tex, anim, atlas)?;
                     for i in parts.iter() {
-                        self.dealloc_buffer(*i);
                         self.mapping_table.remove(i);
                     }
                     self.char_parts_table.remove(&parent_id);
                 }
             }
             _ => {
-                self.dealloc_buffer(id);
                 return Err(ClientError::ResourceError(
                     "unknown ResourceType while parsing".into(),
                 ));
@@ -177,6 +177,13 @@ impl ResourceParser {
         Ok(())
     }
 
+    fn store_owned_texture(id: u32, image: Vec<u8>) -> Result<(), ClientError> {
+        log::info!("decoding texture {} len: {}", id, image.len());
+        let img = Texture::from_memory(image.as_slice())?;
+        RESOURCE_TABLE.write().store(img, id as usize)?;
+        Ok(())
+    }
+
     fn parse_char(res: packet::NetworkResource) -> Result<(), ClientError> {
         log::info!("decoding char {}", res.res_id);
         let chr: Character = res.data.try_into()?;
@@ -188,37 +195,25 @@ impl ResourceParser {
 
     fn parse_char_from_parts(
         id: u32,
-        texture: &[u8],
-        animation: &[u8],
-        atlas: &[u8],
+        texture: Vec<u8>,
+        animation: Vec<u8>,
+        atlas: Vec<u8>,
     ) -> Result<(), ClientError> {
-        let chr: Character = Character::from_memory(texture, animation, atlas)?;
+        let chr: Character =
+            Character::from_memory(texture.as_slice(), animation.as_slice(), atlas.as_slice())?;
         RESOURCE_TABLE.write().store(Box::new(chr), id as usize)?;
         Ok(())
     }
 
     fn alloc_buffer(&mut self, id: u32, length: u32) -> *const u8 {
         log::trace!("Allocating buffer {} with length of {} bytes", id, length);
-        let layout = unsafe { std::alloc::Layout::from_size_align_unchecked(length as usize, 4) };
-        let ptr = unsafe { std::alloc::alloc(layout) };
-        self.buffer_table.insert(id, (ptr, length));
+        let buffer = Vec::with_capacity(length as usize);
+        let ptr = buffer.as_ptr();
+        self.buffer_table.insert(id, buffer);
         ptr
     }
 
-    fn get_buffer(&self, id: u32) -> Option<&[u8]> {
-        if let Some((ptr, length)) = self.buffer_table.get(&id) {
-            unsafe { Some(std::slice::from_raw_parts(*ptr, *length as usize)) }
-        } else {
-            None
-        }
-    }
-
-    fn dealloc_buffer(&mut self, id: u32) {
-        if let Some((ptr, length)) = self.buffer_table.remove(&id) {
-            unsafe {
-                let layout = std::alloc::Layout::from_size_align_unchecked(length as usize, 4);
-                std::alloc::dealloc(ptr as *mut u8, layout)
-            }
-        }
+    fn pop_buffer(&mut self, id: u32) -> Option<Vec<u8>> {
+        self.buffer_table.remove(&id)
     }
 }
