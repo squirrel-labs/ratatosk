@@ -38,8 +38,6 @@ pub struct SynchronizationMemory {
     last_elapsed_ms: i32,
 }
 
-#[cfg(not(target_arch = "wasm32"))]
-const DUMMY_SYNC: SynchronizationMemory = SynchronizationMemory::new();
 #[allow(clippy::while_immutable_condition)]
 /// The synchronization memory is a direct memory interface to the `main.js`.
 /// It is updated before each logic cycle.

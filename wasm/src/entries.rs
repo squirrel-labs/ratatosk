@@ -11,13 +11,13 @@
 //! When executing `init()` a message is sent to the main thread, signaling the initialization has
 //! finished. This signal is used to start the graphics worker.
 
-use crate::communication::MessageQueue;
 use crate::graphics::renderer;
 use crate::logic::LogicContext;
 #[cfg(target_arch = "wasm32")]
 use crate::{
     communication::{
-        Message, SynchronizationMemory, MESSAGE_QUEUE_ELEMENT_COUNT, SYNCHRONIZATION_MEMORY,
+        Message, MessageQueue, SynchronizationMemory, MESSAGE_QUEUE_ELEMENT_COUNT,
+        SYNCHRONIZATION_MEMORY,
     },
     mem,
     wasm_log::{init_panic_handler, WasmLog},
@@ -25,7 +25,7 @@ use crate::{
 use linked_list_allocator::LockedHeap;
 
 use nobg_web_worker::child_entry_point;
-use nobg_web_worker::default_thread_pool;
+#[cfg(target_arch = "wasm32")]
 use nobg_web_worker::set_global_thread_pool;
 
 #[cfg(target_arch = "wasm32")]
@@ -82,22 +82,15 @@ pub extern "C" fn run_logic() {
             MESSAGE_QUEUE_ELEMENT_COUNT as u32,
         )
         .send();
+        let stack = mem::alloc_stack();
+        let tls = mem::alloc_tls();
+        log::debug!("spawn graphic");
+        unsafe {
+            spawn_graphics_worker(stack as u32, tls as u32);
+        }
+        let _global_worker_pool =
+            set_global_thread_pool(4, 1024 * 64, mem::get_tls_size() as u32).unwrap();
     }
-    let stack = mem::alloc_stack();
-    let tls = mem::alloc_tls();
-    unsafe {
-        spawn_graphics_worker(stack as u32, tls as u32);
-    }
-    //log::debug!("tls {}", mem::TLS_SIZE);
-    let (pool, _worker_pool) =
-        default_thread_pool(1, mem::STACK_SIZE as u32, mem::get_tls_size as u32).unwrap();
-    let _global_worker_pool =
-        set_global_thread_pool(1, 1024 * 64 * 4, mem::get_tls_size() as u32).unwrap();
-
-    //log::debug!("init game");
-    //log::debug!("bar");
-    pool.spawn(|| log::info!("hallo from thread"));
-
     loop {
         game.tick()
             .unwrap_or_else(|e| log::error!("Error occurred game_context.tick(): {:?}", e));

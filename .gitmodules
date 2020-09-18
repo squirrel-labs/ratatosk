@@ -1,0 +1,3 @@
+[submodule "wasm/wasm-sync"]
+	path = wasm/wasm-sync
+	url = https://github.com/squirrel-labs/wasm-sync
