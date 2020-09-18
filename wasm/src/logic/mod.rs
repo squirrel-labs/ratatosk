@@ -28,10 +28,10 @@ pub struct LogicContext {
 impl LogicContext {
     pub fn new(message_queue: MessageQueue<'static>) -> Result<Self, ClientError> {
         let mut res_parser = ResourceParser::new();
-        res_parser.fetch_resource(registry::EMPTY);
-        res_parser.fetch_resource(registry::THIEF);
-        res_parser.fetch_resource(registry::SOUND);
-        res_parser.fetch_character_resource(registry::CHAR);
+        res_parser.fetch_resource(registry::EMPTY)?;
+        res_parser.fetch_resource(registry::THIEF)?;
+        res_parser.fetch_resource(registry::SOUND)?;
+        res_parser.fetch_character_resource(registry::CHAR)?;
         Ok(Self {
             state: Vec::new(),
             tick_nr: 0,
@@ -66,9 +66,9 @@ impl LogicContext {
             Some(Event::KeyDown(_, Key::KEY_P)) => Message::PlaySound(registry::SOUND.id).send(),
             Some(Event::KeyDown(_, Key::KEY_S)) => Message::StopSound(registry::SOUND.id).send(),
             Some(Event::KeyDown(_, Key::ENTER)) => {
-                self.res_parser.fetch_resource(registry::EMPTY);
-                self.res_parser.fetch_resource(registry::THIEF);
-                self.res_parser.fetch_character_resource(registry::CHAR);
+                self.res_parser.fetch_resource(registry::EMPTY)?;
+                self.res_parser.fetch_resource(registry::THIEF)?;
+                self.res_parser.fetch_character_resource(registry::CHAR)?;
             }
             _ => (),
         }
@@ -140,10 +140,7 @@ impl LogicContext {
                 res.store(rask_engine::resources::Sound, id as usize)?;
                 Ok(None)
             }
-            Message::RequestAlloc { id, size } => {
-                self.res_parser.alloc(id, size);
-                Ok(None)
-            }
+            Message::RequestAlloc { id, size } => self.res_parser.alloc(id, size).map(|_| None),
             Message::DoneWritingResource(id) => self.res_parser.parse(id).map(|_| None),
             _ => Err(ClientError::EngineError("Unknown Message Type".into())),
         }

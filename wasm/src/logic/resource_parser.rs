@@ -34,20 +34,33 @@ impl ResourceParser {
     }
 
     /// Fetch resource via javascript
-    pub fn fetch_resource(&mut self, info: ResourceInfo) {
+    pub fn fetch_resource(&mut self, info: ResourceInfo) -> Result<(), ClientError> {
+        if self.buffer_table.contains_key(&info.id) {
+            return Err(ClientError::ResourceError(format!(
+                "resource: {:?} is already being fetched",
+                info
+            )));
+        }
         if let ResourceVariant::Sound = info.variant {
             #[cfg(target_arch = "wasm32")]
             Message::PrepareAudio(info.id, info.path).send();
-            return;
+            return Ok(());
         }
         #[cfg(target_arch = "wasm32")]
         Message::FetchResource(info.id, info.path).send();
         self.mapping_table
             .insert(info.id, (info.id, 0, info.variant));
+        Ok(())
     }
 
     /// Fetch character resource via javascript
-    pub fn fetch_character_resource(&mut self, info: CharacterInfo) {
+    pub fn fetch_character_resource(&mut self, info: CharacterInfo) -> Result<(), ClientError> {
+        if self.char_parts_table.contains_key(&info.id) {
+            return Err(ClientError::ResourceError(format!(
+                "character: {:?} is already being fetched",
+                info
+            )));
+        }
         #[cfg(target_arch = "wasm32")]
         Message::FetchResource(self.dyn_resource_id, info.texture).send();
         self.mapping_table.insert(
@@ -68,10 +81,17 @@ impl ResourceParser {
         );
         self.char_parts_table.insert(info.id, [0, 0, 0]);
         self.dyn_resource_id += 3;
+        Ok(())
     }
 
     /// Allocates a new buffer and returns the pointer to it.
-    pub fn alloc(&mut self, id: u32, size: u32) {
+    pub fn alloc(&mut self, id: u32, size: u32) -> Result<(), ClientError> {
+        if self.buffer_table.contains_key(&id) {
+            return Err(ClientError::ResourceError(format!(
+                "buffer for resource: {} is already allocated",
+                id
+            )));
+        }
         log::trace!("allocating {} bytes for resource {}", size, id);
         let ptr = self.alloc_buffer(id, size);
         Message::AllocatedBuffer {
@@ -79,16 +99,14 @@ impl ResourceParser {
             ptr: ptr as u32,
         }
         .send();
+        Ok(())
     }
 
     /// Assumes a resource has been written to the buffer `id` and parses its content.
     pub fn parse(&mut self, id: u32) -> Result<(), ClientError> {
         let mapping = self.mapping_table.get(&id);
-        if self.buffer_table.contains_key(&id) {
-            unsafe {
-                let buffer = self.buffer_table.get_mut(&id).unwrap();
-                buffer.set_len(buffer.capacity())
-            }
+        if let Some(buffer) = self.buffer_table.get_mut(&id) {
+            unsafe { buffer.set_len(buffer.capacity()) }
             if let Some(&mapping) = mapping {
                 self.parse_fetched_data(id, mapping)
             } else {
