@@ -913,6 +913,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a9f8082297d534141b30c8d39e9b1773713ab50fdbe4ff30f750d063b3bfd701"
 
 [[package]]
+name = "linked_list_allocator"
+version = "0.8.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "84565678e403453d1a27a0886882b3b271701e65146d972d9d7d9a4c4a0ff498"
+dependencies = [
+ "spinning_top",
+]
+
+[[package]]
 name = "lobby"
 version = "0.1.0"
 dependencies = [
@@ -976,12 +985,6 @@ checksum = "c198b026e1bbf08a937e94c6c60f9ec4a2267f5b0d2eec9c1b21b061ce2be55f"
 dependencies = [
  "autocfg 1.0.0",
 ]
-
-[[package]]
-name = "memory_units"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8452105ba047068f40ff7093dd1d9da90898e63dd61736462e9cdda6a90ad3c3"
 
 [[package]]
 name = "mime"
@@ -1531,10 +1534,10 @@ name = "rask-wasm"
 version = "0.1.0"
 dependencies = [
  "lazy_static",
+ "linked_list_allocator",
  "log 0.4.8",
  "rask-engine",
  "rect_packer",
- "wee_alloc",
 ]
 
 [[package]]
@@ -1867,12 +1870,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3757cb9d89161a2f24e1cf78efa0c1fcff485d18e3f55e0aa3480824ddaa0f3f"
 
 [[package]]
-name = "spin"
-version = "0.5.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
-
-[[package]]
 name = "spine_tiny"
 version = "0.1.1"
 source = "git+https://github.com/squirrel-labs/spine-rs?branch=develop#c5794b53eab0e2f4c954cc9ee5524c5bd01a2e78"
@@ -1881,6 +1878,15 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
+]
+
+[[package]]
+name = "spinning_top"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "047031d6df5f5ae0092c97aa4f6bb04cfc9c081b4cd4cb9cdb38657994279a00"
+dependencies = [
+ "lock_api",
 ]
 
 [[package]]
@@ -2310,18 +2316,6 @@ name = "wasi"
 version = "0.9.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cccddf32554fecc6acb585f82a32a72e28b48f8c4c1883ddfeeeaa96f7d8e519"
-
-[[package]]
-name = "wee_alloc"
-version = "0.4.5"
-source = "git+https://github.com/zshipko/wee_alloc/#ea7c2b88664ad61765ba98b24c18828527ec7c6e"
-dependencies = [
- "cfg-if",
- "libc",
- "memory_units",
- "spin",
- "winapi 0.3.9",
-]
 
 [[package]]
 name = "winapi"

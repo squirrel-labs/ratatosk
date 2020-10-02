@@ -12,17 +12,9 @@ crate-type = ["cdylib", "lib"]
 log = "0.4"
 lazy_static = "1.4"
 rect_packer = "0.2"
+linked_list_allocator = "0.8.3"
 
 [dependencies.rask-engine]
 version = "0.2.0"
 path = "../rask-engine"
 features = ["nightly"]
-
-[dependencies.wee_alloc]
-# version = "=0.4.6"
-version = "=0.4.5"
-features = ["size_classes", "static_ptr_backend"]
-# git = "https://github.com/squirrel-labs/wee_alloc/"
-git = "https://github.com/zshipko/wee_alloc/"
-# branch = "std-mutex"
-branch = "master"
