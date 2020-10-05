@@ -20,13 +20,14 @@ use crate::{
     mem,
     wasm_log::{init_panic_handler, WasmLog},
 };
+use linked_list_allocator::LockedHeap;
 
 #[cfg(target_arch = "wasm32")]
 static LOGGER: WasmLog = WasmLog;
 
 #[cfg(target_arch = "wasm32")]
 #[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 fn wait_for_main_thread_notify() {
     #[cfg(target_arch = "wasm32")]
@@ -47,7 +48,9 @@ pub extern "C" fn init(heap_base: i32) {
         // Place the synchronization_memory, message_queue and resource_table at the beginning of
         // our heap. This call initializes mem::MEM_ADDRS
         mem::MemoryAddresses::init(heap_base as u32);
-        wee_alloc::init_ptr(*mem::HEAP_BASE as *mut u8, mem::HEAP_SIZE as usize);
+        ALLOCATOR
+            .lock()
+            .init(*mem::HEAP_BASE as usize, mem::HEAP_SIZE as usize);
     }
     // set custom panic handler
     init_panic_handler();
