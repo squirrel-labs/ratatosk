@@ -89,7 +89,7 @@ pub extern "C" fn run_logic() {
             spawn_graphics_worker(stack as u32, tls as u32);
         }
         let _global_worker_pool =
-            set_global_thread_pool(4, 1024 * 64, mem::get_tls_size() as u32).unwrap();
+            set_global_thread_pool(4, 1024 * 64 * 8, mem::get_tls_size() as u32).unwrap();
     }
     loop {
         game.tick()

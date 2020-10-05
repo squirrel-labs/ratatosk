@@ -219,11 +219,11 @@ const imports = {
     },
     spawn_pool_worker: function (id, stack_top, ptr, tls) {
         postMessage({id: id, stack_top: stack_top, work: ptr, tls: tls});
-        console.debug("spawned_pool_worker " + id + " st: " + stack_top);
+        console.debug("spawned_pool_worker " + id + " st: " + stack_top + " tls: " + tls);
     },
     spawn_graphics_worker: function (stack_top, tls) {
         postMessage({stack_top: stack_top, tls: tls});
-        console.debug("spawned_graphics_worker st: " + stack_top);
+        console.debug("spawned_graphics_worker st: " + stack_top + " tls: " + tls);
     }
 };
 
@@ -259,7 +259,7 @@ onmessage = async function ({data}) {
         wasm.exports.__sp.value = data.stack_top;
         wasm.exports.__wasm_init_tls(data.tls);
         // see 'https://www.khronos.org/registry/webgl/specs/latest/1.0/' for documentation
-        gl =canvas.getContext('webgl2', {
+        gl = canvas.getContext('webgl2', {
             alpha: false,
             depth: false,
             stencil: true,

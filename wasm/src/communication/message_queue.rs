@@ -124,10 +124,12 @@ pub struct MessageQueue {
 
 impl MessageQueue {
     // add method to create message_queue with a memory location to make testing easier
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
+        let bytes = [0u8; std::mem::size_of::<MessageQueueElement>() * MESSAGE_QUEUE_ELEMENT_COUNT];
+
         MessageQueue {
             reader_index: 0,
-            data: [MessageQueueElement::new(); MESSAGE_QUEUE_ELEMENT_COUNT],
+            data: unsafe { std::mem::transmute(bytes) },
         }
     }
 

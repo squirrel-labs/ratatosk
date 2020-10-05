@@ -197,8 +197,11 @@ impl ResourceParser {
 
     fn store_owned_texture(id: u32, image: Vec<u8>) -> Result<(), ClientError> {
         log::info!("decoding texture {} len: {}", id, image.len());
-        let img = Texture::from_memory(image.as_slice())?;
-        RESOURCE_TABLE.write().store(img, id as usize)?;
+        rayon::spawn(move || {
+            log::debug!("{}", image.len());
+            let img = Texture::from_memory(image.as_slice()).unwrap();
+            RESOURCE_TABLE.write().store(img, id as usize).unwrap();
+        });
         Ok(())
     }
 

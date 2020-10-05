@@ -73,12 +73,12 @@ async function responseText(promise) {
 
 function postWorkerDescriptor(worker, desc) {
     if (typeof desc.canvas !== "undefined") {
-    Promise.all([responseText(desc.shader.vertex), responseText(desc.shader.fragment)])
-        .then(([vertex, fragment]) => {
-            desc.shader.vertex = vertex;
-            desc.shader.fragment = fragment;
-            worker.postMessage(desc, [desc.canvas]);
-        });
+        Promise.all([responseText(desc.shader.vertex), responseText(desc.shader.fragment)])
+            .then(([vertex, fragment]) => {
+                desc.shader.vertex = vertex;
+                desc.shader.fragment = fragment;
+                worker.postMessage(desc, [desc.canvas]);
+            });
     } else {
         worker.postMessage(desc);
     }
@@ -93,7 +93,6 @@ let wasm_module;
 function spawnLogic(memory) {
     WebAssembly.compileStreaming(fetch('../gen/client.wasm'))
         .then(compiled => {
-            compiled_wasm = compiled;
             let module = {
                 memory: memory,
                 compiled: compiled
@@ -186,23 +185,23 @@ function LogicMessage(e) {
         res.then(async function (data) {
             let buffer = await data.arrayBuffer();
             let audio_buffer = await audio_context.decodeAudioData(buffer);
-            audio_map.set(x[1], audio_buffer)
-            queue.write_i32([AUDIO_LOADED, x[1]])
-            console.debug("done fetching audio " + x[1])
+            audio_map.set(x[1], audio_buffer);
+            queue.write_i32([AUDIO_LOADED, x[1]]);
+            console.debug("done fetching audio " + x[1]);
         })
     } else if (optcode === PLAY_SOUND) {
-        let audio_buffer = audio_map.get(x[1])
+        let audio_buffer = audio_map.get(x[1]);
         let source = audio_context.createBufferSource();
         source.buffer = audio_buffer;
-        source.connect(audio_context.destination)
-        source.start()
-        source_map.set(x[1], source)
-        console.debug("start playing audio " + x[1])
+        source.connect(audio_context.destination);
+        source.start();
+        source_map.set(x[1], source);
+        console.debug("start playing audio " + x[1]);
     } else if (optcode === STOP_SOUND) {
-        let source = source_map.get(x[1])
-        source.stop()
-        source.disconnect(audio_context.destination)
-        console.debug("stop playing audio " + x[1])
+        let source = source_map.get(x[1]);
+        source.stop();
+        source.disconnect(audio_context.destination);
+        console.debug("stop playing audio " + x[1]);
     } else if (optcode === ALLOCATED_BUFFER) {
         const id = x[1];
         let ptr = x[2] / 4;
