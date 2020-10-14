@@ -17,7 +17,7 @@ use resource_parser::ResourceParser;
 pub struct LogicContext {
     state: Vec<Sprite>,
     tick_nr: u64,
-    message_queue: MessageQueue<'static>,
+    pub message_queue: MessageQueue,
     res_parser: ResourceParser,
     angle: i32,
     angle_mod: i32,
@@ -26,7 +26,7 @@ pub struct LogicContext {
 
 /// The logic context stores everything necessary for event handling and the game engine.
 impl LogicContext {
-    pub fn new(message_queue: MessageQueue<'static>) -> Result<Self, ClientError> {
+    pub fn new() -> Result<Self, ClientError> {
         let mut res_parser = ResourceParser::new();
         res_parser.fetch_resource(registry::EMPTY)?;
         res_parser.fetch_resource(registry::THIEF)?;
@@ -35,7 +35,7 @@ impl LogicContext {
         Ok(Self {
             state: Vec::new(),
             tick_nr: 0,
-            message_queue,
+            message_queue: MessageQueue::new(),
             res_parser,
             angle: 0,
             angle_mod: 0,
@@ -65,10 +65,14 @@ impl LogicContext {
             Some(Event::KeyUp(_, Key::ARROW_LEFT)) => self.angle_mod = 0,
             Some(Event::KeyDown(_, Key::KEY_P)) => Message::PlaySound(registry::SOUND.id).send(),
             Some(Event::KeyDown(_, Key::KEY_S)) => Message::StopSound(registry::SOUND.id).send(),
+            Some(Event::KeyDown(_, Key::DIGIT1)) => log::set_max_level(log::LevelFilter::Info),
+            Some(Event::KeyDown(_, Key::DIGIT2)) => log::set_max_level(log::LevelFilter::Debug),
+            Some(Event::KeyDown(_, Key::DIGIT3)) => log::set_max_level(log::LevelFilter::Trace),
             Some(Event::KeyDown(_, Key::ENTER)) => {
                 self.res_parser.fetch_resource(registry::EMPTY)?;
                 self.res_parser.fetch_resource(registry::THIEF)?;
                 self.res_parser.fetch_character_resource(registry::CHAR)?;
+                self.res_parser.fetch_resource(registry::SOUND)?;
             }
             _ => (),
         }
@@ -116,10 +120,8 @@ impl LogicContext {
             let charc: &Box<rask_engine::resources::Character> = res.get(charid as usize).unwrap();
             let sprites = charc.interpolate(self.tick_nr as f32 * 0.006, "standing")?;
             for (i, sprite) in sprites.enumerate() {
-                let sprite = sprite?;
-                //sprite.transform = rask_engine::math::Mat3::scaling(0.05, 0.05) * sprite.transform;
                 self.state[2 + i] =
-                    crate::communication::Sprite::from_animation_state(sprite, charid);
+                    crate::communication::Sprite::from_animation_state(sprite?, charid);
             }
         }
 

@@ -1,6 +1,7 @@
 #[cfg(target_arch = "wasm32")]
-use crate::mem::{atomic_read_i32, wait_until_wake_up_at, SYNCHRONIZATION_MEMORY};
+use crate::mem::{atomic_read_i32, wait_until_wake_up_at};
 
+#[derive(Debug)]
 #[repr(C)]
 /// GameState contains data to be sent over the network and is read by `main.js`.
 pub struct GameState {
@@ -22,6 +23,7 @@ impl GameState {
 
 #[repr(align(4))]
 #[repr(C)]
+#[derive(Debug)]
 /// The SynchronizationMemory is the main interface to the `main.js`.
 /// It exposes some variables from the `main.js` and is used for the atomic wait cycle.
 pub struct SynchronizationMemory {
@@ -36,8 +38,6 @@ pub struct SynchronizationMemory {
     last_elapsed_ms: i32,
 }
 
-#[cfg(not(target_arch = "wasm32"))]
-const DUMMY_SYNC: SynchronizationMemory = SynchronizationMemory::new();
 #[allow(clippy::while_immutable_condition)]
 /// The synchronization memory is a direct memory interface to the `main.js`.
 /// It is updated before each logic cycle.
@@ -53,43 +53,6 @@ impl SynchronizationMemory {
         }
     }
 
-    #[cfg(target_arch = "wasm32")]
-    /// # Safety
-    ///
-    /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
-    /// and is only written to using atomic operations.
-    pub unsafe fn get() -> &'static Self {
-        &*(*SYNCHRONIZATION_MEMORY as *const Self)
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
-    /// # Safety
-    ///
-    /// This function completely safe as it just returns dummy data on non wasm32 targets.
-    pub unsafe fn get() -> &'static Self {
-        &DUMMY_SYNC
-    }
-
-    #[cfg(target_arch = "wasm32")]
-    /// # Safety
-    ///
-    /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
-    /// and is only written to using atomic operations.
-    /// It is only available for the wasm32 target.
-    pub unsafe fn get_mut() -> &'static mut Self {
-        &mut *(*SYNCHRONIZATION_MEMORY as *mut Self)
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
-    /// # Safety
-    ///
-    /// This function is safe, if the SYNCHRONIZATION_MEMORY memory address is valid
-    /// and is only written to using atomic operations.
-    /// It is only available for the wasm32 target.
-    pub unsafe fn get_mut() -> &'static mut Self {
-        panic!("synchronization memory is no supported for non wasm32 targets")
-    }
-
     /// This functions lets the thread sleep until it is woken up by the `main.js` or a timeout is
     /// reached.
     pub fn wait_for_main_thread_notify(&mut self) {
@@ -100,9 +63,9 @@ impl SynchronizationMemory {
         {
             self.last_elapsed_ms = self.elapsed_ms;
             while self.last_elapsed_ms
-                == unsafe { atomic_read_i32(*SYNCHRONIZATION_MEMORY as *const i32) }
+                == unsafe { atomic_read_i32(self as *const SynchronizationMemory as *const i32) }
             {
-                unsafe { wait_until_wake_up_at(*SYNCHRONIZATION_MEMORY as *mut i32) }
+                unsafe { wait_until_wake_up_at(self as *mut SynchronizationMemory as *mut i32) }
             }
         }
     }

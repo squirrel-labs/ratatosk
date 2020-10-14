@@ -11,16 +11,22 @@
 //! When executing `init()` a message is sent to the main thread, signaling the initialization has
 //! finished. This signal is used to start the graphics worker.
 
-use crate::communication::{message_queue::MessageQueueElement, MessageQueue};
 use crate::graphics::renderer;
 use crate::logic::LogicContext;
 #[cfg(target_arch = "wasm32")]
 use crate::{
-    communication::{Message, SynchronizationMemory},
+    communication::{
+        Message, MessageQueue, SynchronizationMemory, MESSAGE_QUEUE_ELEMENT_COUNT,
+        SYNCHRONIZATION_MEMORY,
+    },
     mem,
     wasm_log::{init_panic_handler, WasmLog},
 };
 use linked_list_allocator::LockedHeap;
+
+use nobg_web_worker::child_entry_point;
+#[cfg(target_arch = "wasm32")]
+use nobg_web_worker::set_global_thread_pool;
 
 #[cfg(target_arch = "wasm32")]
 static LOGGER: WasmLog = WasmLog;
@@ -29,9 +35,9 @@ static LOGGER: WasmLog = WasmLog;
 #[global_allocator]
 static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
-fn wait_for_main_thread_notify() {
-    #[cfg(target_arch = "wasm32")]
-    unsafe { SynchronizationMemory::get_mut() }.wait_for_main_thread_notify()
+#[cfg(target_arch = "wasm32")]
+extern "C" {
+    fn spawn_graphics_worker(stack_top: u32, tls: u32);
 }
 
 /// This function initializes the heap, logger, panic handler and graphics context.
@@ -43,55 +49,57 @@ fn wait_for_main_thread_notify() {
 /// Any call to alloc prior to this functions invocation results in an error.
 #[export_name = "init"]
 #[cfg(target_arch = "wasm32")]
-pub extern "C" fn init(heap_base: i32) {
+pub extern "C" fn init(heap_base: u32, mem_size: u32, tls_size: u32) -> u32 {
     unsafe {
-        // Place the synchronization_memory, message_queue and resource_table at the beginning of
-        // our heap. This call initializes mem::MEM_ADDRS
-        mem::MemoryAddresses::init(heap_base as u32);
+        mem::set_tls_size(tls_size);
         ALLOCATOR
             .lock()
-            .init(*mem::HEAP_BASE as usize, mem::HEAP_SIZE as usize);
+            .init(heap_base as usize, (mem_size - heap_base) as usize);
     }
     // set custom panic handler
     init_panic_handler();
     log::set_logger(&LOGGER).unwrap();
     // change the log level to only show certain errors
     log::set_max_level(log::LevelFilter::Debug);
-    // send memory offset to the main thread -> initialize graphics
-    Message::Memory(
-        *mem::SYNCHRONIZATION_MEMORY as u32,
-        *mem::MESSAGE_QUEUE as u32,
-        mem::MESSAGE_QUEUE_ELEMENT_COUNT,
-    )
-    .send();
+    log::info!("mem_size: {}", mem_size - heap_base);
+    mem::alloc_tls() as u32
 }
-
-#[cfg(not(target_arch = "wasm32"))]
-static mut MESSAGES: &mut [MessageQueueElement] = &mut [MessageQueueElement::new()];
 
 /// Initialize the game state, communicate with the graphics worker and set up networking.
 /// This function is being exposed to JavaScript.
 #[export_name = "run_logic"]
 pub extern "C" fn run_logic() {
-    #[cfg(target_arch = "wasm32")]
-    let message_queue = unsafe {
-        MessageQueue::from_memory(
-            *mem::MESSAGE_QUEUE as *mut MessageQueueElement,
-            mem::MESSAGE_QUEUE_ELEMENT_COUNT as usize,
-        )
-    };
-    #[cfg(not(target_arch = "wasm32"))]
-    let message_queue = MessageQueue::new(unsafe { MESSAGES });
-
     // create the logic game context
-    let mut game = LogicContext::new(message_queue).unwrap_or_else(|e| panic!("{}", e));
+    let mut game = LogicContext::new().unwrap_or_else(|e| panic!("{}", e));
 
+    #[cfg(target_arch = "wasm32")]
+    {
+        let syn_addr = unsafe { &SYNCHRONIZATION_MEMORY as *const SynchronizationMemory as u32 };
+        // send memory offset to the main thread -> initialize graphics
+        Message::Memory(
+            syn_addr,
+            &game.message_queue as *const MessageQueue as u32,
+            MESSAGE_QUEUE_ELEMENT_COUNT as u32,
+        )
+        .send();
+        let stack = mem::alloc_stack();
+        let tls = mem::alloc_tls();
+        log::debug!("spawn graphic");
+        unsafe {
+            spawn_graphics_worker(stack as u32, tls as u32);
+        }
+        let _global_worker_pool =
+            set_global_thread_pool(4, 1024 * 64 * 8, mem::get_tls_size() as u32).unwrap();
+    }
     loop {
         game.tick()
             .unwrap_or_else(|e| log::error!("Error occurred game_context.tick(): {:?}", e));
         log::trace!("wait_for_main_thread_notify()");
         // use wasm's atomic wait instruction to sleep until waken by the main thread
-        wait_for_main_thread_notify();
+        #[cfg(target_arch = "wasm32")]
+        unsafe {
+            SYNCHRONIZATION_MEMORY.wait_for_main_thread_notify()
+        };
     }
 }
 
@@ -112,4 +120,10 @@ pub extern "C" fn draw_frame() {
     }
     .render()
     .unwrap_or_else(|e| log::error!("{}", e));
+}
+
+/// This function serves as the entry point for threadpool workers
+#[export_name = "run_pool"]
+pub unsafe extern "C" fn run_pool(ptr: u32) {
+    child_entry_point(ptr);
 }

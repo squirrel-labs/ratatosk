@@ -5,6 +5,8 @@ use std::sync::atomic::AtomicBool;
 use rask_engine::events::{Event, KeyModifier, MouseEvent};
 use rask_engine::network::protocol::op_codes;
 
+pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = 128;
+
 #[repr(C, u32)]
 #[derive(Debug, Clone)]
 #[non_exhaustive]
@@ -114,40 +116,26 @@ impl MessageQueueElement {
 
 #[derive(Debug)]
 /// Abstracts the communication with the main thread.
-pub struct MessageQueue<'a> {
+pub struct MessageQueue {
     /// The index of the next element to be read.
     reader_index: u32,
-    data: &'a mut [MessageQueueElement],
+    data: [MessageQueueElement; MESSAGE_QUEUE_ELEMENT_COUNT],
 }
 
-impl<'a> MessageQueue<'a> {
-    /// # Safety
-    ///
-    /// The memory provided to the function has to be valid and must contain valid messages.
-    pub unsafe fn from_memory(ptr: *mut MessageQueueElement, len: usize) -> Self {
-        MessageQueue {
-            reader_index: 0,
-            data: core::slice::from_raw_parts_mut(ptr, len),
-        }
-    }
-
+impl MessageQueue {
     // add method to create message_queue with a memory location to make testing easier
-    pub fn new(data: &'a mut [MessageQueueElement]) -> Self {
+    pub fn new() -> Self {
+        let bytes = [0u8; std::mem::size_of::<MessageQueueElement>() * MESSAGE_QUEUE_ELEMENT_COUNT];
+
         MessageQueue {
             reader_index: 0,
-            data,
+            data: unsafe { std::mem::transmute(bytes) },
         }
-    }
-
-    fn get_mut(&mut self, n: usize) -> Option<&mut MessageQueueElement> {
-        self.data.get_mut(n)
     }
 
     pub fn pop(&mut self) -> Message {
         loop {
-            let e = self
-                .get_mut(self.reader_index as usize)
-                .expect("Failed to Read MessageQueue");
+            let e = &mut self.data[self.reader_index as usize];
             let e = e.read();
             if let Some(Message::None) = e {
                 return Message::None;

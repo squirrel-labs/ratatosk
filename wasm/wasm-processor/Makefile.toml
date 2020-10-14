@@ -1,0 +1,5 @@
+[tasks.processor]
+workspace = false
+command = "cargo"
+args = [ "build", "--release", "-Z", "unstable-options", "--out-dir", "../gen/" ]
+
