@@ -14,7 +14,7 @@ impl Default for Sprite {
 }
 
 impl Sprite {
-    pub fn new(transform: math::Mat3, tex_id: u32, tex_sub_id: u64) -> Self {
+    pub const fn new(transform: math::Mat3, tex_id: u32, tex_sub_id: u64) -> Self {
         Self {
             transform,
             tex_id,
@@ -30,7 +30,7 @@ impl Sprite {
         }
     }
 
-    pub fn from_animation_state(state: AnimationState, char_id: u32) -> Self {
+    pub const fn from_animation_state(state: AnimationState, char_id: u32) -> Self {
         Self {
             transform: state.transform,
             tex_id: char_id,

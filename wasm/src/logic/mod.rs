@@ -94,13 +94,13 @@ impl LogicContext {
                 let mut guard = crate::communication::TEXTURE_IDS.lock();
                 for &(id, mat) in &[
                     (texid1, rask_engine::math::Mat3::identity()),
-                    (texid2, rask_engine::math::Mat3::scaling(0.4, 0.4)),
+                    (texid2, rask_engine::math::Mat3::scaling(1.0, 1.0)),
                 ] {
                     guard.ids.push(id);
                     self.state
                         .push(crate::communication::Sprite::new(mat, id, 0));
                 }
-                let sprites = charc.interpolate(0.0, "standing")?;
+                let sprites = charc.interpolate(0.0, "walking")?;
                 guard.ids.push(charid);
                 for sprite in sprites {
                     self.state
@@ -118,7 +118,7 @@ impl LogicContext {
             let res = crate::communication::RESOURCE_TABLE.read();
             let charid = rask_engine::resources::registry::CHAR.id;
             let charc: &Box<rask_engine::resources::Character> = res.get(charid as usize).unwrap();
-            let sprites = charc.interpolate(self.tick_nr as f32 * 0.006, "standing")?;
+            let sprites = charc.interpolate(self.tick_nr as f32 * 0.01, "walking")?;
             for (i, sprite) in sprites.enumerate() {
                 self.state[2 + i] =
                     crate::communication::Sprite::from_animation_state(sprite?, charid);
