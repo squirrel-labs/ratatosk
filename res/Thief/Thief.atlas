@@ -1,97 +1,146 @@
 
 Thief.png
+size: 512,256
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-size: 128,256
-ShoeLeft
+thief/right_hand
   rotate: false
-  xy: 1322, 348
-  size: 370, 110
-  orig: 370, 110
+  xy: 196, 1
+  size: 61, 89
+  orig: 61, 89
   offset: 0, 0
   index: -1
-UnderLegLeft
+thief/right_thigh
   rotate: false
-  xy: 967, 506
-  size: 220, 503
-  orig: 220, 503
+  xy: 107, 128
+  size: 82, 107
+  orig: 89, 116
+  offset: 2, 5
+  index: -1
+thief/right_forearm
+  rotate: false
+  xy: 259, 90
+  size: 59, 34
+  orig: 59, 34
   offset: 0, 0
   index: -1
-UpperLegLeft
+thief/right_bicep
   rotate: false
-  xy: 705, 506
-  size: 260, 497
-  orig: 260, 497
+  xy: 320, 1
+  size: 59, 70
+  orig: 107, 72
+  offset: 0, 2
+  index: -1
+thief/right_foot
+  rotate: false
+  xy: 381, 58
+  size: 75, 55
+  orig: 75, 55
   offset: 0, 0
   index: -1
-UpperLegRight
+thief/right_shin_boot
   rotate: false
-  xy: 333, 1
-  size: 370, 537
-  orig: 370, 537
+  xy: 404, 128
+  size: 60, 98
+  orig: 60, 98
   offset: 0, 0
   index: -1
-UnderLegRight
+thief/right_shin
   rotate: false
-  xy: 705, 1
-  size: 300, 503
-  orig: 300, 503
+  xy: 458, 51
+  size: 51, 40
+  orig: 51, 40
   offset: 0, 0
   index: -1
-ShoeRight
+thief/hip
   rotate: false
-  xy: 1322, 236
-  size: 370, 110
-  orig: 370, 110
+  xy: 191, 128
+  size: 80, 97
+  orig: 80, 97
   offset: 0, 0
   index: -1
-Body
+thief/torso
   rotate: false
   xy: 1, 1
-  size: 330, 630
-  orig: 330, 630
+  size: 104, 137
+  orig: 104, 137
   offset: 0, 0
   index: -1
-UpperArmRight
+thief/face
   rotate: false
-  xy: 1007, 1
-  size: 187, 303
-  orig: 187, 303
+  xy: 259, 1
+  size: 59, 87
+  orig: 59, 87
   offset: 0, 0
   index: -1
-ForearmRight
+thief/eye
   rotate: false
-  xy: 1196, 1
-  size: 190, 233
-  orig: 190, 233
+  xy: 458, 93
+  size: 11, 14
+  orig: 11, 14
   offset: 0, 0
   index: -1
-HandRightWithSmokebomb
+thief/hair
   rotate: false
-  xy: 1, 633
-  size: 220, 260
-  orig: 220, 260
+  xy: 107, 1
+  size: 87, 125
+  orig: 87, 125
   offset: 0, 0
   index: -1
-Head
+thief/left_strand
   rotate: false
-  xy: 333, 540
-  size: 370, 430
-  orig: 370, 430
+  xy: 78, 140
+  size: 19, 57
+  orig: 19, 57
   offset: 0, 0
   index: -1
-ForearmLeft
+thief/right_strand
   rotate: false
-  xy: 1007, 306
-  size: 313, 163
-  orig: 313, 163
+  xy: 78, 199
+  size: 25, 39
+  orig: 25, 39
   offset: 0, 0
   index: -1
-HandRightWithMoneysack
+thief/left_thigh
   rotate: false
-  xy: 1189, 506
-  size: 190, 440
-  orig: 190, 440
+  xy: 1, 140
+  size: 75, 113
+  orig: 75, 113
+  offset: 0, 0
+  index: -1
+thief/left_shin
+  rotate: false
+  xy: 320, 73
+  size: 53, 49
+  orig: 53, 49
+  offset: 0, 0
+  index: -1
+thief/left_foot
+  rotate: false
+  xy: 381, 1
+  size: 75, 55
+  orig: 75, 55
+  offset: 0, 0
+  index: -1
+thief/left_arm
+  rotate: false
+  xy: 273, 128
+  size: 67, 108
+  orig: 67, 108
+  offset: 0, 0
+  index: -1
+thief/left_hand
+  rotate: false
+  xy: 458, 1
+  size: 49, 48
+  orig: 49, 48
+  offset: 0, 0
+  index: -1
+thief/left_shin_boot
+  rotate: false
+  xy: 342, 128
+  size: 60, 98
+  orig: 60, 98
   offset: 0, 0
   index: -1

@@ -12,17 +12,20 @@ crate-type = ["cdylib", "lib"]
 log = "0.4"
 lazy_static = "1.4"
 rect_packer = "0.2"
+linked_list_allocator = "0.8.3"
+rayon = "1.1.0"
+spin = "0.5"
 
 [dependencies.rask-engine]
 version = "0.2.0"
 path = "../rask-engine"
 features = ["nightly"]
 
-[dependencies.wee_alloc]
-# version = "=0.4.6"
-version = "=0.4.5"
-features = ["size_classes", "static_ptr_backend"]
-# git = "https://github.com/squirrel-labs/wee_alloc/"
-git = "https://github.com/zshipko/wee_alloc/"
-# branch = "std-mutex"
-branch = "master"
+[dependencies.nobg-web_worker]
+version = "=0.3.2"
+features = ["std_atomics"]
+git = "https://github.com/squirrel-labs/web_worker/"
+branch = "feature/remove-wasm-bindgen"
+
+[dependencies.wasm-sync]
+path = "wasm-sync"

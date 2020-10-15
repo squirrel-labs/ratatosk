@@ -9,6 +9,7 @@ steps:
   - name: cargo
     path: /usr/local/cargo
   commands:
+  - nix-shell --run 'git submodule init && git submodule update'
   - nix-shell --run 'cargo make all' --arg inCI true # build all projects
 - name: test
   image: truedoctor/rust-wasm:latest

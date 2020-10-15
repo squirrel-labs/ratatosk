@@ -17,7 +17,7 @@ use resource_parser::ResourceParser;
 pub struct LogicContext {
     state: Vec<Sprite>,
     tick_nr: u64,
-    message_queue: MessageQueue<'static>,
+    pub message_queue: MessageQueue,
     res_parser: ResourceParser,
     angle: i32,
     angle_mod: i32,
@@ -26,16 +26,16 @@ pub struct LogicContext {
 
 /// The logic context stores everything necessary for event handling and the game engine.
 impl LogicContext {
-    pub fn new(message_queue: MessageQueue<'static>) -> Result<Self, ClientError> {
+    pub fn new() -> Result<Self, ClientError> {
         let mut res_parser = ResourceParser::new();
-        res_parser.fetch_resource(registry::EMPTY);
-        res_parser.fetch_resource(registry::THIEF);
-        res_parser.fetch_resource(registry::SOUND);
-        res_parser.fetch_character_resource(registry::CHAR);
+        res_parser.fetch_resource(registry::EMPTY)?;
+        res_parser.fetch_resource(registry::THIEF)?;
+        res_parser.fetch_resource(registry::SOUND)?;
+        res_parser.fetch_character_resource(registry::CHAR)?;
         Ok(Self {
             state: Vec::new(),
             tick_nr: 0,
-            message_queue,
+            message_queue: MessageQueue::new(),
             res_parser,
             angle: 0,
             angle_mod: 0,
@@ -65,10 +65,14 @@ impl LogicContext {
             Some(Event::KeyUp(_, Key::ARROW_LEFT)) => self.angle_mod = 0,
             Some(Event::KeyDown(_, Key::KEY_P)) => Message::PlaySound(registry::SOUND.id).send(),
             Some(Event::KeyDown(_, Key::KEY_S)) => Message::StopSound(registry::SOUND.id).send(),
+            Some(Event::KeyDown(_, Key::DIGIT1)) => log::set_max_level(log::LevelFilter::Info),
+            Some(Event::KeyDown(_, Key::DIGIT2)) => log::set_max_level(log::LevelFilter::Debug),
+            Some(Event::KeyDown(_, Key::DIGIT3)) => log::set_max_level(log::LevelFilter::Trace),
             Some(Event::KeyDown(_, Key::ENTER)) => {
-                self.res_parser.fetch_resource(registry::EMPTY);
-                self.res_parser.fetch_resource(registry::THIEF);
-                self.res_parser.fetch_character_resource(registry::CHAR);
+                self.res_parser.fetch_resource(registry::EMPTY)?;
+                self.res_parser.fetch_resource(registry::THIEF)?;
+                self.res_parser.fetch_character_resource(registry::CHAR)?;
+                self.res_parser.fetch_resource(registry::SOUND)?;
             }
             _ => (),
         }
@@ -77,7 +81,6 @@ impl LogicContext {
         // TODO: Remove this temporary sprite loading. Replace it with some kind of
         // "resource complete" event
         if self.state.len() < 2 {
-            use rask_engine::resources::GetStore;
             let res = crate::communication::RESOURCE_TABLE.read();
             let texid1 = registry::EMPTY.id;
             let texid2 = registry::THIEF.id;
@@ -91,13 +94,13 @@ impl LogicContext {
                 let mut guard = crate::communication::TEXTURE_IDS.lock();
                 for &(id, mat) in &[
                     (texid1, rask_engine::math::Mat3::identity()),
-                    (texid2, rask_engine::math::Mat3::scaling(0.4, 0.4)),
+                    (texid2, rask_engine::math::Mat3::scaling(1.0, 1.0)),
                 ] {
                     guard.ids.push(id);
                     self.state
                         .push(crate::communication::Sprite::new(mat, id, 0));
                 }
-                let sprites = charc.interpolate(0.0, "standing")?;
+                let sprites = charc.interpolate(0.0, "walking")?;
                 guard.ids.push(charid);
                 for sprite in sprites {
                     self.state
@@ -115,12 +118,14 @@ impl LogicContext {
             let res = crate::communication::RESOURCE_TABLE.read();
             let charid = rask_engine::resources::registry::CHAR.id;
             let charc: &Box<rask_engine::resources::Character> = res.get(charid as usize).unwrap();
-            let sprites = charc.interpolate(self.tick_nr as f32 * 0.006, "standing")?;
+            let sprites = charc.interpolate(self.tick_nr as f32 * 0.018, "walking")?;
             for (i, sprite) in sprites.enumerate() {
-                let sprite = sprite?;
-                //sprite.transform = rask_engine::math::Mat3::scaling(0.05, 0.05) * sprite.transform;
                 self.state[2 + i] =
-                    crate::communication::Sprite::from_animation_state(sprite, charid);
+                    crate::communication::Sprite::from_animation_state(sprite?, charid);
+                self.state[2 + i].transform = rask_engine::math::Mat3::translation(
+                    self.tick_nr as f32 / (90.0 * 2.0) % 2.2 - 1.1,
+                    -0.72,
+                ) * self.state[2 + i].transform;
             }
         }
 
@@ -141,10 +146,7 @@ impl LogicContext {
                 res.store(rask_engine::resources::Sound, id as usize)?;
                 Ok(None)
             }
-            Message::RequestAlloc { id, size } => {
-                self.res_parser.alloc(id, size);
-                Ok(None)
-            }
+            Message::RequestAlloc { id, size } => self.res_parser.alloc(id, size).map(|_| None),
             Message::DoneWritingResource(id) => self.res_parser.parse(id).map(|_| None),
             _ => Err(ClientError::EngineError("Unknown Message Type".into())),
         }

@@ -7,7 +7,7 @@ pub use error::WebGl2Error;
 use std::collections::HashMap;
 
 use super::GraphicsApi;
-use crate::communication::Sprite;
+use crate::communication::{Sprite, SYNCHRONIZATION_MEMORY};
 use crate::error::ClientError;
 use bindings::Gl2;
 use rask_engine::{
@@ -30,7 +30,7 @@ mod imports {
 fn init_canvas_size() -> (u32, u32) {
     let x = unsafe { imports::get_canvas_size() };
     let (x, y) = (x >> 16, x & 0xffff);
-    unsafe { crate::communication::SynchronizationMemory::get_mut() }.canvas_size = (x, y);
+    unsafe { SYNCHRONIZATION_MEMORY.canvas_size = (x, y) };
     (x, y)
 }
 

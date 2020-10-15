@@ -1,19 +1,18 @@
 pub mod message_queue;
 pub mod sprite;
-pub mod sync;
 pub mod synchronization_memory;
 
 #[doc(inline)]
-pub use message_queue::{Message, MessageQueue};
+pub use message_queue::{Message, MessageQueue, MESSAGE_QUEUE_ELEMENT_COUNT};
 use rask_engine::resources;
+use spin::{Mutex, RwLock};
 #[doc(inline)]
 pub use sprite::Sprite;
-#[doc(inline)]
-pub use sync::{Mutex, RwLock};
 #[doc(inline)]
 pub use synchronization_memory::{GameState, SynchronizationMemory};
 
 pub static DOUBLE_BUFFER: Mutex<Vec<Sprite>> = Mutex::new(Vec::new());
 pub static RESOURCE_TABLE: RwLock<resources::ResourceTable> =
     RwLock::new(resources::ResourceTable::new());
+pub static mut SYNCHRONIZATION_MEMORY: SynchronizationMemory = SynchronizationMemory::new();
 pub static TEXTURE_IDS: Mutex<resources::TextureIds> = Mutex::new(resources::TextureIds::empty());

@@ -37,9 +37,9 @@ resources! {
     (THIEF,             Texture,        "thief.png"              ),
     (SOUND,             Sound,          "theme_song.mp3"         ),
     (CHAR,              Character,      Character {
-                          texture:   "Shmief/Shmief.png",
-                          atlas:     "Shmief/Shmief.atlas",
-                          animation: "Shmief/Shmief.json"
+                          texture:   "Thief/Thief.png",
+                          atlas:     "Thief/Thief.atlas",
+                          animation: "Thief/Thief.json"
     }                                                            )
 }
 

@@ -1,7 +1,6 @@
 use super::webgl::WebGl2;
 use super::GraphicsApi;
-use crate::communication::SynchronizationMemory;
-use crate::communication::RESOURCE_TABLE;
+use crate::communication::{RESOURCE_TABLE, SYNCHRONIZATION_MEMORY};
 use crate::error::ClientError;
 use rask_engine::resources::{GetTextures, Texture};
 
@@ -33,7 +32,7 @@ impl<T: GraphicsApi> Renderer<T> {
     pub fn new() -> Result<Self, ClientError> {
         // TODO: Do not hardcode pixelated framebuffer size
         log::debug!("Creating graphics buffer");
-        T::new(160, 90).map(|api| Self { graphics: api })
+        T::new(240, 135).map(|api| Self { graphics: api })
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
@@ -41,7 +40,7 @@ impl<T: GraphicsApi> Renderer<T> {
         self.graphics
             .ok()
             .map_err(|e| ClientError::WebGlError(format!("WebGl2 error: {}", e)))?;
-        let size = (unsafe { SynchronizationMemory::get() }).canvas_size;
+        let size = unsafe { SYNCHRONIZATION_MEMORY.canvas_size };
         log::trace!("canvas_size: {}px x {}px", size.0, size.1);
         self.graphics.update_size(size.0, size.1);
         self.draw_sprites()
