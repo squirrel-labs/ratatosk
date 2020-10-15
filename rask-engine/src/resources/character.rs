@@ -30,14 +30,15 @@ pub struct AnimationStates<'a> {
 
 impl AnimationState {
     fn new(transform: [[f32; 3]; 3], attachment_id: u64) -> Self {
-        let tscale = Mat3::scaling(1.0 / 500.0, 1.0 / 500.0);
+        let tscale = Mat3::scaling(0.5 / 512.0, 0.5 / 512.0);
+        let ascale = Mat3::scaling(1.2, 1.2);
         let mat = Mat3::from_vec3(
             Vec3::from(transform[0]),
             Vec3::from(transform[1]),
             Vec3::from(transform[2]),
         );
         Self {
-            transform: tscale * mat,
+            transform: tscale * mat * ascale,
             att_id: attachment_id,
         }
     }

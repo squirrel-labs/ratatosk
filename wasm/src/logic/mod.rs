@@ -118,10 +118,14 @@ impl LogicContext {
             let res = crate::communication::RESOURCE_TABLE.read();
             let charid = rask_engine::resources::registry::CHAR.id;
             let charc: &Box<rask_engine::resources::Character> = res.get(charid as usize).unwrap();
-            let sprites = charc.interpolate(self.tick_nr as f32 * 0.01, "walking")?;
+            let sprites = charc.interpolate(self.tick_nr as f32 * 0.018, "walking")?;
             for (i, sprite) in sprites.enumerate() {
                 self.state[2 + i] =
                     crate::communication::Sprite::from_animation_state(sprite?, charid);
+                self.state[2 + i].transform = rask_engine::math::Mat3::translation(
+                    self.tick_nr as f32 / (90.0 * 2.0) % 2.2 - 1.1,
+                    -0.72,
+                ) * self.state[2 + i].transform;
             }
         }
 

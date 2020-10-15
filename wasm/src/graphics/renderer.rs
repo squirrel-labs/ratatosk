@@ -32,7 +32,7 @@ impl<T: GraphicsApi> Renderer<T> {
     pub fn new() -> Result<Self, ClientError> {
         // TODO: Do not hardcode pixelated framebuffer size
         log::debug!("Creating graphics buffer");
-        T::new(160, 90).map(|api| Self { graphics: api })
+        T::new(240, 135).map(|api| Self { graphics: api })
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {
