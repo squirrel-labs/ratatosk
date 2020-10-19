@@ -16,10 +16,12 @@ use rask_engine::{
 };
 use rect_packer::DensePacker;
 
+const ASPECT_RATIO: (u32, u32) = (4, 3);
+
 mod imports {
     extern "C" {
         pub fn get_canvas_size() -> u32;
-        pub fn set_canvas_size(w: u32, h: u32);
+        pub fn set_canvas_size(w: u32, h: u32, vx: f32, vy: f32, vw: f32, vh: f32);
     }
 }
 
@@ -35,7 +37,14 @@ fn init_canvas_size() -> (u32, u32) {
 }
 
 fn set_canvas_size(w: u32, h: u32) {
-    unsafe { imports::set_canvas_size(w, h) }
+    let (vx, vy, vw, vh) = if h * ASPECT_RATIO.0 > w * ASPECT_RATIO.1 {
+        let height = w as f32 * (ASPECT_RATIO.1 as f32 / ASPECT_RATIO.0 as f32);
+        (0.0, (h as f32 - height) * 0.5, w as f32, height)
+    } else {
+        let width = h as f32 * (ASPECT_RATIO.0 as f32 / ASPECT_RATIO.1 as f32);
+        ((w as f32 - width) * 0.5, 0.0, width, h as f32)
+    };
+    unsafe { imports::set_canvas_size(w, h, vx, vy, vw, vh) }
 }
 
 pub struct WebGl2 {
@@ -94,9 +103,11 @@ impl GraphicsApi for WebGl2 {
         let tex_size = gl.get_max_texture_size();
         log::debug!("Max Texture size: {:?}", tex_size);
         gl.create_renderbuffer(width, height)?;
+        let (w, h) = init_canvas_size();
+        set_canvas_size(w, h);
         Ok(Self {
             gl,
-            canvas_size: init_canvas_size(),
+            canvas_size: (w, h),
             textures: HashMap::new(),
             sprite_textures: vec![],
             matrix_buffer: vec![],

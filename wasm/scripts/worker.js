@@ -14,6 +14,7 @@ let posLoc, matLoc, texBoundLoc, texLayerLoc;
 let matBuffer, texBuffer;
 // vertex and fragment shader
 let vs, fs;
+let canvasX = 0.0, canvasY = 0.0;
 let canvasWidth, canvasHeight;
 let pixeledWidth, pixeledHeight;
 let fb;
@@ -54,11 +55,13 @@ const imports = {
         canvasHeight = canvas.height;
         return (canvas.width << 16) | canvas.height;
     },
-    set_canvas_size: function (w, h) {
+    set_canvas_size: function (w, h, vx, vy, vw, vh) {
         canvas.width = w;
         canvas.height = h;
-        canvasWidth = w;
-        canvasHeight = h;
+        canvasX = vx;
+        canvasY = vy;
+        canvasWidth = vw;
+        canvasHeight = vh;
     },
     gl_get_error: function () {
         return gl.getError();
@@ -193,7 +196,7 @@ const imports = {
         gl.drawArraysInstanced(gl.TRIANGLES, first, count, instance_count);
 
         gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
-        gl.blitFramebuffer(0, 0, pixeledWidth, pixeledHeight, 0, 0, canvasWidth, canvasHeight, gl.COLOR_BUFFER_BIT, gl.NEAREST);
+        gl.blitFramebuffer(0, 0, pixeledWidth, pixeledHeight, canvasX, canvasY, canvasWidth + canvasX, canvasHeight + canvasY, gl.COLOR_BUFFER_BIT, gl.NEAREST);
     },
     gl_create_renderbuffer: function (width, height) {
         gl.disable(gl.CULL_FACE);
