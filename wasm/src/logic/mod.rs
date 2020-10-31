@@ -28,14 +28,14 @@ pub struct LogicContext {
 
 /// The logic context stores everything necessary for event handling and the game engine.
 impl LogicContext {
-    pub fn new() -> Result<Self, ClientError> {
+    pub fn new(pool: rayon::ThreadPool) -> Result<Self, ClientError> {
         let mut res_parser = ResourceParser::new();
         res_parser.fetch_resource(registry::EMPTY)?;
         res_parser.fetch_resource(registry::THIEF)?;
         res_parser.fetch_resource(registry::SOUND)?;
         res_parser.fetch_character_resource(registry::CHAR)?;
         Ok(Self {
-            engine: RaskEngine::new(),
+            engine: RaskEngine::new(std::sync::Arc::new(pool)),
             last_timestamp: unsafe { SYNCHRONIZATION_MEMORY.elapsed_ms },
             state: Vec::new(),
             tick_nr: 0,

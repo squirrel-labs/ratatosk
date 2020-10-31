@@ -810,6 +810,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93a1bb8316a44459a7d14253c4d28dd7395cbd23cc04a68c46e851b8e46d64b1"
 dependencies = [
  "atom",
+ "rayon",
 ]
 
 [[package]]
@@ -1679,6 +1680,7 @@ dependencies = [
  "image",
  "lazy_static",
  "log 0.4.11",
+ "rayon",
  "specs",
  "spine_tiny",
 ]
@@ -2062,6 +2064,7 @@ dependencies = [
  "arrayvec",
  "hashbrown 0.7.2",
  "mopa",
+ "rayon",
  "smallvec 1.4.2",
  "tynm",
 ]
@@ -2103,6 +2106,7 @@ dependencies = [
  "hashbrown 0.7.2",
  "hibitset",
  "log 0.4.11",
+ "rayon",
  "shred",
  "shrev",
  "specs-derive",

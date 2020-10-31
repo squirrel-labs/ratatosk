@@ -3,7 +3,8 @@
 
 static mut TLS_SIZE: usize = 0;
 pub const STACK_ALIGN: usize = 1024 * 64;
-pub const STACK_SIZE: usize = 1024 * 64 * 8;
+pub const GRAPHICS_STACK_SIZE: usize = 1024 * 64 * 8;
+pub const WORKER_STACK_SIZE: usize = 1024 * 64 * 8;
 
 /// Align given memory address up to the alignment of T.
 ///
@@ -34,10 +35,10 @@ pub fn alloc_tls() -> *const u8 {
     }
 }
 
-pub fn alloc_stack() -> *const u8 {
+pub fn alloc_stack(stack_size: usize) -> *const u8 {
     unsafe {
-        let stack_layout = core::alloc::Layout::from_size_align(STACK_SIZE, STACK_ALIGN).unwrap();
-        std::alloc::alloc(stack_layout).offset(STACK_SIZE as isize)
+        let stack_layout = core::alloc::Layout::from_size_align(stack_size, STACK_ALIGN).unwrap();
+        std::alloc::alloc(stack_layout).offset(stack_size as isize)
     }
 }
 
