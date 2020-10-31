@@ -53,7 +53,11 @@ struct VelocitySystem;
 struct GravitationSystem;
 
 impl<'a> System<'a> for VelocitySystem {
-    type SystemData = (WriteStorage<'a, Pos>, ReadStorage<'a, Vel>, Read<'a, DeltaTime>);
+    type SystemData = (
+        WriteStorage<'a, Pos>,
+        ReadStorage<'a, Vel>,
+        Read<'a, DeltaTime>,
+    );
 
     fn run(&mut self, (mut pos, vel, dt): Self::SystemData) {
         for (vel, pos) in (&vel, &mut pos).join() {
