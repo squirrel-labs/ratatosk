@@ -1,6 +1,7 @@
 use crate::events::Event;
 use crate::math::Vec2;
 use crate::EngineError;
+use specs::WorldExt;
 use specs::{prelude::*, Component};
 
 const GRAVITY: Vec2 = Vec2::new(0.0, -9.807);
@@ -33,6 +34,9 @@ pub struct RaskEngine {
 #[derive(Debug, Default)]
 struct Gravitation(Vec2);
 
+#[derive(Debug, Default)]
+struct DeltaTime(std::time::Duration);
+
 #[derive(Debug, Clone, Copy, Component)]
 #[storage(VecStorage)]
 struct Vel(Vec2);
@@ -49,11 +53,11 @@ struct VelocitySystem;
 struct GravitationSystem;
 
 impl<'a> System<'a> for VelocitySystem {
-    type SystemData = (WriteStorage<'a, Pos>, ReadStorage<'a, Vel>);
+    type SystemData = (WriteStorage<'a, Pos>, ReadStorage<'a, Vel>, Read<'a, DeltaTime>);
 
-    fn run(&mut self, (mut pos, vel): Self::SystemData) {
+    fn run(&mut self, (mut pos, vel, dt): Self::SystemData) {
         for (vel, pos) in (&vel, &mut pos).join() {
-            pos.0 += vel.0;
+            pos.0 += vel.0 * dt.0.as_secs_f32();
         }
     }
 }
@@ -63,11 +67,12 @@ impl<'a> System<'a> for GravitationSystem {
         WriteStorage<'a, Vel>,
         ReadStorage<'a, Static>,
         Read<'a, Gravitation>,
+        Read<'a, DeltaTime>,
     );
 
-    fn run(&mut self, (mut vel, is_static, g): Self::SystemData) {
+    fn run(&mut self, (mut vel, is_static, g, dt): Self::SystemData) {
         for (vel, ()) in (&mut vel, !&is_static).join() {
-            vel.0 += g.0;
+            vel.0 += g.0 * dt.0.as_secs_f32();
         }
     }
 }
@@ -76,6 +81,7 @@ impl GameEngine for RaskEngine {
     fn new(pool: std::sync::Arc<rayon::ThreadPool>) -> Self {
         let mut world: specs::World = specs::WorldExt::new();
         world.insert(Gravitation(GRAVITY));
+        world.insert(DeltaTime(core::time::Duration::from_millis(10)));
 
         let mut tick_dispatcher = DispatcherBuilder::new()
             .with_pool(pool)
@@ -99,7 +105,8 @@ impl GameEngine for RaskEngine {
         Ok(())
     }
 
-    fn tick(&mut self, _dt: core::time::Duration) -> Result<(), EngineError> {
+    fn tick(&mut self, dt: core::time::Duration) -> Result<(), EngineError> {
+        *self.world.write_resource::<DeltaTime>() = DeltaTime(dt);
         Ok(())
     }
 }
