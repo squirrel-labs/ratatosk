@@ -20,6 +20,7 @@ let pixeledWidth, pixeledHeight;
 let fb;
 let texture;
 let textureLoc;
+let stretchLoc;
 let threadpool = [];
 let graphicsWorker;
 
@@ -55,13 +56,14 @@ const imports = {
         canvasHeight = canvas.height;
         return (canvas.width << 16) | canvas.height;
     },
-    set_canvas_size: function (w, h, vx, vy, vw, vh) {
+    set_canvas_size: function (w, h, vx, vy, vw, vh, sx, sy) {
         canvas.width = w;
         canvas.height = h;
         canvasX = vx;
         canvasY = vy;
         canvasWidth = vw;
         canvasHeight = vh;
+        gl.uniform2fv(stretchLoc, [sx, sy]);
     },
     gl_get_error: function () {
         return gl.getError();
@@ -164,7 +166,8 @@ const imports = {
         matLoc = gl.getAttribLocation(prog, 'mat');
         texBoundLoc = gl.getAttribLocation(prog, 'texture_bounds');
         texLayerLoc = gl.getAttribLocation(prog, 'texture_layer');
-        textureLoc = gl.getUniformLocation(prog, "g_texture");
+        textureLoc = gl.getUniformLocation(prog, 'g_texture');
+        stretchLoc = gl.getUniformLocation(prog, 'stretch');
         if (posLoc === -1 || matLoc === -1 || texBoundLoc === -1 || texLayerLoc === -1) {
             return 3;
         }

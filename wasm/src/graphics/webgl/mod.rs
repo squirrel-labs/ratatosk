@@ -16,12 +16,26 @@ use rask_engine::{
 };
 use rect_packer::DensePacker;
 
-const ASPECT_RATIO: (u32, u32) = (4, 3);
+// The maximum visible aspect ratio (width / height)
+const WORLD_ASPECT: f32 = 1.0;
+// The scaling of the screen rect in relation to the world coordinate system
+// 1.0 means the world rect fully contains the screen rect (edge cutting)
+// 2.0 means the screen rect fully contains the world rect (letterboxing)
+pub(crate) static mut SCREEN_RECT_SCALE: f32 = 1.0;
 
 mod imports {
     extern "C" {
         pub fn get_canvas_size() -> u32;
-        pub fn set_canvas_size(w: u32, h: u32, vx: f32, vy: f32, vw: f32, vh: f32);
+        pub fn set_canvas_size(
+            w: u32,
+            h: u32,
+            vx: f32,
+            vy: f32,
+            vw: f32,
+            vh: f32,
+            sx: f32,
+            sy: f32,
+        );
     }
 }
 
@@ -37,14 +51,42 @@ fn init_canvas_size() -> (u32, u32) {
 }
 
 fn set_canvas_size(w: u32, h: u32) {
-    let (vx, vy, vw, vh) = if h * ASPECT_RATIO.0 > w * ASPECT_RATIO.1 {
-        let height = w as f32 * (ASPECT_RATIO.1 as f32 / ASPECT_RATIO.0 as f32);
-        (0.0, (h as f32 - height) * 0.5, w as f32, height)
+    let screen_rect_scale = unsafe { SCREEN_RECT_SCALE };
+    // the aspect ratio of the screen
+    let screen_aspect = w as f32 / (h as f32);
+    let (vx, vy, vw, vh, sx, sy) = if screen_aspect > WORLD_ASPECT {
+        let max_scaling = screen_aspect / WORLD_ASPECT;
+        let scaling = 1.0 + (max_scaling - 1.0) * (screen_rect_scale - 1.0);
+        let w_ = w as f32 / scaling;
+        (
+            (w as f32 - w_) * 0.5,
+            0.0,
+            w_,
+            h as f32,
+            1.0,
+            max_scaling / scaling,
+        )
     } else {
-        let width = h as f32 * (ASPECT_RATIO.0 as f32 / ASPECT_RATIO.1 as f32);
-        ((w as f32 - width) * 0.5, 0.0, width, h as f32)
+        let max_scaling = WORLD_ASPECT / screen_aspect;
+        let scaling = 1.0 + (max_scaling - 1.0) * (screen_rect_scale - 1.0);
+        let h_ = h as f32 / scaling;
+        (
+            0.0,
+            (h as f32 - h_) * 0.5,
+            w as f32,
+            h_,
+            max_scaling / scaling,
+            1.0,
+        )
     };
-    unsafe { imports::set_canvas_size(w, h, vx, vy, vw, vh) }
+    let (sx, sy) = if WORLD_ASPECT > 1.0 {
+        (sx / WORLD_ASPECT, sy)
+    } else if WORLD_ASPECT < 1.0 {
+        (sx, sy * WORLD_ASPECT)
+    } else {
+        (sx, sy)
+    };
+    unsafe { imports::set_canvas_size(w, h, vx, vy, vw, vh, sx, sy) }
 }
 
 pub struct WebGl2 {

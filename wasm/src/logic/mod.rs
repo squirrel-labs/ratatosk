@@ -7,7 +7,7 @@ use crate::{
     error::ClientError,
 };
 use rask_engine::{
-    events::{Event, Key},
+    events::{Event, Key, KeyModifier},
     resources::registry,
     resources::GetStore,
 };
@@ -74,6 +74,18 @@ impl LogicContext {
                 self.res_parser.fetch_character_resource(registry::CHAR)?;
                 self.res_parser.fetch_resource(registry::SOUND)?;
             }
+            Some(Event::KeyDown(_, Key::KEY_W)) => unsafe {
+                if crate::graphics::webgl::SCREEN_RECT_SCALE > 1.025 {
+                    crate::graphics::webgl::SCREEN_RECT_SCALE -= 0.05;
+                    crate::communication::SYNCHRONIZATION_MEMORY.canvas_size_changed = true
+                }
+            },
+            Some(Event::KeyDown(_, Key::KEY_E)) => unsafe {
+                if crate::graphics::webgl::SCREEN_RECT_SCALE < 1.975 {
+                    crate::graphics::webgl::SCREEN_RECT_SCALE += 0.05;
+                    crate::communication::SYNCHRONIZATION_MEMORY.canvas_size_changed = true
+                }
+            },
             _ => (),
         }
         self.angle += self.angle_mod;
@@ -94,7 +106,7 @@ impl LogicContext {
                 let mut guard = crate::communication::TEXTURE_IDS.lock();
                 for &(id, mat) in &[
                     (texid1, rask_engine::math::Mat3::identity()),
-                    (texid2, rask_engine::math::Mat3::scaling(1.0, 1.0)),
+                    (texid2, rask_engine::math::Mat3::identity()),
                 ] {
                     guard.ids.push(id);
                     self.state
