@@ -16,10 +16,22 @@ use rask_engine::{
 };
 use rect_packer::DensePacker;
 
+// The maximum visible aspect ratio (width / height)
+const WORLD_ASPECT: f32 = 1.0;
+
 mod imports {
     extern "C" {
         pub fn get_canvas_size() -> u32;
-        pub fn set_canvas_size(w: u32, h: u32);
+        pub fn set_canvas_size(
+            w: u32,
+            h: u32,
+            vx: f32,
+            vy: f32,
+            vw: f32,
+            vh: f32,
+            sx: f32,
+            sy: f32,
+        );
     }
 }
 
@@ -34,13 +46,48 @@ fn init_canvas_size() -> (u32, u32) {
     (x, y)
 }
 
-fn set_canvas_size(w: u32, h: u32) {
-    unsafe { imports::set_canvas_size(w, h) }
+fn set_canvas_size(w: u32, h: u32, screen_rect_scale: f32) {
+    // the aspect ratio of the screen
+    let screen_aspect = w as f32 / (h as f32);
+    let (vx, vy, vw, vh, sx, sy) = if screen_aspect > WORLD_ASPECT {
+        let max_scaling = screen_aspect / WORLD_ASPECT;
+        let scaling = 1.0 + (max_scaling - 1.0) * (screen_rect_scale - 1.0);
+        let w_ = w as f32 / scaling;
+        (
+            (w as f32 - w_) * 0.5,
+            0.0,
+            w_,
+            h as f32,
+            1.0,
+            max_scaling / scaling,
+        )
+    } else {
+        let max_scaling = WORLD_ASPECT / screen_aspect;
+        let scaling = 1.0 + (max_scaling - 1.0) * (screen_rect_scale - 1.0);
+        let h_ = h as f32 / scaling;
+        (
+            0.0,
+            (h as f32 - h_) * 0.5,
+            w as f32,
+            h_,
+            max_scaling / scaling,
+            1.0,
+        )
+    };
+    let (sx, sy) = if WORLD_ASPECT > 1.0 {
+        (sx / WORLD_ASPECT, sy)
+    } else if WORLD_ASPECT < 1.0 {
+        (sx, sy * WORLD_ASPECT)
+    } else {
+        (sx, sy)
+    };
+    unsafe { imports::set_canvas_size(w, h, vx, vy, vw, vh, sx, sy) }
 }
 
 pub struct WebGl2 {
     gl: Gl2,
     canvas_size: (u32, u32),
+    screen_rect_scale: f32,
     // mapping from texture id to texture with texture range and texture layer
     textures: HashMap<(u32, u64), (TextureRange, u32)>,
     sprite_textures: Vec<(u32, u64)>,
@@ -94,9 +141,13 @@ impl GraphicsApi for WebGl2 {
         let tex_size = gl.get_max_texture_size();
         log::debug!("Max Texture size: {:?}", tex_size);
         gl.create_renderbuffer(width, height)?;
+        let (w, h) = init_canvas_size();
+        let screen_rect_scale = *crate::communication::SCREEN_RECT_SCALE.read();
+        set_canvas_size(w, h, screen_rect_scale);
         Ok(Self {
             gl,
-            canvas_size: init_canvas_size(),
+            canvas_size: (w, h),
+            screen_rect_scale,
             textures: HashMap::new(),
             sprite_textures: vec![],
             matrix_buffer: vec![],
@@ -208,12 +259,16 @@ impl GraphicsApi for WebGl2 {
 
     fn set_size(&mut self, w: u32, h: u32) {
         self.canvas_size = (w, h);
-        set_canvas_size(w, h)
+        set_canvas_size(w, h, self.screen_rect_scale)
     }
 
     fn update_size(&mut self, w: u32, h: u32) {
-        if (w, h) != self.canvas_size && w != 0 && h != 0 {
-            self.set_size(w, h)
+        let screen_rect_scale = *crate::communication::SCREEN_RECT_SCALE.read();
+        if ((w, h) != self.canvas_size && w != 0 && h != 0)
+            || screen_rect_scale != self.screen_rect_scale
+        {
+            self.screen_rect_scale = screen_rect_scale;
+            set_canvas_size(w, h, screen_rect_scale)
         }
     }
 

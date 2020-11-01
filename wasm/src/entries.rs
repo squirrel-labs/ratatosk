@@ -65,12 +65,32 @@ pub extern "C" fn init(heap_base: u32, mem_size: u32, tls_size: u32) -> u32 {
     mem::alloc_tls() as u32
 }
 
+fn spawn_threadpools() -> rayon::ThreadPool {
+    #[cfg(target_arch = "wasm32")]
+    {
+        let global_worker_pool =
+            set_global_thread_pool(4, mem::WORKER_STACK_SIZE as u32, mem::get_tls_size() as u32)
+                .unwrap();
+        #[cfg(target_arch = "wasm32")]
+        let (pool, engine_workers) = nobg_web_worker::default_thread_pool(
+            4,
+            mem::WORKER_STACK_SIZE as u32,
+            mem::get_tls_size() as u32,
+        )
+        .unwrap();
+        Box::leak(Box::new((engine_workers, global_worker_pool)));
+        return pool;
+    }
+    #[allow(unreachable_code)]
+    rayon::ThreadPoolBuilder::new().build().unwrap()
+}
+
 /// Initialize the game state, communicate with the graphics worker and set up networking.
 /// This function is being exposed to JavaScript.
 #[export_name = "run_logic"]
 pub extern "C" fn run_logic() {
     // create the logic game context
-    let mut game = LogicContext::new().unwrap_or_else(|e| panic!("{}", e));
+    let mut game = LogicContext::new(spawn_threadpools()).unwrap_or_else(|e| panic!("{}", e));
 
     #[cfg(target_arch = "wasm32")]
     {
@@ -82,14 +102,12 @@ pub extern "C" fn run_logic() {
             MESSAGE_QUEUE_ELEMENT_COUNT as u32,
         )
         .send();
-        let stack = mem::alloc_stack();
+        let stack = mem::alloc_stack(mem::GRAPHICS_STACK_SIZE);
         let tls = mem::alloc_tls();
         log::debug!("spawn graphic");
         unsafe {
             spawn_graphics_worker(stack as u32, tls as u32);
         }
-        let _global_worker_pool =
-            set_global_thread_pool(4, 1024 * 64 * 8, mem::get_tls_size() as u32).unwrap();
     }
     loop {
         game.tick()

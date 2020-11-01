@@ -111,19 +111,19 @@ pub enum Event {
 pub struct KeyModifier(u8);
 
 impl KeyModifier {
-    pub fn shift(self) -> bool {
+    pub const fn shift(self) -> bool {
         self.0 & 1 != 0
     }
 
-    pub fn control(self) -> bool {
+    pub const fn control(self) -> bool {
         self.0 & (1 << 1) != 0
     }
 
-    pub fn alt(self) -> bool {
+    pub const fn alt(self) -> bool {
         self.0 & (1 << 2) != 0
     }
 
-    pub fn meta(self) -> bool {
+    pub const fn meta(self) -> bool {
         self.0 & (1 << 3) != 0
     }
 }

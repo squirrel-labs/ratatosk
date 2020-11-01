@@ -11,7 +11,6 @@ pub mod events;
 pub mod math;
 pub mod network;
 pub mod resources;
-pub mod world;
 
 #[doc(inline)]
 pub use error::EngineError;
