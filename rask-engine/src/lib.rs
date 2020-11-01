@@ -8,6 +8,7 @@ pub mod collide;
 pub mod engine;
 pub mod error;
 pub mod events;
+pub mod io;
 pub mod math;
 pub mod network;
 pub mod resources;

@@ -11,7 +11,7 @@ pub struct Level {}
 /// An interface for the game server to interact with the game.
 pub trait GameEngine {
     /// Create a new game.
-    fn new(pool: std::sync::Arc<rayon::ThreadPool>) -> Self;
+    fn new(pool: std::sync::Arc<rayon::ThreadPool>, system: Box<dyn crate::io::SystemApi>) -> Self;
 
     fn load_level(level: Level);
 
@@ -82,7 +82,7 @@ impl<'a> System<'a> for GravitationSystem {
 }
 
 impl GameEngine for RaskEngine {
-    fn new(pool: std::sync::Arc<rayon::ThreadPool>) -> Self {
+    fn new(pool: std::sync::Arc<rayon::ThreadPool>, system: Box<dyn crate::io::SystemApi>) -> Self {
         let mut world: specs::World = specs::WorldExt::new();
         world.insert(Gravitation(GRAVITY));
         world.insert(DeltaTime(core::time::Duration::from_millis(10)));

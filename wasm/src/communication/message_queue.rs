@@ -66,10 +66,15 @@ impl Message {
         unsafe { std::slice::from_raw_parts(self as *const Message as *const u32, len as usize) }
     }
 
+    #[cfg(target_arch = "wasm32")]
     pub fn send(&self) {
         let msg = self.to_slice();
         log::trace!("sending {:?}", self);
         unsafe { post_to_main(msg.as_ptr() as u32, msg.len() as u32) }
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn send(&self) {
+        panic!("Can't send messages to javascript when not running on wasm");
     }
 }
 

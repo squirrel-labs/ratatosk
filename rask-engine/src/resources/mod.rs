@@ -24,6 +24,7 @@ pub mod character;
 pub mod registry;
 mod resource_table;
 pub mod sound;
+pub mod sprite;
 pub mod texture;
 
 #[doc(inline)]
@@ -34,6 +35,8 @@ pub use registry::RESOURCE_COUNT;
 pub use resource_table::{GetStore, GetTextures, ResourceTable};
 #[doc(inline)]
 pub use sound::Sound;
+#[doc(inline)]
+pub use sprite::Sprite;
 #[doc(inline)]
 pub use texture::{Texture, TextureIds, TextureRange};
 

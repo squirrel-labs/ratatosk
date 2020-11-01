@@ -1,13 +1,12 @@
 pub mod message_queue;
-pub mod sprite;
 pub mod synchronization_memory;
 
 #[doc(inline)]
 pub use message_queue::{Message, MessageQueue, MESSAGE_QUEUE_ELEMENT_COUNT};
 use rask_engine::resources;
-use spin::{Mutex, RwLock};
 #[doc(inline)]
-pub use sprite::Sprite;
+pub use rask_engine::resources::Sprite;
+use spin::{Mutex, RwLock};
 #[doc(inline)]
 pub use synchronization_memory::{GameState, SynchronizationMemory};
 
