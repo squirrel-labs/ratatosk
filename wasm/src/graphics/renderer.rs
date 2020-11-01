@@ -42,12 +42,7 @@ impl<T: GraphicsApi> Renderer<T> {
             .map_err(|e| ClientError::WebGlError(format!("WebGl2 error: {}", e)))?;
         let size = unsafe { SYNCHRONIZATION_MEMORY.canvas_size };
         log::trace!("canvas_size: {}px x {}px", size.0, size.1);
-        if unsafe { SYNCHRONIZATION_MEMORY.canvas_size_changed } {
-            self.graphics.set_size(size.0, size.1);
-            unsafe { SYNCHRONIZATION_MEMORY.canvas_size_changed = false };
-        } else {
-            self.graphics.update_size(size.0, size.1);
-        }
+        self.graphics.update_size(size.0, size.1);
         self.draw_sprites()
     }
 

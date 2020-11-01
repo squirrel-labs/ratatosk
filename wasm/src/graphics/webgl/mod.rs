@@ -18,10 +18,6 @@ use rect_packer::DensePacker;
 
 // The maximum visible aspect ratio (width / height)
 const WORLD_ASPECT: f32 = 1.0;
-// The scaling of the screen rect in relation to the world coordinate system
-// 1.0 means the world rect fully contains the screen rect (edge cutting)
-// 2.0 means the screen rect fully contains the world rect (letterboxing)
-pub(crate) static mut SCREEN_RECT_SCALE: f32 = 1.0;
 
 mod imports {
     extern "C" {
@@ -50,8 +46,7 @@ fn init_canvas_size() -> (u32, u32) {
     (x, y)
 }
 
-fn set_canvas_size(w: u32, h: u32) {
-    let screen_rect_scale = unsafe { SCREEN_RECT_SCALE };
+fn set_canvas_size(w: u32, h: u32, screen_rect_scale: f32) {
     // the aspect ratio of the screen
     let screen_aspect = w as f32 / (h as f32);
     let (vx, vy, vw, vh, sx, sy) = if screen_aspect > WORLD_ASPECT {
@@ -92,6 +87,7 @@ fn set_canvas_size(w: u32, h: u32) {
 pub struct WebGl2 {
     gl: Gl2,
     canvas_size: (u32, u32),
+    screen_rect_scale: f32,
     // mapping from texture id to texture with texture range and texture layer
     textures: HashMap<(u32, u64), (TextureRange, u32)>,
     sprite_textures: Vec<(u32, u64)>,
@@ -146,10 +142,12 @@ impl GraphicsApi for WebGl2 {
         log::debug!("Max Texture size: {:?}", tex_size);
         gl.create_renderbuffer(width, height)?;
         let (w, h) = init_canvas_size();
-        set_canvas_size(w, h);
+        let screen_rect_scale = *crate::communication::SCREEN_RECT_SCALE.read();
+        set_canvas_size(w, h, screen_rect_scale);
         Ok(Self {
             gl,
             canvas_size: (w, h),
+            screen_rect_scale,
             textures: HashMap::new(),
             sprite_textures: vec![],
             matrix_buffer: vec![],
@@ -261,12 +259,16 @@ impl GraphicsApi for WebGl2 {
 
     fn set_size(&mut self, w: u32, h: u32) {
         self.canvas_size = (w, h);
-        set_canvas_size(w, h)
+        set_canvas_size(w, h, self.screen_rect_scale)
     }
 
     fn update_size(&mut self, w: u32, h: u32) {
-        if (w, h) != self.canvas_size && w != 0 && h != 0 {
-            self.set_size(w, h)
+        let screen_rect_scale = *crate::communication::SCREEN_RECT_SCALE.read();
+        if ((w, h) != self.canvas_size && w != 0 && h != 0)
+            || screen_rect_scale != self.screen_rect_scale
+        {
+            self.screen_rect_scale = screen_rect_scale;
+            set_canvas_size(w, h, screen_rect_scale)
         }
     }
 

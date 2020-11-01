@@ -7,7 +7,7 @@ use crate::{
     error::ClientError,
 };
 use rask_engine::{
-    events::{Event, Key, KeyModifier},
+    events::{Event, Key},
     resources::registry,
     resources::GetStore,
 };
@@ -74,18 +74,18 @@ impl LogicContext {
                 self.res_parser.fetch_character_resource(registry::CHAR)?;
                 self.res_parser.fetch_resource(registry::SOUND)?;
             }
-            Some(Event::KeyDown(_, Key::KEY_W)) => unsafe {
-                if crate::graphics::webgl::SCREEN_RECT_SCALE > 1.025 {
-                    crate::graphics::webgl::SCREEN_RECT_SCALE -= 0.05;
-                    crate::communication::SYNCHRONIZATION_MEMORY.canvas_size_changed = true
+            Some(Event::KeyDown(_, Key::KEY_W)) => {
+                let mut src = crate::communication::SCREEN_RECT_SCALE.write();
+                if *src > 1.025 {
+                    *src -= 0.05;
                 }
-            },
-            Some(Event::KeyDown(_, Key::KEY_E)) => unsafe {
-                if crate::graphics::webgl::SCREEN_RECT_SCALE < 1.975 {
-                    crate::graphics::webgl::SCREEN_RECT_SCALE += 0.05;
-                    crate::communication::SYNCHRONIZATION_MEMORY.canvas_size_changed = true
+            }
+            Some(Event::KeyDown(_, Key::KEY_E)) => {
+                let mut src = crate::communication::SCREEN_RECT_SCALE.write();
+                if *src < 1.975 {
+                    *src += 0.05;
                 }
-            },
+            }
             _ => (),
         }
         self.angle += self.angle_mod;

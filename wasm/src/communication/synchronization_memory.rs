@@ -33,7 +33,6 @@ pub struct SynchronizationMemory {
     pub mouse: (i32, i32),
     /// Canvas size in px.
     pub canvas_size: (u32, u32),
-    pub canvas_size_changed: bool,
     pub player: GameState,
     pub other: GameState,
     last_elapsed_ms: i32,
@@ -48,7 +47,6 @@ impl SynchronizationMemory {
             elapsed_ms: 0,
             mouse: (0, 0),
             canvas_size: (0, 0),
-            canvas_size_changed: false,
             player: GameState::new(),
             other: GameState::new(),
             last_elapsed_ms: 0,
