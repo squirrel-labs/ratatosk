@@ -74,6 +74,18 @@ impl LogicContext {
                 self.res_parser.fetch_character_resource(registry::CHAR)?;
                 self.res_parser.fetch_resource(registry::SOUND)?;
             }
+            Some(Event::KeyDown(_, Key::KEY_W)) => {
+                let mut src = crate::communication::SCREEN_RECT_SCALE.write();
+                if *src > 1.025 {
+                    *src -= 0.05;
+                }
+            }
+            Some(Event::KeyDown(_, Key::KEY_E)) => {
+                let mut src = crate::communication::SCREEN_RECT_SCALE.write();
+                if *src < 1.975 {
+                    *src += 0.05;
+                }
+            }
             _ => (),
         }
         self.angle += self.angle_mod;
@@ -94,7 +106,7 @@ impl LogicContext {
                 let mut guard = crate::communication::TEXTURE_IDS.lock();
                 for &(id, mat) in &[
                     (texid1, rask_engine::math::Mat3::identity()),
-                    (texid2, rask_engine::math::Mat3::scaling(1.0, 1.0)),
+                    (texid2, rask_engine::math::Mat3::identity()),
                 ] {
                     guard.ids.push(id);
                     self.state
