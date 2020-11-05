@@ -1250,13 +1250,14 @@ dependencies = [
 
 [[package]]
 name = "nobg-web_worker"
-version = "0.3.2"
-source = "git+https://github.com/squirrel-labs/web_worker/?branch=feature/remove-wasm-bindgen#ac8b7da5d78003e211bf52c18814329dc55d1bcc"
+version = "0.3.3"
+source = "git+https://github.com/squirrel-labs/web_worker/?branch=feature/remove-wasm-bindgen#a1b20a4ef8710cd099237cb90c2814fa2895ffb9"
 dependencies = [
  "futures",
- "log 0.4.11",
+ "log 0.3.9",
  "rayon",
  "rayon-core",
+ "spin",
 ]
 
 [[package]]

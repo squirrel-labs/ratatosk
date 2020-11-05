@@ -56,7 +56,7 @@ impl<'a> System<'a> for RenderSystem {
         let mut sprites = Vec::new();
         let res = &*resources::RESOURCE_TABLE.read();
         for (pos, sprite) in (&pos, &sprite).join() {
-            if sys.0.check_fetched(sprite.id) {
+            if res.resource_present(sprite.id as usize) {
                 sprites.push(resources::Sprite::new(
                     Mat3::translation(pos.0.x(), pos.0.y())
                         * Mat3::scaling(sprite.scale_x, sprite.scale_y),
@@ -66,7 +66,7 @@ impl<'a> System<'a> for RenderSystem {
             }
         }
         for (pos, anim) in (&pos, &anim).join() {
-            if sys.0.check_fetched(anim.id) {
+            if res.resource_present(anim.id as usize) {
                 let trans = Mat3::translation(pos.0.x(), pos.0.y());
                 let cha: Result<&Box<resources::Character>, EngineError> =
                     res.get(anim.id as usize);
@@ -105,32 +105,22 @@ impl<'a> System<'a> for EventSystem {
         let sys = &mut *sys.0;
         loop {
             let message = sys.0.poll_message().unwrap();
-            //log::info!("event: {:?}", message);
             match message {
                 io::Message::None => break,
                 io::Message::SystemInternal => continue,
-                io::Message::Event(event) => {
-                    log::info!("event: {:?}", event);
-                    match event {
-                        Event::KeyDown(_, Key::ARROW_LEFT) => (),
-                        Event::KeyDown(_, Key::ARROW_RIGHT) => (),
-                        Event::KeyUp(_, Key::ARROW_RIGHT) => (),
-                        Event::KeyUp(_, Key::ARROW_LEFT) => (),
-                        Event::KeyDown(_, Key::KEY_P) => sys.0.play_sound(registry::SOUND.id),
-                        Event::KeyDown(_, Key::KEY_S) => sys.0.stop_sound(registry::SOUND.id),
-                        Event::KeyDown(_, Key::DIGIT1) => {
-                            log::set_max_level(log::LevelFilter::Info)
-                        }
-                        Event::KeyDown(_, Key::DIGIT2) => {
-                            log::set_max_level(log::LevelFilter::Debug)
-                        }
-                        Event::KeyDown(_, Key::DIGIT3) => {
-                            log::set_max_level(log::LevelFilter::Trace)
-                        }
-                        Event::KeyDown(_, Key::ENTER) => (),
-                        _ => (),
-                    }
-                }
+                io::Message::Event(event) => match event {
+                    Event::KeyDown(_, Key::ARROW_LEFT) => (),
+                    Event::KeyDown(_, Key::ARROW_RIGHT) => (),
+                    Event::KeyUp(_, Key::ARROW_RIGHT) => (),
+                    Event::KeyUp(_, Key::ARROW_LEFT) => (),
+                    Event::KeyDown(_, Key::KEY_P) => sys.0.play_sound(registry::SOUND.id),
+                    Event::KeyDown(_, Key::KEY_S) => sys.0.stop_sound(registry::SOUND.id),
+                    Event::KeyDown(_, Key::DIGIT1) => log::set_max_level(log::LevelFilter::Info),
+                    Event::KeyDown(_, Key::DIGIT2) => log::set_max_level(log::LevelFilter::Debug),
+                    Event::KeyDown(_, Key::DIGIT3) => log::set_max_level(log::LevelFilter::Trace),
+                    Event::KeyDown(_, Key::ENTER) => (),
+                    _ => (),
+                },
             }
         }
     }

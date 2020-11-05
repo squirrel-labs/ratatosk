@@ -52,8 +52,7 @@ impl GameEngine for RaskEngine {
             .with(EventSystem, "events", &[])
             .with(GravitationSystem, "gravitation", &["events"])
             .with(VelocitySystem, "velocity", &["gravitation"])
-            .with_barrier()
-            .with(RenderSystem, "rendering", &[])
+            .with_thread_local(RenderSystem)
             .build();
 
         tick_dispatcher.setup(&mut world);
@@ -87,7 +86,7 @@ impl GameEngine for RaskEngine {
     fn tick(&mut self, dt: Duration, elapsed: Duration) -> Result<(), EngineError> {
         *self.world.write_resource::<DeltaTime>() = DeltaTime(dt);
         *self.world.write_resource::<ElapsedTime>() = ElapsedTime(elapsed);
-        self.tick_dispatcher.dispatch_seq(&mut self.world);
+        self.tick_dispatcher.dispatch(&mut self.world);
         self.world.maintain();
         Ok(())
     }

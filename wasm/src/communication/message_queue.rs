@@ -75,7 +75,7 @@ impl Message {
     #[cfg(target_arch = "wasm32")]
     pub fn send(&self) {
         let msg = self.to_slice();
-        log::trace!("sending {:?}", self);
+        log::debug!("sending {:?}", self);
         unsafe { post_to_main(msg.as_ptr() as u32, msg.len() as u32) }
     }
     #[cfg(not(target_arch = "wasm32"))]
