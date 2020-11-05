@@ -137,7 +137,7 @@ impl GraphicsApi for WebGl2 {
         gl.create_vao_with_buffer_data(&[
             -1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0,
         ])?;
-        log::info!("shaders compiled and linked");
+        log::debug!("shaders compiled and linked");
         let tex_size = gl.get_max_texture_size();
         log::debug!("Max Texture size: {:?}", tex_size);
         gl.create_renderbuffer(width, height)?;

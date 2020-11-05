@@ -61,7 +61,7 @@ pub extern "C" fn init(heap_base: u32, mem_size: u32, tls_size: u32) -> u32 {
     log::set_logger(&LOGGER).unwrap();
     // change the log level to only show certain errors
     log::set_max_level(log::LevelFilter::Debug);
-    log::info!("mem_size: {}", mem_size - heap_base);
+    log::debug!("mem_size: {}", mem_size - heap_base);
     mem::alloc_tls() as u32
 }
 
@@ -114,7 +114,6 @@ pub extern "C" fn run_logic() {
     loop {
         game.tick()
             .unwrap_or_else(|e| log::error!("Error occurred game_context.tick(): {:?}", e));
-        log::trace!("wait_for_main_thread_notify()");
         // use wasm's atomic wait instruction to sleep until waken by the main thread
         #[cfg(target_arch = "wasm32")]
         unsafe {

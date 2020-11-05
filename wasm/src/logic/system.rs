@@ -28,7 +28,7 @@ impl SystemIO {
         })
     }
     fn handle_message(&mut self, message: Message) -> Result<Option<Event>, EngineError> {
-        log::info!("message {:?}", message);
+        log::trace!("message {:?}", message);
         match message {
             Message::KeyDown(modifier, hash) => Ok(Some(Event::KeyDown(modifier, Key::from(hash)))),
             Message::KeyUp(modifier, hash) => Ok(Some(Event::KeyUp(modifier, Key::from(hash)))),
