@@ -120,15 +120,15 @@ impl MessageQueueElement {
 }
 
 #[derive(Debug)]
+#[repr(C)]
 /// Abstracts the communication with the main thread.
 pub struct MessageQueue {
     /// The index of the next element to be read.
-    reader_index: u32,
     data: [MessageQueueElement; MESSAGE_QUEUE_ELEMENT_COUNT],
+    reader_index: u32,
 }
 
 impl MessageQueue {
-    // add method to create message_queue with a memory location to make testing easier
     pub fn new() -> Self {
         let bytes = [0u8; std::mem::size_of::<MessageQueueElement>() * MESSAGE_QUEUE_ELEMENT_COUNT];
 
@@ -159,5 +159,9 @@ impl MessageQueue {
     /// Push an outbound Message to the main thread.
     pub fn push(&self, msg: Message) {
         msg.send();
+    }
+
+    pub fn pos(&self) -> usize {
+        &(self.data[0]) as *const MessageQueueElement as *const u8 as usize
     }
 }

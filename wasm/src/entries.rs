@@ -98,7 +98,7 @@ pub extern "C" fn run_logic() {
         // send memory offset to the main thread -> initialize graphics
         Message::Memory(
             syn_addr,
-            game.get_message_queue_pos() as *const u8 as *const MessageQueue as u32,
+            game.get_message_queue_pos() as u32,
             MESSAGE_QUEUE_ELEMENT_COUNT as u32,
         )
         .send();

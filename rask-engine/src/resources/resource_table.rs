@@ -78,9 +78,10 @@ impl ResourceTable {
     }
 
     pub fn resource_present(&self, id: usize) -> bool {
-        self.0
-            .get(id)
-            .map_or(false, |x| !matches!(x, Resource::None))
+        match self.0.get(id) {
+            None | Some(Resource::None) => false,
+            _ => true,
+        }
     }
 
     fn index_check(&self, id: usize) -> Result<(), EngineError> {

@@ -65,7 +65,7 @@ class MessageQueueWriter {
     }
 }
 
-queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
+queue = null;
 
 async function responseText(promise) {
     return await (await promise).text();
@@ -230,6 +230,7 @@ function LogicMessage(e) {
         SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
         SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2;
         SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3;
+        console.log(MESSAGE_QUEUE);
         resize_canvas();
         queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_QUEUE_LENGTH);
     } else if (optcode === SET_TEXT_MODE) {

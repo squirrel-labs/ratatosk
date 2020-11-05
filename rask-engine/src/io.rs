@@ -1,21 +1,45 @@
 use crate::events::Event;
 use crate::resources::registry::{CharacterInfo, ResourceInfo};
-use crate::resources::Sprite;
+use crate::resources::{Character, Sound, Sprite, Texture};
 use crate::EngineError;
 
+#[derive(Debug)]
 pub enum Message {
     None,
     SystemInternal,
     Event(Event),
 }
 
-pub trait SystemApi {
-    fn poll_message(&mut self) -> Result<Message, EngineError>;
-    fn fetch_resource(&mut self, info: ResourceInfo) -> Result<(), EngineError>;
-    fn fetch_character_resource(&mut self, info: CharacterInfo) -> Result<(), EngineError>;
-    fn check_fetched(&self, id: u32) -> bool;
-    fn push_sprites(&mut self, sprites: Vec<Sprite>);
-    fn send_event(&self, event: Event);
-    fn play_sound(&self, id: u32);
-    fn stop_sound(&self, id: u32);
+pub trait SystemApi: Send + Sync {
+    fn poll_message(&mut self) -> Result<Message, EngineError> {
+        unimplemented!("poll_message is not implemented for the system api");
+    }
+    fn fetch_resource(&mut self, _info: ResourceInfo) -> Result<(), EngineError> {
+        unimplemented!("fetch_resource is not implemented for the system api");
+    }
+    fn fetch_character_resource(&mut self, _info: CharacterInfo) -> Result<(), EngineError> {
+        unimplemented!("fetch_character_resource is not implemented for the system api");
+    }
+    fn check_fetched(&self, _id: u32) -> bool {
+        unimplemented!("check_fetched is not implemented for the system api");
+    }
+    fn push_sprites(&mut self, _sprites: Vec<Sprite>) {
+        unimplemented!("push_sprites is not implemented for the system api");
+    }
+    fn push_textures(&mut self, _textures: Vec<u32>) {
+        unimplemented!("push_textures is not implemented for the system api");
+    }
+    fn send_event(&self, _event: Event) {
+        unimplemented!("send_event is not implemented for the system api");
+    }
+    fn play_sound(&self, _id: u32) {
+        unimplemented!("play_sound is not implemented for the system api");
+    }
+    fn stop_sound(&self, _id: u32) {
+        unimplemented!("stop_sound is not implemented for the system api");
+    }
 }
+
+#[derive(Debug, Default)]
+pub struct DummySystemApi;
+impl SystemApi for DummySystemApi {}

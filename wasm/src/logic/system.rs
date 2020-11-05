@@ -1,6 +1,6 @@
 use super::resource_parser::ResourceParser;
 use crate::{
-    communication::{Message, MessageQueue, Sprite, DOUBLE_BUFFER},
+    communication::{Message, MessageQueue, Sprite, DOUBLE_BUFFER, TEXTURE_IDS},
     error::ClientError,
 };
 use rask_engine::{
@@ -44,13 +44,13 @@ impl SystemIO {
     }
 }
 
+use rask_engine::resources::{Character, Sound, Texture};
 impl rask_engine::io::SystemApi for SystemIO {
     fn poll_message(&mut self) -> Result<io::Message, EngineError> {
         let msg = self.message_queue.pop();
         if let Message::None = msg {
             return Ok(io::Message::None);
         }
-        log::debug!("{:?}", msg);
         Ok(match self.handle_message(msg)? {
             None => io::Message::SystemInternal,
             Some(event) => io::Message::Event(event),
@@ -67,7 +67,13 @@ impl rask_engine::io::SystemApi for SystemIO {
         res.resource_present(id as usize)
     }
     fn push_sprites(&mut self, sprites: Vec<Sprite>) {
+        //log::info!("{:?}", sprites);
         *DOUBLE_BUFFER.lock() = sprites;
+    }
+    fn push_textures(&mut self, tex_ids: Vec<u32>) {
+        let mut tex = &mut *TEXTURE_IDS.lock();
+        tex.ids = tex_ids;
+        tex.reset_notify = 1;
     }
     fn send_event(&self, event: Event) {
         Message::EngineEvent(event).send();
@@ -76,6 +82,6 @@ impl rask_engine::io::SystemApi for SystemIO {
         Message::PlaySound(id).send();
     }
     fn stop_sound(&self, id: u32) {
-        Message::StopSound(id);
+        Message::StopSound(id).send();
     }
 }
