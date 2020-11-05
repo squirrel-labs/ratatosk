@@ -28,6 +28,7 @@ impl SystemIO {
         })
     }
     fn handle_message(&mut self, message: Message) -> Result<Option<Event>, EngineError> {
+        log::trace!("message {:?}", message);
         match message {
             Message::KeyDown(modifier, hash) => Ok(Some(Event::KeyDown(modifier, Key::from(hash)))),
             Message::KeyUp(modifier, hash) => Ok(Some(Event::KeyUp(modifier, Key::from(hash)))),
@@ -75,19 +76,19 @@ impl rask_engine::io::SystemApi for SystemIO {
         tex.ids = tex_ids;
         tex.reset_notify = 1;
     }
-    fn get_mouse_position(&mut self) -> (i32, i32) {
+    fn get_mouse_position(&self) -> (i32, i32) {
         unsafe { SYNCHRONIZATION_MEMORY.mouse }
     }
-    fn get_canvas_size(&mut self) -> (u32, u32) {
+    fn get_canvas_size(&self) -> (u32, u32) {
         unsafe { SYNCHRONIZATION_MEMORY.canvas_size }
     }
     fn send_event(&self, event: Event) {
         Message::EngineEvent(event).send();
     }
-    fn play_sound(&self, id: u32) {
+    fn play_sound(&mut self, id: u32) {
         Message::PlaySound(id).send();
     }
-    fn stop_sound(&self, id: u32) {
+    fn stop_sound(&mut self, id: u32) {
         Message::StopSound(id).send();
     }
 }

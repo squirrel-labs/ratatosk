@@ -188,14 +188,14 @@ impl ResourceParser {
     }
 
     fn store_texture(id: u32, image: &[u8]) -> Result<(), EngineError> {
-        log::info!("decoding texture {} len: {}", id, image.len());
+        log::debug!("decoding texture {} len: {}", id, image.len());
         let img = Texture::from_memory(image)?;
         RESOURCE_TABLE.write().store(img, id as usize)?;
         Ok(())
     }
 
     fn store_owned_texture(id: u32, image: Vec<u8>) -> Result<(), EngineError> {
-        log::info!("decoding texture {} len: {}", id, image.len());
+        log::debug!("decoding texture {} len: {}", id, image.len());
         rayon::spawn(move || {
             log::debug!("{}", image.len());
             let img = Texture::from_memory(image.as_slice()).unwrap();
@@ -205,7 +205,7 @@ impl ResourceParser {
     }
 
     fn parse_char(res: packet::NetworkResource) -> Result<(), EngineError> {
-        log::info!("decoding char {}", res.res_id);
+        log::debug!("decoding char {}", res.res_id);
         let chr: Character = res.data.try_into()?;
         RESOURCE_TABLE
             .write()

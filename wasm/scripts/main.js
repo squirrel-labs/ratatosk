@@ -90,6 +90,7 @@ function postWorkerDescriptor(worker, desc) {
 function spawnModule(module) {
     let worker = new Worker(WORKER_URI);
     postWorkerDescriptor(worker, module);
+    worker.addEventListener("message", LogicMessage);
     return worker;
 }
 let wasm_module;
