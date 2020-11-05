@@ -5,14 +5,14 @@ use rask_engine::math::Vec2;
 #[test]
 fn test_collide_dot_dot() {
     let a = Vec2::new(1.0, 7.5);
-    assert!(a.collides(&a));
+    assert!(a.collides(&a, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
 fn test_not_collide_dot_dot() {
     let a = Vec2::new(1.0, 7.5);
     let b = Vec2::new(5.0, 7.5);
-    assert!(!a.collides(&b));
+    assert!(!a.collides(&b, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -22,7 +22,7 @@ fn test_collide_aabox_dot() {
     let c = Vec2::new(1.5, 5.0);
     let aa_box = AABox { pos: a, size: b };
 
-    assert!(aa_box.collides(&c));
+    assert!(aa_box.collides(&c, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -32,7 +32,7 @@ fn test_not_collide_aabox_dot() {
     let c = Vec2::new(0.5, 5.0);
     let aa_box = AABox { pos: a, size: b };
 
-    assert!(!(aa_box.collides(&c)));
+    assert!(!aa_box.collides(&c, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -44,7 +44,7 @@ fn test_collide_aabox_aabox_intersecting() {
     let b = Vec2::new(3.0, 7.5);
     let bb_box = AABox { pos: a, size: b };
 
-    assert!(aa_box.collides(&bb_box));
+    assert!(aa_box.collides(&bb_box, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -56,7 +56,7 @@ fn test_collide_aabox_aabox_crossed() {
     let b = Vec2::new(5.0, 4.5);
     let bb_box = AABox { pos: a, size: b };
 
-    assert!(aa_box.collides(&bb_box));
+    assert!(aa_box.collides(&bb_box, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -66,7 +66,7 @@ fn test_collide_aabox_aabox_same() {
         size: Vec2::new(1.0, 1.0),
     };
 
-    assert!(aa_box.collides(&aa_box));
+    assert!(aa_box.collides(&aa_box, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -78,7 +78,7 @@ fn test_not_collide_aabox_aabox() {
     let b = Vec2::new(3.0, 7.5);
     let bb_box = AABox { pos: a, size: b };
 
-    assert!(!(aa_box.collides(&bb_box)));
+    assert!(!aa_box.collides(&bb_box, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -94,7 +94,7 @@ fn test_collide_rbox_dot() {
 
     let c = Vec2::new(1.6, 0.6);
 
-    assert!(rbox.collides(&c));
+    assert!(rbox.collides(&c, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -110,7 +110,7 @@ fn test_not_collide_rbox_dot() {
 
     let c = Vec2::new(1.4, 0.4);
 
-    assert!(!(rbox.collides(&c)));
+    assert!(!rbox.collides(&c, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -125,7 +125,7 @@ fn test_collide_rbox_aabox_intersecting() {
         size: Vec2::new(3.0, 7.5),
     };
 
-    assert!(box1.collides(&box2));
+    assert!(box1.collides(&box2, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -138,7 +138,7 @@ fn test_collide_rbox_aabox_edges_touch() {
         size: Vec2::new(4.0, 5.0),
     };
 
-    assert!(box1.collides(&box2));
+    assert!(box1.collides(&box2, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -151,7 +151,7 @@ fn test_collide_rbox_aabox_crossed() {
         size: Vec2::new(15.0, 1.5),
     };
 
-    assert!(box1.collides(&box2));
+    assert!(box1.collides(&box2, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -164,7 +164,7 @@ fn test_not_collide_rbox_aabox_next_to() {
         size: Vec2::new(15.0, 1.5),
     };
 
-    assert!(!box1.collides(&box2));
+    assert!(!box1.collides(&box2, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -179,7 +179,7 @@ fn test_not_collide_rbox_aabox() {
         size: Vec2::new(3.0, 7.5),
     };
 
-    assert!(!(box1.collides(&box2)));
+    assert!(!box1.collides(&box2, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -195,7 +195,7 @@ fn test_collide_rbox_rbox_intersecting() {
     }
     .into();
 
-    assert!(box1.collides(&box2));
+    assert!(box1.collides(&box2, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -209,7 +209,7 @@ fn test_collide_rbox_rbox_edges_touch() {
     }
     .into();
 
-    assert!(box1.collides(&box2));
+    assert!(box1.collides(&box2, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -223,14 +223,14 @@ fn test_collide_rbox_rbox_crossed() {
     }
     .into();
 
-    assert!(box1.collides(&box2));
+    assert!(box1.collides(&box2, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
 fn test_collide_rbox_rbox_same() {
     let rbox = RBox::new(Vec2::zero(), Vec2::new(1.0, 1.0), 1.0);
 
-    assert!(rbox.collides(&rbox));
+    assert!(rbox.collides(&rbox, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -244,7 +244,7 @@ fn test_not_collide_rbox_rbox_next_to() {
     }
     .into();
 
-    assert!(!box1.collides(&box2));
+    assert!(!box1.collides(&box2, Vec::new(0.0, 0.0)).is_some());
 }
 
 #[test]
@@ -256,5 +256,5 @@ fn test_not_collide_rbox_rbox() {
     };
     let box2 = RBox::new(Vec2::new(3.0, 3.5), Vec2::new(1.0, 1.0), 1.0);
 
-    assert!(!(box1.collides(&box2)));
+    assert!(!box1.collides(&box2, Vec::new(0.0, 0.0)).is_some());
 }
