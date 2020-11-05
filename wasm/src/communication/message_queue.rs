@@ -51,7 +51,13 @@ pub enum Message {
 
     // Misc Management Commands
     /// Send memory offsets to javascript.
-    Memory(u32, u32, u32) = op_codes::MEMORY_OFFSETS,
+    Memory {
+        sync_addr: u32,
+        queue_addr: u32,
+        queue_length: u32,
+        element_size: u32,
+        game_state_size: u32,
+    } = op_codes::MEMORY_OFFSETS,
 }
 
 impl Default for Message {

@@ -1,25 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use crate::mem::{atomic_read_i32, wait_until_wake_up_at};
 
-#[derive(Debug)]
-#[repr(C)]
-/// GameState contains data to be sent over the network and is read by `main.js`.
-pub struct GameState {
-    pub player_x: f32,
-    pub player_y: f32,
-    /// Encodes actions the player takes + status effects, e.g. poisoned.
-    pub player_state: i32,
-}
-
-impl GameState {
-    pub const fn new() -> Self {
-        Self {
-            player_x: 0.0,
-            player_y: 0.0,
-            player_state: 0,
-        }
-    }
-}
+pub use rask_engine::network::GameState;
 
 #[repr(align(4))]
 #[repr(C)]

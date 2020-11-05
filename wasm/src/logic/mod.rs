@@ -3,10 +3,7 @@
 
 mod resource_parser;
 mod system;
-use crate::{
-    communication::{MessageQueue, Sprite, DOUBLE_BUFFER, SYNCHRONIZATION_MEMORY},
-    error::ClientError,
-};
+use crate::{communication::SYNCHRONIZATION_MEMORY, error::ClientError};
 use rask_engine::engine::{GameEngine, RaskEngine};
 use system::SystemIO;
 

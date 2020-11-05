@@ -17,7 +17,4 @@ pub mod resources;
 pub use error::EngineError;
 
 #[doc(inline)]
-pub use engine::GameEngine;
-
-#[doc(inline)]
-pub use engine::RaskEngine;
+pub use engine::{GameEngine, RaskEngine};

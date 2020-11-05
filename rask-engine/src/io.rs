@@ -1,6 +1,6 @@
 use crate::events::Event;
 use crate::resources::registry::{CharacterInfo, ResourceInfo};
-use crate::resources::{Character, Sound, Sprite, Texture};
+use crate::resources::Sprite;
 use crate::EngineError;
 
 #[derive(Debug)]
@@ -28,6 +28,12 @@ pub trait SystemApi: Send + Sync {
     }
     fn push_textures(&mut self, _textures: Vec<u32>) {
         unimplemented!("push_textures is not implemented for the system api");
+    }
+    fn get_mouse_position(&mut self) -> (i32, i32) {
+        unimplemented!("get_mouse_position is not implemented for the system api");
+    }
+    fn get_canvas_size(&mut self) -> (u32, u32) {
+        unimplemented!("get_canvas_size is not implemented for the system api");
     }
     fn send_event(&self, _event: Event) {
         unimplemented!("send_event is not implemented for the system api");

@@ -1,6 +1,8 @@
 use super::resource_parser::ResourceParser;
 use crate::{
-    communication::{Message, MessageQueue, Sprite, DOUBLE_BUFFER, TEXTURE_IDS},
+    communication::{
+        Message, MessageQueue, Sprite, DOUBLE_BUFFER, SYNCHRONIZATION_MEMORY, TEXTURE_IDS,
+    },
     error::ClientError,
 };
 use rask_engine::{
@@ -44,7 +46,6 @@ impl SystemIO {
     }
 }
 
-use rask_engine::resources::{Character, Sound, Texture};
 impl rask_engine::io::SystemApi for SystemIO {
     fn poll_message(&mut self) -> Result<io::Message, EngineError> {
         let msg = self.message_queue.pop();
@@ -74,6 +75,12 @@ impl rask_engine::io::SystemApi for SystemIO {
         let mut tex = &mut *TEXTURE_IDS.lock();
         tex.ids = tex_ids;
         tex.reset_notify = 1;
+    }
+    fn get_mouse_position(&mut self) -> (i32, i32) {
+        unsafe { SYNCHRONIZATION_MEMORY.mouse }
+    }
+    fn get_canvas_size(&mut self) -> (u32, u32) {
+        unsafe { SYNCHRONIZATION_MEMORY.canvas_size }
     }
     fn send_event(&self, event: Event) {
         Message::EngineEvent(event).send();
