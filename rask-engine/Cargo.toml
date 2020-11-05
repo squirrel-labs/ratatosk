@@ -6,6 +6,7 @@ edition = "2018"
 
 [features]
 nightly = []
+spin_mutex = []
 
 [dependencies.specs]
 version = "0.16"
@@ -21,9 +22,9 @@ git = "https://github.com/squirrel-labs/spine-rs"
 branch = "develop"
 version = "=0.1.1"
 
-[dev-dependencies]
-lazy_static = "1.4.0"
 
 [dependencies]
 log = "0.4"
 rayon = "1.5"
+lazy_static = "1.4.0"
+spin = {version = "0.5", optional = false}

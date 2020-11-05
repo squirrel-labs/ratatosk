@@ -1682,6 +1682,7 @@ dependencies = [
  "log 0.4.11",
  "rayon",
  "specs",
+ "spin",
  "spine_tiny",
 ]
 

@@ -77,6 +77,13 @@ impl ResourceTable {
         unsafe { std::mem::transmute(bytes) }
     }
 
+    pub fn resource_present(&self, id: usize) -> bool {
+        match self.0.get(id) {
+            None | Some(Resource::None) => false,
+            _ => true,
+        }
+    }
+
     fn index_check(&self, id: usize) -> Result<(), EngineError> {
         if id >= self.0.len() {
             return Err(EngineError::ResourceIndex(format!(

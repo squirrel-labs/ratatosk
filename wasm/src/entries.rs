@@ -16,8 +16,8 @@ use crate::logic::LogicContext;
 #[cfg(target_arch = "wasm32")]
 use crate::{
     communication::{
-        Message, MessageQueue, SynchronizationMemory, MESSAGE_QUEUE_ELEMENT_COUNT,
-        SYNCHRONIZATION_MEMORY,
+        message_queue::MessageQueueElement, Message, SynchronizationMemory,
+        MESSAGE_QUEUE_ELEMENT_COUNT, SYNCHRONIZATION_MEMORY,
     },
     mem,
     wasm_log::{init_panic_handler, WasmLog},
@@ -94,13 +94,15 @@ pub extern "C" fn run_logic() {
 
     #[cfg(target_arch = "wasm32")]
     {
-        let syn_addr = unsafe { &SYNCHRONIZATION_MEMORY as *const SynchronizationMemory as u32 };
+        let sync_addr = unsafe { &SYNCHRONIZATION_MEMORY as *const SynchronizationMemory as u32 };
         // send memory offset to the main thread -> initialize graphics
-        Message::Memory(
-            syn_addr,
-            &game.message_queue as *const MessageQueue as u32,
-            MESSAGE_QUEUE_ELEMENT_COUNT as u32,
-        )
+        Message::Memory {
+            sync_addr,
+            queue_addr: game.get_message_queue_pos() as u32,
+            queue_length: MESSAGE_QUEUE_ELEMENT_COUNT as u32,
+            element_size: std::mem::size_of::<MessageQueueElement>() as u32,
+            game_state_size: std::mem::size_of::<rask_engine::network::GameState>() as u32,
+        }
         .send();
         let stack = mem::alloc_stack(mem::GRAPHICS_STACK_SIZE);
         let tls = mem::alloc_tls();

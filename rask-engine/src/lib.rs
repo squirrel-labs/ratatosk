@@ -8,6 +8,7 @@ pub mod collide;
 pub mod engine;
 pub mod error;
 pub mod events;
+pub mod io;
 pub mod math;
 pub mod network;
 pub mod resources;
@@ -16,7 +17,4 @@ pub mod resources;
 pub use error::EngineError;
 
 #[doc(inline)]
-pub use engine::GameEngine;
-
-#[doc(inline)]
-pub use engine::RaskEngine;
+pub use engine::{GameEngine, RaskEngine};

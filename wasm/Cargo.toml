@@ -19,7 +19,7 @@ spin = "0.5"
 [dependencies.rask-engine]
 version = "0.2.0"
 path = "../rask-engine"
-features = ["nightly"]
+features = ["nightly", "spin_mutex"]
 
 [dependencies.nobg-web_worker]
 version = "=0.3.2"

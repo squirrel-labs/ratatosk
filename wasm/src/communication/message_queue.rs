@@ -51,7 +51,13 @@ pub enum Message {
 
     // Misc Management Commands
     /// Send memory offsets to javascript.
-    Memory(u32, u32, u32) = op_codes::MEMORY_OFFSETS,
+    Memory {
+        sync_addr: u32,
+        queue_addr: u32,
+        queue_length: u32,
+        element_size: u32,
+        game_state_size: u32,
+    } = op_codes::MEMORY_OFFSETS,
 }
 
 impl Default for Message {
@@ -66,10 +72,15 @@ impl Message {
         unsafe { std::slice::from_raw_parts(self as *const Message as *const u32, len as usize) }
     }
 
+    #[cfg(target_arch = "wasm32")]
     pub fn send(&self) {
         let msg = self.to_slice();
         log::trace!("sending {:?}", self);
         unsafe { post_to_main(msg.as_ptr() as u32, msg.len() as u32) }
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn send(&self) {
+        panic!("Can't send messages to javascript when not running on wasm");
     }
 }
 
@@ -115,15 +126,15 @@ impl MessageQueueElement {
 }
 
 #[derive(Debug)]
+#[repr(C)]
 /// Abstracts the communication with the main thread.
 pub struct MessageQueue {
     /// The index of the next element to be read.
-    reader_index: u32,
     data: [MessageQueueElement; MESSAGE_QUEUE_ELEMENT_COUNT],
+    reader_index: u32,
 }
 
 impl MessageQueue {
-    // add method to create message_queue with a memory location to make testing easier
     pub fn new() -> Self {
         let bytes = [0u8; std::mem::size_of::<MessageQueueElement>() * MESSAGE_QUEUE_ELEMENT_COUNT];
 
@@ -154,5 +165,9 @@ impl MessageQueue {
     /// Push an outbound Message to the main thread.
     pub fn push(&self, msg: Message) {
         msg.send();
+    }
+
+    pub fn pos(&self) -> usize {
+        self.data.as_ptr() as *const u8 as usize
     }
 }
