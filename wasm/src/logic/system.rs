@@ -68,7 +68,6 @@ impl rask_engine::io::SystemApi for SystemIO {
         res.resource_present(id as usize)
     }
     fn push_sprites(&mut self, sprites: Vec<Sprite>) {
-        //log::info!("{:?}", sprites);
         *DOUBLE_BUFFER.lock() = sprites;
     }
     fn push_textures(&mut self, tex_ids: Vec<u32>) {

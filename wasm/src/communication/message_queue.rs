@@ -168,6 +168,6 @@ impl MessageQueue {
     }
 
     pub fn pos(&self) -> usize {
-        &(self.data[0]) as *const MessageQueueElement as *const u8 as usize
+        self.data.as_ptr() as *const u8 as usize
     }
 }

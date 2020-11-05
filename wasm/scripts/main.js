@@ -5,7 +5,7 @@ const WEBSOCKET_URI = 'ws://localhost:5001/'
 const RESOURCE_PREFIX = '../../res/'
 const MEMORY_MB = 32;
 let decoder = new TextDecoder('utf-8', {ignoreBOM: true, fatal: true});
-let MESSAGE_ITEM_SIZE = 32;
+let MESSAGE_ITEM_SIZE;
 let SYNCHRONIZATION_MEMORY;
 let MESSAGE_QUEUE = null;
 let MESSAGE_QUEUE_LENGTH;
@@ -25,7 +25,7 @@ let ws;
 try {
     ws = new WebSocket(WEBSOCKET_URI, [token, "tuesday"]);
     ws.binaryType = 'arraybuffer';
-} catch (error) {console.log("Failed to establish websocket connection", error);}
+} catch (error) {console.error("Failed to establish websocket connection", error);}
 let mousex = 0;
 let mousey = 0;
 const audio_context = new AudioContext();
@@ -309,7 +309,7 @@ function waitForSocketConnection(socket, callback){
                     callback();
                 }
             } else if (socket.readyState > 1) {
-                console.log("websocket connection could not be established");
+                console.error("websocket connection could not be established");
             } else {
                 waitForSocketConnection(socket, callback);
             }
