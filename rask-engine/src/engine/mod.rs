@@ -72,6 +72,7 @@ impl GameEngine for RaskEngine {
             .with(Animation {
                 id: registry::CHAR.id,
                 animation: "walking".to_string(),
+                start: 0.0,
             })
             .with(Static)
             .build();

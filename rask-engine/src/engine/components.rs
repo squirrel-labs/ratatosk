@@ -39,6 +39,7 @@ pub struct Pos(pub Vec2);
 pub struct Animation {
     pub id: u32,
     pub animation: String,
+    pub start: f32,
 }
 
 #[derive(Debug, Clone, Component)]

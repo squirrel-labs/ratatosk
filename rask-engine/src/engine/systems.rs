@@ -46,15 +46,14 @@ impl<'a> System<'a> for RenderSystem {
     type SystemData = (
         ReadStorage<'a, Pos>,
         ReadStorage<'a, Sprite>,
-        ReadStorage<'a, Animation>,
+        WriteStorage<'a, Animation>,
         Read<'a, ElapsedTime>,
         Write<'a, SystemApi>,
         Write<'a, TextureIds>,
     );
 
-    fn run(&mut self, (pos, sprite, anim, elapsed, mut sys, mut tex_ids): Self::SystemData) {
+    fn run(&mut self, (pos, sprite, mut anim, elapsed, mut sys, mut tex_ids): Self::SystemData) {
         let mut sprites = Vec::new();
-        let res = &*resources::RESOURCE_TABLE.read();
         for (pos, sprite) in (&pos, &sprite).join() {
             if res.resource_present(sprite.id as usize) {
                 sprites.push(resources::Sprite::new(
@@ -65,22 +64,34 @@ impl<'a> System<'a> for RenderSystem {
                 ))
             }
         }
-        for (pos, anim) in (&pos, &anim).join() {
+        let res = &mut *resources::RESOURCE_TABLE.write();
+        for (pos, anim) in (&pos, &mut anim).join() {
             if res.resource_present(anim.id as usize) {
                 let trans = Mat3::translation(pos.0.x(), pos.0.y());
-                let cha: Result<&Box<resources::Character>, EngineError> =
-                    res.get(anim.id as usize);
-                let cha = cha.unwrap();
-                for sp in cha
-                    .interpolate(elapsed.0.as_secs_f32(), anim.animation.as_str())
-                    .unwrap()
-                {
-                    let sp = sp.unwrap();
-                    sprites.push(resources::Sprite::new(
-                        trans * sp.transform,
-                        anim.id,
-                        sp.att_id,
-                    ))
+                let cha: Result<&mut Box<resources::Character>, EngineError> =
+                    res.get_mut(anim.id as usize);
+                let cha = cha.unwrap().as_mut();
+
+                //todo factor out into own subsystem
+                if cha.animation_name() != anim.animation {
+                    cha.set_animation(
+                        anim.animation.as_str(),
+                        0.0,
+                        elapsed.0.as_secs_f32() - anim.start,
+                        0.1,
+                    )
+                    .unwrap();
+                }
+
+                if let Ok(sps) = cha.interpolate(elapsed.0.as_secs_f32()) {
+                    for sp in sps {
+                        let sp = sp.unwrap();
+                        sprites.push(resources::Sprite::new(
+                            trans * sp.transform,
+                            anim.id,
+                            sp.att_id,
+                        ))
+                    }
                 }
             }
         }
