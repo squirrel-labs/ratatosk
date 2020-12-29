@@ -1,17 +1,21 @@
 use super::components::*;
 
-use crate::events::Event;
-use crate::events::Key;
+use crate::events::{Event, Key, Keyboard};
 use crate::io;
 use crate::math::Mat3;
 use crate::resources::{self, registry, GetStore};
 use crate::EngineError;
 use specs::prelude::*;
 
+lazy_static::lazy_static! {
+    pub static ref KEYBOARD:  Keyboard= Keyboard::new();
+}
+
 pub struct EventSystem;
 pub struct VelocitySystem;
 pub struct GravitationSystem;
 pub struct RenderSystem;
+pub struct Movement;
 
 impl<'a> System<'a> for VelocitySystem {
     type SystemData = (
@@ -76,14 +80,15 @@ impl<'a> System<'a> for RenderSystem {
                 if cha.animation_name() != anim.animation {
                     cha.set_animation(
                         anim.animation.as_str(),
-                        0.0,
                         elapsed.0.as_secs_f32() - anim.start,
-                        0.1,
+                        0.0,
+                        4.5,
                     )
                     .unwrap();
+                    anim.start = elapsed.0.as_secs_f32();
                 }
 
-                if let Ok(sps) = cha.interpolate(elapsed.0.as_secs_f32()) {
+                if let Ok(sps) = cha.interpolate(elapsed.0.as_secs_f32() - anim.start) {
                     for sp in sps {
                         let sp = sp.unwrap();
                         sprites.push(resources::Sprite::new(
@@ -109,6 +114,20 @@ impl<'a> System<'a> for RenderSystem {
     }
 }
 
+impl<'a> System<'a> for Movement {
+    type SystemData = (WriteStorage<'a, Animation>, Read<'a, ElapsedTime>);
+
+    fn run(&mut self, (mut anim, elapsed): Self::SystemData) {
+        for anim in (&mut anim).join() {
+            anim.animation = if KEYBOARD.get(Key::ARROW_RIGHT) || KEYBOARD.get(Key::ARROW_LEFT) {
+                "walking".to_owned()
+            } else {
+                "standing".to_owned()
+            };
+        }
+    }
+}
+
 impl<'a> System<'a> for EventSystem {
     type SystemData = (Write<'a, SystemApi>,);
 
@@ -119,19 +138,25 @@ impl<'a> System<'a> for EventSystem {
             match message {
                 io::Message::None => break,
                 io::Message::SystemInternal => continue,
-                io::Message::Event(event) => match event {
-                    Event::KeyDown(_, Key::ARROW_LEFT) => (),
-                    Event::KeyDown(_, Key::ARROW_RIGHT) => (),
-                    Event::KeyUp(_, Key::ARROW_RIGHT) => (),
-                    Event::KeyUp(_, Key::ARROW_LEFT) => (),
-                    Event::KeyDown(_, Key::KEY_P) => sys.0.play_sound(registry::SOUND.id),
-                    Event::KeyDown(_, Key::KEY_S) => sys.0.stop_sound(registry::SOUND.id),
-                    Event::KeyDown(_, Key::DIGIT1) => log::set_max_level(log::LevelFilter::Info),
-                    Event::KeyDown(_, Key::DIGIT2) => log::set_max_level(log::LevelFilter::Debug),
-                    Event::KeyDown(_, Key::DIGIT3) => log::set_max_level(log::LevelFilter::Trace),
-                    Event::KeyDown(_, Key::ENTER) => (),
-                    _ => (),
-                },
+                io::Message::Event(event) => {
+                    log::trace!("event: {:?}", event);
+                    match event {
+                        Event::KeyDown(_, Key::KEY_P) => sys.0.play_sound(registry::SOUND.id),
+                        Event::KeyDown(_, Key::KEY_S) => sys.0.stop_sound(registry::SOUND.id),
+                        Event::KeyDown(_, Key::DIGIT1) => {
+                            log::set_max_level(log::LevelFilter::Info)
+                        }
+                        Event::KeyDown(_, Key::DIGIT2) => {
+                            log::set_max_level(log::LevelFilter::Debug)
+                        }
+                        Event::KeyDown(_, Key::DIGIT3) => {
+                            log::set_max_level(log::LevelFilter::Trace)
+                        }
+                        Event::KeyDown(_, key) => KEYBOARD.set(key, true),
+                        Event::KeyUp(_, key) => KEYBOARD.set(key, false),
+                        _ => (),
+                    }
+                }
             }
         }
     }

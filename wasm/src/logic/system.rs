@@ -30,8 +30,14 @@ impl SystemIO {
     fn handle_message(&mut self, message: Message) -> Result<Option<Event>, EngineError> {
         log::trace!("message {:?}", message);
         match message {
-            Message::KeyDown(modifier, hash) => Ok(Some(Event::KeyDown(modifier, Key::from(hash)))),
-            Message::KeyUp(modifier, hash) => Ok(Some(Event::KeyUp(modifier, Key::from(hash)))),
+            Message::KeyDown(modifier, hash) => match Key::from_hash(hash) {
+                Some(key) => Ok(Some(Event::KeyDown(modifier, key))),
+                None => Ok(None),
+            },
+            Message::KeyUp(modifier, hash) => match Key::from_hash(hash) {
+                Some(key) => Ok(Some(Event::KeyUp(modifier, key))),
+                None => Ok(None),
+            },
             Message::MouseDown(event) => Ok(Some(Event::MouseDown(event))),
             Message::MouseUp(event) => Ok(Some(Event::MouseUp(event))),
             Message::KeyPress(t, code) => Ok(Some(Event::KeyPress(t as u16, code))),
