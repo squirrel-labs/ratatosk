@@ -58,6 +58,7 @@ impl<'a> System<'a> for RenderSystem {
 
     fn run(&mut self, (pos, sprite, mut anim, elapsed, mut sys, mut tex_ids): Self::SystemData) {
         let mut sprites = Vec::new();
+        let res = &mut *resources::RESOURCE_TABLE.write();
         for (pos, sprite) in (&pos, &sprite).join() {
             if res.resource_present(sprite.id as usize) {
                 sprites.push(resources::Sprite::new(
@@ -68,7 +69,6 @@ impl<'a> System<'a> for RenderSystem {
                 ))
             }
         }
-        let res = &mut *resources::RESOURCE_TABLE.write();
         for (pos, anim) in (&pos, &mut anim).join() {
             if res.resource_present(anim.id as usize) {
                 let trans = Mat3::translation(pos.0.x(), pos.0.y());
@@ -82,7 +82,7 @@ impl<'a> System<'a> for RenderSystem {
                         anim.animation.as_str(),
                         elapsed.0.as_secs_f32() - anim.start,
                         0.0,
-                        4.5,
+                        0.2,
                     )
                     .unwrap();
                     anim.start = elapsed.0.as_secs_f32();

@@ -154,22 +154,25 @@ impl Character {
     pub fn set_animation(
         &mut self,
         anim_name: &str,
-        start_offset: f32,
         current_time: f32,
+        start_offset: f32,
         fade_time: f32,
     ) -> Result<(), EngineError> {
         self.animation.with_mut(|fields| {
             *fields.animation = Some(
                 if fields.animation.is_some() {
-                    Skeleton::get_animated_skin_with_transiton(
-                        &fields.skeleton_contents,
-                        "default",
-                        anim_name,
-                        fields.animation_name.as_str(),
-                        current_time,
-                        start_offset,
-                        fade_time,
-                    )
+                    fields
+                        .animation
+                        .as_ref()
+                        .unwrap()
+                        .get_animated_skin_with_transiton(
+                            &fields.skeleton_contents,
+                            "default",
+                            anim_name,
+                            current_time,
+                            start_offset,
+                            fade_time,
+                        )
                 } else {
                     fields
                         .skeleton_contents
@@ -183,7 +186,6 @@ impl Character {
     }
     pub fn interpolate(&self, time: f32) -> Result<AnimationStates, EngineError> {
         if let Some(animated_skin) = self.animation.with_animation(|anim| anim) {
-            let time = time.rem_euclid(animated_skin.get_duration());
             Ok(AnimationStates::new(
                 animated_skin
                     .interpolate(time)

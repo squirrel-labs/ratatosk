@@ -2,7 +2,6 @@
 //! This includes math utilities such as vectors and matrices, a trait for collisions and multiple
 //! boxes for modeling objects.
 
-#![feature(once_cell)]
 #![cfg_attr(feature = "nightly", feature(const_in_array_repeat_expressions))]
 pub mod boxes;
 pub mod collide;

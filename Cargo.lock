@@ -2179,8 +2179,8 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
 name = "spine_tiny"
-version = "0.1.1"
-source = "git+https://github.com/squirrel-labs/spine-rs?branch=transitions#07aac4262581bfcb86360bb153fdf2e17f6cc1ff"
+version = "0.1.2"
+source = "git+https://github.com/squirrel-labs/spine-rs?branch=transitions#8b8dfcd5c7ee394ed2836b0e580b9a781fed9fe0"
 dependencies = [
  "rustc-hex",
  "serde",

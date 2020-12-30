@@ -20,7 +20,7 @@ features = ["png"]
 [dependencies.spine_tiny]
 git = "https://github.com/squirrel-labs/spine-rs"
 branch = "transitions"
-version = "=0.1.1"
+version = "=0.1.2"
 
 
 [dependencies]
