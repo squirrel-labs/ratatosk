@@ -2,7 +2,7 @@ use super::components::*;
 
 use crate::events::{Event, Key, Keyboard};
 use crate::io;
-use crate::math::Mat3;
+use crate::math::{Mat3, Vec2};
 use crate::resources::{self, registry, GetStore};
 use crate::EngineError;
 use specs::prelude::*;
@@ -51,27 +51,32 @@ impl<'a> System<'a> for RenderSystem {
         ReadStorage<'a, Pos>,
         ReadStorage<'a, Sprite>,
         WriteStorage<'a, Animation>,
+        ReadStorage<'a, Scale>,
         Read<'a, ElapsedTime>,
         Write<'a, SystemApi>,
         Write<'a, TextureIds>,
     );
 
-    fn run(&mut self, (pos, sprite, mut anim, elapsed, mut sys, mut tex_ids): Self::SystemData) {
+    fn run(
+        &mut self,
+        (pos, sprite, mut anim, scale, elapsed, mut sys, mut tex_ids): Self::SystemData,
+    ) {
         let mut sprites = Vec::new();
         let res = &mut *resources::RESOURCE_TABLE.write();
-        for (pos, sprite) in (&pos, &sprite).join() {
+        for (pos, sprite, scale) in (&pos, &sprite, &scale).join() {
             if res.resource_present(sprite.id as usize) {
                 sprites.push(resources::Sprite::new(
                     Mat3::translation(pos.0.x(), pos.0.y())
-                        * Mat3::scaling(sprite.scale_x, sprite.scale_y),
+                        * Mat3::scaling(scale.scale_x, scale.scale_y),
                     sprite.id,
                     0,
                 ))
             }
         }
-        for (pos, anim) in (&pos, &mut anim).join() {
+        for (pos, anim, scale) in (&pos, &mut anim, &scale).join() {
             if res.resource_present(anim.id as usize) {
                 let trans = Mat3::translation(pos.0.x(), pos.0.y());
+                let scale = Mat3::scaling(scale.scale_x, scale.scale_y);
                 let cha: Result<&mut Box<resources::Character>, EngineError> =
                     res.get_mut(anim.id as usize);
                 let cha = cha.unwrap().as_mut();
@@ -92,7 +97,7 @@ impl<'a> System<'a> for RenderSystem {
                     for sp in sps {
                         let sp = sp.unwrap();
                         sprites.push(resources::Sprite::new(
-                            trans * sp.transform,
+                            trans * scale * sp.transform,
                             anim.id,
                             sp.att_id,
                         ))
@@ -115,11 +120,23 @@ impl<'a> System<'a> for RenderSystem {
 }
 
 impl<'a> System<'a> for Movement {
-    type SystemData = (WriteStorage<'a, Animation>, Read<'a, ElapsedTime>);
+    type SystemData = (
+        WriteStorage<'a, Animation>,
+        WriteStorage<'a, Pos>,
+        WriteStorage<'a, Scale>,
+        ReadStorage<'a, Speed>,
+        Read<'a, DeltaTime>,
+    );
 
-    fn run(&mut self, (mut anim, elapsed): Self::SystemData) {
-        for anim in (&mut anim).join() {
-            anim.animation = if KEYBOARD.get(Key::ARROW_RIGHT) || KEYBOARD.get(Key::ARROW_LEFT) {
+    fn run(&mut self, (mut anim, mut pos, mut scale, speed, delta_time): Self::SystemData) {
+        for (anim, pos, scale, speed) in (&mut anim, &mut pos, &mut scale, &speed).join() {
+            anim.animation = if KEYBOARD.get(Key::ARROW_RIGHT) {
+                scale.scale_x = 1.0;
+                pos.0 += Vec2::new(delta_time.0.as_secs_f32() * speed.0, 0.0);
+                "walking".to_owned()
+            } else if KEYBOARD.get(Key::ARROW_LEFT) {
+                scale.scale_x = -1.0;
+                pos.0 -= Vec2::new(delta_time.0.as_secs_f32() * speed.0, 0.0);
                 "walking".to_owned()
             } else {
                 "standing".to_owned()

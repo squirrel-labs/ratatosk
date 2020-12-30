@@ -160,19 +160,15 @@ impl Character {
     ) -> Result<(), EngineError> {
         self.animation.with_mut(|fields| {
             *fields.animation = Some(
-                if fields.animation.is_some() {
-                    fields
-                        .animation
-                        .as_ref()
-                        .unwrap()
-                        .get_animated_skin_with_transiton(
-                            &fields.skeleton_contents,
-                            "default",
-                            anim_name,
-                            current_time,
-                            start_offset,
-                            fade_time,
-                        )
+                if let Some(anim) = &fields.animation {
+                    anim.get_animated_skin_with_transiton(
+                        &fields.skeleton_contents,
+                        "default",
+                        anim_name,
+                        current_time,
+                        start_offset,
+                        fade_time,
+                    )
                 } else {
                     fields
                         .skeleton_contents

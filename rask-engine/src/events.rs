@@ -89,7 +89,7 @@ lazy_static::lazy_static! {
         (68837, 80),
         (68838, 81),
         (68839, 82),
-    ].iter().cloned().collect();
+    ].iter().copied().collect();
 }
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct Key(u32);
