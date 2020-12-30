@@ -71,6 +71,31 @@ impl RBox {
             v2: orth,
         }
     }
+
+    /// Brings the RBox into the normal form
+    /// `pos` has the least y-value.
+    /// `v1` is left of `v2`.
+    /// TODO: force normal form for every RBox
+    pub fn as_normal_form(&self) -> Self {
+        let (pos, v1, v2, b) = if self.v2.y() < 0.0 {
+            if self.v1.y() < 0.0 {
+                (
+                    self.pos + self.v1 + self.v2,
+                    -self.v1,
+                    -self.v2,
+                    self.v1.x() >= 0.0,
+                )
+            } else {
+                (self.pos + self.v2, -self.v2, self.v1, self.v2.x() >= 0.0)
+            }
+        } else if self.v1.y() < 0.0 {
+            (self.pos + self.v1, self.v2, -self.v1, self.v1.x() < 0.0)
+        } else {
+            (self.pos, self.v1, self.v2, self.v1.x() < 0.0)
+        };
+        let (v1, v2) = if b { (v1, v2) } else { (v2, v1) };
+        Self { pos, v1, v2 }
+    }
 }
 
 impl ops::Add<Vec2> for RBox {
