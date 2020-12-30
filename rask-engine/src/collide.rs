@@ -24,17 +24,15 @@ pub enum Collidable {
 impl Collide for Collidable {
     fn collide_after(&self, other: &Self, dv: Vec2) -> Option<f32> {
         match (self, other) {
-            (&Self::Point(ref a), &Self::Point(ref b)) => a.collide_after(b, dv),
-            (&Self::Point(ref a), &Self::AABox(ref b)) => a.collide_after(b, dv),
-            //(Self::Point(a), Self::RBox(b)) => a.collide_after(b, dv),
-            (&Self::AABox(ref a), &Self::Point(ref b)) => a.collide_after(b, dv),
-            (&Self::AABox(ref a), &Self::AABox(ref b)) => a.collide_after(b, dv),
-            //(Self::AABox(a), Self::RBox(b)) => a.collide_after(b, dv),
-            //(Self::RBox(a), Self::Point(b)) => a.collide_after(b, dv),
-            //(Self::RBox(a), Self::AABox(b)) => a.collide_after(b, dv),
-            //(Self::RBox(a), Self::RBox(b)) => a.collide_after(b, dv),
-            // TODO: remove following:
-            _ => None,
+            (Self::Point(a), Self::Point(b)) => a.collide_after(b, dv),
+            (Self::Point(a), Self::AABox(b)) => a.collide_after(b, dv),
+            (Self::Point(a), Self::RBox(b)) => a.collide_after(b, dv),
+            (Self::AABox(a), Self::Point(b)) => a.collide_after(b, dv),
+            (Self::AABox(a), Self::AABox(b)) => a.collide_after(b, dv),
+            (Self::AABox(a), Self::RBox(b)) => a.collide_after(b, dv),
+            (Self::RBox(a), Self::Point(b)) => a.collide_after(b, dv),
+            (Self::RBox(a), Self::AABox(b)) => a.collide_after(b, dv),
+            (Self::RBox(a), Self::RBox(b)) => a.collide_after(b, dv),
         }
     }
 }
@@ -73,9 +71,16 @@ fn project(rbox: &RBox, axis: Vec2) -> (f32, f32) {
 }
 
 macro_rules! impl_collide {
-    (for {$A:ident} $item:item) => {
+    (for {$A:ident} $item:item) => { impl_collide!(for {$A/$A} $item); };
+    (for {$A:ident/$C:ident} $item:item) => {
         impl Collide for $A {
             $item
+        }
+
+        impl From<$A> for Collidable {
+            fn from(other: $A) -> Self {
+                Self::$C(other)
+            }
         }
     };
     (for {$A:ident, $B:ident} $item:item) => {
@@ -84,13 +89,13 @@ macro_rules! impl_collide {
         }
         impl Collide<$A> for $B {
             fn collide_after(&self, other: &$A, dv: Vec2) -> Option<f32> {
-                other.collide_after(self, -dv).map(|r| -r)
+                other.collide_after(self, -dv)
             }
         }
     };
 }
 
-impl_collide!(for {Vec2}
+impl_collide!(for {Vec2/Point}
     fn collide_after(&self, other: &Self, dv: Vec2) -> Option<f32> {
         in_range(match (dv.x() == 0.0, dv.y() == 0.0) {
             (true, true) => return if self == other { Some(0.0) } else { None },
@@ -107,23 +112,35 @@ impl_collide!(for {Vec2}
 
 impl_collide!(for {Vec2, AABox}
     fn collide_after(&self, other: &AABox, dv: Vec2) -> Option<f32> {
-        let left = || ((self.x() + dv.x() - other.pos.x()) / dv.x());
-        let bottom = || ((self.y() + dv.y() - other.pos.y()) / dv.y());
-        let right = || ((self.x() + dv.x() - other.pos.x() - other.size.x()) / dv.x());
-        let top = || ((self.y() + dv.y() - other.pos.y() - other.size.y()) / dv.y());
-        if left_under(other.pos, *self) && left_under(*self, other.pos + other.size) {
-            Some(if dv.x() > 0.0 {
-                     if dv.y() > 0.0 {
-                         bottom().min(left())
-                     } else {
-                         top().min(left())
-                     }
-                 } else if dv.y() > 0.0 {
-                     bottom().min(right())
-                 } else {
-                     top().min(right())
-                 })
-        } else { None }
+        // test collision between a line starting at a with the vector v
+        // and another line starting at p with the vector (0, w).
+        let line_col = |a: Vec2, v: Vec2, p: Vec2, w| {
+            let t = (p.x() - a.x()) / v.x();
+            //println!("  a={:?}, p={:?}, v={:?}, w={:?}, t={:?}", a, p, v, w, 1.0-t);
+            if (0.0..=1.0).contains(&t) && (0.0..=w).contains(&(a.y() - p.y() + v.y() * t)) {
+                Some(1.0 - t)
+            } else {
+                None
+            }
+        };
+        let rev = |v: Vec2| Vec2::new(v.y(), v.x());
+        let left = || line_col(*self, dv, other.pos, other.size.y());
+        let right = || line_col(*self, dv, other.pos + Vec2::new(other.size.x(), 0.0), other.size.y());
+        let bottom = || line_col(rev(*self), rev(dv), rev(other.pos), other.size.x());
+        let top = || line_col(rev(*self), rev(dv), rev(other.pos + Vec2::new(0.0, other.size.y())), other.size.x());
+        if dv.x() >= 0.0 {
+            if dv.y() >= 0.0 {
+                left().or_else(bottom)
+            } else {
+                left().or_else(top)
+            }
+        } else {
+            if dv.y() >= 0.0 {
+                right().or_else(bottom)
+            } else {
+                right().or_else(top)
+            }
+        }
     }
 );
 
