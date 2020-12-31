@@ -28,7 +28,8 @@ try {
 } catch (error) {console.error("Failed to establish websocket connection", error);}
 let mousex = 0;
 let mousey = 0;
-const audio_context = new AudioContext();
+let audio_context = null;
+let audio_callbacks = [];
 
 class MessageQueueWriter {
     constructor(pos, length) {
@@ -187,13 +188,23 @@ function LogicMessage(e) {
     } else if (optcode === PREPARE_AUDIO) {
         const res = fetch(RESOURCE_PREFIX + str_from_mem(x[2], x[3]));
         res.then(async function (data) {
+            let f = async function() {
             let buffer = await data.arrayBuffer();
             let audio_buffer = await audio_context.decodeAudioData(buffer);
             audio_map.set(x[1], audio_buffer);
             queue.write_i32([AUDIO_LOADED, x[1]]);
             console.debug("done fetching audio " + x[1]);
+            };
+            if (audio_context) {
+                await f();
+            } else {
+                audio_callbacks.push(f);
+            }
         })
     } else if (optcode === PLAY_SOUND) {
+        if (!audio_context) {
+            console.error("Tried to play a sound before a key was pressed");
+        }
         let audio_buffer = audio_map.get(x[1]);
         let source = audio_context.createBufferSource();
         source.buffer = audio_buffer;
@@ -202,6 +213,9 @@ function LogicMessage(e) {
         source_map.set(x[1], source);
         console.debug("start playing audio " + x[1]);
     } else if (optcode === STOP_SOUND) {
+        if (!audio_context) {
+            console.error("Tried to play a sound before a key was pressed");
+        }
         let source = source_map.get(x[1]);
         source.stop();
         source.disconnect(audio_context.destination);
@@ -383,6 +397,12 @@ window.addEventListener('resize', resize_canvas);
 window.addEventListener('keydown', e => {
     const key = evalKey(e);
     const mod = keyMod(e);
+    if (!audio_context) {
+        audio_context = new AudioContext();
+        audio_callbacks.forEach(function(f) {
+            f();
+        });
+    }
     if (key !== undefined && key !== 0 && mod !== undefined) {queue.write_i32([KEY_DOWN, mod, key]);}
 });
 
