@@ -37,37 +37,12 @@ impl Collide for Collidable {
     }
 }
 
-fn left_under(v1: Vec2, v2: Vec2) -> bool {
-    v1.x() < v2.x() && v1.y() < v2.y()
-}
-
 fn in_range(t: f32) -> Option<f32> {
     if (0.0..=1.0).contains(&t) {
         Some(1.0 - t)
     } else {
         None
     }
-}
-
-fn project(rbox: &RBox, axis: Vec2) -> (f32, f32) {
-    // the vertices of rbox without rbox.pos
-    let vertices = [
-        rbox.pos + rbox.v1,
-        rbox.pos + rbox.v2,
-        rbox.pos + rbox.v1 + rbox.v2,
-    ];
-    // project each vertex onto axis
-    let p = axis.dot(rbox.pos);
-    let mut proj = (p, p);
-    for &vertex in vertices.iter() {
-        let p = axis.dot(vertex);
-        if p < proj.0 {
-            proj.0 = p;
-        } else if p > proj.0 {
-            proj.1 = p;
-        }
-    }
-    proj
 }
 
 macro_rules! impl_collide {
@@ -222,29 +197,25 @@ impl_collide!(for {AABox}
 
 impl_collide!(for {Vec2, RBox}
     fn collide_after(&self, other: &RBox, dv: Vec2) -> Option<f32> {
-        let p = *self + dv;
-        let (amin, amax) = project(other, other.v1);
-        let a = p.dot(other.v1);
-        let (bmin, bmax) = project(other, other.v2);
-        let b = p.dot(other.v2);
-        if (amin..=amax).contains(&a) && (bmin..=bmax).contains(&b) {
-            let f = |v, a, min, max| {
-                let t = self.dot(v);
-                if t < min {
-                    Some((a - min) / (a - t))
-                } else if t > max {
-                    Some((a - max) / (a - t))
-                } else {
-                    None
-                }
-            };
-            Some(match (f(other.v1, a, amin, amax), f(other.v2, b, bmin, bmax)) {
-                (Some(a), Some(b)) => a.min(b),
-                (Some(a), None) | (None, Some(a)) => a,
-                _ => 1.0
-            })
-        } else {
-            None
+        let rbox = other.as_normal_form();
+        let col_lines = |b: Vec2, w: Vec2| {
+            let t = (w.x() * (b.y() - self.y() - dv.y()) + w.y() * (dv.x() + self.x() - b.x()))
+                / (dv.x() * w.y() - dv.y() * w.x());
+            if (0.0..=1.0).contains(&t) && (0.0..=1.0).contains(&((self.x() - b.x() + dv.x() * (1.0 - t)) / w.x())) {
+                Some(t)
+            } else {
+                None
+            }
+        };
+        let left = || col_lines(rbox.pos, rbox.v1);
+        let right = || col_lines(rbox.pos + rbox.v2, rbox.v1);
+        let top = || col_lines(rbox.pos + rbox.v1, rbox.v2);
+        let bottom = || col_lines(rbox.pos, rbox.v2);
+        match (dv.dot(rbox.v2) >= 0.0, dv.dot(rbox.v1) >= 0.0) {
+            (true, true) => left().or_else(bottom),
+            (true, false) => left().or_else(top),
+            (false, true) => right().or_else(bottom),
+            (false, false) => right().or_else(top),
         }
     }
 );
@@ -259,7 +230,7 @@ impl_collide!(for {RBox, AABox}
             rbox.pos,
         ];
 
-        // corner of rbox moves into endge of aabox:
+        // corner of rbox moves into edge of aabox:
         // ----------------------------------------
 
         let (x, y) = (dv.x(), dv.y());

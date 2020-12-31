@@ -300,3 +300,50 @@ fn test_collide_aabox_aabox_konverge() {
         None
     )
 }
+
+#[test]
+fn test_collide_dot_rbox_simple() {
+    assert_collide!(
+        Vec2::new(4.0, -1.0),
+        RBox {
+            pos: Vec2::new(3.0, 1.0),
+            v1: Vec2::new(-2.0, 2.0),
+            v2: Vec2::new(4.0, 4.0),
+        },
+        (0.0, 5.0),
+        Some(2.0 / 5.0)
+    )
+}
+
+#[test]
+fn test_collide_dot_rbox_equivalent_rboxes() {
+    fn test(pos: Vec2, v1: Vec2, v2: Vec2) {
+        for &(v1, v2) in &[(v1, v2), (v2, v1)] {
+            assert_collide!(
+                Vec2::new(1.5, 1.0),
+                RBox { pos, v1, v2 },
+                (1.0, 3.0),
+                Some(3.0 / 4.0)
+            )
+        }
+    }
+    let (v1, v2) = (Vec2::new(-1.0, 3.0), Vec2::new(6.0, 2.0));
+    test(Vec2::new(2.0, 1.0), v1, v2);
+    test(Vec2::new(8.0, 3.0), -v2, v1);
+    test(Vec2::new(7.0, 6.0), -v1, -v2);
+    test(Vec2::new(1.0, 4.0), v2, -v1);
+}
+
+#[test]
+fn test_collide_dot_rbox_pass_through() {
+    assert_collide!(
+        Vec2::new(6.0, 5.0),
+        RBox {
+            pos: Vec2::new(1.0, 5.0),
+            v1: Vec2::new(4.0, 1.0),
+            v2: Vec2::new(1.0, -4.0),
+        },
+        (-4.0, 1.0),
+        Some(0.8)
+    )
+}
