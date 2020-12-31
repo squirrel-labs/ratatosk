@@ -188,12 +188,12 @@ function LogicMessage(e) {
     } else if (optcode === PREPARE_AUDIO) {
         const res = fetch(RESOURCE_PREFIX + str_from_mem(x[2], x[3]));
         res.then(async function (data) {
-            let f = async function() {
-            let buffer = await data.arrayBuffer();
-            let audio_buffer = await audio_context.decodeAudioData(buffer);
-            audio_map.set(x[1], audio_buffer);
-            queue.write_i32([AUDIO_LOADED, x[1]]);
-            console.debug("done fetching audio " + x[1]);
+            let f = async function () {
+                let buffer = await data.arrayBuffer();
+                let audio_buffer = await audio_context.decodeAudioData(buffer);
+                audio_map.set(x[1], audio_buffer);
+                queue.write_i32([AUDIO_LOADED, x[1]]);
+                console.debug("done fetching audio " + x[1]);
             };
             if (audio_context) {
                 await f();
@@ -316,11 +316,11 @@ async function wakeLogic() {
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
 }
 
-function waitForSocketConnection(socket, callback){
+function waitForSocketConnection(socket, callback) {
     setTimeout(
         function () {
             if (socket.readyState === 1) {
-                if (callback != null){
+                if (callback != null) {
                     callback();
                 }
             } else if (socket.readyState > 1) {
@@ -399,7 +399,7 @@ window.addEventListener('keydown', e => {
     const mod = keyMod(e);
     if (!audio_context) {
         audio_context = new AudioContext();
-        audio_callbacks.forEach(function(f) {
+        audio_callbacks.forEach(function (f) {
             f();
         });
     }
