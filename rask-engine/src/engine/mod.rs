@@ -50,7 +50,7 @@ impl GameEngine for RaskEngine {
         let mut tick_dispatcher = DispatcherBuilder::new()
             .with_pool(pool)
             .with(EventSystem, "events", &[])
-            .with(CheckPresentSystem, "check_present", &["events"])
+            .with(CheckPresentSystem, "check_present", &[]) // does not depend on anything, because resource parsing is handled asynchronously
             .with(UpdateAnimationSystem, "update_anim", &["check_present"])
             .with(MovementSystem, "movement", &["events"])
             .with(GravitationSystem, "gravitation", &["movement"])
