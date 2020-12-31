@@ -18,6 +18,9 @@ use rect_packer::DensePacker;
 
 // The maximum visible aspect ratio (width / height)
 const WORLD_ASPECT: f32 = 1.0;
+// Set the position to zoom towards
+const ZOOM_X: f32 = -0.0;
+const ZOOM_Y: f32 = -0.6;
 
 mod imports {
     extern "C" {
@@ -31,6 +34,8 @@ mod imports {
             vh: f32,
             sx: f32,
             sy: f32,
+            ox: f32,
+            oy: f32,
         );
     }
 }
@@ -49,7 +54,7 @@ fn init_canvas_size() -> (u32, u32) {
 fn set_canvas_size(w: u32, h: u32, screen_rect_scale: f32) {
     // the aspect ratio of the screen
     let screen_aspect = w as f32 / (h as f32);
-    let (vx, vy, vw, vh, sx, sy) = if screen_aspect > WORLD_ASPECT {
+    let (vx, vy, vw, vh, sx, sy, ox, oy) = if screen_aspect > WORLD_ASPECT {
         let max_scaling = screen_aspect / WORLD_ASPECT;
         let scaling = 1.0 + (max_scaling - 1.0) * (screen_rect_scale - 1.0);
         let w_ = w as f32 / scaling;
@@ -60,6 +65,8 @@ fn set_canvas_size(w: u32, h: u32, screen_rect_scale: f32) {
             h as f32,
             1.0,
             max_scaling / scaling,
+            0.0,
+            (WORLD_ASPECT - screen_aspect) * ZOOM_Y / WORLD_ASPECT,
         )
     } else {
         let max_scaling = WORLD_ASPECT / screen_aspect;
@@ -72,6 +79,8 @@ fn set_canvas_size(w: u32, h: u32, screen_rect_scale: f32) {
             h_,
             max_scaling / scaling,
             1.0,
+            (WORLD_ASPECT - screen_aspect) * ZOOM_X / WORLD_ASPECT,
+            0.0,
         )
     };
     let (sx, sy) = if WORLD_ASPECT > 1.0 {
@@ -81,7 +90,7 @@ fn set_canvas_size(w: u32, h: u32, screen_rect_scale: f32) {
     } else {
         (sx, sy)
     };
-    unsafe { imports::set_canvas_size(w, h, vx, vy, vw, vh, sx, sy) }
+    unsafe { imports::set_canvas_size(w, h, vx, vy, vw, vh, sx, sy, ox, oy) }
 }
 
 pub struct WebGl2 {
