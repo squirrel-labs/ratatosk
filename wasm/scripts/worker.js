@@ -56,14 +56,14 @@ const imports = {
         canvasHeight = canvas.height;
         return (canvas.width << 16) | canvas.height;
     },
-    set_canvas_size: function (w, h, vx, vy, vw, vh, sx, sy) {
+    set_canvas_size: function (w, h, vx, vy, vw, vh, sx, sy, ox, oy) {
         canvas.width = w;
         canvas.height = h;
         canvasX = vx;
         canvasY = vy;
         canvasWidth = vw;
         canvasHeight = vh;
-        gl.uniform2fv(stretchLoc, [sx, sy]);
+        gl.uniform4fv(stretchLoc, [sx, sy, ox, oy]);
     },
     gl_get_error: function () {
         return gl.getError();
