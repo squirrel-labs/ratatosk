@@ -189,3 +189,114 @@ fn test_collide_dot_aabox_pass_diagonal() {
         None
     )
 }
+
+#[test]
+fn test_collide_aabox_aabox_trivial_intersect() {
+    assert_collide!(
+        AABox {
+            pos: Vec2::new(1.0, 1.0),
+            size: Vec2::new(2.0, 2.0),
+        },
+        AABox {
+            pos: Vec2::new(1.0, 4.0),
+            size: Vec2::new(2.0, 2.0),
+        },
+        (0.0, 2.0),
+        Some(0.5)
+    )
+}
+
+#[test]
+fn test_collide_aabox_aabox_up() {
+    assert_collide!(
+        AABox {
+            pos: Vec2::new(0.0, 0.0),
+            size: Vec2::new(3.0, 2.0),
+        },
+        AABox {
+            pos: Vec2::new(4.0, 3.0),
+            size: Vec2::new(1.0, 5.0),
+        },
+        (3.0, 2.0),
+        Some(0.5)
+    )
+}
+
+#[test]
+fn test_collide_aabox_aabox_right() {
+    assert_collide!(
+        AABox {
+            pos: Vec2::new(-2.0, 6.0),
+            size: Vec2::new(1.0, 1.0),
+        },
+        AABox {
+            pos: Vec2::new(4.0, 2.0),
+            size: Vec2::new(1.0, 5.0),
+        },
+        (5.5, -3.5),
+        Some(1.0 / 11.0)
+    )
+}
+
+#[test]
+fn test_collide_aabox_aabox_left() {
+    assert_collide!(
+        AABox {
+            pos: Vec2::new(6.0, 3.0),
+            size: Vec2::new(3.0, 0.07),
+        },
+        AABox {
+            pos: Vec2::new(1.0, 1.0),
+            size: Vec2::new(4.0, 2.0),
+        },
+        (-6.0, -5.0),
+        Some(5.0 / 6.0)
+    )
+}
+#[test]
+fn test_collide_aabox_aabox_down() {
+    assert_collide!(
+        AABox {
+            pos: Vec2::new(-2.5, 0.0),
+            size: Vec2::new(0.5, 5.0),
+        },
+        AABox {
+            pos: Vec2::new(-2.0, 7.0),
+            size: Vec2::new(1.0, 1.0),
+        },
+        (0.5, 5.5),
+        Some(7.0 / 11.0)
+    )
+}
+
+#[test]
+fn test_collide_aabox_aabox_pass_tight() {
+    assert_collide!(
+        AABox {
+            pos: Vec2::new(6.0, 3.0),
+            size: Vec2::new(1.0, 4.0),
+        },
+        AABox {
+            pos: Vec2::new(1.0, 1.0),
+            size: Vec2::new(4.0, 2.0),
+        },
+        (-2.0, -15.0),
+        None
+    )
+}
+
+#[test]
+fn test_collide_aabox_aabox_konverge() {
+    assert_collide!(
+        AABox {
+            pos: Vec2::new(1.0, 2.0),
+            size: Vec2::new(6.0, 2.0),
+        },
+        AABox {
+            pos: Vec2::new(3.0, 6.0),
+            size: Vec2::new(1.0, 1.0),
+        },
+        (-0.05, 1.95),
+        None
+    )
+}

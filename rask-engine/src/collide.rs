@@ -146,25 +146,76 @@ impl_collide!(for {Vec2, AABox}
 
 impl_collide!(for {AABox}
     fn collide_after(&self, other: &Self, dv: Vec2) -> Option<f32> {
-        let left = || (self.pos.x() + dv.x() - other.pos.x()) / dv.x();
-        let bottom = || (self.pos.y() + dv.y() - other.pos.y()) / dv.y();
-        let right = || (self.pos.x() + self.size.x() + dv.x() - other.pos.x()) / dv.x();
-        let top = || (self.pos.y() + self.size.y() + dv.y() - other.pos.y()) / dv.y();
-        if left_under(self.pos, other.pos + other.size)
-                && left_under(other.pos, self.pos + self.size) {
-            Some(if dv.x() > 0.0 {
-                     if dv.y() > 0.0 {
-                         bottom().min(left())
-                     } else {
-                         top().min(left())
-                     }
-                 } else if dv.y() > 0.0 {
-                     bottom().min(right())
-                 } else {
-                     top().min(right())
-                 })
+        type F = fn(&f32, &f32) -> bool;
+        let lines_col = |a: Vec2, b: Vec2, w: f32, u: f32, v: Vec2, f1: F, f2: F| {
+            let t = (b.x() - a.x()) / v.x();
+            if (0.0..=1.0).contains(&t) {
+                let z = v.y() * (a.x() - b.x()) + v.x() * (b.y() - a.y());
+                let (s1, s2) = (u * v.x() + z, w * v.x());
+                if f1(&s1, &0.0) && f2(&z, &s2) {
+                    Some(1.0 - t)
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        };
+        let lines_col_p = |a: Vec2, b: Vec2, w: f32, u: f32, v: Vec2| {
+            lines_col(a, b, w, u, v, PartialOrd::ge, PartialOrd::le)
+        };
+        let lines_col_n = |a: Vec2, b: Vec2, w: f32, u: f32, v: Vec2| {
+            lines_col(a, b, w, u, v, PartialOrd::le, PartialOrd::ge)
+        };
+        let rev = |v: Vec2| Vec2::new(v.y(), v.x());
+        let left = || {
+            lines_col_p(
+                self.pos + Vec2::new(self.size.x(), 0.0),
+                other.pos,
+                self.size.y(),
+                other.size.y(),
+                dv,
+            )
+        };
+        let right = || {
+            lines_col_n(
+                self.pos,
+                other.pos + Vec2::new(other.size.x(), 0.0),
+                self.size.y(),
+                other.size.y(),
+                dv,
+            )
+        };
+        let bottom = || {
+            lines_col_p(
+                rev(self.pos + Vec2::new(0.0, self.size.y())),
+                rev(other.pos),
+                self.size.x(),
+                other.size.x(),
+                rev(dv),
+            )
+        };
+        let top = || {
+            lines_col_n(
+                rev(self.pos),
+                rev(other.pos + Vec2::new(0.0, other.size.y())),
+                self.size.x(),
+                other.size.x(),
+                rev(dv),
+            )
+        };
+        if dv.x() >= 0.0 {
+            if dv.y() >= 0.0 {
+                left().or_else(bottom)
+            } else {
+                left().or_else(top)
+            }
         } else {
-            None
+            if dv.y() >= 0.0 {
+                right().or_else(bottom)
+            } else {
+                right().or_else(top)
+            }
         }
     }
 );
