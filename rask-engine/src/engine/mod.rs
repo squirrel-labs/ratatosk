@@ -50,8 +50,10 @@ impl GameEngine for RaskEngine {
         let mut tick_dispatcher = DispatcherBuilder::new()
             .with_pool(pool)
             .with(EventSystem, "events", &[])
-            .with(Movement, "movement", &[])
-            .with(GravitationSystem, "gravitation", &["events"])
+            .with(CheckPresentSystem, "check_present", &["events"])
+            .with(UpdateAnimationSystem, "update_anim", &["check_present"])
+            .with(MovementSystem, "movement", &["events"])
+            .with(GravitationSystem, "gravitation", &["movement"])
             .with(VelocitySystem, "velocity", &["gravitation"])
             .with_thread_local(RenderSystem)
             .build();

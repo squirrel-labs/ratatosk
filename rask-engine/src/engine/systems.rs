@@ -15,7 +15,9 @@ pub struct EventSystem;
 pub struct VelocitySystem;
 pub struct GravitationSystem;
 pub struct RenderSystem;
-pub struct Movement;
+pub struct MovementSystem;
+pub struct CheckPresentSystem;
+pub struct UpdateAnimationSystem;
 
 impl<'a> System<'a> for VelocitySystem {
     type SystemData = (
@@ -46,12 +48,41 @@ impl<'a> System<'a> for GravitationSystem {
     }
 }
 
+impl<'a> System<'a> for UpdateAnimationSystem {
+    type SystemData = (
+        WriteStorage<'a, Animation>,
+        ReadStorage<'a, Present>,
+        Read<'a, ElapsedTime>,
+    );
+
+    fn run(&mut self, (mut animations, present, elapsed): Self::SystemData) {
+        let res = &mut *resources::RESOURCE_TABLE.write();
+        for (mut animation, _) in (&mut animations, &present).join() {
+            let cha: Result<&mut Box<resources::Character>, EngineError> =
+                res.get_mut(animation.id as usize);
+            if let Ok(cha) = cha {
+                if cha.animation_name() != animation.animation {
+                    cha.set_animation(
+                        animation.animation.as_str(),
+                        elapsed.0.as_secs_f32() - animation.start,
+                        0.0,
+                        0.2,
+                    )
+                    .unwrap();
+                    animation.start = elapsed.0.as_secs_f32();
+                }
+            }
+        }
+    }
+}
+
 impl<'a> System<'a> for RenderSystem {
     type SystemData = (
         ReadStorage<'a, Pos>,
         ReadStorage<'a, Sprite>,
-        WriteStorage<'a, Animation>,
+        ReadStorage<'a, Animation>,
         ReadStorage<'a, Scale>,
+        ReadStorage<'a, Present>,
         Read<'a, ElapsedTime>,
         Write<'a, SystemApi>,
         Write<'a, TextureIds>,
@@ -59,49 +90,35 @@ impl<'a> System<'a> for RenderSystem {
 
     fn run(
         &mut self,
-        (pos, sprite, mut anim, scale, elapsed, mut sys, mut tex_ids): Self::SystemData,
+        (pos, sprite, anim, scale, present, elapsed, mut sys, mut tex_ids): Self::SystemData,
     ) {
         let mut sprites = Vec::new();
-        let res = &mut *resources::RESOURCE_TABLE.write();
-        for (pos, sprite, scale) in (&pos, &sprite, &scale).join() {
-            if res.resource_present(sprite.id as usize) {
-                sprites.push(resources::Sprite::new(
-                    Mat3::translation(pos.0.x(), pos.0.y())
-                        * Mat3::scaling(scale.scale_x, scale.scale_y),
-                    sprite.id,
-                    0,
-                ))
-            }
+        for (pos, sprite, scale, _) in (&pos, &sprite, &scale, &present).join() {
+            sprites.push(resources::Sprite::new(
+                Mat3::translation(pos.0.x(), pos.0.y())
+                    * Mat3::scaling(scale.scale_x, scale.scale_y),
+                sprite.id,
+                0,
+            ))
         }
-        for (pos, anim, scale) in (&pos, &mut anim, &scale).join() {
-            if res.resource_present(anim.id as usize) {
+        let res = &*resources::RESOURCE_TABLE.read();
+        for (pos, anim, scale, _) in (&pos, &anim, &scale, &present).join() {
+            let cha: Result<&Box<resources::Character>, EngineError> = res.get(anim.id as usize);
+            if let Ok(cha) = cha {
                 let trans = Mat3::translation(pos.0.x(), pos.0.y());
                 let scale = Mat3::scaling(scale.scale_x, scale.scale_y);
-                let cha: Result<&mut Box<resources::Character>, EngineError> =
-                    res.get_mut(anim.id as usize);
-                let cha = cha.unwrap().as_mut();
 
-                //todo factor out into own subsystem
-                if cha.animation_name() != anim.animation {
-                    cha.set_animation(
-                        anim.animation.as_str(),
-                        elapsed.0.as_secs_f32() - anim.start,
-                        0.0,
-                        0.2,
-                    )
-                    .unwrap();
-                    anim.start = elapsed.0.as_secs_f32();
-                }
-
-                if let Ok(sps) = cha.interpolate(elapsed.0.as_secs_f32() - anim.start) {
-                    for sp in sps {
-                        let sp = sp.unwrap();
-                        sprites.push(resources::Sprite::new(
-                            trans * scale * sp.transform,
-                            anim.id,
-                            sp.att_id,
-                        ))
+                match cha.interpolate(elapsed.0.as_secs_f32() - anim.start) {
+                    Ok(sps) => {
+                        for sp in sps.flatten() {
+                            sprites.push(resources::Sprite::new(
+                                trans * scale * sp.transform,
+                                anim.id,
+                                sp.att_id,
+                            ))
+                        }
                     }
+                    Err(e) => log::error!("{}", e),
                 }
             }
         }
@@ -119,7 +136,7 @@ impl<'a> System<'a> for RenderSystem {
     }
 }
 
-impl<'a> System<'a> for Movement {
+impl<'a> System<'a> for MovementSystem {
     type SystemData = (
         WriteStorage<'a, Animation>,
         WriteStorage<'a, Pos>,
@@ -141,6 +158,36 @@ impl<'a> System<'a> for Movement {
             } else {
                 "standing".to_owned()
             };
+        }
+    }
+}
+
+impl<'a> System<'a> for CheckPresentSystem {
+    type SystemData = (
+        ReadStorage<'a, Animation>,
+        ReadStorage<'a, Sprite>,
+        Entities<'a>,
+        WriteStorage<'a, Present>,
+    );
+
+    fn run(&mut self, (anim, sprite, entities, mut present): Self::SystemData) {
+        let res = &*resources::RESOURCE_TABLE.read();
+
+        let mut modified = Vec::new();
+        for (sprite, entity, _) in (&sprite, &entities, !&present).join() {
+            if res.resource_present(sprite.id as usize) {
+                modified.push(entity);
+            }
+        }
+        for (anim, entity, _) in (&anim, &entities, !&present).join() {
+            if res.resource_present(anim.id as usize) {
+                modified.push(entity);
+            }
+        }
+        for item in modified {
+            let _ = present
+                .insert(item, Present)
+                .map_err(|e| log::debug!("{}", e));
         }
     }
 }

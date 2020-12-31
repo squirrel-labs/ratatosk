@@ -62,6 +62,10 @@ pub struct Sprite {
 #[storage(NullStorage)]
 pub struct Static;
 
+#[derive(Debug, Default, Clone, Copy, Component)]
+#[storage(NullStorage)]
+pub struct Present;
+
 #[derive(Debug, Clone, Copy, Component)]
 #[storage(VecStorage)]
 pub struct Resource(pub ResourceInfo);
