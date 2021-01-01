@@ -336,14 +336,233 @@ fn test_collide_dot_rbox_equivalent_rboxes() {
 
 #[test]
 fn test_collide_dot_rbox_pass_through() {
+    let rbox = RBox {
+        pos: Vec2::new(1.0, 5.0),
+        v1: Vec2::new(4.0, 1.0),
+        v2: Vec2::new(1.0, -4.0),
+    };
+    assert_collide!(Vec2::new(6.0, 5.0), rbox, (-4.0, 1.0), Some(0.8));
+    assert_collide!(Vec2::new(0.0, 2.0), rbox, (6.0, 4.0), Some(3.0 / 4.0))
+}
+
+#[test]
+fn test_collide_dot_rbox_orthogonal() {
     assert_collide!(
-        Vec2::new(6.0, 5.0),
+        Vec2::new(1.0, 0.0),
+        RBox {
+            pos: Vec2::new(3.0, 0.0),
+            v1: Vec2::new(-2.0, 3.0),
+            v2: Vec2::new(6.0, 4.0),
+        },
+        (3.0, 2.0),
+        Some(7.0 / 13.0)
+    )
+}
+
+#[test]
+fn test_collide_dot_rbox_miss() {
+    for &(sx, sy, vx, vy) in &[
+        (1.0, 0.5, 3.0, 0.0),
+        (4.0, -1.0, 2.0, 4.0),
+        (6.0, 7.0, -0.5, -2.0),
+        (1.0, 2.0, 4.0, 4.0),
+    ] {
+        assert_collide!(
+            Vec2::new(sx, sy),
+            RBox {
+                pos: Vec2::new(3.0, 1.0),
+                v1: Vec2::new(-1.0, 1.0),
+                v2: Vec2::new(3.0, 3.0),
+            },
+            (vx, vy),
+            None
+        )
+    }
+}
+
+#[test]
+fn test_collide_aabox_rbox_simple() {
+    assert_collide!(
+        AABox {
+            pos: Vec2::new(1.0, 1.0),
+            size: Vec2::new(2.0, 2.0),
+        },
+        RBox {
+            pos: Vec2::new(5.0, 3.0),
+            v1: Vec2::new(-2.0, 2.0),
+            v2: Vec2::new(3.0, 3.0),
+        },
+        (3.0, 3.0),
+        Some(2.0 / 3.0)
+    )
+}
+
+#[test]
+fn test_collide_aabox_rbox_right_up() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(1.5, -1.0),
+            v1: Vec2::new(1.5, 3.0),
+            v2: Vec2::new(2.0, -1.0),
+        },
+        AABox {
+            pos: Vec2::new(4.0, 3.0),
+            size: Vec2::new(5.0, 3.0),
+        },
+        (2.0, 3.0),
+        Some(5.0 / 8.0)
+    )
+}
+
+#[test]
+fn test_collide_aabox_rbox_up() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(6.75, -1.0),
+            v1: Vec2::new(-4.0, -1.0),
+            v2: Vec2::new(-0.75, 3.0),
+        },
+        AABox {
+            pos: Vec2::new(4.0, 3.0),
+            size: Vec2::new(5.0, 3.0),
+        },
+        (-3.0, 2.0),
+        Some(0.5)
+    )
+}
+
+#[test]
+fn test_collide_aabox_rbox_left_up() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(8.0, 0.0),
+            v1: Vec2::new(6.0, 7.0),
+            v2: Vec2::new(3.5, -3.0),
+        },
+        AABox {
+            pos: Vec2::new(4.0, 3.0),
+            size: Vec2::new(5.0, 3.0),
+        },
+        (-4.0, -1.0),
+        Some(0.5)
+    )
+}
+
+#[test]
+fn test_collide_aabox_rbox_left() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(12.0, 9.0),
+            v1: Vec2::new(-1.0, 1.0),
+            v2: Vec2::new(1.0, 1.0),
+        },
+        AABox {
+            pos: Vec2::new(4.0, 3.0),
+            size: Vec2::new(5.0, 3.0),
+        },
+        (-5.0, -7.0),
+        Some(0.5)
+    )
+}
+
+#[test]
+fn test_collide_aabox_rbox_left_down() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(3.0, 8.0),
+            v1: Vec2::new(0.5, 3.5),
+            v2: Vec2::new(7.0, -1.0),
+        },
+        AABox {
+            pos: Vec2::new(4.0, 3.0),
+            size: Vec2::new(5.0, 3.0),
+        },
+        (-1.0, -2.0),
+        Some(7.0 / 15.0)
+    )
+}
+
+#[test]
+fn test_collide_aabox_rbox_down() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(3.0, 8.0),
+            v1: Vec2::new(0.5, 3.5),
+            v2: Vec2::new(7.0, -1.0),
+        },
+        AABox {
+            pos: Vec2::new(4.0, 3.0),
+            size: Vec2::new(5.0, 3.0),
+        },
+        (-7.0, -3.5),
+        Some(5.0 / 7.0)
+    )
+}
+
+#[test]
+fn test_collide_aabox_rbox_right_down() {
+    assert_collide!(
         RBox {
             pos: Vec2::new(1.0, 5.0),
-            v1: Vec2::new(4.0, 1.0),
-            v2: Vec2::new(1.0, -4.0),
+            v1: Vec2::new(1.0, 3.0),
+            v2: Vec2::new(3.0, -1.0),
         },
-        (-4.0, 1.0),
-        Some(0.8)
+        AABox {
+            pos: Vec2::new(6.0, 1.0),
+            size: Vec2::new(5.0, 3.0),
+        },
+        (5.0, -3.0),
+        Some(2.0 / 3.0)
+    )
+}
+
+#[test]
+fn test_collide_aabox_rbox_right() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(1.0, 5.0),
+            v1: Vec2::new(1.0, 3.0),
+            v2: Vec2::new(3.0, -1.0),
+        },
+        AABox {
+            pos: Vec2::new(6.0, 1.0),
+            size: Vec2::new(5.0, 3.0),
+        },
+        (1.5, -5.5),
+        Some(1.0 / 3.0)
+    )
+}
+
+#[test]
+fn test_collide_aabox_rbox_parallel_pass() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(2.0, 6.0),
+            v1: Vec2::new(1.0, 3.0),
+            v2: Vec2::new(3.0, -1.0),
+        },
+        AABox {
+            pos: Vec2::new(6.0, 1.0),
+            size: Vec2::new(5.0, 3.0),
+        },
+        (11.0, 0.0),
+        None
+    )
+}
+
+#[test]
+fn test_collide_aabox_rbox_corner_approach() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(13.0, 6.0),
+            v1: Vec2::new(-3.0, 4.0),
+            v2: Vec2::new(4.0, 3.0),
+        },
+        AABox {
+            pos: Vec2::new(6.0, 1.0),
+            size: Vec2::new(5.0, 3.0),
+        },
+        (-1.0, -3.0),
+        None
     )
 }

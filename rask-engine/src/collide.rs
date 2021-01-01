@@ -195,18 +195,21 @@ impl_collide!(for {AABox}
     }
 );
 
+fn line_intersect(a: Vec2, v: Vec2, b: Vec2, w: Vec2) -> Option<f32> {
+    let t = (w.x() * (b.y() - a.y() - v.y()) + w.y() * (v.x() + a.x() - b.x()))
+        / (v.x() * w.y() - v.y() * w.x());
+    let k = a.x() - b.x() + v.x() * (1.0 - t);
+    if (0.0..=1.0).contains(&t) && ((0.0..=w.x()).contains(&k) || (w.x()..=0.0).contains(&k)) {
+        Some(t)
+    } else {
+        None
+    }
+}
+
 impl_collide!(for {Vec2, RBox}
     fn collide_after(&self, other: &RBox, dv: Vec2) -> Option<f32> {
         let rbox = other.as_normal_form();
-        let col_lines = |b: Vec2, w: Vec2| {
-            let t = (w.x() * (b.y() - self.y() - dv.y()) + w.y() * (dv.x() + self.x() - b.x()))
-                / (dv.x() * w.y() - dv.y() * w.x());
-            if (0.0..=1.0).contains(&t) && (0.0..=1.0).contains(&((self.x() - b.x() + dv.x() * (1.0 - t)) / w.x())) {
-                Some(t)
-            } else {
-                None
-            }
-        };
+        let col_lines = |b, w| line_intersect(*self, dv, b, w);
         let left = || col_lines(rbox.pos, rbox.v1);
         let right = || col_lines(rbox.pos + rbox.v2, rbox.v1);
         let top = || col_lines(rbox.pos + rbox.v1, rbox.v2);
@@ -223,77 +226,76 @@ impl_collide!(for {Vec2, RBox}
 impl_collide!(for {RBox, AABox}
     fn collide_after(&self, other: &AABox, dv: Vec2) -> Option<f32> {
         let rbox = self.as_normal_form();
-        let [left, right, top, bottom] = [
-            rbox.pos + rbox.v1,
-            rbox.pos + rbox.v2,
-            rbox.pos + rbox.v1 + rbox.v2,
-            rbox.pos,
-        ];
+        let (w, h) = (
+            other.pos + Vec2::new(other.size.x(), 0.0),
+            other.pos + Vec2::new(0.0, other.size.y()),
+        );
+
+        if rbox.v1.x() == 0.0 {
+            return AABox {
+                pos: rbox.pos,
+                size: Vec2::new(rbox.v2.x(), rbox.v1.y()),
+            }
+            .collide_after(other, dv);
+        }
 
         // corner of rbox moves into edge of aabox:
         // ----------------------------------------
 
-        let (x, y) = (dv.x(), dv.y());
-
-        let edges = if dv.x() >= 0.0 {
-            if dv.y() >= 0.0 {
-                [(right.x(), other.pos.x(), x), (top.y(), other.pos.y(), y)]
-            } else {
-                [
-                    (right.x(), other.pos.x(), x),
-                    (bottom.y(), other.pos.y() + other.size.y(), y),
-                ]
-            }
-        } else if dv.y() >= 0.0 {
-            [
-                (left.x(), other.pos.x() + other.size.x(), x),
-                (top.y(), other.pos.y(), y),
-            ]
-        } else {
-            [
-                (left.x(), other.pos.x() + other.size.x(), x),
-                (bottom.y(), other.pos.y() + other.size.y(), y),
-            ]
-        };
-        let mut ts = edges.iter().filter_map(|(start, end, delta)| {
-            let t = 1.0 + (start - end) / delta;
-            if (0.0..=1.0).contains(&t) {
-                Some(t)
+        let line_col = |a: Vec2, v: Vec2, p: Vec2, w| {
+            let t = (p.x() - a.x()) / v.x();
+            //println!("  a={:?}, p={:?}, v={:?}, w={:?}, t={:?}", a, p, v, w, 1.0-t);
+            if (0.0..=1.0).contains(&t) && (0.0..=w).contains(&(a.y() - p.y() + v.y() * t)) {
+                Some(1.0 - t)
             } else {
                 None
             }
-        });
-        let mut t_min = ts
-            .next()
-            .map(|t1| ts.next().filter(|t2| t2 < &t1).unwrap_or(t1));
+        };
+        let rev = |v: Vec2| Vec2::new(v.y(), v.x());
+        let left = || line_col(rbox.pos + rbox.v2, dv, other.pos, other.size.y());
+        let right = || line_col(rbox.pos + rbox.v1, dv, w, other.size.y());
+        let bottom = || {
+            line_col(
+                rev(rbox.pos + rbox.v1 + rbox.v2),
+                rev(dv),
+                rev(other.pos),
+                other.size.x(),
+            )
+        };
+        let top = || line_col(rev(rbox.pos), rev(dv), rev(h), other.size.x());
+        let mut t = if dv.x() >= 0.0 {
+            if dv.y() >= 0.0 {
+                left().or_else(bottom)
+            } else {
+                left().or_else(top)
+            }
+        } else {
+            if dv.y() >= 0.0 {
+                right().or_else(bottom)
+            } else {
+                right().or_else(top)
+            }
+        };
 
         // edge of rbox moves into corner of aabox:
         // ----------------------------------------
 
-        let vdotvn = (dv.dot(rbox.v1), dv.dot(rbox.v2));
-        for &(start, end, vn, dot) in &[
-            (
-                right,
-                other.pos + Vec2::new(0.0, other.size.y()),
-                rbox.v1,
-                vdotvn.0,
-            ),
-            (right, other.pos, rbox.v2, vdotvn.1),
-            (left, other.pos + other.size, rbox.v2, vdotvn.1),
-            (
-                left,
-                other.pos + Vec2::new(other.size.x(), 0.0),
-                rbox.v1,
-                vdotvn.0,
-            ),
+        for &(a, b, w) in &[
+            (other.pos + other.size, rbox.pos, rbox.v1),
+            (h, rbox.pos, rbox.v2),
+            (other.pos, rbox.pos + rbox.v2, rbox.v1),
+            (w, rbox.pos + rbox.v1, rbox.v2),
         ] {
-            let t = (start - end).dot(vn) / dot;
-            if (0.0..=1.0).contains(&t) && t < t_min.unwrap_or(1.0) {
-                t_min = Some(t)
+            let t_ = line_intersect(a, -dv, b, w);
+            println!("a={:?} b={:?} w={:?} t={:?} v={:?}", a, b, w, t_, -dv);
+            if let Some(t_) = t_ {
+                if !t.filter(|t| t > &t_).is_some() {
+                    t = Some(t_)
+                }
             }
         }
 
-        t_min
+        t
     }
 );
 
