@@ -91,7 +91,6 @@ impl_collide!(for {Vec2, AABox}
         // and another line starting at p with the vector (0, w).
         let line_col = |a: Vec2, v: Vec2, p: Vec2, w| {
             let t = (p.x() - a.x()) / v.x();
-            //println!("  a={:?}, p={:?}, v={:?}, w={:?}, t={:?}", a, p, v, w, 1.0-t);
             if (0.0..=1.0).contains(&t) && (0.0..=w).contains(&(a.y() - p.y() + v.y() * t)) {
                 Some(1.0 - t)
             } else {
@@ -244,7 +243,6 @@ impl_collide!(for {RBox, AABox}
 
         let line_col = |a: Vec2, v: Vec2, p: Vec2, w| {
             let t = (p.x() - a.x()) / v.x();
-            //println!("  a={:?}, p={:?}, v={:?}, w={:?}, t={:?}", a, p, v, w, 1.0-t);
             if (0.0..=1.0).contains(&t) && (0.0..=w).contains(&(a.y() - p.y() + v.y() * t)) {
                 Some(1.0 - t)
             } else {
@@ -287,7 +285,6 @@ impl_collide!(for {RBox, AABox}
             (w, rbox.pos + rbox.v1, rbox.v2),
         ] {
             let t_ = line_intersect(a, -dv, b, w);
-            println!("a={:?} b={:?} w={:?} t={:?} v={:?}", a, b, w, t_, -dv);
             if let Some(t_) = t_ {
                 if !t.filter(|t| t > &t_).is_some() {
                     t = Some(t_)
@@ -320,13 +317,15 @@ fn collide_rbox_rbox_helper(b1: &RBox, b2: &RBox, dv: Vec2) -> Option<f32> {
     } else {
         [(bottom2, b2.v1), (bottom2, b2.v2)]
     };
-    let mut t = None;
-    for p in &[left1, right1, top1, bottom1] {
-        for (start, v) in &lines {
-            let t_ = (v.y() * (start.x() - p.x()) + v.x() * (p.y() - start.y()))
-                / (dv.dot(Vec2::new(v.y(), v.x())));
-            if (0.0..=1.0).contains(&t_) && t.map(|t| t_ > t).unwrap_or(true) {
-                t = Some(t_)
+    let mut t: Option<f32> = None;
+    for &p in &[left1, right1, top1, bottom1] {
+        for &(start, v) in &lines {
+            println!("{:?} {:?} {:?} {:?}", p, dv, start, v);
+            if let Some(t_) = line_intersect(p, dv, start, v) {
+                println!(" -> {:?}", t_);
+                if !Option::filter(t, |t| t > &t_).is_some() {
+                    t = Some(t_)
+                }
             }
         }
     }
@@ -338,6 +337,6 @@ impl_collide!(for {RBox}
         let b1 = self.as_normal_form();
         let b2 = other.as_normal_form();
         let t = collide_rbox_rbox_helper(&b1, &b2, dv);
-        collide_rbox_rbox_helper(&b2, &b1, dv).and_then(|t1| t.filter(|t2| t2 > &t1)).or(t)
+        collide_rbox_rbox_helper(&b2, &b1, -dv).map(|t1| t.map(|t2| f32::max(t1, t2)).unwrap_or(t1)).or(t)
     }
 );

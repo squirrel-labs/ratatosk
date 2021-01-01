@@ -566,3 +566,57 @@ fn test_collide_aabox_rbox_corner_approach() {
         None
     )
 }
+
+#[test]
+fn test_collide_rbox_rbox_simple() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(0.0, 2.0),
+            v1: Vec2::new(1.0, 3.0),
+            v2: Vec2::new(3.0, -1.0),
+        },
+        RBox {
+            pos: Vec2::new(8.0, 1.0),
+            v1: Vec2::new(-3.0, 4.0),
+            v2: Vec2::new(4.0, 3.0),
+        },
+        (5.0, -2.0),
+        Some(0.5)
+    )
+}
+
+#[test]
+fn test_collide_rbox_rbox_tight_angle() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(0.0, 2.0),
+            v1: Vec2::new(1.0, 3.0),
+            v2: Vec2::new(3.0, -1.0),
+        },
+        RBox {
+            pos: Vec2::new(8.0, 1.0),
+            v1: Vec2::new(-3.0, 4.0),
+            v2: Vec2::new(4.0, 3.0),
+        },
+        (6.0, 7.0),
+        Some(9.0 / 11.0)
+    )
+}
+
+#[test]
+fn test_collide_rbox_rbox_parralel_approach() {
+    assert_collide!(
+        RBox {
+            pos: Vec2::new(2.0, 2.0),
+            v1: Vec2::new(1.0, 3.0),
+            v2: Vec2::new(3.0, -1.0),
+        },
+        RBox {
+            pos: Vec2::new(6.0, 2.0),
+            v1: Vec2::new(2.0, 6.0),
+            v2: Vec2::new(3.0, -1.0),
+        },
+        (2.0, 2.0),
+        Some(0.5)
+    )
+}
