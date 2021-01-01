@@ -37,6 +37,9 @@ impl Collide for Collidable {
     }
 }
 
+// Given a fraction of the dv vectors length,
+// return the amount to set the objects back
+// in case of a collision
 fn in_range(t: f32) -> Option<f32> {
     if (0.0..=1.0).contains(&t) {
         Some(1.0 - t)
@@ -91,30 +94,17 @@ impl_collide!(for {Vec2, AABox}
         // and another line starting at p with the vector (0, w).
         let line_col = |a: Vec2, v: Vec2, p: Vec2, w| {
             let t = (p.x() - a.x()) / v.x();
-            if (0.0..=1.0).contains(&t) && (0.0..=w).contains(&(a.y() - p.y() + v.y() * t)) {
-                Some(1.0 - t)
-            } else {
-                None
-            }
+            if (0.0..=w).contains(&(a.y() - p.y() + v.y() * t)) {
+                in_range(t)
+            } else{ None }
         };
         let rev = |v: Vec2| Vec2::new(v.y(), v.x());
         let left = || line_col(*self, dv, other.pos, other.size.y());
         let right = || line_col(*self, dv, other.pos + Vec2::new(other.size.x(), 0.0), other.size.y());
         let bottom = || line_col(rev(*self), rev(dv), rev(other.pos), other.size.x());
         let top = || line_col(rev(*self), rev(dv), rev(other.pos + Vec2::new(0.0, other.size.y())), other.size.x());
-        if dv.x() >= 0.0 {
-            if dv.y() >= 0.0 {
-                left().or_else(bottom)
-            } else {
-                left().or_else(top)
-            }
-        } else {
-            if dv.y() >= 0.0 {
-                right().or_else(bottom)
-            } else {
-                right().or_else(top)
-            }
-        }
+        (if dv.x() >= 0.0 { left() } else { right() })
+            .or_else(|| if dv.y() >= 0.0 { bottom() } else { top() })
     }
 );
 
@@ -122,15 +112,11 @@ impl_collide!(for {AABox}
     fn collide_after(&self, other: &Self, dv: Vec2) -> Option<f32> {
         type F = fn(&f32, &f32) -> bool;
         let lines_col = |a: Vec2, b: Vec2, w: f32, u: f32, v: Vec2, f1: F, f2: F| {
-            let t = (b.x() - a.x()) / v.x();
-            if (0.0..=1.0).contains(&t) {
-                let z = v.y() * (a.x() - b.x()) + v.x() * (b.y() - a.y());
-                let (s1, s2) = (u * v.x() + z, w * v.x());
-                if f1(&s1, &0.0) && f2(&z, &s2) {
-                    Some(1.0 - t)
-                } else {
-                    None
-                }
+            let z = v.y() * (a.x() - b.x()) + v.x() * (b.y() - a.y());
+            let (s1, s2) = (u * v.x() + z, w * v.x());
+            if f1(&s1, &0.0) && f2(&z, &s2) {
+                let t = (b.x() - a.x()) / v.x();
+                in_range(t)
             } else {
                 None
             }
@@ -178,28 +164,18 @@ impl_collide!(for {AABox}
                 rev(dv),
             )
         };
-        if dv.x() >= 0.0 {
-            if dv.y() >= 0.0 {
-                left().or_else(bottom)
-            } else {
-                left().or_else(top)
-            }
-        } else {
-            if dv.y() >= 0.0 {
-                right().or_else(bottom)
-            } else {
-                right().or_else(top)
-            }
-        }
+        (if dv.x() >= 0.0 { left() } else { right() })
+            .or_else(|| if dv.y() >= 0.0 { bottom() } else { top() })
     }
 );
 
 fn line_intersect(a: Vec2, v: Vec2, b: Vec2, w: Vec2) -> Option<f32> {
-    let t = (w.x() * (b.y() - a.y() - v.y()) + w.y() * (v.x() + a.x() - b.x()))
-        / (v.x() * w.y() - v.y() * w.x());
-    let k = a.x() - b.x() + v.x() * (1.0 - t);
-    if (0.0..=1.0).contains(&t) && ((0.0..=w.x()).contains(&k) || (w.x()..=0.0).contains(&k)) {
-        Some(t)
+    let t = 1.0
+        - (w.x() * (b.y() - a.y() - v.y()) + w.y() * (v.x() + a.x() - b.x()))
+            / (v.x() * w.y() - v.y() * w.x());
+    let k = a.x() - b.x() + v.x() * t;
+    if (0.0..=w.x()).contains(&k) || (w.x()..=0.0).contains(&k) {
+        in_range(t)
     } else {
         None
     }
@@ -209,16 +185,13 @@ impl_collide!(for {Vec2, RBox}
     fn collide_after(&self, other: &RBox, dv: Vec2) -> Option<f32> {
         let rbox = other.as_normal_form();
         let col_lines = |b, w| line_intersect(*self, dv, b, w);
+
         let left = || col_lines(rbox.pos, rbox.v1);
         let right = || col_lines(rbox.pos + rbox.v2, rbox.v1);
         let top = || col_lines(rbox.pos + rbox.v1, rbox.v2);
         let bottom = || col_lines(rbox.pos, rbox.v2);
-        match (dv.dot(rbox.v2) >= 0.0, dv.dot(rbox.v1) >= 0.0) {
-            (true, true) => left().or_else(bottom),
-            (true, false) => left().or_else(top),
-            (false, true) => right().or_else(bottom),
-            (false, false) => right().or_else(top),
-        }
+        (if dv.dot(rbox.v2) >= 0.0 { left() } else { right() })
+            .or_else(|| if dv.dot(rbox.v1) >= 0.0 { bottom() } else { top() })
     }
 );
 
@@ -261,19 +234,8 @@ impl_collide!(for {RBox, AABox}
             )
         };
         let top = || line_col(rev(rbox.pos), rev(dv), rev(h), other.size.x());
-        let mut t = if dv.x() >= 0.0 {
-            if dv.y() >= 0.0 {
-                left().or_else(bottom)
-            } else {
-                left().or_else(top)
-            }
-        } else {
-            if dv.y() >= 0.0 {
-                right().or_else(bottom)
-            } else {
-                right().or_else(top)
-            }
-        };
+        let mut t = (if dv.x() >= 0.0 { left() } else { right() })
+            .or_else(|| if dv.y() >= 0.0 { bottom() } else { top() });
 
         // edge of rbox moves into corner of aabox:
         // ----------------------------------------
@@ -286,7 +248,7 @@ impl_collide!(for {RBox, AABox}
         ] {
             let t_ = line_intersect(a, -dv, b, w);
             if let Some(t_) = t_ {
-                if !t.filter(|t| t > &t_).is_some() {
+                if t.filter(|t| t > &t_).is_none() {
                     t = Some(t_)
                 }
             }

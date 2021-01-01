@@ -132,3 +132,25 @@ fn test_sub_assign_rbox_vec2() {
 
     assert_eq!(aa_box, bb_box);
 }
+
+#[test]
+fn test_normalize_rbox() {
+    let a = Vec2::new(1.0, 7.5);
+    let b = Vec2::new(3.0, -2.5);
+    let c = Vec2::new(-2.5, -3.0);
+    let aa_box = RBox {
+        pos: a,
+        v1: b,
+        v2: c,
+    };
+    let a = Vec2::new(1.5, 2.0);
+    let b = Vec2::new(-3.0, 2.5);
+    let c = Vec2::new(2.5, 3.0);
+    let bb_box = RBox {
+        pos: a,
+        v1: b,
+        v2: c,
+    };
+    let aa_box = aa_box.as_normal_form();
+    assert_eq!(aa_box, bb_box);
+}
