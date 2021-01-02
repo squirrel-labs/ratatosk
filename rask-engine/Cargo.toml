@@ -19,12 +19,13 @@ features = ["png"]
 
 [dependencies.spine_tiny]
 git = "https://github.com/squirrel-labs/spine-rs"
-branch = "develop"
-version = "=0.1.1"
+branch = "transitions"
+version = "=0.1.2"
 
 
 [dependencies]
 log = "0.4"
 rayon = "1.5"
 lazy_static = "1.4.0"
+ouroboros = "0.5"
 spin = {version = "0.5", optional = false}

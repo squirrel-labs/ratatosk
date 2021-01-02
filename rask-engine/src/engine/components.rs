@@ -36,22 +36,32 @@ pub struct Pos(pub Vec2);
 
 #[derive(Debug, Clone, Component)]
 #[storage(DenseVecStorage)]
+pub struct Speed(pub f32);
+
+#[derive(Debug, Clone, Component)]
+#[storage(DenseVecStorage)]
 pub struct Animation {
     pub id: u32,
     pub animation: String,
+    pub start: f32,
 }
+#[derive(Debug, Clone, Component)]
+#[storage(VecStorage)]
+pub struct Scale(pub Vec2);
 
 #[derive(Debug, Clone, Component)]
 #[storage(VecStorage)]
 pub struct Sprite {
     pub id: u32,
-    pub scale_x: f32,
-    pub scale_y: f32,
 }
 
 #[derive(Debug, Default, Clone, Copy, Component)]
 #[storage(NullStorage)]
 pub struct Static;
+
+#[derive(Debug, Default, Clone, Copy, Component)]
+#[storage(NullStorage)]
+pub struct Present;
 
 #[derive(Debug, Clone, Copy, Component)]
 #[storage(VecStorage)]

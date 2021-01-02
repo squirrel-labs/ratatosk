@@ -26,6 +26,24 @@ macro_rules! get_store {
                 }
             }
 
+            fn get_mut<U: Into<usize> + Debug + Copy>(
+                &mut self,
+                id: U,
+            ) -> Result<&mut $type, EngineError> {
+                self.index_check(id.into())?;
+                match &mut self.0[id.into()] {
+                    Resource::$enum_type(ref mut value) => Ok(value),
+                    Resource::None => Err(EngineError::ResourceMissing(format!(
+                        "Could not find requested resource #{}",
+                        id.into(),
+                    ))),
+                    _ => Err(EngineError::ResourceType(format!(
+                        "Wrong resource type, required \"{}\"",
+                        stringify!($type),
+                    ))),
+                }
+            }
+
             fn store(&mut self, data: $type, id: usize) -> Result<(), EngineError> {
                 self.index_check(id)?;
                 Ok(self.0[id] = Resource::$enum_type(data))
@@ -37,6 +55,7 @@ macro_rules! get_store {
 pub trait GetStore<T> {
     /// Retrieve a resource from the library.
     fn get<U: Into<usize> + Debug + Copy>(&self, id: U) -> Result<&T, EngineError>;
+    fn get_mut<U: Into<usize> + Debug + Copy>(&mut self, id: U) -> Result<&mut T, EngineError>;
 
     /// Store a resource to the library
     fn store(&mut self, data: T, id: usize) -> Result<(), EngineError>;

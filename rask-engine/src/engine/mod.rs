@@ -50,7 +50,10 @@ impl GameEngine for RaskEngine {
         let mut tick_dispatcher = DispatcherBuilder::new()
             .with_pool(pool)
             .with(EventSystem, "events", &[])
-            .with(GravitationSystem, "gravitation", &["events"])
+            .with(CheckPresentSystem, "check_present", &[]) // does not depend on anything, because resource parsing is handled asynchronously
+            .with(UpdateAnimationSystem, "update_anim", &["check_present"])
+            .with(MovementSystem, "movement", &["events"])
+            .with(GravitationSystem, "gravitation", &["movement"])
             .with(VelocitySystem, "velocity", &["gravitation"])
             .with_thread_local(RenderSystem)
             .build();
@@ -61,18 +64,21 @@ impl GameEngine for RaskEngine {
             .with(Pos(Vec2::new(0.0, 0.0)))
             .with(Sprite {
                 id: registry::EMPTY.id,
-                scale_x: 1.0,
-                scale_y: 1.0,
             })
+            .with(Scale(Vec2::new(1.0, 1.0)))
             .with(Static)
             .build();
         let _char = world
             .create_entity()
             .with(Pos(Vec2::new(0.0, -0.8)))
+            .with(Vel(Vec2::new(0.0, 0.0)))
+            .with(Speed(0.2))
             .with(Animation {
                 id: registry::CHAR.id,
                 animation: "walking".to_string(),
+                start: 0.0,
             })
+            .with(Scale(Vec2::new(1.0, 1.0)))
             .with(Static)
             .build();
         Self {
