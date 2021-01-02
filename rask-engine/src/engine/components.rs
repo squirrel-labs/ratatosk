@@ -64,19 +64,20 @@ pub struct Health {
 
 #[derive(Debug, Clone, Component)]
 pub struct Damaging {
-    pub collider: Collidable,
     pub damage: f32,
 }
 
 #[derive(Debug, Clone, Component)]
 pub struct Vulnerable {
-    pub collider: Collidable,
     pub armor: f32,
 }
 
+#[derive(Debug, Default, Clone, Component)]
+#[storage(NullStorage)]
+pub struct Terrain;
+
 #[derive(Debug, Clone, Component)]
-#[storage(DenseVecStorage)]
-pub struct Terrain(pub Collidable);
+pub struct SubCollider(pub Collidable);
 
 #[derive(Debug, Clone)]
 pub enum HitboxType {
@@ -102,6 +103,7 @@ pub struct Animation {
     pub animation: String,
     pub start: f32,
 }
+
 #[derive(Debug, Clone, Component)]
 #[storage(VecStorage)]
 pub struct Scale(pub Vec2);
@@ -111,6 +113,9 @@ pub struct Scale(pub Vec2);
 pub struct Sprite {
     pub id: u32,
 }
+
+#[derive(Debug, Default, Clone, Copy, Component)]
+pub struct Mass(pub f32);
 
 #[derive(Debug, Default, Clone, Copy, Component)]
 #[storage(NullStorage)]

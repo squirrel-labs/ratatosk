@@ -12,6 +12,7 @@ lazy_static::lazy_static! {
 }
 
 pub struct EventSystem;
+pub struct SimpleVelocitySystem;
 pub struct VelocitySystem;
 pub struct GravitationSystem;
 pub struct RenderSystem;
@@ -19,29 +20,55 @@ pub struct MovementSystem;
 pub struct CheckPresentSystem;
 pub struct UpdateAnimationSystem;
 
+impl<'a> System<'a> for SimpleVelocitySystem {
+    type SystemData = (
+        WriteStorage<'a, Pos>,
+        ReadStorage<'a, Vel>,
+        ReadStorage<'a, Mass>,
+        Read<'a, DeltaTime>,
+    );
+
+    fn run(&mut self, (mut pos, vel, mass, dt): Self::SystemData) {
+        for (vel, pos, _) in (&vel, &mut pos, !&mass).join() {
+            pos.0 += vel.0 * dt.0.as_secs_f32();
+        }
+    }
+}
+
 impl<'a> System<'a> for VelocitySystem {
     type SystemData = (
         WriteStorage<'a, Pos>,
         ReadStorage<'a, Vel>,
+        ReadStorage<'a, Mass>,
+        ReadStorage<'a, Collider>,
+        ReadStorage<'a, Terrain>,
         Read<'a, DeltaTime>,
     );
 
-    fn run(&mut self, (mut pos, vel, dt): Self::SystemData) {
-        for (vel, pos) in (&vel, &mut pos).join() {
+    fn run(&mut self, (mut pos, vel, mass, collider, terrain, dt): Self::SystemData) {
+        for (vel, pos, _) in (&vel, &mut pos, !&mass).join() {
             pos.0 += vel.0 * dt.0.as_secs_f32();
         }
+        (&collider, &vel, !&terrain, &mut pos, &mass)
+            .par_join()
+            .for_each(|(col1, vel, _, pos1, mass)| {
+                for (col2, _, pos2) in (&collider, &terrain, &pos).join() {
+                    // TODO: collision code
+                }
+            })
     }
 }
 
 impl<'a> System<'a> for GravitationSystem {
     type SystemData = (
         WriteStorage<'a, Vel>,
+        ReadStorage<'a, Mass>,
         Read<'a, Gravitation>,
         Read<'a, DeltaTime>,
     );
 
-    fn run(&mut self, (mut vel, g, dt): Self::SystemData) {
-        for vel in (&mut vel).join() {
+    fn run(&mut self, (mut vel, mass, g, dt): Self::SystemData) {
+        for (vel, _) in (&mut vel, &mass).join() {
             vel.0 += g.0 * dt.0.as_secs_f32();
         }
     }
