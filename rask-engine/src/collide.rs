@@ -15,6 +15,7 @@ pub trait Collide<Rhs = Self> {
     fn collide_after(&self, other: &Rhs, dv: Vec2) -> Option<f32>;
 }
 
+#[derive(Debug, Clone)]
 pub enum Collidable {
     Point(Vec2),
     AABox(AABox),

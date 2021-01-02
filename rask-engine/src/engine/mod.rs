@@ -61,14 +61,23 @@ impl GameEngine for RaskEngine {
             .build();
 
         tick_dispatcher.setup(&mut world);
-        let _backround = world
+        let _background = world
             .create_entity()
             .with(Pos(Vec2::new(0.0, 0.0)))
             .with(Sprite {
                 id: registry::EMPTY.id,
             })
             .with(Scale(Vec2::new(1.0, 1.0)))
-            .with(Static)
+            .build();
+        let _ground = world
+            .create_entity()
+            .with(Terrain(
+                crate::boxes::AABox {
+                    pos: Vec2::new(-2.0, -0.85),
+                    size: Vec2::new(4.0, -3.0),
+                }
+                .into(),
+            ))
             .build();
         let _char = world
             .create_entity()
@@ -81,7 +90,6 @@ impl GameEngine for RaskEngine {
                 start: 0.0,
             })
             .with(Scale(Vec2::new(1.0, 1.0)))
-            .with(Static)
             .build();
         Self {
             world,

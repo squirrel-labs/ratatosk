@@ -36,13 +36,12 @@ impl<'a> System<'a> for VelocitySystem {
 impl<'a> System<'a> for GravitationSystem {
     type SystemData = (
         WriteStorage<'a, Vel>,
-        ReadStorage<'a, Static>,
         Read<'a, Gravitation>,
         Read<'a, DeltaTime>,
     );
 
-    fn run(&mut self, (mut vel, is_static, g, dt): Self::SystemData) {
-        for (vel, ()) in (&mut vel, !&is_static).join() {
+    fn run(&mut self, (mut vel, g, dt): Self::SystemData) {
+        for vel in (&mut vel).join() {
             vel.0 += g.0 * dt.0.as_secs_f32();
         }
     }

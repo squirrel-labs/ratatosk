@@ -1,3 +1,4 @@
+use crate::collide::Collidable;
 use crate::io;
 use crate::math::Vec2;
 use crate::resources::{
@@ -6,6 +7,7 @@ use crate::resources::{
 };
 use specs::{prelude::*, Component};
 use specs_hierarchy::Parent as PParent;
+use std::collections::HashMap;
 
 #[derive(Debug, Default)]
 pub struct Gravitation(pub Vec2);
@@ -55,6 +57,45 @@ pub struct Pos(pub Vec2);
 pub struct Speed(pub f32);
 
 #[derive(Debug, Clone, Component)]
+pub struct Health {
+    pub value: u32,
+    pub max_value: u32,
+}
+
+#[derive(Debug, Clone, Component)]
+pub struct Damaging {
+    pub collider: Collidable,
+    pub damage: f32,
+}
+
+#[derive(Debug, Clone, Component)]
+pub struct Vulnerable {
+    pub collider: Collidable,
+    pub armor: f32,
+}
+
+#[derive(Debug, Clone, Component)]
+#[storage(DenseVecStorage)]
+pub struct Terrain(pub Collidable);
+
+#[derive(Debug, Clone)]
+pub enum HitboxType {
+    Damaging,
+    Vulnerable,
+    Repulsion,
+}
+
+#[derive(Debug, Clone)]
+pub struct Collider {
+    pub mapping: HashMap<u32, HitboxType>,
+    pub default: HitboxType,
+}
+
+impl Component for Collider {
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+}
+
+#[derive(Debug, Clone, Component)]
 #[storage(DenseVecStorage)]
 pub struct Animation {
     pub id: u32,
@@ -70,10 +111,6 @@ pub struct Scale(pub Vec2);
 pub struct Sprite {
     pub id: u32,
 }
-
-#[derive(Debug, Default, Clone, Copy, Component)]
-#[storage(NullStorage)]
-pub struct Static;
 
 #[derive(Debug, Default, Clone, Copy, Component)]
 #[storage(NullStorage)]
