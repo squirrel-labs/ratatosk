@@ -1,242 +1,304 @@
 //! The collide module provides the Collide trait for objects that can collide along with several
 //! implementations for various types.
 
-use core::ops::Range;
-
 use crate::boxes::{AABox, RBox};
-use crate::math::Vec2;
-use spine::skeleton::srt::SRT;
+use crate::math::{Vec2, EPSILON};
 
 // For information on the SAT, see: http://www.dyn4j.org/2010/01/sat/.
 
 /// A trait for objects that can collide with other objects.
-pub trait Collide<Rhs: ?Sized = Self> {
-    fn collides(&self, other: &Rhs) -> bool;
+pub trait Collide<Rhs = Self> {
+    /// calculate the penetration depth (a scalar ratio of `dv`)
+    /// of the collision after applying the velocity,
+    /// if there was any.
+    /// `dv` is the difference between the two velocities
+    fn collide_after(&self, other: &Rhs, dv: Vec2) -> Option<f32>;
 }
 
-/// A trait for common objects to be collidable with other common objects.
-pub trait Collidable: Collide<RBox> + Collide<SRT> + Collide<AABox> + Collide<Vec2> {}
-
-fn left_under(v1: Vec2, v2: Vec2) -> bool {
-    v1.x() < v2.x() && v1.y() < v2.y()
+pub enum Collidable {
+    Point(Vec2),
+    AABox(AABox),
+    RBox(RBox),
 }
 
-#[derive(Debug)]
-struct Projection {
-    min: f32,
-    max: f32,
-}
-
-impl Collide for Projection {
-    fn collides(&self, other: &Self) -> bool {
-        self.max >= other.min && self.min <= other.max
-    }
-}
-
-fn project(rbox: &RBox, axis: Vec2) -> Projection {
-    // the vertices of rbox without rbox.pos
-    let vertices = [
-        rbox.pos + rbox.v1,
-        rbox.pos + rbox.v2,
-        rbox.pos + rbox.v1 + rbox.v2,
-    ];
-    // project each vertex onto axis
-    let p = axis.dot(rbox.pos);
-    let mut proj = Projection { min: p, max: p };
-    for &vertex in vertices.iter() {
-        let p = axis.dot(vertex);
-        if p < proj.min {
-            proj.min = p;
-        } else if p > proj.max {
-            proj.max = p;
+impl Collide for Collidable {
+    fn collide_after(&self, other: &Self, dv: Vec2) -> Option<f32> {
+        match (self, other) {
+            (Self::Point(a), Self::Point(b)) => a.collide_after(b, dv),
+            (Self::Point(a), Self::AABox(b)) => a.collide_after(b, dv),
+            (Self::Point(a), Self::RBox(b)) => a.collide_after(b, dv),
+            (Self::AABox(a), Self::Point(b)) => a.collide_after(b, dv),
+            (Self::AABox(a), Self::AABox(b)) => a.collide_after(b, dv),
+            (Self::AABox(a), Self::RBox(b)) => a.collide_after(b, dv),
+            (Self::RBox(a), Self::Point(b)) => a.collide_after(b, dv),
+            (Self::RBox(a), Self::AABox(b)) => a.collide_after(b, dv),
+            (Self::RBox(a), Self::RBox(b)) => a.collide_after(b, dv),
         }
     }
-    proj
 }
 
-/// Calculate the bound in a line segment that collides an AABox projected onto an axis.
-/// `bound` is a tuple of the start and ending point of the AABB.
-/// `pos` is a component of the position vector of the line segment.
-/// `direction` is a component of the direction vector of the line segment.
-fn calculate_aabox_rbox_component_bounds(
-    bound: Range<f32>,
-    pos: f32,
-    direction: f32,
-) -> (f32, f32) {
-    if direction == 0.0 {
-        return (0.0, 1.0);
-    }
-    // get bounds of s by transforming "g(s) = pos + s * direction"
-    // and applying the inequality g(s) >= bound.start and g(s) <= bound.end
-    let (s1, s2) = (
-        (bound.start - pos) / direction,
-        (bound.end - pos) / direction,
-    );
-    // if direction is negative, you have to switch the values
-    if direction > 0.0 {
-        (s1, s2)
+// Given a fraction of the dv vectors length,
+// return the amount to set the objects back
+// in case of a collision
+fn in_range(t: f32) -> Option<f32> {
+    if (0.0..=1.0).contains(&t) {
+        Some(1.0 - t)
     } else {
-        (s2, s1)
+        None
     }
 }
 
-/// Test for collision between an AABox and an edge of a rbox
-fn collide_aabox_rbox_segment(
-    xbound: Range<f32>,
-    ybound: Range<f32>,
-    pos: Vec2,
-    direction: Vec2,
-) -> bool {
-    let sbound1 = calculate_aabox_rbox_component_bounds(xbound, pos.x(), direction.x());
-    if sbound1.0 > sbound1.1 {
-        return false;
-    }
-    let sbound2 = calculate_aabox_rbox_component_bounds(ybound, pos.y(), direction.y());
-    if sbound2.0 > sbound2.1 {
-        return false;
-    }
-    let (sbound1, sbound2) = (sbound1.0..sbound1.1, sbound2.0..sbound2.1);
+macro_rules! impl_collide {
+    (for {$A:ident} $item:item) => { impl_collide!(for {$A/$A} $item); };
+    (for {$A:ident/$C:ident} $item:item) => {
+        impl Collide for $A {
+            $item
+        }
 
-    sbound1.end >= sbound2.start
-        && sbound1.start <= sbound2.end
-        && sbound1.end >= 0.0
-        && sbound2.end >= 0.0
-        && sbound1.start <= 1.0
-        && sbound2.start <= 1.0
+        impl From<$A> for Collidable {
+            fn from(other: $A) -> Self {
+                Self::$C(other)
+            }
+        }
+    };
+    (for {$A:ident, $B:ident} $item:item) => {
+        impl Collide<$B> for $A {
+            $item
+        }
+        impl Collide<$A> for $B {
+            fn collide_after(&self, other: &$A, dv: Vec2) -> Option<f32> {
+                other.collide_after(self, -dv)
+            }
+        }
+    };
 }
 
-impl Collide for Vec2 {
-    fn collides(&self, other: &Self) -> bool {
-        self == other
+impl_collide!(for {Vec2/Point}
+    fn collide_after(&self, other: &Self, dv: Vec2) -> Option<f32> {
+        in_range(match (dv.x() == 0.0, dv.y() == 0.0) {
+            (true, true) => return if self == other { Some(0.0) } else { None },
+            (true, false) => (other.x() - self.x()) / dv.x(),
+            (false, true) => (other.y() - self.y()) / dv.y(),
+            (false, false) => {
+                let t = (*other - *self) / dv;
+                if f32::abs(t.x() - t.y()) <= EPSILON { t.x() }
+                else { return None; }
+            }
+        })
     }
-}
+);
 
-impl Collide<AABox> for Vec2 {
-    fn collides(&self, other: &AABox) -> bool {
-        other.collides(self)
+impl_collide!(for {Vec2, AABox}
+    fn collide_after(&self, other: &AABox, dv: Vec2) -> Option<f32> {
+        // test collision between a line starting at a with the vector v
+        // and another line starting at p with the vector (0, w).
+        let line_col = |a: Vec2, v: Vec2, p: Vec2, w| {
+            let t = (p.x() - a.x()) / v.x();
+            if (0.0..=w).contains(&(a.y() - p.y() + v.y() * t)) {
+                in_range(t)
+            } else{ None }
+        };
+        let rev = |v: Vec2| Vec2::new(v.y(), v.x());
+        let left = || line_col(*self, dv, other.pos, other.size.y());
+        let right = || line_col(*self, dv, other.pos + Vec2::new(other.size.x(), 0.0), other.size.y());
+        let bottom = || line_col(rev(*self), rev(dv), rev(other.pos), other.size.x());
+        let top = || line_col(rev(*self), rev(dv), rev(other.pos + Vec2::new(0.0, other.size.y())), other.size.x());
+        (if dv.x() >= 0.0 { left() } else { right() })
+            .or_else(|| if dv.y() >= 0.0 { bottom() } else { top() })
     }
-}
+);
 
-impl Collide<RBox> for Vec2 {
-    fn collides(&self, other: &RBox) -> bool {
-        other.collides(self)
-    }
-}
-
-impl Collide<SRT> for Vec2 {
-    fn collides(&self, other: &SRT) -> bool {
-        other.collides(self)
-    }
-}
-
-impl Collide<Vec2> for AABox {
-    fn collides(&self, other: &Vec2) -> bool {
-        left_under(self.pos, *other) && left_under(*other, self.pos + self.size)
-    }
-}
-
-impl Collide<RBox> for AABox {
-    fn collides(&self, other: &RBox) -> bool {
-        other.collides(self)
-    }
-}
-
-impl Collide<SRT> for AABox {
-    fn collides(&self, other: &SRT) -> bool {
-        other.collides(self)
-    }
-}
-
-impl Collide for AABox {
-    fn collides(&self, other: &Self) -> bool {
-        left_under(self.pos, other.pos + other.size) && left_under(other.pos, self.pos + self.size)
-    }
-}
-
-impl Collide<Vec2> for RBox {
-    fn collides(&self, other: &Vec2) -> bool {
-        let v1_proj = project(self, self.v1);
-        let p1 = other.dot(self.v1);
-        let v2_proj = project(self, self.v2);
-        let p2 = other.dot(self.v2);
-        v1_proj.min <= p1 && v1_proj.max >= p1 && v2_proj.min <= p2 && v2_proj.max >= p2
-    }
-}
-
-impl Collide<Vec2> for SRT {
-    fn collides(&self, other: &Vec2) -> bool {
-        let rbox: RBox = self.into();
-        rbox.collides(other)
-    }
-}
-
-impl Collide<AABox> for SRT {
-    fn collides(&self, other: &AABox) -> bool {
-        let rbox: RBox = self.into();
-        rbox.collides(other)
-    }
-}
-
-impl Collide<RBox> for SRT {
-    fn collides(&self, other: &RBox) -> bool {
-        let rbox: RBox = self.into();
-        rbox.collides(other)
-    }
-}
-
-impl Collide for SRT {
-    fn collides(&self, other: &Self) -> bool {
-        let (rbox1, rbox2): (RBox, RBox) = (self.into(), other.into());
-        rbox1.collides(&rbox2)
-    }
-}
-
-impl Collide<AABox> for RBox {
-    fn collides(&self, other: &AABox) -> bool {
-        let xbound = other.pos.x()..other.pos.x() + other.size.x();
-        let ybound = other.pos.y()..other.pos.y() + other.size.y();
-        collide_aabox_rbox_segment(xbound.clone(), ybound.clone(), self.pos, self.v1)
-            || collide_aabox_rbox_segment(xbound.clone(), ybound.clone(), self.pos, self.v2)
-            || collide_aabox_rbox_segment(
-                xbound.clone(),
-                ybound.clone(),
-                self.pos + self.v1,
-                self.v2,
+impl_collide!(for {AABox}
+    fn collide_after(&self, other: &Self, dv: Vec2) -> Option<f32> {
+        type F = fn(&f32, &f32) -> bool;
+        let lines_col = |a: Vec2, b: Vec2, w: f32, u: f32, v: Vec2, f1: F, f2: F| {
+            let z = v.y() * (a.x() - b.x()) + v.x() * (b.y() - a.y());
+            let (s1, s2) = (u * v.x() + z, w * v.x());
+            if f1(&s1, &0.0) && f2(&z, &s2) {
+                let t = (b.x() - a.x()) / v.x();
+                in_range(t)
+            } else {
+                None
+            }
+        };
+        let lines_col_p = |a: Vec2, b: Vec2, w: f32, u: f32, v: Vec2| {
+            lines_col(a, b, w, u, v, PartialOrd::ge, PartialOrd::le)
+        };
+        let lines_col_n = |a: Vec2, b: Vec2, w: f32, u: f32, v: Vec2| {
+            lines_col(a, b, w, u, v, PartialOrd::le, PartialOrd::ge)
+        };
+        let rev = |v: Vec2| Vec2::new(v.y(), v.x());
+        let left = || {
+            lines_col_p(
+                self.pos + Vec2::new(self.size.x(), 0.0),
+                other.pos,
+                self.size.y(),
+                other.size.y(),
+                dv,
             )
-            || collide_aabox_rbox_segment(xbound, ybound, self.pos + self.v2, self.v1)
+        };
+        let right = || {
+            lines_col_n(
+                self.pos,
+                other.pos + Vec2::new(other.size.x(), 0.0),
+                self.size.y(),
+                other.size.y(),
+                dv,
+            )
+        };
+        let bottom = || {
+            lines_col_p(
+                rev(self.pos + Vec2::new(0.0, self.size.y())),
+                rev(other.pos),
+                self.size.x(),
+                other.size.x(),
+                rev(dv),
+            )
+        };
+        let top = || {
+            lines_col_n(
+                rev(self.pos),
+                rev(other.pos + Vec2::new(0.0, other.size.y())),
+                self.size.x(),
+                other.size.x(),
+                rev(dv),
+            )
+        };
+        (if dv.x() >= 0.0 { left() } else { right() })
+            .or_else(|| if dv.y() >= 0.0 { bottom() } else { top() })
+    }
+);
+
+fn line_intersect(a: Vec2, v: Vec2, b: Vec2, w: Vec2) -> Option<f32> {
+    let t = 1.0
+        - (w.x() * (b.y() - a.y() - v.y()) + w.y() * (v.x() + a.x() - b.x()))
+            / (v.x() * w.y() - v.y() * w.x());
+    let k = a.x() - b.x() + v.x() * t;
+    if (0.0..=w.x()).contains(&k) || (w.x()..=0.0).contains(&k) {
+        in_range(t)
+    } else {
+        None
     }
 }
 
-impl Collide<SRT> for RBox {
-    fn collides(&self, other: &SRT) -> bool {
-        let rbox: RBox = other.into();
-        rbox.collides(self)
+impl_collide!(for {Vec2, RBox}
+    fn collide_after(&self, other: &RBox, dv: Vec2) -> Option<f32> {
+        let rbox = other.as_normal_form();
+        let col_lines = |b, w| line_intersect(*self, dv, b, w);
+
+        let left = || col_lines(rbox.pos, rbox.v1);
+        let right = || col_lines(rbox.pos + rbox.v2, rbox.v1);
+        let top = || col_lines(rbox.pos + rbox.v1, rbox.v2);
+        let bottom = || col_lines(rbox.pos, rbox.v2);
+        (if dv.dot(rbox.v2) >= 0.0 { left() } else { right() })
+            .or_else(|| if dv.dot(rbox.v1) >= 0.0 { bottom() } else { top() })
     }
+);
+
+impl_collide!(for {RBox, AABox}
+    fn collide_after(&self, other: &AABox, dv: Vec2) -> Option<f32> {
+        let rbox = self.as_normal_form();
+        let (w, h) = (
+            other.pos + Vec2::new(other.size.x(), 0.0),
+            other.pos + Vec2::new(0.0, other.size.y()),
+        );
+
+        if rbox.v1.x() == 0.0 {
+            return AABox {
+                pos: rbox.pos,
+                size: Vec2::new(rbox.v2.x(), rbox.v1.y()),
+            }
+            .collide_after(other, dv);
+        }
+
+        // corner of rbox moves into edge of aabox:
+        // ----------------------------------------
+
+        let line_col = |a: Vec2, v: Vec2, p: Vec2, w| {
+            let t = (p.x() - a.x()) / v.x();
+            if (0.0..=1.0).contains(&t) && (0.0..=w).contains(&(a.y() - p.y() + v.y() * t)) {
+                Some(1.0 - t)
+            } else {
+                None
+            }
+        };
+        let rev = |v: Vec2| Vec2::new(v.y(), v.x());
+        let left = || line_col(rbox.pos + rbox.v2, dv, other.pos, other.size.y());
+        let right = || line_col(rbox.pos + rbox.v1, dv, w, other.size.y());
+        let bottom = || {
+            line_col(
+                rev(rbox.pos + rbox.v1 + rbox.v2),
+                rev(dv),
+                rev(other.pos),
+                other.size.x(),
+            )
+        };
+        let top = || line_col(rev(rbox.pos), rev(dv), rev(h), other.size.x());
+        let mut t = (if dv.x() >= 0.0 { left() } else { right() })
+            .or_else(|| if dv.y() >= 0.0 { bottom() } else { top() });
+
+        // edge of rbox moves into corner of aabox:
+        // ----------------------------------------
+
+        for &(a, b, w) in &[
+            (other.pos + other.size, rbox.pos, rbox.v1),
+            (h, rbox.pos, rbox.v2),
+            (other.pos, rbox.pos + rbox.v2, rbox.v1),
+            (w, rbox.pos + rbox.v1, rbox.v2),
+        ] {
+            let t_ = line_intersect(a, -dv, b, w);
+            if let Some(t_) = t_ {
+                if t.filter(|t| t > &t_).is_none() {
+                    t = Some(t_)
+                }
+            }
+        }
+
+        t
+    }
+);
+
+fn collide_rbox_rbox_helper(b1: &RBox, b2: &RBox, dv: Vec2) -> Option<f32> {
+    let [left1, right1, top1, bottom1] = [
+        b1.pos + b1.v1,
+        b1.pos + b1.v2,
+        b1.pos + b1.v1 + b1.v2,
+        b1.pos,
+    ];
+    let [left2, right2, bottom2] = [b2.pos + b2.v1, b2.pos + b2.v2, b2.pos];
+    let dotv1 = dv.dot(b2.v1);
+    let dotv2 = dv.dot(b2.v2);
+    let lines = if dotv1 < 0.0 {
+        if dotv2 < 0.0 {
+            [(left2, b2.v2), (right2, b2.v1)]
+        } else {
+            [(bottom2, b2.v1), (left2, b2.v2)]
+        }
+    } else if dotv2 < 0.0 {
+        [(bottom2, b2.v2), (right2, b2.v1)]
+    } else {
+        [(bottom2, b2.v1), (bottom2, b2.v2)]
+    };
+    let mut t: Option<f32> = None;
+    for &p in &[left1, right1, top1, bottom1] {
+        for &(start, v) in &lines {
+            println!("{:?} {:?} {:?} {:?}", p, dv, start, v);
+            if let Some(t_) = line_intersect(p, dv, start, v) {
+                println!(" -> {:?}", t_);
+                if !Option::filter(t, |t| t > &t_).is_some() {
+                    t = Some(t_)
+                }
+            }
+        }
+    }
+    t
 }
 
-impl Collide for RBox {
-    fn collides(&self, other: &Self) -> bool {
-        // using the SAT
-        // TODO: optimization: remove duplicate axes
-        let axes = [self.v1, self.v2, other.v1, other.v2];
-        axes.iter()
-            .all(|axis| project(self, *axis).collides(&project(other, *axis)))
+impl_collide!(for {RBox}
+    fn collide_after(&self, other: &RBox, dv: Vec2) -> Option<f32> {
+        let b1 = self.as_normal_form();
+        let b2 = other.as_normal_form();
+        let t = collide_rbox_rbox_helper(&b1, &b2, dv);
+        collide_rbox_rbox_helper(&b2, &b1, -dv).map(|t1| t.map(|t2| f32::max(t1, t2)).unwrap_or(t1)).or(t)
     }
-}
-
-impl<S, T: Collide<S>> Collide<S> for [T] {
-    fn collides(&self, other: &S) -> bool {
-        self.iter().any(|x| x.collides(other))
-    }
-}
-
-impl<S, T: Collide<S>> Collide<[T]> for S {
-    fn collides(&self, other: &[T]) -> bool {
-        other.collides(self)
-    }
-}
-
-impl Collidable for RBox {}
-impl Collidable for SRT {}
-impl Collidable for AABox {}
-impl Collidable for Vec2 {}
+);
