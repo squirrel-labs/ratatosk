@@ -47,10 +47,7 @@ pub struct Animation {
 }
 #[derive(Debug, Clone, Component)]
 #[storage(VecStorage)]
-pub struct Scale {
-    pub scale_x: f32,
-    pub scale_y: f32,
-}
+pub struct Scale(pub Vec2);
 
 #[derive(Debug, Clone, Component)]
 #[storage(VecStorage)]

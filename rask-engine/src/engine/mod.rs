@@ -65,25 +65,20 @@ impl GameEngine for RaskEngine {
             .with(Sprite {
                 id: registry::EMPTY.id,
             })
-            .with(Scale {
-                scale_x: 1.0,
-                scale_y: 1.0,
-            })
+            .with(Scale(Vec2::new(1.0, 1.0)))
             .with(Static)
             .build();
         let _char = world
             .create_entity()
             .with(Pos(Vec2::new(0.0, -0.8)))
+            .with(Vel(Vec2::new(0.0, 0.0)))
             .with(Speed(0.2))
             .with(Animation {
                 id: registry::CHAR.id,
                 animation: "walking".to_string(),
                 start: 0.0,
             })
-            .with(Scale {
-                scale_x: 1.0,
-                scale_y: 1.0,
-            })
+            .with(Scale(Vec2::new(1.0, 1.0)))
             .with(Static)
             .build();
         Self {

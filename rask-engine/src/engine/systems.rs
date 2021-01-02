@@ -8,7 +8,7 @@ use crate::EngineError;
 use specs::prelude::*;
 
 lazy_static::lazy_static! {
-    pub static ref KEYBOARD:  Keyboard= Keyboard::new();
+    pub static ref KEYBOARD: Keyboard = Keyboard::new();
 }
 
 pub struct EventSystem;
@@ -66,7 +66,7 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                         animation.animation.as_str(),
                         elapsed.0.as_secs_f32() - animation.start,
                         0.0,
-                        0.2,
+                        0.2, // fade time TODO make adjustable
                     )
                     .unwrap();
                     animation.start = elapsed.0.as_secs_f32();
@@ -95,8 +95,7 @@ impl<'a> System<'a> for RenderSystem {
         let mut sprites = Vec::new();
         for (pos, sprite, scale, _) in (&pos, &sprite, &scale, &present).join() {
             sprites.push(resources::Sprite::new(
-                Mat3::translation(pos.0.x(), pos.0.y())
-                    * Mat3::scaling(scale.scale_x, scale.scale_y),
+                Mat3::translation(pos.0.x(), pos.0.y()) * Mat3::scaling(scale.0.x(), scale.0.y()),
                 sprite.id,
                 0,
             ))
@@ -106,7 +105,7 @@ impl<'a> System<'a> for RenderSystem {
             let cha: Result<&Box<resources::Character>, EngineError> = res.get(anim.id as usize);
             if let Ok(cha) = cha {
                 let trans = Mat3::translation(pos.0.x(), pos.0.y());
-                let scale = Mat3::scaling(scale.scale_x, scale.scale_y);
+                let scale = Mat3::scaling(scale.0.x(), scale.0.y());
 
                 match cha.interpolate(elapsed.0.as_secs_f32() - anim.start) {
                     Ok(sps) => {
@@ -139,23 +138,23 @@ impl<'a> System<'a> for RenderSystem {
 impl<'a> System<'a> for MovementSystem {
     type SystemData = (
         WriteStorage<'a, Animation>,
-        WriteStorage<'a, Pos>,
+        WriteStorage<'a, Vel>,
         WriteStorage<'a, Scale>,
         ReadStorage<'a, Speed>,
-        Read<'a, DeltaTime>,
     );
 
-    fn run(&mut self, (mut anim, mut pos, mut scale, speed, delta_time): Self::SystemData) {
-        for (anim, pos, scale, speed) in (&mut anim, &mut pos, &mut scale, &speed).join() {
+    fn run(&mut self, (mut anim, mut vel, mut scale, speed): Self::SystemData) {
+        for (anim, vel, scale, speed) in (&mut anim, &mut vel, &mut scale, &speed).join() {
             anim.animation = if KEYBOARD.get(Key::ARROW_RIGHT) {
-                scale.scale_x = 1.0;
-                pos.0 += Vec2::new(delta_time.0.as_secs_f32() * speed.0, 0.0);
+                scale.0 = Vec2::new(1.0, scale.0.y());
+                vel.0 = Vec2::new(speed.0, 0.0);
                 "walking".to_owned()
             } else if KEYBOARD.get(Key::ARROW_LEFT) {
-                scale.scale_x = -1.0;
-                pos.0 -= Vec2::new(delta_time.0.as_secs_f32() * speed.0, 0.0);
+                scale.0 = Vec2::new(-1.0, scale.0.y());
+                vel.0 = Vec2::new(-speed.0, 0.0);
                 "walking".to_owned()
             } else {
+                vel.0 = Vec2::new(0.0, 0.0);
                 "standing".to_owned()
             };
         }
