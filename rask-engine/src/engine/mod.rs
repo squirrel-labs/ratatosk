@@ -47,6 +47,7 @@ impl GameEngine for RaskEngine {
         world.insert(ElapsedTime(Duration::from_millis(0)));
         world.insert(TextureIds(Vec::new()));
         world.insert(SystemApi(system));
+        world.register::<Terrain>();
 
         let mut tick_dispatcher = DispatcherBuilder::new()
             .with_pool(pool)
@@ -66,18 +67,21 @@ impl GameEngine for RaskEngine {
             .with(Pos(Vec2::new(0.0, 0.0)))
             .with(Sprite {
                 id: registry::EMPTY.id,
+                sub_id: 0,
             })
             .with(Scale(Vec2::new(1.0, 1.0)))
             .build();
         let _ground = world
             .create_entity()
-            .with(Terrain(
-                crate::boxes::AABox {
+            .with(Terrain)
+            .with(SubCollider {
+                collider: crate::boxes::AABox {
                     pos: Vec2::new(-2.0, -0.85),
                     size: Vec2::new(4.0, -3.0),
                 }
                 .into(),
-            ))
+                parent: _background,
+            })
             .build();
         let _char = world
             .create_entity()

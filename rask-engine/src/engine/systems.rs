@@ -77,13 +77,19 @@ impl<'a> System<'a> for GravitationSystem {
 impl<'a> System<'a> for UpdateAnimationSystem {
     type SystemData = (
         WriteStorage<'a, Animation>,
+        WriteStorage<'a, Sprite>,
+        WriteStorage<'a, Transform>,
+        ReadStorage<'a, Collider>,
         ReadStorage<'a, Present>,
         Read<'a, ElapsedTime>,
     );
 
-    fn run(&mut self, (mut animations, present, elapsed): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut animations, mut sprite, mut mat3, collider, present, elapsed): Self::SystemData,
+    ) {
         let res = &mut *resources::RESOURCE_TABLE.write();
-        for (mut animation, _) in (&mut animations, &present).join() {
+        for (mut animation, collider, _) in (&mut animations, &collider, &present).join() {
             let cha: Result<&mut Box<resources::Character>, EngineError> =
                 res.get_mut(animation.id as usize);
             if let Ok(cha) = cha {
@@ -97,6 +103,9 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                     .unwrap();
                     animation.start = elapsed.0.as_secs_f32();
                 }
+
+                let mut sprites = cha.interpolate(elapsed.0.as_secs_f32() - animation.start);
+                //for sprite in (sprites.join()).filter(|s| s.)
             }
         }
     }

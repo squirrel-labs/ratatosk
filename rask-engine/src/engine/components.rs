@@ -1,12 +1,12 @@
 use crate::collide::Collidable;
 use crate::io;
-use crate::math::Vec2;
+use crate::math::{Mat3, Vec2};
 use crate::resources::{
     self,
     registry::{CharacterInfo, ResourceInfo},
 };
 use specs::{prelude::*, Component};
-use specs_hierarchy::Parent as PParent;
+use specs_hierarchy::{Hierarchy, Parent as PParent};
 use std::collections::HashMap;
 
 #[derive(Debug, Default)]
@@ -76,8 +76,21 @@ pub struct Vulnerable {
 #[storage(NullStorage)]
 pub struct Terrain;
 
-#[derive(Debug, Clone, Component)]
-pub struct SubCollider(pub Collidable);
+#[derive(Debug, Clone)]
+pub struct SubCollider {
+    pub collider: Collidable,
+    pub parent: Entity,
+}
+
+impl PParent for SubCollider {
+    fn parent_entity(&self) -> Entity {
+        self.parent
+    }
+}
+
+impl Component for SubCollider {
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+}
 
 #[derive(Debug, Clone)]
 pub enum HitboxType {
@@ -112,7 +125,12 @@ pub struct Scale(pub Vec2);
 #[storage(VecStorage)]
 pub struct Sprite {
     pub id: u32,
+    pub sub_id: u32,
 }
+
+#[derive(Debug, Clone, Component)]
+#[storage(VecStorage)]
+pub struct Transform(pub Mat3);
 
 #[derive(Debug, Default, Clone, Copy, Component)]
 pub struct Mass(pub f32);
