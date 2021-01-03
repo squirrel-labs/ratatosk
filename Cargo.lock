@@ -1810,11 +1810,13 @@ dependencies = [
 name = "rask-engine"
 version = "0.2.0"
 dependencies = [
+ "hibitset",
  "image",
  "lazy_static",
  "log 0.4.14",
  "ouroboros",
  "rayon",
+ "shrev",
  "specs",
  "specs-hierarchy",
  "spin",

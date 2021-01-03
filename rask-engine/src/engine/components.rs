@@ -143,11 +143,20 @@ pub struct Sprite {
     pub sub_id: u64,
 }
 
-#[derive(Debug, Clone, Component)]
-#[storage(VecStorage)]
+#[derive(Debug, Clone)]
 pub struct Transform {
     pub mat3: Mat3,
     pub parent: Entity,
+}
+
+impl Component for Transform {
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+}
+
+impl PParent for Transform {
+    fn parent_entity(&self) -> Entity {
+        self.parent
+    }
 }
 
 #[derive(Debug, Default, Clone, Copy, Component)]

@@ -89,7 +89,7 @@ impl<'a> System<'a> for UpdateAnimationSystem {
         WriteStorage<'a, Damaging>,
         ReadStorage<'a, Present>,
         Entities<'a>,
-        ReadExpect<'a, Hierarchy<SubCollider>>,
+        ReadExpect<'a, Hierarchy<Animation>>,
         Read<'a, ElapsedTime>,
     );
 
@@ -180,6 +180,9 @@ impl<'a> System<'a> for RenderSystem {
         ReadStorage<'a, Animation>,
         ReadStorage<'a, Scale>,
         ReadStorage<'a, Present>,
+        ReadStorage<'a, Transform>,
+        ReadExpect<'a, Hierarchy<Animation>>,
+        Entities<'a>,
         Read<'a, ElapsedTime>,
         Write<'a, SystemApi>,
         Write<'a, TextureIds>,
@@ -187,34 +190,40 @@ impl<'a> System<'a> for RenderSystem {
 
     fn run(
         &mut self,
-        (pos, sprite, anim, scale, present, elapsed, mut sys, mut tex_ids): Self::SystemData,
+        (
+            pos,
+            sprite,
+            anim,
+            scale,
+            present,
+            transform,
+            hierarchy,
+            entities,
+            elapsed,
+            mut sys,
+            mut tex_ids,
+        ): Self::SystemData,
     ) {
         let mut sprites = Vec::new();
         for (pos, sprite, scale, _) in (&pos, &sprite, &scale, &present).join() {
             sprites.push(resources::Sprite::new(
                 Mat3::translation(pos.0.x(), pos.0.y()) * Mat3::scaling(scale.0.x(), scale.0.y()),
                 sprite.id,
-                0,
+                sprite.sub_id,
             ))
         }
-        let res = &*resources::RESOURCE_TABLE.read();
-        for (pos, anim, scale, _) in (&pos, &anim, &scale, &present).join() {
-            let cha: Result<&Box<resources::Character>, EngineError> = res.get(anim.id as usize);
-            if let Ok(cha) = cha {
-                let trans = Mat3::translation(pos.0.x(), pos.0.y());
-                let scale = Mat3::scaling(scale.0.x(), scale.0.y());
-
-                match cha.interpolate(elapsed.0.as_secs_f32() - anim.start) {
-                    Ok(sps) => {
-                        for sp in sps.flatten() {
-                            sprites.push(resources::Sprite::new(
-                                trans * scale * sp.transform,
-                                anim.id,
-                                sp.att_id,
-                            ))
-                        }
-                    }
-                    Err(e) => log::error!("{}", e),
+        for (pos, _, scale, entity, _) in (&pos, &anim, &scale, &entities, &present).join() {
+            let trans = Mat3::translation(pos.0.x(), pos.0.y());
+            let scale = Mat3::scaling(scale.0.x(), scale.0.y());
+            for &entity in hierarchy.children(entity) {
+                if let Some((transform, sprite)) =
+                    (&transform, &sprite).join().get(entity, &entities)
+                {
+                    sprites.push(resources::Sprite::new(
+                        trans * scale * transform.mat3,
+                        sprite.id,
+                        sprite.sub_id,
+                    ))
                 }
             }
         }

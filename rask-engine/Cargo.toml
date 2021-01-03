@@ -29,3 +29,5 @@ lazy_static = "1.4.0"
 ouroboros = "0.5"
 specs-hierarchy = "0.6"
 spin = {version = "0.5", optional = false}
+shrev = "1.1"
+hibitset = "0.6"

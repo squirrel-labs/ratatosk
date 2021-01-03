@@ -3,6 +3,7 @@ use crate::math::Vec2;
 use crate::resources::registry;
 use crate::EngineError;
 use core::time::Duration;
+use shrev::EventChannel;
 use specs::prelude::*;
 use specs::WorldExt;
 use specs_hierarchy::{Hierarchy, HierarchySystem};
@@ -47,7 +48,6 @@ impl GameEngine for RaskEngine {
         world.insert(ElapsedTime(Duration::from_millis(0)));
         world.insert(TextureIds(Vec::new()));
         world.insert(SystemApi(system));
-        world.register::<Terrain>();
 
         let mut tick_dispatcher = DispatcherBuilder::new()
             .with_pool(pool)
@@ -62,6 +62,7 @@ impl GameEngine for RaskEngine {
             .build();
 
         tick_dispatcher.setup(&mut world);
+
         let _background = world
             .create_entity()
             .with(Pos(Vec2::new(0.0, 0.0)))
