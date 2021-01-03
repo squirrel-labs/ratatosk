@@ -199,6 +199,11 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                 let ci = hierarchy.children(entity);
                 let mut ci: Vec<_> = ci.to_vec();
                 ci.sort_unstable_by_key(|x| x.id()); //TODO we might be able to remove this
+                let aabb = crate::collide::calculate_aabb(
+                    ci.iter()
+                        .map(|e| sub.get(*e).map(|s| &s.collider))
+                        .flatten(),
+                );
                 let mut ci = ci.iter();
                 for (i, s) in sprites.enumerate() {
                     let s = s.unwrap();
@@ -244,6 +249,15 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                         }
                     }
                 }
+                let new_aabb = crate::collide::calculate_aabb(
+                    hierarchy
+                        .children(entity)
+                        .iter()
+                        .map(|e| sub.get(*e).map(|s| &s.collider))
+                        .flatten(),
+                );
+
+                // modify position to avoid collisions
             }
         }
     }

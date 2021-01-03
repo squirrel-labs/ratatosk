@@ -38,6 +38,41 @@ impl Collide for Collidable {
     }
 }
 
+/// calculate the axis aligned bounding box for a set of collidables
+pub fn calculate_aabb<'a, I: Iterator<Item = &'a Collidable>>(vals: I) -> AABox {
+    let (mut minx, mut maxx, mut miny, mut maxy) = (0.0, 0.0, 0.0, 0.0);
+    let mut first_iter = true;
+    let mut f = |points: &[Vec2]| {
+        for point in points {
+            if first_iter {
+                minx = point.x();
+                maxx = point.x();
+                miny = point.y();
+                maxy = point.y();
+                first_iter = false;
+            } else {
+                minx = f32::min(minx, point.x());
+                maxx = f32::max(maxx, point.x());
+                miny = f32::min(miny, point.y());
+                maxy = f32::max(maxy, point.y());
+            }
+        }
+    };
+    for val in vals {
+        match val {
+            Collidable::Point(v) => f(&[*v]),
+            Collidable::AABox(AABox { pos, size }) => f(&[*pos, *pos + *size]),
+            Collidable::RBox(RBox { pos, v1, v2 }) => {
+                f(&[*pos, *pos + *v1, *pos + *v2, *pos + *v1 + *v2])
+            }
+        };
+    }
+    AABox {
+        pos: Vec2::new(minx, miny),
+        size: Vec2::new(maxx - minx, maxy - miny),
+    }
+}
+
 // Given a fraction of the dv vectors length,
 // return the amount to set the objects back
 // in case of a collision
