@@ -1,7 +1,7 @@
 use core::iter::{once, Chain, Once};
 use core::ops;
 
-use crate::math::EPSILON;
+use crate::math::{Vec3, EPSILON};
 
 /// A 2-dimensional euclidean vector with `f32` elements.
 #[derive(Clone, Copy, Debug, Default)]
@@ -141,6 +141,12 @@ impl From<[f32; 2]> for Vec2 {
 impl From<Vec2> for [f32; 2] {
     fn from(vec: Vec2) -> Self {
         [vec.x(), vec.y()]
+    }
+}
+
+impl From<Vec3> for Vec2 {
+    fn from(vec: Vec3) -> Self {
+        Vec2::new(vec.x(), vec.y())
     }
 }
 

@@ -109,12 +109,27 @@ impl Component for Collider {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
 }
 
-#[derive(Debug, Clone, Component)]
-#[storage(DenseVecStorage)]
+impl PParent for Collider {
+    fn parent_entity(&self) -> Entity {
+        unimplemented!()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct Animation {
     pub id: u32,
     pub animation: String,
     pub start: f32,
+}
+
+impl PParent for Animation {
+    fn parent_entity(&self) -> Entity {
+        unimplemented!()
+    }
+}
+
+impl Component for Animation {
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
 }
 
 #[derive(Debug, Clone, Component)]
@@ -125,12 +140,15 @@ pub struct Scale(pub Vec2);
 #[storage(VecStorage)]
 pub struct Sprite {
     pub id: u32,
-    pub sub_id: u32,
+    pub sub_id: u64,
 }
 
 #[derive(Debug, Clone, Component)]
 #[storage(VecStorage)]
-pub struct Transform(pub Mat3);
+pub struct Transform {
+    pub mat3: Mat3,
+    pub parent: Entity,
+}
 
 #[derive(Debug, Default, Clone, Copy, Component)]
 pub struct Mass(pub f32);

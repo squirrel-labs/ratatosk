@@ -1,11 +1,15 @@
 use super::components::*;
 
+use crate::boxes::RBox;
+use crate::collide::Collidable;
 use crate::events::{Event, Key, Keyboard};
 use crate::io;
 use crate::math::{Mat3, Vec2};
 use crate::resources::{self, registry, GetStore};
 use crate::EngineError;
+use specs::join::JoinIter;
 use specs::prelude::*;
+use specs_hierarchy::*;
 
 lazy_static::lazy_static! {
     pub static ref KEYBOARD: Keyboard = Keyboard::new();
@@ -49,13 +53,13 @@ impl<'a> System<'a> for VelocitySystem {
         for (vel, pos, _) in (&vel, &mut pos, !&mass).join() {
             pos.0 += vel.0 * dt.0.as_secs_f32();
         }
-        (&collider, &vel, !&terrain, &mut pos, &mass)
-            .par_join()
-            .for_each(|(col1, vel, _, pos1, mass)| {
-                for (col2, _, pos2) in (&collider, &terrain, &pos).join() {
-                    // TODO: collision code
-                }
-            })
+        /*(&collider, &vel, !&terrain, &mut pos, &mass)
+        .par_join()
+        .for_each(|(col1, vel, _, pos1, mass)| {
+            for (col2, _, pos2) in (&collider, &terrain, &pos).join() {
+                // TODO: collision code
+            }
+        })*/
     }
 }
 
@@ -80,16 +84,35 @@ impl<'a> System<'a> for UpdateAnimationSystem {
         WriteStorage<'a, Sprite>,
         WriteStorage<'a, Transform>,
         ReadStorage<'a, Collider>,
+        WriteStorage<'a, SubCollider>,
+        WriteStorage<'a, Vulnerable>,
+        WriteStorage<'a, Damaging>,
         ReadStorage<'a, Present>,
+        Entities<'a>,
+        ReadExpect<'a, Hierarchy<SubCollider>>,
         Read<'a, ElapsedTime>,
     );
 
     fn run(
         &mut self,
-        (mut animations, mut sprite, mut mat3, collider, present, elapsed): Self::SystemData,
+        (
+            mut animations,
+            mut sprite,
+            mut mat3,
+            collider,
+            mut sub,
+            mut vul,
+            mut dmg,
+            present,
+            entities,
+            anim_h,
+            elapsed,
+        ): Self::SystemData,
     ) {
         let res = &mut *resources::RESOURCE_TABLE.write();
-        for (mut animation, collider, _) in (&mut animations, &collider, &present).join() {
+        for (mut animation, collider, e, _) in
+            (&mut animations, &collider, &entities, &present).join()
+        {
             let cha: Result<&mut Box<resources::Character>, EngineError> =
                 res.get_mut(animation.id as usize);
             if let Ok(cha) = cha {
@@ -104,7 +127,46 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                     animation.start = elapsed.0.as_secs_f32();
                 }
 
-                let mut sprites = cha.interpolate(elapsed.0.as_secs_f32() - animation.start);
+                let sprites = cha
+                    .interpolate(elapsed.0.as_secs_f32() - animation.start)
+                    .unwrap();
+                let ci = anim_h.children(e);
+                let mut ci: Vec<_> = ci.to_vec();
+                ci.sort_unstable_by_key(|x| x.id());
+                let mut ci = ci.iter();
+                for (i, s) in sprites.enumerate() {
+                    let s = s.unwrap();
+                    let c = ci.next().cloned().unwrap_or_else(|| {
+                        let e = entities.create();
+                        match collider.mapping.get(&(i as u32)) {
+                            Some(HitboxType::Damaging) => {
+                                dmg.insert(e, Damaging { damage: 0.0 }).unwrap();
+                            }
+                            Some(HitboxType::Vulnerable) => {
+                                vul.insert(e, Vulnerable { armor: 0.0 }).unwrap();
+                            }
+                            _ => (),
+                        }
+                        e
+                    });
+                    if let Some((sprite, mat3, sub)) =
+                        JoinIter::get(&mut (&mut sprite, &mut mat3, &mut sub).join(), c, &entities)
+                    {
+                        *mat3 = Transform {
+                            mat3: s.transform,
+                            parent: e,
+                        };
+                        *sprite = Sprite {
+                            id: animation.id,
+                            sub_id: s.att_id,
+                        };
+                        *sub = SubCollider {
+                            collider: Collidable::RBox(RBox::from(&s.transform)),
+                            parent: e,
+                        }
+                    }
+                }
+
                 //for sprite in (sprites.join()).filter(|s| s.)
             }
         }
