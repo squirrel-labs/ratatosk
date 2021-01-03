@@ -63,7 +63,7 @@ impl<'a> System<'a> for VelocitySystem {
                 let mut percent = -1.0;
                 let mut ids = (entity1.id(), 0);
                 let v = vel.0 * dt.0.as_secs_f32();
-                'b: for (_, _, _pos2, entity2) in (&collider, &terrain, &pos, &entities).join() {
+                for (_, _, _pos2, entity2) in (&collider, &terrain, &pos, &entities).join() {
                     for e1 in hierarchy.children(entity1) {
                         for e2 in hierarchy.children(entity2) {
                             if let (

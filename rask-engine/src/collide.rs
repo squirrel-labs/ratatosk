@@ -38,32 +38,23 @@ impl Collide for Collidable {
     }
 }
 
-/// calculate the axis aligned bounding box for a set of collidables
+/// calculate the minimal axis aligned bounding box that contains all `Collidable`s of a given set
 pub fn calculate_aabb<'a, I: Iterator<Item = &'a Collidable>>(vals: I) -> AABox {
-    let (mut minx, mut maxx, mut miny, mut maxy) = (0.0, 0.0, 0.0, 0.0);
-    let mut first_iter = true;
-    let mut f = |points: &[Vec2]| {
-        for point in points {
-            if first_iter {
-                minx = point.x();
-                maxx = point.x();
-                miny = point.y();
-                maxy = point.y();
-                first_iter = false;
-            } else {
-                minx = f32::min(minx, point.x());
-                maxx = f32::max(maxx, point.x());
-                miny = f32::min(miny, point.y());
-                maxy = f32::max(maxy, point.y());
-            }
-        }
+    let [(mut minx, mut maxx), (mut miny, mut maxy)] = [(f32::INFINITY, f32::NEG_INFINITY); 2];
+    let mut minmax = |v1: &Vec2, v2: &Vec2| {
+        minx = f32::min(minx, v1.x());
+        maxx = f32::max(maxx, v2.x());
+        miny = f32::min(miny, v1.y());
+        maxy = f32::max(maxy, v2.y());
     };
     for val in vals {
         match val {
-            Collidable::Point(v) => f(&[*v]),
-            Collidable::AABox(AABox { pos, size }) => f(&[*pos, *pos + *size]),
-            Collidable::RBox(RBox { pos, v1, v2 }) => {
-                f(&[*pos, *pos + *v1, *pos + *v2, *pos + *v1 + *v2])
+            Collidable::Point(v) => minmax(v, v),
+            Collidable::AABox(AABox { pos, size }) => minmax(pos, &(*pos + *size)),
+            &Collidable::RBox(RBox { pos, v1, v2 }) => {
+                for point in &[pos, pos + v1, pos + v2, pos + v1 + v2] {
+                    minmax(point, point)
+                }
             }
         };
     }
