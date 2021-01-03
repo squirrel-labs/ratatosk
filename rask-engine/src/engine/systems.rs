@@ -57,15 +57,13 @@ impl<'a> System<'a> for VelocitySystem {
         &mut self,
         (mut pos, mut vel, mass, collider, mut transform, sub, terrain, entities, hierarchy, dt): Self::SystemData,
     ) {
-        for (vel, pos, _) in (&vel, &mut pos, !&mass).join() {
-            pos.0 += vel.0 * dt.0.as_secs_f32();
-        }
         let reset_values: Vec<_> = (&collider, &vel, !&terrain, &pos, &mass, &entities)
             .par_join()
             .map(|(_col1, vel, _, _pos1, _mass, entity1)| {
-                let mut reset = Vec2::zero();
+                let mut percent = -1.0;
                 let mut ids = (entity1.id(), 0);
-                for (_, _, _pos2, entity2) in (&collider, &terrain, &pos, &entities).join() {
+                let v = vel.0 * dt.0.as_secs_f32();
+                'b: for (_, _, _pos2, entity2) in (&collider, &terrain, &pos, &entities).join() {
                     for e1 in hierarchy.children(entity1) {
                         for e2 in hierarchy.children(entity2) {
                             if let (
@@ -73,36 +71,30 @@ impl<'a> System<'a> for VelocitySystem {
                                 Some(SubCollider { collider: c2 }),
                             ) = (sub.get(*e1), sub.get(*e2))
                             {
-                                if let Some(percent) = c1.collide_after(c2, vel.0) {
-                                    reset = vel.0 * (1.0 - percent);
-                                    log::debug!("collision!");
-                                    break;
+                                if let Some(move_out) = c1.collide_after(c2, v) {
+                                    if move_out > percent {
+                                        percent = move_out;
+                                        ids = (entity1.id(), entity2.id());
+                                    }
                                 }
                             }
                         }
-                        if reset != Vec2::zero() {
-                            break;
-                        }
-                        ids = (entity1.id(), entity2.id());
-                    }
-                    if reset != Vec2::zero() {
-                        break;
                     }
                 }
-                if reset == Vec2::zero() {
-                    reset = vel.0;
+                if percent == -1.0 {
+                    (ids.0, core::u32::MAX, v)
+                } else {
+                    (ids.0, ids.1, v * (1.0 - percent))
                 }
-                (ids.0, ids.1, reset)
             })
             .collect();
         for (e1, e2, rv) in reset_values {
-            //log::debug!("e1: {}, e2: {} rv: {:?}", e1, e2, rv);
             let e1 = entities.entity(e1);
             if let Some(pos) = pos.get_mut(e1) {
-                pos.0 += rv * dt.0.as_secs_f32();
+                pos.0 += rv;
             }
             if let Some(vel) = vel.get_mut(e1) {
-                if vel.0 != rv {
+                if e2 != core::u32::MAX {
                     vel.0 = Vec2::zero();
                 }
             }

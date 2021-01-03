@@ -160,8 +160,8 @@ impl From<&spine::skeleton::srt::SRT> for RBox {
 impl From<&Mat3> for RBox {
     fn from(mat: &Mat3) -> RBox {
         let pos = Vec2::from(*mat * Vec3::new(-1.0, -1.0, 1.0));
-        let v1 = Mat2::from(mat) * Vec2::new(0.0, 2.0) - pos;
-        let v2 = Mat2::from(mat) * Vec2::new(2.0, 0.0) - pos;
+        let v1 = Mat2::from(mat) * Vec2::new(0.0, 2.0);
+        let v2 = Mat2::from(mat) * Vec2::new(2.0, 0.0);
         RBox { pos, v1, v2 }
     }
 }

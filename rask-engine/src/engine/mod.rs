@@ -58,6 +58,11 @@ impl GameEngine for RaskEngine {
             .with(MovementSystem, "movement", &["events"])
             .with(GravitationSystem, "gravitation", &["movement"])
             .with(UpdateAnimationSystem, "update_anim", &["movement"])
+            .with(
+                SimpleVelocitySystem,
+                "simple_velocity",
+                &["gravitation", "update_anim"],
+            )
             .with(VelocitySystem, "velocity", &["gravitation", "update_anim"])
             .with_thread_local(RenderSystem)
             .build();
@@ -71,17 +76,24 @@ impl GameEngine for RaskEngine {
                 id: registry::EMPTY.id,
                 sub_id: 0,
             })
+            .with(Terrain)
+            .with(Collider {
+                mapping: HashMap::new(),
+                default: HitboxType::Repulsion,
+            })
             .with(Scale(Vec2::new(1.0, 1.0)))
             .build();
         let _ground = world
             .create_entity()
-            .with(Terrain)
             .with(SubCollider {
                 collider: crate::boxes::AABox {
-                    pos: Vec2::new(-2.0, -0.85),
-                    size: Vec2::new(4.0, -3.0),
+                    pos: Vec2::new(-2.0, -1.0),
+                    size: Vec2::new(6.0, 0.15),
                 }
                 .into(),
+            })
+            .with(Parent {
+                entity: _background,
             })
             .build();
         let _char = world
