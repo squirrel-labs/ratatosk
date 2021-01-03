@@ -3,10 +3,10 @@ use crate::math::Vec2;
 use crate::resources::registry;
 use crate::EngineError;
 use core::time::Duration;
-use shrev::EventChannel;
 use specs::prelude::*;
 use specs::WorldExt;
 use specs_hierarchy::{Hierarchy, HierarchySystem};
+use std::collections::HashMap;
 
 mod components;
 mod systems;
@@ -63,6 +63,7 @@ impl GameEngine for RaskEngine {
 
         tick_dispatcher.setup(&mut world);
 
+        let root = world.create_entity().build();
         let _background = world
             .create_entity()
             .with(Pos(Vec2::new(0.0, 0.0)))
@@ -81,7 +82,7 @@ impl GameEngine for RaskEngine {
                     size: Vec2::new(4.0, -3.0),
                 }
                 .into(),
-                parent: _background,
+                parent: root,
             })
             .build();
         let _char = world
@@ -93,6 +94,12 @@ impl GameEngine for RaskEngine {
                 id: registry::CHAR.id,
                 animation: "walking".to_string(),
                 start: 0.0,
+                parent: root,
+            })
+            .with(Collider {
+                mapping: HashMap::new(),
+                default: HitboxType::Vulnerable,
+                parent: root,
             })
             .with(Scale(Vec2::new(1.0, 1.0)))
             .build();

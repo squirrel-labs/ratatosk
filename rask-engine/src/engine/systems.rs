@@ -89,7 +89,7 @@ impl<'a> System<'a> for UpdateAnimationSystem {
         WriteStorage<'a, Damaging>,
         ReadStorage<'a, Present>,
         Entities<'a>,
-        ReadExpect<'a, Hierarchy<Animation>>,
+        ReadExpect<'a, Hierarchy<Collider>>,
         Read<'a, ElapsedTime>,
     );
 

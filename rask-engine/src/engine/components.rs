@@ -103,6 +103,7 @@ pub enum HitboxType {
 pub struct Collider {
     pub mapping: HashMap<u32, HitboxType>,
     pub default: HitboxType,
+    pub parent: Entity,
 }
 
 impl Component for Collider {
@@ -111,7 +112,7 @@ impl Component for Collider {
 
 impl PParent for Collider {
     fn parent_entity(&self) -> Entity {
-        unimplemented!()
+        self.parent
     }
 }
 
@@ -120,16 +121,17 @@ pub struct Animation {
     pub id: u32,
     pub animation: String,
     pub start: f32,
-}
-
-impl PParent for Animation {
-    fn parent_entity(&self) -> Entity {
-        unimplemented!()
-    }
+    pub parent: Entity,
 }
 
 impl Component for Animation {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+}
+
+impl PParent for Animation {
+    fn parent_entity(&self) -> Entity {
+        self.parent
+    }
 }
 
 #[derive(Debug, Clone, Component)]
