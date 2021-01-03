@@ -57,13 +57,13 @@ impl GameEngine for RaskEngine {
             .with(UpdateAnimationSystem, "update_anim", &["check_present"])
             .with(MovementSystem, "movement", &["events"])
             .with(GravitationSystem, "gravitation", &["movement"])
-            .with(VelocitySystem, "velocity", &["gravitation"])
+            .with(UpdateAnimationSystem, "update_anim", &["movement"])
+            .with(VelocitySystem, "velocity", &["gravitation", "update_anim"])
             .with_thread_local(RenderSystem)
             .build();
 
         tick_dispatcher.setup(&mut world);
 
-        let root = world.create_entity().build();
         let _background = world
             .create_entity()
             .with(Pos(Vec2::new(0.0, 0.0)))
@@ -82,24 +82,22 @@ impl GameEngine for RaskEngine {
                     size: Vec2::new(4.0, -3.0),
                 }
                 .into(),
-                parent: root,
             })
             .build();
         let _char = world
             .create_entity()
-            .with(Pos(Vec2::new(0.0, -0.8)))
+            .with(Pos(Vec2::new(0.0, 0.8)))
             .with(Vel(Vec2::new(0.0, 0.0)))
             .with(Speed(0.2))
+            .with(Mass(1.0))
             .with(Animation {
                 id: registry::CHAR.id,
                 animation: "walking".to_string(),
                 start: 0.0,
-                parent: root,
             })
             .with(Collider {
                 mapping: HashMap::new(),
                 default: HitboxType::Vulnerable,
-                parent: root,
             })
             .with(Scale(Vec2::new(1.0, 1.0)))
             .build();

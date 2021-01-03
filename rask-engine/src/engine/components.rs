@@ -79,13 +79,6 @@ pub struct Terrain;
 #[derive(Debug, Clone)]
 pub struct SubCollider {
     pub collider: Collidable,
-    pub parent: Entity,
-}
-
-impl PParent for SubCollider {
-    fn parent_entity(&self) -> Entity {
-        self.parent
-    }
 }
 
 impl Component for SubCollider {
@@ -99,21 +92,10 @@ pub enum HitboxType {
     Repulsion,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Component)]
 pub struct Collider {
     pub mapping: HashMap<u32, HitboxType>,
     pub default: HitboxType,
-    pub parent: Entity,
-}
-
-impl Component for Collider {
-    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
-}
-
-impl PParent for Collider {
-    fn parent_entity(&self) -> Entity {
-        self.parent
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -121,17 +103,10 @@ pub struct Animation {
     pub id: u32,
     pub animation: String,
     pub start: f32,
-    pub parent: Entity,
 }
 
 impl Component for Animation {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
-}
-
-impl PParent for Animation {
-    fn parent_entity(&self) -> Entity {
-        self.parent
-    }
 }
 
 #[derive(Debug, Clone, Component)]
@@ -148,17 +123,10 @@ pub struct Sprite {
 #[derive(Debug, Clone)]
 pub struct Transform {
     pub mat3: Mat3,
-    pub parent: Entity,
 }
 
 impl Component for Transform {
     type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
-}
-
-impl PParent for Transform {
-    fn parent_entity(&self) -> Entity {
-        self.parent
-    }
 }
 
 #[derive(Debug, Default, Clone, Copy, Component)]
