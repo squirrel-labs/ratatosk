@@ -141,10 +141,12 @@ impl<'a> System<'a> for UpdateAnimationSystem {
         WriteStorage<'a, Parent>,
         ReadStorage<'a, Present>,
         ReadStorage<'a, Scale>,
-        ReadStorage<'a, Pos>,
+        WriteStorage<'a, Pos>,
+        WriteStorage<'a, Vel>,
         Entities<'a>,
         ReadExpect<'a, Hierarchy<Parent>>,
         Read<'a, ElapsedTime>,
+        Read<'a, DeltaTime>,
     );
 
     fn run(
@@ -160,18 +162,21 @@ impl<'a> System<'a> for UpdateAnimationSystem {
             mut parent,
             present,
             scale,
-            pos,
+            mut pos,
+            mut vel,
             entities,
             hierarchy,
             elapsed,
+            dt,
         ): Self::SystemData,
     ) {
         let res = &mut *resources::RESOURCE_TABLE.write();
-        for (mut animation, collider, scale, pos, entity, _) in (
+        for (mut animation, collider, scale, pos, vel, entity, _) in (
             &mut animations,
             &collider,
             &scale,
-            &pos,
+            &mut pos,
+            &mut vel,
             &entities,
             &present,
         )
@@ -256,6 +261,39 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                         .map(|e| sub.get(*e).map(|s| &s.collider))
                         .flatten(),
                 );
+
+                use crate::boxes::AABox;
+                let f = |old: AABox, new: AABox, dv, c: fn(Vec2) -> f32| {
+                    let u = |d, b| if b { d } else { 0.0 };
+                    if c(dv) > 0.0 {
+                        let d = c(old.pos + old.size) - c(new.pos + new.size);
+                        u(d, d < 0.0)
+                    } else {
+                        let d = c(old.pos - new.pos);
+                        u(d, d > 0.0)
+                    }
+                };
+
+                let x = f(aabb, new_aabb, vel.0, Vec2::x);
+                let y = f(aabb, new_aabb, vel.0, Vec2::y);
+                if x.is_finite() && y.is_finite() {
+                    let diff = Vec2::new(x, y);
+                    pos.0 += diff;
+                    vel.0 -= diff / dt.0.as_secs_f32();
+                    log::debug!("x: {}, y: {}, vel: {:?}", x, y, vel.0);
+                    for e in hierarchy.children(entity) {
+                        if let Some(trans) = mat3.get_mut(*e) {
+                            trans.mat3 *= Mat3::translation(diff.x(), diff.y());
+                        }
+                        if let Some(sub) = sub.get_mut(*e) {
+                            match sub.collider {
+                                Collidable::AABox(mut a) => a.pos += diff,
+                                Collidable::RBox(mut r) => r.pos += diff,
+                                Collidable::Point(mut p) => p += diff,
+                            };
+                        }
+                    }
+                }
 
                 // modify position to avoid collisions
             }

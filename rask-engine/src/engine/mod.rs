@@ -96,9 +96,22 @@ impl GameEngine for RaskEngine {
                 entity: _background,
             })
             .build();
+        let _ground = world
+            .create_entity()
+            .with(SubCollider {
+                collider: crate::boxes::AABox {
+                    pos: Vec2::new(0.0, -1.0),
+                    size: Vec2::new(2.0, 0.5),
+                }
+                .into(),
+            })
+            .with(Parent {
+                entity: _background,
+            })
+            .build();
         let _char = world
             .create_entity()
-            .with(Pos(Vec2::new(0.0, 0.8)))
+            .with(Pos(Vec2::new(0.0, 0.0)))
             .with(Vel(Vec2::new(0.0, 0.0)))
             .with(Speed(0.2))
             .with(Mass(1.0))
