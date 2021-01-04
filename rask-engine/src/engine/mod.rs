@@ -85,6 +85,12 @@ impl GameEngine for RaskEngine {
             .build();
         let _ground = world
             .create_entity()
+            .with(Pos(Vec2::new(-2.0, -1.0)))
+            .with(Scale(Vec2::new(6.0, 0.15)))
+            .with(Sprite {
+                id: registry::EMPTY.id,
+                sub_id: 0,
+            })
             .with(SubCollider {
                 collider: crate::boxes::AABox {
                     pos: Vec2::new(-2.0, -1.0),
@@ -98,6 +104,12 @@ impl GameEngine for RaskEngine {
             .build();
         let _ground = world
             .create_entity()
+            .with(Sprite {
+                id: registry::EMPTY.id,
+                sub_id: 0,
+            })
+            .with(Pos(Vec2::new(1.0, -1.0)))
+            .with(Scale(Vec2::new(1.0, 0.5)))
             .with(SubCollider {
                 collider: crate::boxes::AABox {
                     pos: Vec2::new(0.0, -1.0),
@@ -113,6 +125,7 @@ impl GameEngine for RaskEngine {
             .create_entity()
             .with(Pos(Vec2::new(0.0, 0.0)))
             .with(Vel(Vec2::new(0.0, 0.0)))
+            .with(Vel_(Vec2::zero()))
             .with(Speed(0.2))
             .with(Mass(1.0))
             .with(Animation {

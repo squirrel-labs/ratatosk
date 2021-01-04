@@ -43,6 +43,7 @@ impl<'a> System<'a> for VelocitySystem {
     type SystemData = (
         WriteStorage<'a, Pos>,
         WriteStorage<'a, Vel>,
+        ReadStorage<'a, Vel_>,
         ReadStorage<'a, Mass>,
         ReadStorage<'a, Collider>,
         WriteStorage<'a, Transform>,
@@ -53,16 +54,17 @@ impl<'a> System<'a> for VelocitySystem {
         Read<'a, DeltaTime>,
     );
 
+    #[rustfmt::skip]
     fn run(
         &mut self,
-        (mut pos, mut vel, mass, collider, mut transform, sub, terrain, entities, hierarchy, dt): Self::SystemData,
+        (mut pos, mut vel, vel_, mass, collider, mut transform, sub, terrain, entities, hierarchy, dt): Self::SystemData,
     ) {
-        let reset_values: Vec<_> = (&collider, &vel, !&terrain, &pos, &mass, &entities)
+        let reset_values: Vec<_> = (&collider, &vel, (&vel_).maybe(), !&terrain, &pos, &mass, &entities)
             .par_join()
-            .map(|(_col1, vel, _, _pos1, _mass, entity1)| {
+            .map(|(_col1, vel, vel_, _, _pos1, _mass, entity1)| {
                 let mut percent = -1.0;
                 let mut ids = (entity1.id(), 0);
-                let v = vel.0 * dt.0.as_secs_f32();
+                let v = vel.0 * dt.0.as_secs_f32() + vel_.map(|x| x.0).unwrap_or_else(Vec2::zero);
                 for (_, _, _pos2, entity2) in (&collider, &terrain, &pos, &entities).join() {
                     for e1 in hierarchy.children(entity1) {
                         for e2 in hierarchy.children(entity2) {
@@ -81,6 +83,7 @@ impl<'a> System<'a> for VelocitySystem {
                         }
                     }
                 }
+                log::debug!("woop {:?}", percent);
                 if percent == -1.0 {
                     (ids.0, core::u32::MAX, v)
                 } else {
@@ -121,10 +124,8 @@ impl<'a> System<'a> for GravitationSystem {
 
     fn run(&mut self, (mut vel, mass, present, g, dt): Self::SystemData) {
         let dt = dt.0.as_secs_f32();
-        if dt < 0.5 {
-            for (vel, _, _) in (&mut vel, &mass, &present).join() {
-                vel.0 += g.0 * dt;
-            }
+        for (vel, _, _) in (&mut vel, &mass, &present).join() {
+            vel.0 += g.0 * dt;
         }
     }
 }
@@ -143,6 +144,7 @@ impl<'a> System<'a> for UpdateAnimationSystem {
         ReadStorage<'a, Scale>,
         WriteStorage<'a, Pos>,
         WriteStorage<'a, Vel>,
+        WriteStorage<'a, Vel_>,
         Entities<'a>,
         ReadExpect<'a, Hierarchy<Parent>>,
         Read<'a, ElapsedTime>,
@@ -164,6 +166,7 @@ impl<'a> System<'a> for UpdateAnimationSystem {
             scale,
             mut pos,
             mut vel,
+            mut vel_,
             entities,
             hierarchy,
             elapsed,
@@ -171,12 +174,13 @@ impl<'a> System<'a> for UpdateAnimationSystem {
         ): Self::SystemData,
     ) {
         let res = &mut *resources::RESOURCE_TABLE.write();
-        for (mut animation, collider, scale, pos, vel, entity, _) in (
+        for (mut animation, collider, scale, pos, vel, mut vel__, entity, _) in (
             &mut animations,
             &collider,
             &scale,
             &mut pos,
             &mut vel,
+            &mut vel_,
             &entities,
             &present,
         )
@@ -268,6 +272,8 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                     if c(dv) > 0.0 {
                         let d = c(old.pos + old.size) - c(new.pos + new.size);
                         u(d, d < 0.0)
+                    } else if c(dv) == 0.0 {
+                        0.0
                     } else {
                         let d = c(old.pos - new.pos);
                         u(d, d > 0.0)
@@ -279,8 +285,8 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                 if x.is_finite() && y.is_finite() {
                     let diff = Vec2::new(x, y);
                     pos.0 += diff;
-                    vel.0 -= diff / dt.0.as_secs_f32();
-                    log::debug!("x: {}, y: {}, vel: {:?}", x, y, vel.0);
+                    vel__.0 = diff;
+                    log::debug!("pos: {:?}, x: {}, y: {}, vel: {:?}", pos.0, x, y, vel.0);
                     for e in hierarchy.children(entity) {
                         if let Some(trans) = mat3.get_mut(*e) {
                             trans.mat3 *= Mat3::translation(diff.x(), diff.y());
