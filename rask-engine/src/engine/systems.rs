@@ -57,14 +57,15 @@ impl<'a> System<'a> for VelocitySystem {
     #[rustfmt::skip]
     fn run(
         &mut self,
-        (mut pos, mut vel, vel_, mass, collider, mut transform, sub, terrain, entities, hierarchy, dt): Self::SystemData,
+        (mut pos, mut vel, vel_, mass, collider, mut transform, mut sub, terrain, entities, hierarchy, dt): Self::SystemData,
     ) {
-        let reset_values: Vec<_> = (&collider, &vel, (&vel_).maybe(), !&terrain, &pos, &mass, &entities)
+        let reset_values: Vec<_> = (&collider, &pos, &vel, (&vel_).maybe(), !&terrain, &pos, &mass, &entities)
             .par_join()
-            .map(|(_col1, vel, vel_, _, _pos1, _mass, entity1)| {
+            .map(|(_col1, &pos_, vel, vel_, _, _pos1, _mass, entity1)| {
                 let mut percent = -1.0;
                 let mut ids = (entity1.id(), 0);
-                let v = vel.0 * dt.0.as_secs_f32() + vel_.map(|x| x.0).unwrap_or_else(Vec2::zero);
+                let v_ = vel_.map(|x|x.0).unwrap_or_default();
+                let v = vel.0 * dt.0.as_secs_f32() + v_;
                 for (_, _, _pos2, entity2) in (&collider, &terrain, &pos, &entities).join() {
                     for e1 in hierarchy.children(entity1) {
                         for e2 in hierarchy.children(entity2) {
@@ -73,6 +74,8 @@ impl<'a> System<'a> for VelocitySystem {
                                 Some(SubCollider { collider: c2 }),
                             ) = (sub.get(*e1), sub.get(*e2))
                             {
+                                let c1 = c1.shift(pos_.0 - v_);
+                                //log::debug!("c1:{:?}", pos_.0 - v);
                                 if let Some(move_out) = c1.collide_after(c2, v) {
                                     if move_out > percent {
                                         percent = move_out;
@@ -83,11 +86,11 @@ impl<'a> System<'a> for VelocitySystem {
                         }
                     }
                 }
-                log::debug!("woop {:?}", percent);
                 if percent == -1.0 {
-                    (ids.0, core::u32::MAX, v)
+                    (ids.0, core::u32::MAX, v - v_)
                 } else {
-                    (ids.0, ids.1, v * (1.0 - percent))
+                log::debug!("rv {:?}, v_: {:?}", v, v_);
+                    (ids.0, ids.1, v * (1.0 - percent) - v_)
                 }
             })
             .collect();
@@ -95,18 +98,24 @@ impl<'a> System<'a> for VelocitySystem {
             let e1 = entities.entity(e1);
             if let Some(pos) = pos.get_mut(e1) {
                 pos.0 += rv;
-            }
-            if let Some(vel) = vel.get_mut(e1) {
-                if e2 != core::u32::MAX {
-                    vel.0 = Vec2::zero();
+                //log::debug!("new vel {:?}, new pos: {:?}", rv, pos.0);
+                let trans_mat = Mat3::translation(pos.0.x(), pos.0.y());
+                if let Some(vel) = vel.get_mut(e1) {
+                    if e2 != core::u32::MAX {
+                        vel.0 = Vec2::zero();
+                    }
                 }
-            }
-            for e in hierarchy.children(e1) {
-                if let Some(trans) = transform.get_mut(*e) {
-                    trans.mat3 *= Mat3::translation(rv.x(), rv.y()); // * trans.mat3;
-                }
-                if let Some(sub) = sub.get(*e) {
-                    //sub. += Mat3::translation(rv.x(), rv.y()) * trans.mat3;
+                for e in hierarchy.children(e1) {
+                    if let Some(trans) = transform.get_mut(*e) {
+                        trans.mat3 = trans_mat * trans.mat3;
+                    }
+                    if let Some(sub) = sub.get_mut(*e) {
+                        match sub.collider {
+                            Collidable::AABox(mut a) => a.pos += rv,
+                            Collidable::RBox(mut r) => r.pos += rv,
+                            Collidable::Point(mut p) => p += rv,
+                        };
+                    }
                 }
             }
         }
@@ -217,6 +226,7 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                 for (i, s) in sprites.enumerate() {
                     let s = s.unwrap();
                     let n_transform = trans * scale * s.transform;
+                    let n_transform = scale * s.transform;
                     let (new_mat3, new_sprite, new_sub) = (
                         Transform { mat3: n_transform },
                         Sprite {
@@ -284,19 +294,21 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                 let y = f(aabb, new_aabb, vel.0, Vec2::y);
                 if x.is_finite() && y.is_finite() {
                     let diff = Vec2::new(x, y);
-                    pos.0 += diff;
-                    vel__.0 = diff;
-                    log::debug!("pos: {:?}, x: {}, y: {}, vel: {:?}", pos.0, x, y, vel.0);
+                    let diff = Vec2::new(0.0, y);
+                    //let diff = Vec2::new(0.0, 0.001);
+                    //pos.0 += diff;
+                    vel__.0 = diff * -1.1;
+                    //log::debug!("pos: {:?}, x: {}, y: {}, vel: {:?}", pos.0, x, y, vel.0);
                     for e in hierarchy.children(entity) {
                         if let Some(trans) = mat3.get_mut(*e) {
-                            trans.mat3 *= Mat3::translation(diff.x(), diff.y());
+                            //trans.mat3 *= Mat3::translation(diff.x(), diff.y());
                         }
                         if let Some(sub) = sub.get_mut(*e) {
-                            match sub.collider {
+                            /*match sub.collider {
                                 Collidable::AABox(mut a) => a.pos += diff,
                                 Collidable::RBox(mut r) => r.pos += diff,
                                 Collidable::Point(mut p) => p += diff,
-                            };
+                            };*/
                         }
                     }
                 }

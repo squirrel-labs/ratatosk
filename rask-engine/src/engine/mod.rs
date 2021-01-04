@@ -126,7 +126,7 @@ impl GameEngine for RaskEngine {
             .with(Pos(Vec2::new(0.0, 0.0)))
             .with(Vel(Vec2::new(0.0, 0.0)))
             .with(Vel_(Vec2::zero()))
-            .with(Speed(0.2))
+            .with(Speed(0.4))
             .with(Mass(1.0))
             .with(Animation {
                 id: registry::CHAR.id,

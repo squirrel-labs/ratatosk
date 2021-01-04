@@ -38,6 +38,23 @@ impl Collide for Collidable {
     }
 }
 
+impl Collidable {
+    pub fn shift(&self, dv: Vec2) -> Collidable {
+        match self {
+            Collidable::AABox(a) => Collidable::AABox(AABox {
+                pos: a.pos + dv,
+                size: a.size,
+            }),
+            Collidable::RBox(r) => Collidable::RBox(RBox {
+                pos: r.pos + dv,
+                v1: r.v1,
+                v2: r.v2,
+            }),
+            Collidable::Point(p) => Collidable::Point(*p + dv),
+        }
+    }
+}
+
 /// calculate the minimal axis aligned bounding box that contains all `Collidable`s of a given set
 pub fn calculate_aabb<'a, I: Iterator<Item = &'a Collidable>>(vals: I) -> AABox {
     let [(mut minx, mut maxx), (mut miny, mut maxy)] = [(f32::INFINITY, f32::NEG_INFINITY); 2];

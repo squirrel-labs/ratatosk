@@ -44,15 +44,15 @@ impl PParent for Parent {
     }
 }
 
-#[derive(Debug, Clone, Copy, Component)]
+#[derive(Debug, Clone, Copy, Default, Component)]
 #[storage(VecStorage)]
 pub struct Vel(pub Vec2);
 
-#[derive(Debug, Clone, Copy, Component)]
+#[derive(Debug, Clone, Copy, Default, Component)]
 #[storage(VecStorage)]
 pub struct Vel_(pub Vec2);
 
-#[derive(Debug, Clone, Copy, Component)]
+#[derive(Debug, Clone, Copy, Default, Component)]
 #[storage(VecStorage)]
 pub struct Pos(pub Vec2);
 
