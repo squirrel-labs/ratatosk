@@ -5,6 +5,7 @@ use crate::EngineError;
 use core::time::Duration;
 use specs::prelude::*;
 use specs::WorldExt;
+use specs_hierarchy::{Hierarchy, HierarchySystem};
 
 mod components;
 mod systems;
@@ -51,6 +52,7 @@ impl GameEngine for RaskEngine {
             .with_pool(pool)
             .with(EventSystem, "events", &[])
             .with(CheckPresentSystem, "check_present", &[]) // does not depend on anything, because resource parsing is handled asynchronously
+            .with(HierarchySystem::<Parent>::new(&mut world), "hierarchy", &[])
             .with(UpdateAnimationSystem, "update_anim", &["check_present"])
             .with(MovementSystem, "movement", &["events"])
             .with(GravitationSystem, "gravitation", &["movement"])

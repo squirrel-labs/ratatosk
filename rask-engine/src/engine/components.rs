@@ -5,6 +5,7 @@ use crate::resources::{
     registry::{CharacterInfo, ResourceInfo},
 };
 use specs::{prelude::*, Component};
+use specs_hierarchy::Parent as PParent;
 
 #[derive(Debug, Default)]
 pub struct Gravitation(pub Vec2);
@@ -23,6 +24,21 @@ pub struct SystemApi(pub(super) Box<dyn io::SystemApi>);
 impl Default for SystemApi {
     fn default() -> Self {
         Self(Box::new(io::DummySystemApi))
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Parent {
+    pub entity: Entity,
+}
+
+impl Component for Parent {
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+}
+
+impl PParent for Parent {
+    fn parent_entity(&self) -> Entity {
+        self.entity
     }
 }
 
