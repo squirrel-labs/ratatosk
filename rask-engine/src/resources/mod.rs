@@ -21,6 +21,7 @@ fn test() {
 */
 
 pub mod character;
+pub mod font;
 pub mod registry;
 mod resource_table;
 pub mod sound;
@@ -29,6 +30,8 @@ pub mod texture;
 
 #[doc(inline)]
 pub use character::Character;
+#[doc(inline)]
+pub use font::Font;
 #[doc(inline)]
 pub use registry::RESOURCE_COUNT;
 #[doc(inline)]
@@ -57,4 +60,5 @@ pub enum Resource {
     Character(Box<Character>),
     Texture(Texture),
     Sound(Sound),
+    Font(Font),
 }

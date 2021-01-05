@@ -658,6 +658,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
+name = "fontdue"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3203e88e086474e56b0785255804a0c23542f76253584d3f43152cd2bb95d0b7"
+dependencies = [
+ "hashbrown 0.8.2",
+ "ttf-parser",
+]
+
+[[package]]
 name = "foreign-types"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -793,6 +803,16 @@ name = "hashbrown"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "96282e96bfcd3da0d3aa9938bedf1e50df3269b6db08b4876d2da0bb1a0841cf"
+dependencies = [
+ "ahash",
+ "autocfg 1.0.1",
+]
+
+[[package]]
+name = "hashbrown"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e91b62f79061a0bc2e046024cb7ba44b08419ed238ecbd9adbd787434b9e8c25"
 dependencies = [
  "ahash",
  "autocfg 1.0.1",
@@ -1119,6 +1139,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "lru"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3aae342b73d57ad0b8b364bd12584819f2c1fe9114285dfcf8b0722607671635"
+
+[[package]]
 name = "matches"
 version = "0.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1273,7 +1299,7 @@ version = "0.3.3"
 source = "git+https://github.com/squirrel-labs/web_worker/?branch=feature/remove-wasm-bindgen#a1b20a4ef8710cd099237cb90c2814fa2895ffb9"
 dependencies = [
  "futures",
- "log 0.3.9",
+ "log 0.4.11",
  "rayon",
  "rayon-core",
  "spin",
@@ -1719,9 +1745,11 @@ dependencies = [
 name = "rask-engine"
 version = "0.2.0"
 dependencies = [
+ "fontdue",
  "image",
  "lazy_static",
  "log 0.4.11",
+ "lru",
  "ouroboros",
  "rayon",
  "specs",
@@ -2481,6 +2509,12 @@ checksum = "283d3b89e1368717881a9d51dad843cc435380d8109c9e47d38780a324698d8b"
 dependencies = [
  "cfg-if 0.1.10",
 ]
+
+[[package]]
+name = "ttf-parser"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7622061403fd00f0820df288e5a580e87d3ce15a1c4313c59fd1ffb77129903f"
 
 [[package]]
 name = "tuple_utils"

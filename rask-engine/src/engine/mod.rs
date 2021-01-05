@@ -38,6 +38,7 @@ impl GameEngine for RaskEngine {
     fn new(pool: std::sync::Arc<rayon::ThreadPool>, mut system: Box<dyn io::SystemApi>) -> Self {
         system.fetch_resource(registry::EMPTY).unwrap();
         system.fetch_resource(registry::SOUND).unwrap();
+        system.fetch_resource(registry::PIXELFONT).unwrap();
         system.fetch_character_resource(registry::CHAR).unwrap();
 
         let mut world: specs::World = specs::WorldExt::new();

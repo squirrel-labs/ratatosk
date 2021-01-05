@@ -97,10 +97,7 @@ impl ResourceTable {
     }
 
     pub fn resource_present(&self, id: usize) -> bool {
-        match self.0.get(id) {
-            None | Some(Resource::None) => false,
-            _ => true,
-        }
+        !matches!(self.0.get(id), None | Some(Resource::None))
     }
 
     fn index_check(&self, id: usize) -> Result<(), EngineError> {
@@ -118,6 +115,7 @@ impl ResourceTable {
 get_store!(super::Texture, Texture);
 get_store!(super::Sound, Sound);
 get_store!(Box<super::Character>, Character);
+get_store!(super::Font, Font);
 
 impl GetTextures for ResourceTable {
     fn get_textures<U: Into<usize> + Debug + Copy>(
@@ -129,6 +127,9 @@ impl GetTextures for ResourceTable {
             Resource::Texture(value) => Ok(vec![(0, value)]),
             Resource::Character(value) => {
                 Ok(value.atlas().iter().map(|(id, t)| (*id, t)).collect())
+            }
+            Resource::Font(value) => {
+                Ok(value.cache().iter().map(|(id, (_, t))| (*id, t)).collect())
             }
             Resource::None => Err(EngineError::ResourceMissing(format!(
                 "Could not find requested resource #{}",
@@ -151,7 +152,13 @@ impl GetTextures for ResourceTable {
             Resource::Texture(value) => Ok(value),
             Resource::Character(value) => value.atlas().get(&sid).ok_or_else(|| {
                 EngineError::ResourceIndex(format!(
-                    "Invalid subtexture id #{} of texture #{:?}",
+                    "Invalid subtexture id #{} of character #{:?}",
+                    sid, id
+                ))
+            }),
+            Resource::Font(value) => value.get_glyph_data(sid).ok_or_else(|| {
+                EngineError::ResourceIndex(format!(
+                    "Invalid subtexture id #{} of font #{:?}",
                     sid, id
                 ))
             }),

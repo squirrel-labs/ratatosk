@@ -9,7 +9,7 @@ use rask_engine::network::{
 };
 use rask_engine::resources::{
     registry::{CharacterInfo, ResourceInfo, ResourceVariant, RESOURCE_COUNT},
-    Character, GetStore, Texture,
+    Character, Font, GetStore, Texture,
 };
 use rask_engine::EngineError;
 
@@ -129,7 +129,7 @@ impl ResourceParser {
                 resource_types::CHARACTER => ResourceParser::parse_char(data)?,
                 _ => {
                     return Err(EngineError::ResourceFormat(
-                        "unknown ResourceType while parsing".into(),
+                        "unknown ResourceType while parsing websocket packet".into(),
                     ));
                 }
             }
@@ -151,7 +151,16 @@ impl ResourceParser {
                         id
                     ))
                 })?;
-                ResourceParser::store_owned_texture(parent_id, data)?
+                ResourceParser::store_owned_texture(parent_id, data)
+            }
+            ResourceVariant::Font => {
+                let data = self.pop_buffer(id).ok_or_else(|| {
+                    EngineError::ResourceFetchConflict(format!(
+                        "Tried to parse resource id {} for wich no buffer is allocated",
+                        id
+                    ))
+                })?;
+                ResourceParser::store_owned_font(parent_id, data)
             }
             ResourceVariant::Character => {
                 let parts = self.char_parts_table.get_mut(&parent_id).unwrap();
@@ -194,14 +203,21 @@ impl ResourceParser {
         Ok(())
     }
 
-    fn store_owned_texture(id: u32, image: Vec<u8>) -> Result<(), EngineError> {
+    fn store_owned_texture(id: u32, image: Vec<u8>) {
         log::debug!("decoding texture {} len: {}", id, image.len());
         rayon::spawn(move || {
             log::debug!("{}", image.len());
             let img = Texture::from_memory(image.as_slice()).unwrap();
             RESOURCE_TABLE.write().store(img, id as usize).unwrap();
         });
-        Ok(())
+    }
+
+    fn store_owned_font(id: u32, font: Vec<u8>) {
+        log::debug!("parsing font {} len: {}", id, font.len());
+        rayon::spawn(move || {
+            let img = Font::new(font.as_slice()).unwrap();
+            RESOURCE_TABLE.write().store(img, id as usize).unwrap();
+        });
     }
 
     fn parse_char(res: packet::NetworkResource) -> Result<(), EngineError> {
