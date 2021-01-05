@@ -5,7 +5,12 @@ use crate::io;
 use crate::math::{Mat3, Vec2};
 use crate::resources::{self, registry, GetStore};
 use crate::EngineError;
+use core::iter::FromIterator;
+use fontdue::layout::{
+    CoordinateSystem, HorizontalAlign, Layout, LayoutSettings, TextStyle, VerticalAlign, WrapStyle,
+};
 use specs::prelude::*;
+use specs_hierarchy::Hierarchy;
 
 lazy_static::lazy_static! {
     pub static ref KEYBOARD: Keyboard = Keyboard::new();
@@ -18,6 +23,148 @@ pub struct RenderSystem;
 pub struct MovementSystem;
 pub struct CheckPresentSystem;
 pub struct UpdateAnimationSystem;
+
+#[derive(Default)]
+pub struct TextRenderSystem {
+    pub modified: BitSet,
+    pub processed: BitSet,
+    pub reader_id: Option<ReaderId<ComponentEvent>>,
+}
+
+impl<'a> System<'a> for TextRenderSystem {
+    type SystemData = (
+        ReadStorage<'a, TextBox>,
+        ReadStorage<'a, Present>,
+        WriteStorage<'a, Parent>,
+        WriteStorage<'a, Sprite>,
+        WriteStorage<'a, Pos>,
+        WriteStorage<'a, Scale>,
+        WriteStorage<'a, Glyph>,
+        ReadExpect<'a, Hierarchy<Parent>>,
+        Entities<'a>,
+    );
+
+    fn run(
+        &mut self,
+        (
+            textboxes,
+            present,
+            mut parent,
+            mut sprites,
+            mut pos,
+            mut scale,
+            mut glyps,
+            hierarchy,
+            entities,
+        ): Self::SystemData,
+    ) {
+        let events = textboxes.channel().read(self.reader_id.as_mut().unwrap());
+        self.processed.clear();
+        self.modified.clear();
+
+        for event in events {
+            match event {
+                ComponentEvent::Modified(id) | ComponentEvent::Inserted(id) => {
+                    log::debug!("texbox modified: {}", id);
+                    self.modified.add(*id);
+                }
+                ComponentEvent::Removed(_) => (),
+            }
+        }
+
+        for (tex, entity, _) in (&textboxes, &self.modified, &present).join() {
+            let layout_settings = LayoutSettings {
+                x: 0.0,
+                y: 0.0,
+                max_width: tex.width,
+                max_height: tex.height,
+                horizontal_align: HorizontalAlign::Left,
+                vertical_align: VerticalAlign::Top,
+                wrap_style: WrapStyle::Word,
+                wrap_hard_breaks: true,
+            };
+            let entity = entities.entity(entity);
+            let mut layout: Layout<()> = Layout::new(CoordinateSystem::PositiveYUp);
+            layout.reset(&layout_settings);
+            assert!(matches!(tex.font.variant, registry::ResourceVariant::Font));
+            let res = &mut *resources::RESOURCE_TABLE.write();
+            let font: Result<&mut resources::Font, EngineError> = res.get_mut(tex.font.id as usize);
+            let style = TextStyle::new(&tex.content, tex.fontsize, 0);
+            if let Ok(font) = font {
+                layout.append(&[font.font()], &style);
+                let mut ci = hierarchy.children(entity).iter();
+
+                let curr_pos = pos
+                    .get(entity)
+                    .expect("Every textbox has to have a position")
+                    .0;
+                for glyph in layout.glyphs() {
+                    if glyph.char_data.is_whitespace()
+                        || glyph.char_data.is_control()
+                        || glyph.char_data.is_missing()
+                    {
+                        continue;
+                    }
+                    let id = font.store_glyph(glyph);
+                    let (npo, nsp, nsc) = (
+                        Pos(Vec2::new(
+                            curr_pos.x() + glyph.x / tex.fontsize / 4.0,
+                            curr_pos.y() + glyph.y / tex.fontsize / 4.0,
+                        )),
+                        Sprite {
+                            id: tex.font.id,
+                            sub_id: id,
+                        },
+                        Scale(Vec2::new(
+                            glyph.width as f32 / -400.0,
+                            glyph.height as f32 / -400.0,
+                        )),
+                    );
+                    log::debug!("printing: {:?} pos: {:?}", glyph.key.c, npo);
+                    match ci.next().cloned() {
+                        None => {
+                            entities
+                                .build_entity()
+                                .with(npo, &mut pos)
+                                .with(nsp, &mut sprites)
+                                .with(nsc, &mut scale)
+                                .with(Glyph, &mut glyps)
+                                .with(Parent { entity }, &mut parent)
+                                .build();
+                        }
+                        Some(c) => {
+                            if let Some((pos_, sprite, scale_)) =
+                                (&mut pos, &mut sprites, &mut scale)
+                                    .join()
+                                    .get(c, &entities)
+                            {
+                                *pos_ = npo;
+                                *sprite = nsp;
+                                *scale_ = nsc;
+                            } else {
+                                unreachable!()
+                            }
+                        }
+                    }
+                }
+                for id in ci {
+                    entities.delete(*id).unwrap();
+                }
+            }
+        }
+        for (_, e) in (&glyps, &entities).join() {
+            if parent.get(e).is_none() {
+                entities.delete(e).unwrap();
+            }
+        }
+        self.modified ^= &self.processed;
+    }
+
+    fn setup(&mut self, world: &mut World) {
+        Self::SystemData::setup(world);
+        self.reader_id = Some(WriteStorage::<TextBox>::fetch(&world).register_reader());
+    }
+}
 
 impl<'a> System<'a> for VelocitySystem {
     type SystemData = (
@@ -97,7 +244,7 @@ impl<'a> System<'a> for RenderSystem {
             sprites.push(resources::Sprite::new(
                 Mat3::translation(pos.0.x(), pos.0.y()) * Mat3::scaling(scale.0.x(), scale.0.y()),
                 sprite.id,
-                0,
+                sprite.sub_id,
             ))
         }
         let res = &*resources::RESOURCE_TABLE.read();
@@ -165,11 +312,12 @@ impl<'a> System<'a> for CheckPresentSystem {
     type SystemData = (
         ReadStorage<'a, Animation>,
         ReadStorage<'a, Sprite>,
+        ReadStorage<'a, TextBox>,
         Entities<'a>,
         WriteStorage<'a, Present>,
     );
 
-    fn run(&mut self, (anim, sprite, entities, mut present): Self::SystemData) {
+    fn run(&mut self, (anim, sprite, textbox, entities, mut present): Self::SystemData) {
         let res = &*resources::RESOURCE_TABLE.read();
 
         let mut modified = Vec::new();
@@ -183,6 +331,11 @@ impl<'a> System<'a> for CheckPresentSystem {
                 modified.push(entity);
             }
         }
+        for (textbox, entity, _) in (&textbox, &entities, !&present).join() {
+            if res.resource_present(textbox.font.id as usize) {
+                modified.push(entity);
+            }
+        }
         for item in modified {
             let _ = present
                 .insert(item, Present)
@@ -192,20 +345,20 @@ impl<'a> System<'a> for CheckPresentSystem {
 }
 
 impl<'a> System<'a> for EventSystem {
-    type SystemData = (Write<'a, SystemApi>,);
+    type SystemData = (Write<'a, SystemApi>, WriteStorage<'a, TextBox>);
 
-    fn run(&mut self, mut sys: Self::SystemData) {
+    fn run(&mut self, (mut sys, mut textboxes): Self::SystemData) {
         let sys = &mut *sys.0;
         loop {
-            let message = sys.0.poll_message().unwrap();
+            let message = sys.poll_message().unwrap();
             match message {
                 io::Message::None => break,
                 io::Message::SystemInternal => continue,
                 io::Message::Event(event) => {
                     log::trace!("event: {:?}", event);
                     match event {
-                        Event::KeyDown(_, Key::KEY_P) => sys.0.play_sound(registry::SOUND.id),
-                        Event::KeyDown(_, Key::KEY_S) => sys.0.stop_sound(registry::SOUND.id),
+                        Event::KeyDown(_, Key::KEY_P) => sys.play_sound(registry::SOUND.id),
+                        Event::KeyDown(_, Key::KEY_S) => sys.stop_sound(registry::SOUND.id),
                         Event::KeyDown(_, Key::DIGIT1) => {
                             log::set_max_level(log::LevelFilter::Info)
                         }
@@ -214,6 +367,11 @@ impl<'a> System<'a> for EventSystem {
                         }
                         Event::KeyDown(_, Key::DIGIT3) => {
                             log::set_max_level(log::LevelFilter::Trace)
+                        }
+                        Event::KeyDown(_, Key::KEY_A) => {
+                            for t in (&mut textboxes).join() {
+                                t.content += "a"
+                            }
                         }
                         Event::KeyDown(_, key) => KEYBOARD.set(key, true),
                         Event::KeyUp(_, key) => KEYBOARD.set(key, false),

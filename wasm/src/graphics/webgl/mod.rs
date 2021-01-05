@@ -210,6 +210,9 @@ impl GraphicsApi for WebGl2 {
         let prev_layer_index = self.layer_index;
         let empty = self.textures.is_empty();
         for texture in textures {
+            if texture.2.width() == 0 || texture.2.height() == 0 {
+                continue;
+            }
             let rect = self
                 .texture_packer
                 .pack(texture.2.width() as i32, texture.2.height() as i32, false)
@@ -223,7 +226,13 @@ impl GraphicsApi for WebGl2 {
                         false,
                     )
                 })
-                .ok_or_else(|| ClientError::WebGlError("texture too large for GPU".to_string()))?;
+                .ok_or_else(|| {
+                    ClientError::WebGlError(format!(
+                        "texture w:{} h:{} too large for GPU",
+                        texture.2.width(),
+                        texture.2.height()
+                    ))
+                })?;
             let tex = (
                 TextureRange::new(
                     (rect.x as u32, rect.y as u32),

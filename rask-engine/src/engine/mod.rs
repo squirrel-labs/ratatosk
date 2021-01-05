@@ -55,6 +55,7 @@ impl GameEngine for RaskEngine {
             .with(CheckPresentSystem, "check_present", &[]) // does not depend on anything, because resource parsing is handled asynchronously
             .with(HierarchySystem::<Parent>::new(&mut world), "hierarchy", &[])
             .with(UpdateAnimationSystem, "update_anim", &["check_present"])
+            .with(TextRenderSystem::default(), "textbox", &["check_present"])
             .with(MovementSystem, "movement", &["events"])
             .with(GravitationSystem, "gravitation", &["movement"])
             .with(VelocitySystem, "velocity", &["gravitation"])
@@ -67,8 +68,23 @@ impl GameEngine for RaskEngine {
             .with(Pos(Vec2::new(0.0, 0.0)))
             .with(Sprite {
                 id: registry::EMPTY.id,
+                sub_id: 0,
             })
             .with(Scale(Vec2::new(1.0, 1.0)))
+            .with(Static)
+            .build();
+        let _text = world
+            .create_entity()
+            .with(Pos(Vec2::new(-0.7, 0.0)))
+            .with(TextBox {
+                font: registry::PIXELFONT,
+                content: String::from("Hallo Welt"),
+                fontsize: 40.0,
+                color: core::u32::MAX,
+                width: None,
+                height: None,
+            })
+            .with(Scale(Vec2::new(0.1, -0.1)))
             .with(Static)
             .build();
         let _char = world

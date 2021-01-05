@@ -23,17 +23,21 @@ impl Font {
     }
 
     /// Stores the glyph in the cache and return the texture subid
-    pub fn store_gyph(&mut self, glyph: GlyphPosition) -> u64 {
+    pub fn store_glyph(&mut self, glyph: &GlyphPosition) -> u64 {
         let mut s = DefaultHasher::new();
         glyph.key.hash(&mut s);
         let key = s.finish();
         if !self.cache.contains(&key) {
             let (metrics, data) = self.font.rasterize_config(glyph.key);
+            let mut new_data = Vec::new();
+            for d in data {
+                new_data.append(&mut vec![d, d, d, d]);
+            }
             let tex = Texture::form_raw_parts(
-                data,
+                new_data,
                 metrics.width as u32,
                 metrics.height as u32,
-                image::ColorType::L8,
+                image::ColorType::Rgba8,
             );
 
             self.cache.put(key, (metrics, tex));
@@ -50,5 +54,8 @@ impl Font {
 
     pub fn cache(&self) -> &LruCache<u64, (Metrics, Texture)> {
         &self.cache
+    }
+    pub fn font(&self) -> &FFont {
+        &self.font
     }
 }

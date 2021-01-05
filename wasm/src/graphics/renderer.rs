@@ -4,6 +4,7 @@ use crate::communication::{RESOURCE_TABLE, SYNCHRONIZATION_MEMORY};
 use crate::error::ClientError;
 use rask_engine::resources::{GetTextures, Texture};
 
+const RENDER_RESOLUTION: (u32, u32) = (240, 135);
 type RenderBackend = WebGl2;
 static mut RENDERER: Option<Renderer<RenderBackend>> = None;
 
