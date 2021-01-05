@@ -13,6 +13,7 @@
 *.png   binary
 *.gif   binary
 *.mp3   binary
+*.ttf   binary
 
 ###############################################################################
 # diff behavior for common document formats
