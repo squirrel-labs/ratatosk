@@ -6,12 +6,13 @@ use crate::resources::{
 };
 use specs::{prelude::*, Component};
 use specs_hierarchy::Parent as PParent;
+use std::collections::HashSet;
 
 #[derive(Debug, Default)]
 pub struct Gravitation(pub Vec2);
 
 #[derive(Debug, Default)]
-pub struct TextureIds(pub Vec<u32>);
+pub struct TextureIds(pub HashSet<(u32, u64)>);
 
 #[derive(Debug, Default)]
 pub struct DeltaTime(pub std::time::Duration);

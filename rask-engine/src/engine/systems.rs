@@ -43,6 +43,7 @@ impl<'a> System<'a> for TextRenderSystem {
         ReadExpect<'a, Hierarchy<Parent>>,
         Entities<'a>,
         Read<'a, RenderBufferDimensions>,
+        Write<'a, TextureIds>,
     );
 
     fn run(
@@ -58,6 +59,7 @@ impl<'a> System<'a> for TextRenderSystem {
             hierarchy,
             entities,
             buf_dim,
+            mut texture_ids,
         ): Self::SystemData,
     ) {
         let events = textboxes.channel().read(self.reader_id.as_mut().unwrap());
@@ -67,7 +69,7 @@ impl<'a> System<'a> for TextRenderSystem {
         for event in events {
             match event {
                 ComponentEvent::Modified(id) | ComponentEvent::Inserted(id) => {
-                    log::debug!("texbox modified: {}", id);
+                    //log::debug!("texbox modified: {}", id);
                     self.modified.add(*id);
                 }
                 ComponentEvent::Removed(_) => (),
@@ -107,7 +109,10 @@ impl<'a> System<'a> for TextRenderSystem {
                     {
                         continue;
                     }
-                    let id = font.store_glyph(glyph);
+                    let (id, modified) = font.store_glyph(glyph);
+                    if modified {
+                        texture_ids.0.remove(&(tex.font.id, id));
+                    }
                     let nscale = (
                         -(glyph.width as f32 / buf_dim.0 .0 as f32),
                         -(glyph.height as f32 / buf_dim.0 .1 as f32),
@@ -123,7 +128,7 @@ impl<'a> System<'a> for TextRenderSystem {
                         },
                         Scale(Vec2::new(nscale.0, nscale.1)),
                     );
-                    log::debug!("printing: {:?} pos: {:?}, scale: {:?}", glyph, npo, nsc);
+                    //log::debug!("printing: {:?} pos: {:?}, scale: {:?}", glyph, npo, nsc);
                     match ci.next().cloned() {
                         None => {
                             entities
@@ -273,13 +278,13 @@ impl<'a> System<'a> for RenderSystem {
         }
         let mut dirty = false;
         for sp in &sprites {
-            if !tex_ids.0.contains(&sp.tex_id) {
-                tex_ids.0.push(sp.tex_id);
+            if !tex_ids.0.contains(&(sp.tex_id, sp.tex_sub_id)) {
+                tex_ids.0.insert((sp.tex_id, sp.tex_sub_id));
                 dirty = true;
             }
         }
         if dirty {
-            sys.0.push_textures(tex_ids.0.clone());
+            sys.0.push_textures(tex_ids.0.iter().map(|x| x.0).collect());
         }
         sys.0.push_sprites(sprites);
     }
@@ -290,11 +295,14 @@ impl<'a> System<'a> for MovementSystem {
         WriteStorage<'a, Animation>,
         WriteStorage<'a, Vel>,
         WriteStorage<'a, Scale>,
+        WriteStorage<'a, TextBox>,
         ReadStorage<'a, Speed>,
+        ReadStorage<'a, Pos>,
     );
 
-    fn run(&mut self, (mut anim, mut vel, mut scale, speed): Self::SystemData) {
-        for (anim, vel, scale, speed) in (&mut anim, &mut vel, &mut scale, &speed).join() {
+    fn run(&mut self, (mut anim, mut vel, mut scale, mut textboxes, speed, pos): Self::SystemData) {
+        for (anim, vel, scale, speed, pos) in (&mut anim, &mut vel, &mut scale, &speed, &pos).join()
+        {
             anim.animation = if KEYBOARD.get(Key::ARROW_RIGHT) {
                 scale.0 = Vec2::new(1.0, scale.0.y());
                 vel.0 = Vec2::new(speed.0, 0.0);
@@ -307,6 +315,9 @@ impl<'a> System<'a> for MovementSystem {
                 vel.0 = Vec2::new(0.0, 0.0);
                 "standing".to_owned()
             };
+            for tb in (&mut textboxes).join() {
+                tb.content = format!("pos: |{:.2}, {:.2}|", pos.0.x(), pos.0.y())
+            }
         }
     }
 }

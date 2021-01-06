@@ -5,7 +5,8 @@ use crate::EngineError;
 use core::time::Duration;
 use specs::prelude::*;
 use specs::WorldExt;
-use specs_hierarchy::{Hierarchy, HierarchySystem};
+use specs_hierarchy::HierarchySystem;
+use std::collections::HashSet;
 
 mod components;
 mod systems;
@@ -46,7 +47,7 @@ impl GameEngine for RaskEngine {
         world.insert(Gravitation(GRAVITY));
         world.insert(DeltaTime(Duration::from_millis(10)));
         world.insert(ElapsedTime(Duration::from_millis(0)));
-        world.insert(TextureIds(Vec::new()));
+        world.insert(TextureIds(HashSet::new()));
         world.insert(RenderBufferDimensions(
             system.get_render_buffer_dimensions(),
         ));
@@ -78,13 +79,13 @@ impl GameEngine for RaskEngine {
             .build();
         let _text = world
             .create_entity()
-            .with(Pos(Vec2::new(-0.7, 0.0)))
+            .with(Pos(Vec2::new(-0.9, 0.6)))
             .with(TextBox {
                 font: registry::PIXELFONT,
                 content: String::from("Hallo Welt"),
-                fontsize: 40.0,
+                fontsize: 20.0,
                 color: core::u32::MAX,
-                width: None,
+                width: Some(220.0),
                 height: None,
             })
             .with(Scale(Vec2::new(0.1, -0.1)))

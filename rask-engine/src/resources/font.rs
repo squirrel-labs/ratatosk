@@ -5,7 +5,7 @@ use lru::LruCache;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-const FONTCACHESIZE: usize = 128;
+const FONTCACHESIZE: usize = 256;
 
 pub struct Font {
     font: FFont,
@@ -22,11 +22,13 @@ impl Font {
         })
     }
 
-    /// Stores the glyph in the cache and return the texture subid
-    pub fn store_glyph(&mut self, glyph: &GlyphPosition) -> u64 {
+    /// Stores the glyph in the cache and return the texture subid and whether the it was already
+    /// present in the cache
+    pub fn store_glyph(&mut self, glyph: &GlyphPosition) -> (u64, bool) {
         let mut s = DefaultHasher::new();
         glyph.key.hash(&mut s);
         let key = s.finish();
+        //log::debug!("adding key: {}, glyph: {:?}", key, glyph);
         if !self.cache.contains(&key) {
             let (metrics, data) = self.font.rasterize_config(glyph.key);
             let mut new_data = Vec::new(); // TODO: Replace with color management
@@ -41,8 +43,10 @@ impl Font {
             );
 
             self.cache.put(key, (metrics, tex));
+            (key, true)
+        } else {
+            (key, false)
         }
-        key
     }
 
     pub fn get_glyph_metrics(&self, key: u64) -> Option<&Metrics> {

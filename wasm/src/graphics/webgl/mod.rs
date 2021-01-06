@@ -110,21 +110,30 @@ impl WebGl2 {
     fn generate_texture_buffers(
         &mut self,
         sprites: &[Sprite],
-    ) -> Option<(Vec<[f32; 4]>, Vec<u32>)> {
+    ) -> Result<(Vec<[f32; 4]>, Vec<u32>), Vec<Sprite>> {
         self.sprite_textures = sprites.iter().map(|s| (s.tex_id, s.tex_sub_id)).collect();
-        Some(
-            self.sprite_textures
+        let mapping = self
+            .sprite_textures
+            .iter()
+            .map(|i| {
+                self.textures
+                    .get(i)
+                    .map(|(range, layer)| (range.into_floats(), layer))
+            })
+            .collect::<Option<Vec<_>>>();
+        if let Some(mapping) = mapping {
+            Ok(mapping.iter().cloned().unzip())
+        } else {
+            Err(sprites
                 .iter()
-                .map(|i| {
+                .filter_map(|t| {
                     self.textures
-                        .get(i)
-                        .map(|(range, layer)| (range.into_floats(), layer))
+                        .get(&(t.tex_id, t.tex_sub_id))
+                        .map_or(Some(t), |_| None)
                 })
-                .collect::<Option<Vec<_>>>()?
-                .iter()
                 .cloned()
-                .unzip(),
-        )
+                .collect())
+        }
     }
 }
 
@@ -170,6 +179,15 @@ impl GraphicsApi for WebGl2 {
         if sprites.is_empty() {
             return Ok(());
         }
+
+        let fetch_texture_info = |sps, api: &mut Self| {
+            api.generate_texture_buffers(sps).map_err(|sprites| {
+                ClientError::ResourceError(format!(
+                    "Tried to add sprite with non-existent texture. Missing sprites: {:#?}",
+                    sprites
+                ))
+            })
+        };
         if sprites.len() == self.matrix_buffer.len() {
             let keep_textures = self
                 .sprite_textures
@@ -177,12 +195,7 @@ impl GraphicsApi for WebGl2 {
                 .zip(sprites.iter())
                 .all(|(&t, s)| s.tex_id == t.0 && s.tex_sub_id == t.1);
             if !keep_textures {
-                let (texture_ranges, texture_layers) =
-                    self.generate_texture_buffers(sprites).ok_or_else(|| {
-                        ClientError::ResourceError(
-                            "tried to set sprite texture to non-existent texture".to_string(),
-                        )
-                    })?;
+                let (texture_ranges, texture_layers) = fetch_texture_info(sprites, self)?;
                 self.gl
                     .update_texture_buffer(&texture_ranges, &texture_layers);
             }
@@ -193,12 +206,7 @@ impl GraphicsApi for WebGl2 {
             Ok(())
         } else {
             self.matrix_buffer = sprites.iter().map(|s| s.transform).collect();
-            let (texture_ranges, texture_layers) =
-                self.generate_texture_buffers(sprites).ok_or_else(|| {
-                    ClientError::ResourceError(
-                        "tried to add sprite with non-existent texture".to_string(),
-                    )
-                })?;
+            let (texture_ranges, texture_layers) = fetch_texture_info(sprites, self)?;
             self.gl
                 .allocate_buffers(&self.matrix_buffer, &texture_ranges, &texture_layers)
         }
