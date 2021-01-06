@@ -33,7 +33,7 @@ pub struct TextRenderSystem {
 
 impl<'a> System<'a> for TextRenderSystem {
     type SystemData = (
-        ReadStorage<'a, TextBox>,
+        WriteStorage<'a, TextBox>,
         ReadStorage<'a, Present>,
         WriteStorage<'a, Parent>,
         WriteStorage<'a, Sprite>,
@@ -49,7 +49,7 @@ impl<'a> System<'a> for TextRenderSystem {
     fn run(
         &mut self,
         (
-            textboxes,
+            mut textboxes,
             present,
             mut parent,
             mut sprites,
@@ -76,7 +76,7 @@ impl<'a> System<'a> for TextRenderSystem {
             }
         }
 
-        for (tex, entity, _) in (&textboxes, &self.modified, &present).join() {
+        for (tex, entity, _) in (&mut textboxes, &self.modified, &present).join() {
             let layout_settings = LayoutSettings {
                 x: 0.0,
                 y: 0.0,
@@ -97,6 +97,9 @@ impl<'a> System<'a> for TextRenderSystem {
             if let Ok(font) = font {
                 layout.append(&[font.font()], &style);
                 let mut ci = hierarchy.children(entity).iter();
+                if tex.content == super::INITIAL_CHARS {
+                    tex.content = String::new();
+                }
 
                 let curr_pos = pos
                     .get(entity)
@@ -126,7 +129,7 @@ impl<'a> System<'a> for TextRenderSystem {
                             id: tex.font.id,
                             sub_id: id,
                         },
-                        Scale(Vec2::new(nscale.0, nscale.1)),
+                        Scale(Vec2::new(nscale.0 * 0.9, nscale.1 * 0.9)),
                     );
                     //log::debug!("printing: {:?} pos: {:?}, scale: {:?}", glyph, npo, nsc);
                     match ci.next().cloned() {
@@ -298,9 +301,13 @@ impl<'a> System<'a> for MovementSystem {
         WriteStorage<'a, TextBox>,
         ReadStorage<'a, Speed>,
         ReadStorage<'a, Pos>,
+        ReadStorage<'a, Present>,
     );
 
-    fn run(&mut self, (mut anim, mut vel, mut scale, mut textboxes, speed, pos): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut anim, mut vel, mut scale, mut textboxes, speed, pos, present): Self::SystemData,
+    ) {
         for (anim, vel, scale, speed, pos) in (&mut anim, &mut vel, &mut scale, &speed, &pos).join()
         {
             anim.animation = if KEYBOARD.get(Key::ARROW_RIGHT) {
@@ -315,8 +322,10 @@ impl<'a> System<'a> for MovementSystem {
                 vel.0 = Vec2::new(0.0, 0.0);
                 "standing".to_owned()
             };
-            for tb in (&mut textboxes).join() {
-                tb.content = format!("pos: |{:.2}, {:.2}|", pos.0.x(), pos.0.y())
+            for (tb, _) in (&mut textboxes, &present).join() {
+                if tb.content.is_empty() {
+                    tb.content = format!("pos: |{:.2}, {:.2}|", pos.0.x(), pos.0.y())
+                }
             }
         }
     }

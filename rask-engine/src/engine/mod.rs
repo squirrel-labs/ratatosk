@@ -14,6 +14,13 @@ use components::*;
 use systems::*;
 
 const GRAVITY: Vec2 = Vec2::new(0.0, -9.807);
+pub const INITIAL_CHARS: &str = ", !, \", #, $, %, &, ', (, ), *, +,
+                    ,, -, ., /, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    :, ;, <, =, >, ?, @, A, B, C, D, E, F, G,
+                    H, I, J, K, L, M, N, O, P, Q, R, S, T, U,
+                    V, W, X, Y, Z, [, \\, ], ^, _, `, a, b, c,
+                    d, e, f, g, h, i, j, k, l, m, n, o, p, q,
+                    r, s, t, u, v, w, x, y, z, {, |, }, ~";
 
 pub struct Level {}
 
@@ -82,7 +89,7 @@ impl GameEngine for RaskEngine {
             .with(Pos(Vec2::new(-0.9, 0.6)))
             .with(TextBox {
                 font: registry::PIXELFONT,
-                content: String::from("Hallo Welt"),
+                content: String::from(INITIAL_CHARS),
                 fontsize: 20.0,
                 color: core::u32::MAX,
                 width: Some(220.0),
