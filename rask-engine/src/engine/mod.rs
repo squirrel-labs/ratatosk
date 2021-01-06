@@ -47,6 +47,9 @@ impl GameEngine for RaskEngine {
         world.insert(DeltaTime(Duration::from_millis(10)));
         world.insert(ElapsedTime(Duration::from_millis(0)));
         world.insert(TextureIds(Vec::new()));
+        world.insert(RenderBufferDimensions(
+            system.get_render_buffer_dimensions(),
+        ));
         world.insert(SystemApi(system));
 
         let mut tick_dispatcher = DispatcherBuilder::new()
@@ -111,7 +114,7 @@ impl GameEngine for RaskEngine {
     fn tick(&mut self, dt: Duration, elapsed: Duration) -> Result<(), EngineError> {
         *self.world.write_resource::<DeltaTime>() = DeltaTime(dt);
         *self.world.write_resource::<ElapsedTime>() = ElapsedTime(elapsed);
-        self.tick_dispatcher.dispatch(&mut self.world);
+        self.tick_dispatcher.dispatch(&self.world);
         self.world.maintain();
         Ok(())
     }

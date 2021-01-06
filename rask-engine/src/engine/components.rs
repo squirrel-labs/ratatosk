@@ -19,6 +19,9 @@ pub struct DeltaTime(pub std::time::Duration);
 #[derive(Debug, Default)]
 pub struct ElapsedTime(pub std::time::Duration);
 
+#[derive(Debug, Default)]
+pub struct RenderBufferDimensions(pub (u32, u32));
+
 pub struct SystemApi(pub(super) Box<dyn io::SystemApi>);
 
 impl Default for SystemApi {

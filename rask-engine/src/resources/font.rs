@@ -29,7 +29,7 @@ impl Font {
         let key = s.finish();
         if !self.cache.contains(&key) {
             let (metrics, data) = self.font.rasterize_config(glyph.key);
-            let mut new_data = Vec::new();
+            let mut new_data = Vec::new(); // TODO: Replace with color management
             for d in data {
                 new_data.append(&mut vec![d, d, d, d]);
             }

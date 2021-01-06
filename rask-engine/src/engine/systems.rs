@@ -42,6 +42,7 @@ impl<'a> System<'a> for TextRenderSystem {
         WriteStorage<'a, Glyph>,
         ReadExpect<'a, Hierarchy<Parent>>,
         Entities<'a>,
+        Read<'a, RenderBufferDimensions>,
     );
 
     fn run(
@@ -56,6 +57,7 @@ impl<'a> System<'a> for TextRenderSystem {
             mut glyps,
             hierarchy,
             entities,
+            buf_dim,
         ): Self::SystemData,
     ) {
         let events = textboxes.channel().read(self.reader_id.as_mut().unwrap());
@@ -106,21 +108,22 @@ impl<'a> System<'a> for TextRenderSystem {
                         continue;
                     }
                     let id = font.store_glyph(glyph);
+                    let nscale = (
+                        -(glyph.width as f32 / buf_dim.0 .0 as f32),
+                        -(glyph.height as f32 / buf_dim.0 .1 as f32),
+                    );
                     let (npo, nsp, nsc) = (
                         Pos(Vec2::new(
-                            curr_pos.x() + glyph.x / tex.fontsize / 4.0,
-                            curr_pos.y() + glyph.y / tex.fontsize / 4.0,
+                            curr_pos.x() + glyph.x / buf_dim.0 .0 as f32 * 2.0 - nscale.0 / 2.0,
+                            curr_pos.y() + glyph.y / buf_dim.0 .1 as f32 * 2.0 - nscale.1 / 2.0,
                         )),
                         Sprite {
                             id: tex.font.id,
                             sub_id: id,
                         },
-                        Scale(Vec2::new(
-                            glyph.width as f32 / -400.0,
-                            glyph.height as f32 / -400.0,
-                        )),
+                        Scale(Vec2::new(nscale.0, nscale.1)),
                     );
-                    log::debug!("printing: {:?} pos: {:?}", glyph.key.c, npo);
+                    log::debug!("printing: {:?} pos: {:?}, scale: {:?}", glyph, npo, nsc);
                     match ci.next().cloned() {
                         None => {
                             entities

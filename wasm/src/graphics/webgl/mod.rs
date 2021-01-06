@@ -17,7 +17,7 @@ use rask_engine::{
 use rect_packer::DensePacker;
 
 // The maximum visible aspect ratio (width / height)
-const WORLD_ASPECT: f32 = 1.0;
+pub const WORLD_ASPECT: f32 = 1.0;
 // Set the position to zoom towards
 const ZOOM_X: f32 = -0.0;
 const ZOOM_Y: f32 = -0.6;
@@ -210,9 +210,6 @@ impl GraphicsApi for WebGl2 {
         let prev_layer_index = self.layer_index;
         let empty = self.textures.is_empty();
         for texture in textures {
-            if texture.2.width() == 0 || texture.2.height() == 0 {
-                continue;
-            }
             let rect = self
                 .texture_packer
                 .pack(texture.2.width() as i32, texture.2.height() as i32, false)

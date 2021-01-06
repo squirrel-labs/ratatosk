@@ -44,6 +44,9 @@ pub trait SystemApi: Send + Sync {
     fn stop_sound(&mut self, _id: u32) {
         unimplemented!("stop_sound is not implemented for the system api");
     }
+    fn get_render_buffer_dimensions(&mut self) -> (u32, u32) {
+        unimplemented!("get_render_buffer_dimensions is not implemented for the system api");
+    }
 }
 
 #[derive(Debug, Default)]
