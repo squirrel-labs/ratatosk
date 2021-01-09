@@ -37,10 +37,15 @@ resources! {
     (THIEF,             Texture,        "thief.png"              ),
     (SOUND,             Sound,          "theme_song.mp3"         ),
     (CHAR,              Character,      Character {
+                          texture:   "Thief/Square.png",
+                          atlas:     "Thief/Square.atlas",
+                          animation: "Thief/Square.json"
+    }                                                            )
+    /*(CHAR2,              Character,      Character {
                           texture:   "Thief/Thief.png",
                           atlas:     "Thief/Thief.atlas",
                           animation: "Thief/Thief.json"
-    }                                                            )
+    }                                                            )*/
 }
 
 trait ResourceId {

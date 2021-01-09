@@ -182,6 +182,16 @@ impl Vec2 {
         self.y
     }
 
+    /// Returns a mutable reference to the x coordinate.
+    pub fn x_mut(&mut self) -> &mut f32 {
+        &mut self.x
+    }
+
+    /// Returns a mutable reference to the y coordinate.
+    pub fn y_mut(&mut self) -> &mut f32 {
+        &mut self.y
+    }
+
     /// Returns the dot product.
     pub fn dot(self, other: Self) -> f32 {
         self.x * other.x + self.y * other.y

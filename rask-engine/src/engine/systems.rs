@@ -1,6 +1,6 @@
 use super::components::*;
 
-use crate::boxes::RBox;
+use crate::boxes::{AABox, RBox};
 use crate::collide::{Collidable, Collide};
 use crate::events::{Event, Key, Keyboard};
 use crate::io;
@@ -43,7 +43,7 @@ impl<'a> System<'a> for VelocitySystem {
     type SystemData = (
         WriteStorage<'a, Pos>,
         WriteStorage<'a, Vel>,
-        ReadStorage<'a, Vel_>,
+        ReadStorage<'a, DeltaVel>,
         ReadStorage<'a, Mass>,
         ReadStorage<'a, Collider>,
         WriteStorage<'a, Transform>,
@@ -57,15 +57,15 @@ impl<'a> System<'a> for VelocitySystem {
     #[rustfmt::skip]
     fn run(
         &mut self,
-        (mut pos, mut vel, vel_, mass, collider, mut transform, mut sub, terrain, entities, hierarchy, dt): Self::SystemData,
+        (mut pos, mut vel, delta_vel, mass, collider, mut transform, mut sub, terrain, entities, hierarchy, dt): Self::SystemData,
     ) {
-        let reset_values: Vec<_> = (&collider, &pos, &vel, (&vel_).maybe(), !&terrain, &pos, &mass, &entities)
+        let reset_values: Vec<_> = (&collider, &pos, &vel, (&delta_vel).maybe(), !&terrain, &pos, &mass, &entities)
             .par_join()
-            .map(|(_col1, &pos_, vel, vel_, _, _pos1, _mass, entity1)| {
+            .map(|(_col1, _, vel, delta_vel, _, _pos1, _mass, entity1)| {
                 let mut percent = -1.0;
                 let mut ids = (entity1.id(), 0);
-                let v_ = vel_.map(|x|x.0).unwrap_or_default();
-                let v = vel.0 * dt.0.as_secs_f32() + v_;
+                let v_ = delta_vel.map(|x| x.0).unwrap_or_default();
+                let v = (vel.0 + v_) * dt.0.as_secs_f32();
                 for (_, _, _pos2, entity2) in (&collider, &terrain, &pos, &entities).join() {
                     for e1 in hierarchy.children(entity1) {
                         for e2 in hierarchy.children(entity2) {
@@ -74,9 +74,10 @@ impl<'a> System<'a> for VelocitySystem {
                                 Some(SubCollider { collider: c2 }),
                             ) = (sub.get(*e1), sub.get(*e2))
                             {
-                                let c1 = c1.shift(pos_.0 - v_);
-                                //log::debug!("c1:{:?}", pos_.0 - v);
                                 if let Some(move_out) = c1.collide_after(c2, v) {
+                                    /*if move_out == 1.0 {
+                                        log::debug!("move out 1.0 -> {:?}", (c1, c2, v));
+                                    }*/
                                     if move_out > percent {
                                         percent = move_out;
                                         ids = (entity1.id(), entity2.id());
@@ -87,19 +88,17 @@ impl<'a> System<'a> for VelocitySystem {
                     }
                 }
                 if percent == -1.0 {
-                    (ids.0, core::u32::MAX, v - v_)
+                    (ids.0, core::u32::MAX, v)
                 } else {
-                log::debug!("rv {:?}, v_: {:?}", v, v_);
-                    (ids.0, ids.1, v * (1.0 - percent) - v_)
+                    (ids.0, ids.1, v * (1.0 - percent - 0.01))
                 }
             })
             .collect();
         for (e1, e2, rv) in reset_values {
             let e1 = entities.entity(e1);
             if let Some(pos) = pos.get_mut(e1) {
+                //log::debug!("!!!!!!! pos {:?}\n^^^^^^ dv {:?}", pos.0, rv);
                 pos.0 += rv;
-                //log::debug!("new vel {:?}, new pos: {:?}", rv, pos.0);
-                let trans_mat = Mat3::translation(pos.0.x(), pos.0.y());
                 if let Some(vel) = vel.get_mut(e1) {
                     if e2 != core::u32::MAX {
                         vel.0 = Vec2::zero();
@@ -107,14 +106,10 @@ impl<'a> System<'a> for VelocitySystem {
                 }
                 for e in hierarchy.children(e1) {
                     if let Some(trans) = transform.get_mut(*e) {
-                        trans.mat3 = trans_mat * trans.mat3;
+                        trans.shift(rv);
                     }
                     if let Some(sub) = sub.get_mut(*e) {
-                        match sub.collider {
-                            Collidable::AABox(mut a) => a.pos += rv,
-                            Collidable::RBox(mut r) => r.pos += rv,
-                            Collidable::Point(mut p) => p += rv,
-                        };
+                        sub.collider.shift(rv);
                     }
                 }
             }
@@ -134,7 +129,7 @@ impl<'a> System<'a> for GravitationSystem {
     fn run(&mut self, (mut vel, mass, present, g, dt): Self::SystemData) {
         let dt = dt.0.as_secs_f32();
         for (vel, _, _) in (&mut vel, &mass, &present).join() {
-            vel.0 += g.0 * dt;
+            vel.0 += g.0 * 0.1 * dt;
         }
     }
 }
@@ -145,6 +140,7 @@ impl<'a> System<'a> for UpdateAnimationSystem {
         WriteStorage<'a, Sprite>,
         WriteStorage<'a, Transform>,
         ReadStorage<'a, Collider>,
+        ReadStorage<'a, Terrain>,
         WriteStorage<'a, SubCollider>,
         WriteStorage<'a, Vulnerable>,
         WriteStorage<'a, Damaging>,
@@ -153,7 +149,7 @@ impl<'a> System<'a> for UpdateAnimationSystem {
         ReadStorage<'a, Scale>,
         WriteStorage<'a, Pos>,
         WriteStorage<'a, Vel>,
-        WriteStorage<'a, Vel_>,
+        WriteStorage<'a, DeltaVel>,
         Entities<'a>,
         ReadExpect<'a, Hierarchy<Parent>>,
         Read<'a, ElapsedTime>,
@@ -165,8 +161,9 @@ impl<'a> System<'a> for UpdateAnimationSystem {
         (
             mut animations,
             mut sprite,
-            mut mat3,
-            collider,
+            mut transform,
+            colliders,
+            terrain,
             mut sub,
             mut vul,
             mut dmg,
@@ -175,7 +172,7 @@ impl<'a> System<'a> for UpdateAnimationSystem {
             scale,
             mut pos,
             mut vel,
-            mut vel_,
+            mut delta_vel,
             entities,
             hierarchy,
             elapsed,
@@ -183,13 +180,13 @@ impl<'a> System<'a> for UpdateAnimationSystem {
         ): Self::SystemData,
     ) {
         let res = &mut *resources::RESOURCE_TABLE.write();
-        for (mut animation, collider, scale, pos, vel, mut vel__, entity, _) in (
+        for (mut animation, collider, scale, pos, vel, mut delta_vel, entity, _) in (
             &mut animations,
-            &collider,
+            &colliders,
             &scale,
             &mut pos,
             &mut vel,
-            &mut vel_,
+            &mut delta_vel,
             &entities,
             &present,
         )
@@ -212,38 +209,154 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                 let sprites = cha
                     .interpolate(elapsed.0.as_secs_f32() - animation.start)
                     .unwrap();
-                let trans = Mat3::translation(pos.0.x(), pos.0.y());
-                let scale = Mat3::scaling(scale.0.x(), scale.0.y());
+                let trans_scale = Mat3::translation(pos.0.x(), pos.0.y())
+                    * Mat3::scaling(scale.0.x(), scale.0.y());
                 let ci = hierarchy.children(entity);
                 let mut ci: Vec<_> = ci.to_vec();
                 ci.sort_unstable_by_key(|x| x.id()); //TODO we might be able to remove this
-                let aabb = crate::collide::calculate_aabb(
-                    ci.iter()
-                        .map(|e| sub.get(*e).map(|s| &s.collider))
-                        .flatten(),
-                );
+                let dv = vel.0;
+                #[derive(Debug, Clone)]
+                struct Side {
+                    old: Vec2,
+                    new: Vec2,
+                    is_x: bool,
+                    is_positive: bool,
+                    inited: bool,
+                    old_bound: Vec2,
+                }
+                impl Side {
+                    fn new(is_x: bool, is_positive: bool) -> Self {
+                        let n = if is_positive {
+                            f32::NEG_INFINITY
+                        } else {
+                            f32::INFINITY
+                        };
+                        Self {
+                            old: Vec2::new(n, n),
+                            old_bound: Vec2::new(n, n),
+                            new: Vec2::new(n, n),
+                            is_x,
+                            is_positive,
+                            inited: false,
+                        }
+                    }
+                    fn ic(&self, v: f32) -> Vec2 {
+                        if self.is_x {
+                            Vec2::new(v, 0.0)
+                        } else {
+                            Vec2::new(0.0, v)
+                        }
+                    }
+                    fn c(&self, vec: &Vec2) -> f32 {
+                        if self.is_x {
+                            vec.x()
+                        } else {
+                            vec.y()
+                        }
+                    }
+                    fn c_mut<'a>(&self, vec: &'a mut Vec2) -> &'a mut f32 {
+                        if self.is_x {
+                            vec.x_mut()
+                        } else {
+                            vec.y_mut()
+                        }
+                    }
+                    fn cmp_fl(&self, a: f32, b: f32) -> bool {
+                        if self.is_positive {
+                            a > b
+                        } else {
+                            a < b
+                        }
+                    }
+                    fn cmp(&self, a: &Vec2, b: &Vec2) -> bool {
+                        self.cmp_fl(self.c(a), self.c(b))
+                    }
+                    fn bound_of_rbox(&self, rbox: &RBox) -> Vec2 {
+                        let [a, b, c, d] = [
+                            rbox.pos,
+                            rbox.pos + rbox.v1,
+                            rbox.pos + rbox.v2,
+                            rbox.pos + rbox.v1 + rbox.v2,
+                        ];
+                        if self.cmp(&a, &b) {
+                            if self.cmp(&a, &c) {
+                                if self.cmp(&a, &d) {
+                                    a
+                                } else {
+                                    d
+                                }
+                            } else {
+                                if self.cmp(&c, &d) {
+                                    c
+                                } else {
+                                    d
+                                }
+                            }
+                        } else {
+                            if self.cmp(&b, &c) {
+                                if self.cmp(&b, &d) {
+                                    b
+                                } else {
+                                    d
+                                }
+                            } else {
+                                if self.cmp(&c, &d) {
+                                    c
+                                } else {
+                                    d
+                                }
+                            }
+                        }
+                    }
+                    fn bound_of(&self, col: &Collidable) -> Vec2 {
+                        match col {
+                            &Collidable::Point(v) => v,
+                            &Collidable::AABox(AABox { pos, size }) => {
+                                if self.is_positive {
+                                    pos + size
+                                } else {
+                                    pos
+                                }
+                            }
+                            Collidable::RBox(rbox) => self.bound_of_rbox(rbox),
+                        }
+                    }
+                    fn update(&mut self, old: &Collidable, new: &Collidable) {
+                        let (old, new) = (self.bound_of(old), self.bound_of(new));
+                        if self.cmp(&new, &self.new) {
+                            self.new = new;
+                            self.old = old;
+                            self.inited = true;
+                        }
+                        if self.cmp(&old, &self.old_bound) {
+                            self.old_bound = old
+                        }
+                    }
+                }
+                let mut xside = Side::new(true, dv.x() > 0.0);
+                let mut yside = Side::new(false, dv.y() > 0.0);
                 let mut ci = ci.iter();
                 for (i, s) in sprites.enumerate() {
                     let s = s.unwrap();
-                    let n_transform = trans * scale * s.transform;
-                    let n_transform = scale * s.transform;
-                    let (new_mat3, new_sprite, new_sub) = (
-                        Transform { mat3: n_transform },
+                    let mat = trans_scale * s.transform;
+                    let (new_sprite, new_sub) = (
                         Sprite {
                             id: animation.id,
                             sub_id: s.att_id,
                         },
                         SubCollider {
-                            collider: Collidable::RBox(RBox::from(&n_transform)),
+                            collider: Collidable::RBox(RBox::from(&mat)),
                         },
                     );
                     if let Some(c) = ci.next().cloned() {
-                        if let Some((sprite, mat3, sub)) = JoinIter::get(
-                            &mut (&mut sprite, &mut mat3, &mut sub).join(),
+                        if let Some((sprite, transform, sub)) = JoinIter::get(
+                            &mut (&mut sprite, &mut transform, &mut sub).join(),
                             c,
                             &entities,
                         ) {
-                            *mat3 = new_mat3;
+                            xside.update(&sub.collider, &new_sub.collider);
+                            yside.update(&sub.collider, &new_sub.collider);
+                            *transform = Transform(mat);
                             *sprite = new_sprite;
                             *sub = new_sub;
                         }
@@ -251,7 +364,7 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                         let e = entities.create();
                         entities
                             .build_entity()
-                            .with(new_mat3, &mut mat3)
+                            .with(Transform(s.transform), &mut transform)
                             .with(new_sub, &mut sub)
                             .with(new_sprite, &mut sprite)
                             .with(Parent { entity }, &mut parent)
@@ -268,52 +381,60 @@ impl<'a> System<'a> for UpdateAnimationSystem {
                         }
                     }
                 }
-                let new_aabb = crate::collide::calculate_aabb(
-                    hierarchy
-                        .children(entity)
-                        .iter()
-                        .map(|e| sub.get(*e).map(|s| &s.collider))
-                        .flatten(),
-                );
 
-                use crate::boxes::AABox;
-                let f = |old: AABox, new: AABox, dv, c: fn(Vec2) -> f32| {
-                    let u = |d, b| if b { d } else { 0.0 };
-                    if c(dv) > 0.0 {
-                        let d = c(old.pos + old.size) - c(new.pos + new.size);
-                        u(d, d < 0.0)
-                    } else if c(dv) == 0.0 {
-                        0.0
-                    } else {
-                        let d = c(old.pos - new.pos);
-                        u(d, d > 0.0)
-                    }
-                };
-
-                let x = f(aabb, new_aabb, vel.0, Vec2::x);
-                let y = f(aabb, new_aabb, vel.0, Vec2::y);
-                if x.is_finite() && y.is_finite() {
-                    let diff = Vec2::new(x, y);
-                    let diff = Vec2::new(0.0, y);
-                    //let diff = Vec2::new(0.0, 0.001);
-                    //pos.0 += diff;
-                    vel__.0 = diff * -1.1;
-                    //log::debug!("pos: {:?}, x: {}, y: {}, vel: {:?}", pos.0, x, y, vel.0);
-                    for e in hierarchy.children(entity) {
-                        if let Some(trans) = mat3.get_mut(*e) {
-                            //trans.mat3 *= Mat3::translation(diff.x(), diff.y());
+                if xside.inited && yside.inited {
+                    let mut delta_p = Vec2::zero();
+                    use core::iter::once;
+                    for side in once(xside).chain(once(yside)) {
+                        if side.c(&side.old_bound) == side.c(&side.new) {
+                            continue;
                         }
-                        if let Some(sub) = sub.get_mut(*e) {
-                            /*match sub.collider {
-                                Collidable::AABox(mut a) => a.pos += diff,
-                                Collidable::RBox(mut r) => r.pos += diff,
-                                Collidable::Point(mut p) => p += diff,
-                            };*/
+                        let d = side.c(&side.new) - side.c(&side.old_bound);
+                        *side.c_mut(&mut delta_vel.0) += d;
+                        if !side.cmp_fl(d, 0.0) {
+                            continue;
+                        }
+                        /*if !side.is_x {
+                            log::debug!("{:?}", side);
+                        }*/
+                        let mut v = Vec2::zero();
+                        *side.c_mut(&mut v) = d;
+                        's: for (_, ent, _) in (&colliders, &entities, &terrain).join() {
+                            for &col in hierarchy.children(ent) {
+                                if let Some(col) = sub.get(col) {
+                                    if let Some(p) =
+                                        side.old.collide_after(&col.collider, side.new - side.old)
+                                    {
+                                        let v =
+                                            side.ic(p * (side.c(&side.new) - side.c(&side.old)));
+                                        log::debug!(
+                                            "{:?}\n{:?}\n{:?}\n=> {:?}",
+                                            side,
+                                            side.new - side.old,
+                                            col.collider,
+                                            v,
+                                        );
+                                        delta_p -= 1.1 * v;
+                                        break 's;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if delta_p != Vec2::zero() {
+                        pos.0 += delta_p;
+                        for e in hierarchy.children(entity) {
+                            if let Some(trans) = transform.get_mut(*e) {
+                                trans.shift(delta_p);
+                            }
+                            if let Some(sub) = sub.get_mut(*e) {
+                                log::debug!("zup {:?}\n{:?}", sub.collider, delta_p);
+                                sub.collider.shift(delta_p);
+                            }
                         }
                     }
                 }
-
-                // modify position to avoid collisions
             }
         }
     }
@@ -344,7 +465,7 @@ impl<'a> System<'a> for RenderSystem {
         }
         for (sprite, transform, _) in (&sprite, &transform, &present).join() {
             sprites.push(resources::Sprite::new(
-                transform.mat3,
+                transform.0,
                 sprite.id,
                 sprite.sub_id,
             ))
@@ -375,14 +496,14 @@ impl<'a> System<'a> for MovementSystem {
         for (anim, vel, scale, speed) in (&mut anim, &mut vel, &mut scale, &speed).join() {
             anim.animation = if KEYBOARD.get(Key::ARROW_RIGHT) {
                 scale.0 = Vec2::new(scale.0.x().abs(), scale.0.y());
-                vel.0 = Vec2::new(speed.0, 0.0);
+                *vel.0.x_mut() = speed.0;
                 "walking".to_owned()
             } else if KEYBOARD.get(Key::ARROW_LEFT) {
                 scale.0 = Vec2::new(-scale.0.y().abs(), scale.0.y());
-                vel.0 = Vec2::new(-speed.0, 0.0);
+                *vel.0.x_mut() = -speed.0;
                 "walking".to_owned()
             } else {
-                vel.0 = Vec2::new(0.0, 0.0);
+                *vel.0.x_mut() = 0.0;
                 "standing".to_owned()
             };
         }

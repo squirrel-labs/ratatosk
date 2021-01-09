@@ -9,6 +9,7 @@ use crate::math::{Vec2, EPSILON};
 /// A trait for objects that can collide with other objects.
 pub trait Collide<Rhs = Self> {
     /// calculate the penetration depth (a scalar ratio of `dv`)
+    /// as well as the normal of the colliding edge
     /// of the collision after applying the velocity,
     /// if there was any.
     /// `dv` is the difference between the two velocities
@@ -39,8 +40,8 @@ impl Collide for Collidable {
 }
 
 impl Collidable {
-    pub fn shift(&self, dv: Vec2) -> Collidable {
-        match self {
+    pub fn shift(&mut self, dv: Vec2) {
+        *self = match self {
             Collidable::AABox(a) => Collidable::AABox(AABox {
                 pos: a.pos + dv,
                 size: a.size,
@@ -52,32 +53,6 @@ impl Collidable {
             }),
             Collidable::Point(p) => Collidable::Point(*p + dv),
         }
-    }
-}
-
-/// calculate the minimal axis aligned bounding box that contains all `Collidable`s of a given set
-pub fn calculate_aabb<'a, I: Iterator<Item = &'a Collidable>>(vals: I) -> AABox {
-    let [(mut minx, mut maxx), (mut miny, mut maxy)] = [(f32::INFINITY, f32::NEG_INFINITY); 2];
-    let mut minmax = |v1: &Vec2, v2: &Vec2| {
-        minx = f32::min(minx, v1.x());
-        maxx = f32::max(maxx, v2.x());
-        miny = f32::min(miny, v1.y());
-        maxy = f32::max(maxy, v2.y());
-    };
-    for val in vals {
-        match val {
-            Collidable::Point(v) => minmax(v, v),
-            Collidable::AABox(AABox { pos, size }) => minmax(pos, &(*pos + *size)),
-            &Collidable::RBox(RBox { pos, v1, v2 }) => {
-                for point in &[pos, pos + v1, pos + v2, pos + v1 + v2] {
-                    minmax(point, point)
-                }
-            }
-        };
-    }
-    AABox {
-        pos: Vec2::new(minx, miny),
-        size: Vec2::new(maxx - minx, maxy - miny),
     }
 }
 
@@ -102,6 +77,26 @@ macro_rules! impl_collide {
         impl From<$A> for Collidable {
             fn from(other: $A) -> Self {
                 Self::$C(other)
+            }
+        }
+
+        impl Collide<$A> for Collidable {
+            fn collide_after(&self, other: &$A, dv: Vec2) -> Option<f32> {
+                match self {
+                    Collidable::Point(s) => s.collide_after(other, dv),
+                    Collidable::AABox(s) => s.collide_after(other, dv),
+                    Collidable::RBox(s) => s.collide_after(other, dv),
+                }
+            }
+        }
+
+        impl Collide<Collidable> for $A {
+            fn collide_after(&self, other: &Collidable, dv: Vec2) -> Option<f32> {
+                match other {
+                    Collidable::Point(s) => self.collide_after(s, dv),
+                    Collidable::AABox(s) => self.collide_after(s, dv),
+                    Collidable::RBox(s) => self.collide_after(s, dv),
+                }
             }
         }
     };

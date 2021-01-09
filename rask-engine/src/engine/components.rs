@@ -50,7 +50,7 @@ pub struct Vel(pub Vec2);
 
 #[derive(Debug, Clone, Copy, Default, Component)]
 #[storage(VecStorage)]
-pub struct Vel_(pub Vec2);
+pub struct DeltaVel(pub Vec2);
 
 #[derive(Debug, Clone, Copy, Default, Component)]
 #[storage(VecStorage)]
@@ -124,13 +124,13 @@ pub struct Sprite {
     pub sub_id: u64,
 }
 
-#[derive(Debug, Clone)]
-pub struct Transform {
-    pub mat3: Mat3,
-}
+#[derive(Debug, Default, Clone, Component)]
+pub struct Transform(pub Mat3);
 
-impl Component for Transform {
-    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+impl Transform {
+    pub fn shift(&mut self, vec: Vec2) {
+        self.0 = Mat3::translation(vec.x(), vec.y()) * self.0
+    }
 }
 
 #[derive(Debug, Default, Clone, Copy, Component)]

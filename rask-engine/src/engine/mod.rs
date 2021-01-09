@@ -123,9 +123,9 @@ impl GameEngine for RaskEngine {
             .build();
         let _char = world
             .create_entity()
-            .with(Pos(Vec2::new(0.0, 0.0)))
+            .with(Pos(Vec2::new(0.3, 0.0)))
             .with(Vel(Vec2::new(0.0, 0.0)))
-            .with(Vel_(Vec2::zero()))
+            .with(DeltaVel(Vec2::zero()))
             .with(Speed(0.4))
             .with(Mass(1.0))
             .with(Animation {
