@@ -15,11 +15,12 @@ rect_packer = "0.2"
 linked_list_allocator = "0.8.3"
 rayon = "1.1.0"
 spin = "0.5"
+wasm_set_stack_pointer = {git= "https://github.com/kettle11/wasm_set_stack_pointer", branch = "main"}
 
 [dependencies.rask-engine]
 version = "0.2.0"
 path = "../rask-engine"
-features = ["nightly", "spin_mutex"]
+features = ["spin_mutex"]
 
 [dependencies.nobg-web_worker]
 version = "=0.3.3"

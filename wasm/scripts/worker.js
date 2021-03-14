@@ -255,14 +255,14 @@ onmessage = async function ({data}) {
         wasm.exports.__wasm_init_tls(tls);
         wasm.exports.run_logic();
     } else if (is_subworker && has_work) {
-        wasm.exports.__sp.value = data.stack_top;
+        wasm.exports.set_stack_pointer(data.stack_top);
         wasm.exports.__wasm_init_tls(data.tls);
         wasm.exports.run_pool(data.work);
     } else if (has_canvas) {
         vs = data.shader.vertex;
         fs = data.shader.fragment;
         canvas = data.canvas;
-        wasm.exports.__sp.value = data.stack_top;
+        wasm.exports.set_stack_pointer(data.stack_top);
         wasm.exports.__wasm_init_tls(data.tls);
         // see 'https://www.khronos.org/registry/webgl/specs/latest/1.0/' for documentation
         gl = canvas.getContext('webgl2', {
