@@ -31,6 +31,10 @@ use nobg_web_worker::set_global_thread_pool;
 #[cfg(target_arch = "wasm32")]
 static LOGGER: WasmLog = WasmLog;
 
+#[allow(unused_imports)]
+#[cfg(target_arch = "wasm32")]
+use wasm_set_stack_pointer::*;
+
 #[cfg(target_arch = "wasm32")]
 #[global_allocator]
 static ALLOCATOR: LockedHeap = LockedHeap::empty();

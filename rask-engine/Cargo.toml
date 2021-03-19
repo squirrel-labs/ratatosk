@@ -5,7 +5,6 @@ authors = ["konsumlamm <konsumlamm@gmail.com>", "Dennis Kobert <dennis@kobert.de
 edition = "2018"
 
 [features]
-nightly = []
 spin_mutex = []
 
 [dependencies.specs]

@@ -1,9 +1,0 @@
-[package]
-name = "rask-wasm-processor"
-version = "0.1.0"
-authors = ["Dennis Kobert <dennis@kobert.dev>"]
-edition = "2018"
-
-[dependencies]
-walrus = "0.18"
-anyhow = "1.0"

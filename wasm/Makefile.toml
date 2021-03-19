@@ -9,14 +9,8 @@ workspace = false
 command = "cargo"
 args = [ "fmt", "--all" ]
 
-[tasks.processor]
-workspace = false
-command = "cargo"
-args = [ "make", "--cwd", "wasm-processor/", "--makefile", "Makefile.toml", "processor" ]
-
 [tasks.wasm]
 workspace = false
-dependencies = [ "processor" ]
 env = {RUSTFLAGS = "-Ctarget-feature=+atomics,+bulk-memory -Clink-arg=-zstacksize=131072 -Clink-arg=--demangle" }
 script = [
 '''
@@ -30,7 +24,7 @@ gen=$top/wasm/gen
 cargo make exec-${BUILD_ENV} -- build -p rask-wasm --target wasm32-unknown-unknown -Z build-std=std,panic_abort
 file=$top/target/rask_wasm/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm.wasm
 mkdir -p $gen
-gen/rask-wasm-processor $file $gen/client.wasm
+mv $file $gen/client.wasm
 sed "/pub/{ s/pub//; s/:\s*u32//}" $top/rask-engine/src/network/protocol/op_codes.rs > $gen/main.js
 cat $top/wasm/scripts/main.js >> $gen/main.js
 '''
