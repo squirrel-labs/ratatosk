@@ -1729,7 +1729,6 @@ dependencies = [
  "rayon",
  "rect_packer",
  "spin",
- "wasm-sync",
  "wasm_set_stack_pointer",
 ]
 

@@ -250,7 +250,6 @@ onmessage = async function ({data}) {
         }
     });
     if (!is_subworker && !has_canvas) {
-        wasm.exports.__wasm_init_memory();
         const tls = wasm.exports.init(wasm.exports.__heap_base.value, mem.buffer.byteLength, wasm.exports.__tls_size.value);
         wasm.exports.__wasm_init_tls(tls);
         wasm.exports.run_logic();

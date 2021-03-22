@@ -28,5 +28,5 @@ features = ["std_atomics"]
 git = "https://github.com/squirrel-labs/web_worker/"
 branch = "feature/remove-wasm-bindgen"
 
-[dependencies.wasm-sync]
-path = "wasm-sync"
+#[dependencies.wasm-sync]
+#path = "wasm-sync"
