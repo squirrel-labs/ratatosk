@@ -1,11 +1,13 @@
+use crate::collide::Collidable;
 use crate::io;
-use crate::math::Vec2;
+use crate::math::{Mat3, Vec2};
 use crate::resources::{
     self,
     registry::{CharacterInfo, ResourceInfo},
 };
 use specs::{prelude::*, Component};
-use specs_hierarchy::Parent as PParent;
+use specs_hierarchy::{Hierarchy, Parent as PParent};
+use std::collections::HashMap;
 
 #[derive(Debug, Default)]
 pub struct Gravitation(pub Vec2);
@@ -42,11 +44,15 @@ impl PParent for Parent {
     }
 }
 
-#[derive(Debug, Clone, Copy, Component)]
+#[derive(Debug, Clone, Copy, Default, Component)]
 #[storage(VecStorage)]
 pub struct Vel(pub Vec2);
 
-#[derive(Debug, Clone, Copy, Component)]
+#[derive(Debug, Clone, Copy, Default, Component)]
+#[storage(VecStorage)]
+pub struct DeltaVel(pub Vec2);
+
+#[derive(Debug, Clone, Copy, Default, Component)]
 #[storage(VecStorage)]
 pub struct Pos(pub Vec2);
 
@@ -55,12 +61,58 @@ pub struct Pos(pub Vec2);
 pub struct Speed(pub f32);
 
 #[derive(Debug, Clone, Component)]
-#[storage(DenseVecStorage)]
+pub struct Health {
+    pub value: u32,
+    pub max_value: u32,
+}
+
+#[derive(Debug, Clone, Component)]
+pub struct Damaging {
+    pub damage: f32,
+}
+
+#[derive(Debug, Clone, Component)]
+pub struct Vulnerable {
+    pub armor: f32,
+}
+
+#[derive(Debug, Default, Clone, Component)]
+#[storage(NullStorage)]
+pub struct Terrain;
+
+#[derive(Debug, Clone)]
+pub struct SubCollider {
+    pub collider: Collidable,
+}
+
+impl Component for SubCollider {
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+}
+
+#[derive(Debug, Clone)]
+pub enum HitboxType {
+    Damaging,
+    Vulnerable,
+    Repulsion,
+}
+
+#[derive(Debug, Clone, Component)]
+pub struct Collider {
+    pub mapping: HashMap<u32, HitboxType>,
+    pub default: HitboxType,
+}
+
+#[derive(Debug, Clone)]
 pub struct Animation {
     pub id: u32,
     pub animation: String,
     pub start: f32,
 }
+
+impl Component for Animation {
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+}
+
 #[derive(Debug, Clone, Component)]
 #[storage(VecStorage)]
 pub struct Scale(pub Vec2);
@@ -69,11 +121,20 @@ pub struct Scale(pub Vec2);
 #[storage(VecStorage)]
 pub struct Sprite {
     pub id: u32,
+    pub sub_id: u64,
+}
+
+#[derive(Debug, Default, Clone, Component)]
+pub struct Transform(pub Mat3);
+
+impl Transform {
+    pub fn shift(&mut self, vec: Vec2) {
+        self.0 = Mat3::translation(vec.x(), vec.y()) * self.0
+    }
 }
 
 #[derive(Debug, Default, Clone, Copy, Component)]
-#[storage(NullStorage)]
-pub struct Static;
+pub struct Mass(pub f32);
 
 #[derive(Debug, Default, Clone, Copy, Component)]
 #[storage(NullStorage)]

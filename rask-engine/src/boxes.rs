@@ -3,7 +3,7 @@
 
 use core::ops;
 
-use crate::math::Vec2;
+use crate::math::{Mat2, Mat3, Vec2, Vec3};
 
 /// An axis-aligned box.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -153,6 +153,15 @@ impl From<&spine::skeleton::srt::SRT> for RBox {
         let pos = srt.transform([-1.0, -1.0]).into();
         let v1 = Vec2::from(srt.transform([1.0, -1.0])) - pos;
         let v2 = Vec2::from(srt.transform([-1.0, 1.0])) - pos;
+        RBox { pos, v1, v2 }
+    }
+}
+
+impl From<&Mat3> for RBox {
+    fn from(mat: &Mat3) -> RBox {
+        let pos = (*mat * Vec3::new(-1.0, -1.0, 1.0)).into();
+        let v1 = (*mat * Vec3::new(0.0, 2.0, 0.0)).into();
+        let v2 = (*mat * Vec3::new(2.0, 0.0, 0.0)).into();
         RBox { pos, v1, v2 }
     }
 }

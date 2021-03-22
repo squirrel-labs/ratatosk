@@ -6,6 +6,7 @@ use core::time::Duration;
 use specs::prelude::*;
 use specs::WorldExt;
 use specs_hierarchy::{Hierarchy, HierarchySystem};
+use std::collections::HashMap;
 
 mod components;
 mod systems;
@@ -56,32 +57,87 @@ impl GameEngine for RaskEngine {
             .with(UpdateAnimationSystem, "update_anim", &["check_present"])
             .with(MovementSystem, "movement", &["events"])
             .with(GravitationSystem, "gravitation", &["movement"])
-            .with(VelocitySystem, "velocity", &["gravitation"])
+            .with(UpdateAnimationSystem, "update_anim", &["movement"])
+            .with(
+                SimpleVelocitySystem,
+                "simple_velocity",
+                &["gravitation", "update_anim"],
+            )
+            .with(VelocitySystem, "velocity", &["gravitation", "update_anim"])
             .with_thread_local(RenderSystem)
             .build();
 
         tick_dispatcher.setup(&mut world);
-        let _backround = world
+
+        let _background = world
             .create_entity()
             .with(Pos(Vec2::new(0.0, 0.0)))
             .with(Sprite {
                 id: registry::EMPTY.id,
+                sub_id: 0,
+            })
+            .with(Terrain)
+            .with(Collider {
+                mapping: HashMap::new(),
+                default: HitboxType::Repulsion,
             })
             .with(Scale(Vec2::new(1.0, 1.0)))
-            .with(Static)
+            .build();
+        let _ground = world
+            .create_entity()
+            .with(Pos(Vec2::new(-2.0, -1.0)))
+            .with(Scale(Vec2::new(6.0, 0.15)))
+            .with(Sprite {
+                id: registry::EMPTY.id,
+                sub_id: 0,
+            })
+            .with(SubCollider {
+                collider: crate::boxes::AABox {
+                    pos: Vec2::new(-2.0, -1.0),
+                    size: Vec2::new(6.0, 0.15),
+                }
+                .into(),
+            })
+            .with(Parent {
+                entity: _background,
+            })
+            .build();
+        let _ground = world
+            .create_entity()
+            .with(Sprite {
+                id: registry::EMPTY.id,
+                sub_id: 0,
+            })
+            .with(Pos(Vec2::new(1.0, -1.0)))
+            .with(Scale(Vec2::new(1.0, 0.5)))
+            .with(SubCollider {
+                collider: crate::boxes::AABox {
+                    pos: Vec2::new(0.0, -1.0),
+                    size: Vec2::new(2.0, 0.5),
+                }
+                .into(),
+            })
+            .with(Parent {
+                entity: _background,
+            })
             .build();
         let _char = world
             .create_entity()
-            .with(Pos(Vec2::new(0.0, -0.8)))
+            .with(Pos(Vec2::new(0.3, 0.0)))
             .with(Vel(Vec2::new(0.0, 0.0)))
-            .with(Speed(0.2))
+            .with(DeltaVel(Vec2::zero()))
+            .with(Speed(0.4))
+            .with(Mass(1.0))
             .with(Animation {
                 id: registry::CHAR.id,
                 animation: "walking".to_string(),
                 start: 0.0,
             })
+            .with(Collider {
+                mapping: HashMap::new(),
+                default: HitboxType::Vulnerable,
+            })
             .with(Scale(Vec2::new(1.0, 1.0)))
-            .with(Static)
             .build();
         Self {
             world,

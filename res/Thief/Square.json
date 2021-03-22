@@ -1,0 +1,58 @@
+{
+    "skeleton": {
+        "width": 1,
+        "height": 1,
+        "fps": 24,
+        "hash": " ",
+        "name": "Armature"
+    },
+    "bones": [{ "name": "root" }],
+    "slots": [
+        {
+            "name": "Square",
+            "bone": "root",
+            "attachment": "Square"
+        }
+    ],
+    "skins": {
+        "default": {
+            "Square": {
+                "Square": {
+                    "name": "Square",
+                    "width": 1,
+                    "height": 1,
+                    "scaleX": 160,
+                    "scaleY": 160
+                }
+            }
+        }
+    },
+    "animations": {
+        "walking": {
+            "bones": {
+                "root": {
+                    "rotate": [
+                        {"time": 0, "angle": 0},
+                        {"time": 0.25, "angle": -45},
+                        {"time": 0.5, "angle": 0}
+                    ],
+                    "shear": [
+                        {"time": 0},
+                        {"time": 0.25},
+                        {"time": 0.5}
+                    ]
+                }
+            }
+        },
+        "standing": {
+            "bones": {
+                "root": {
+                    "scale": [
+                        {"time": 0, "x": 1, "y": 1},
+                        {"time": 0.25, "x": 1.5, "y": 1}
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -1,7 +1,7 @@
 use core::convert;
 use core::ops;
 
-use crate::math::{Vec2, EPSILON};
+use crate::math::{Mat3, Vec2, EPSILON};
 
 /// A 2x2 matrix with `f32` elements.
 #[derive(Clone, Copy, Debug, Default)]
@@ -189,5 +189,12 @@ impl Mat2 {
 impl convert::AsRef<[f32; 4]> for Mat2 {
     fn as_ref(&self) -> &[f32; 4] {
         &self.data
+    }
+}
+
+impl From<&Mat3> for Mat2 {
+    fn from(mat: &Mat3) -> Self {
+        let mat = mat.as_ref();
+        Self::new(mat[0], mat[1], mat[3], mat[4])
     }
 }

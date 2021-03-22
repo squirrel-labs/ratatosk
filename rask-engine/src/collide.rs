@@ -9,12 +9,14 @@ use crate::math::{Vec2, EPSILON};
 /// A trait for objects that can collide with other objects.
 pub trait Collide<Rhs = Self> {
     /// calculate the penetration depth (a scalar ratio of `dv`)
+    /// as well as the normal of the colliding edge
     /// of the collision after applying the velocity,
     /// if there was any.
     /// `dv` is the difference between the two velocities
     fn collide_after(&self, other: &Rhs, dv: Vec2) -> Option<f32>;
 }
 
+#[derive(Debug, Clone)]
 pub enum Collidable {
     Point(Vec2),
     AABox(AABox),
@@ -33,6 +35,23 @@ impl Collide for Collidable {
             (Self::RBox(a), Self::Point(b)) => a.collide_after(b, dv),
             (Self::RBox(a), Self::AABox(b)) => a.collide_after(b, dv),
             (Self::RBox(a), Self::RBox(b)) => a.collide_after(b, dv),
+        }
+    }
+}
+
+impl Collidable {
+    pub fn shift(&mut self, dv: Vec2) {
+        *self = match self {
+            Collidable::AABox(a) => Collidable::AABox(AABox {
+                pos: a.pos + dv,
+                size: a.size,
+            }),
+            Collidable::RBox(r) => Collidable::RBox(RBox {
+                pos: r.pos + dv,
+                v1: r.v1,
+                v2: r.v2,
+            }),
+            Collidable::Point(p) => Collidable::Point(*p + dv),
         }
     }
 }
@@ -58,6 +77,26 @@ macro_rules! impl_collide {
         impl From<$A> for Collidable {
             fn from(other: $A) -> Self {
                 Self::$C(other)
+            }
+        }
+
+        impl Collide<$A> for Collidable {
+            fn collide_after(&self, other: &$A, dv: Vec2) -> Option<f32> {
+                match self {
+                    Collidable::Point(s) => s.collide_after(other, dv),
+                    Collidable::AABox(s) => s.collide_after(other, dv),
+                    Collidable::RBox(s) => s.collide_after(other, dv),
+                }
+            }
+        }
+
+        impl Collide<Collidable> for $A {
+            fn collide_after(&self, other: &Collidable, dv: Vec2) -> Option<f32> {
+                match other {
+                    Collidable::Point(s) => self.collide_after(s, dv),
+                    Collidable::AABox(s) => self.collide_after(s, dv),
+                    Collidable::RBox(s) => self.collide_after(s, dv),
+                }
             }
         }
     };

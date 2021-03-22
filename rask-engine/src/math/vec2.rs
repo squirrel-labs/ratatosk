@@ -1,7 +1,7 @@
 use core::iter::{once, Chain, Once};
 use core::ops;
 
-use crate::math::EPSILON;
+use crate::math::{Vec3, EPSILON};
 
 /// A 2-dimensional euclidean vector with `f32` elements.
 #[derive(Clone, Copy, Debug, Default)]
@@ -144,6 +144,12 @@ impl From<Vec2> for [f32; 2] {
     }
 }
 
+impl From<Vec3> for Vec2 {
+    fn from(vec: Vec3) -> Self {
+        Vec2::new(vec.x(), vec.y())
+    }
+}
+
 pub type IntoIter = Chain<Once<f32>, Once<f32>>;
 
 impl IntoIterator for Vec2 {
@@ -174,6 +180,16 @@ impl Vec2 {
     /// Returns the y coordinate.
     pub const fn y(self) -> f32 {
         self.y
+    }
+
+    /// Returns a mutable reference to the x coordinate.
+    pub fn x_mut(&mut self) -> &mut f32 {
+        &mut self.x
+    }
+
+    /// Returns a mutable reference to the y coordinate.
+    pub fn y_mut(&mut self) -> &mut f32 {
+        &mut self.y
     }
 
     /// Returns the dot product.
