@@ -24,7 +24,10 @@ gen=$top/wasm/gen
 cargo make exec-${BUILD_ENV} -- build -p rask-wasm --target wasm32-unknown-unknown -Z build-std=std,panic_abort
 file=$top/target/rask_wasm/wasm32-unknown-unknown/${BUILD_ENV}/rask_wasm.wasm
 mkdir -p $gen
-mv $file $gen/client.wasm
+#mv $file $gen/client.wasm
+wasm-dis $file -o /dev/stdout --detect-features | sed 's/call \$llvm.wasm.atomic.wait.i32/memory.atomic.wait32/g;s/call \$llvm.wasm.atomic.notify/memory.atomic.notify/g;s/^.*llvm.wasm.atomic.*$//g' > /tmp/tmp.wat
+wasm-as /tmp/tmp.wat -o $gen/client.wasm --detect-features --enable-bulk-memory --enable-bulk-memory --enable-mutable-globals --enable-threads
+rm /tmp/tmp.wat
 sed "/pub/{ s/pub//; s/:\s*u32//}" $top/rask-engine/src/network/protocol/op_codes.rs > $gen/main.js
 cat $top/wasm/scripts/main.js >> $gen/main.js
 '''
