@@ -12,6 +12,11 @@ The game is written in the programming language [Rust](https://doc.rust-lang.org
 For documentation and overview purposes we have a
 **[Wiki](https://github.com/TrueDoctor/ratatosk/wiki)**.
 
+## Discord
+
+If you have any questions or just want to contribute, we also have a
+**[discord server](https://discord.gg/8SHhnFXytd)**.
+
 ## Setup
 
 This is a simple recipe on how to get `ratatosk` working locally. Further details can be
