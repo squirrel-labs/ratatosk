@@ -97,4 +97,8 @@ impl rask_engine::io::SystemApi for SystemIO {
     fn stop_sound(&mut self, id: u32) {
         Message::StopSound(id).send();
     }
+    fn get_render_buffer_dimensions(&mut self) -> (u32, u32) {
+        use crate::graphics::renderer::*;
+        (RENDER_BUFFER_WIDTH, RENDER_BUFFER_HEIGHT)
+    }
 }

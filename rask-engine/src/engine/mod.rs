@@ -5,7 +5,8 @@ use crate::EngineError;
 use core::time::Duration;
 use specs::prelude::*;
 use specs::WorldExt;
-use specs_hierarchy::{Hierarchy, HierarchySystem};
+use specs_hierarchy::HierarchySystem;
+use std::collections::HashSet;
 
 mod components;
 mod systems;
@@ -13,6 +14,13 @@ use components::*;
 use systems::*;
 
 const GRAVITY: Vec2 = Vec2::new(0.0, -9.807);
+pub const INITIAL_CHARS: &str = ", !, \", #, $, %, &, ', (, ), *, +,
+                    ,, -, ., /, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    :, ;, <, =, >, ?, @, A, B, C, D, E, F, G,
+                    H, I, J, K, L, M, N, O, P, Q, R, S, T, U,
+                    V, W, X, Y, Z, [, \\, ], ^, _, `, a, b, c,
+                    d, e, f, g, h, i, j, k, l, m, n, o, p, q,
+                    r, s, t, u, v, w, x, y, z, {, |, }, ~";
 
 pub struct Level {}
 
@@ -39,13 +47,17 @@ impl GameEngine for RaskEngine {
     fn new(pool: std::sync::Arc<rayon::ThreadPool>, mut system: Box<dyn io::SystemApi>) -> Self {
         system.fetch_resource(registry::EMPTY).unwrap();
         system.fetch_resource(registry::SOUND).unwrap();
+        system.fetch_resource(registry::PIXELFONT).unwrap();
         system.fetch_character_resource(registry::CHAR).unwrap();
 
         let mut world: specs::World = specs::WorldExt::new();
         world.insert(Gravitation(GRAVITY));
         world.insert(DeltaTime(Duration::from_millis(10)));
         world.insert(ElapsedTime(Duration::from_millis(0)));
-        world.insert(TextureIds(Vec::new()));
+        world.insert(TextureIds(HashSet::new()));
+        world.insert(RenderBufferDimensions(
+            system.get_render_buffer_dimensions(),
+        ));
         world.insert(SystemApi(system));
 
         let mut tick_dispatcher = DispatcherBuilder::new()
@@ -54,6 +66,7 @@ impl GameEngine for RaskEngine {
             .with(CheckPresentSystem, "check_present", &[]) // does not depend on anything, because resource parsing is handled asynchronously
             .with(HierarchySystem::<Parent>::new(&mut world), "hierarchy", &[])
             .with(UpdateAnimationSystem, "update_anim", &["check_present"])
+            .with(TextRenderSystem::default(), "textbox", &["check_present"])
             .with(MovementSystem, "movement", &["events"])
             .with(GravitationSystem, "gravitation", &["movement"])
             .with(VelocitySystem, "velocity", &["gravitation"])
@@ -66,8 +79,23 @@ impl GameEngine for RaskEngine {
             .with(Pos(Vec2::new(0.0, 0.0)))
             .with(Sprite {
                 id: registry::EMPTY.id,
+                sub_id: 0,
             })
             .with(Scale(Vec2::new(1.0, 1.0)))
+            .with(Static)
+            .build();
+        let _text = world
+            .create_entity()
+            .with(Pos(Vec2::new(-0.9, 0.6)))
+            .with(TextBox {
+                font: registry::PIXELFONT,
+                content: String::from(INITIAL_CHARS),
+                fontsize: 20.0,
+                color: core::u32::MAX,
+                width: Some(220.0),
+                height: None,
+            })
+            .with(Scale(Vec2::new(0.1, -0.1)))
             .with(Static)
             .build();
         let _char = world
@@ -94,7 +122,7 @@ impl GameEngine for RaskEngine {
     fn tick(&mut self, dt: Duration, elapsed: Duration) -> Result<(), EngineError> {
         *self.world.write_resource::<DeltaTime>() = DeltaTime(dt);
         *self.world.write_resource::<ElapsedTime>() = ElapsedTime(elapsed);
-        self.tick_dispatcher.dispatch(&mut self.world);
+        self.tick_dispatcher.dispatch(&self.world);
         self.world.maintain();
         Ok(())
     }

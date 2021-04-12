@@ -6,18 +6,22 @@ use crate::resources::{
 };
 use specs::{prelude::*, Component};
 use specs_hierarchy::Parent as PParent;
+use std::collections::HashSet;
 
 #[derive(Debug, Default)]
 pub struct Gravitation(pub Vec2);
 
 #[derive(Debug, Default)]
-pub struct TextureIds(pub Vec<u32>);
+pub struct TextureIds(pub HashSet<(u32, u64)>);
 
 #[derive(Debug, Default)]
 pub struct DeltaTime(pub std::time::Duration);
 
 #[derive(Debug, Default)]
 pub struct ElapsedTime(pub std::time::Duration);
+
+#[derive(Debug, Default)]
+pub struct RenderBufferDimensions(pub (u32, u32));
 
 pub struct SystemApi(pub(super) Box<dyn io::SystemApi>);
 
@@ -61,14 +65,47 @@ pub struct Animation {
     pub animation: String,
     pub start: f32,
 }
+
 #[derive(Debug, Clone, Component)]
 #[storage(VecStorage)]
 pub struct Scale(pub Vec2);
+
+#[derive(Debug, Clone)]
+pub struct TextBox {
+    pub font: ResourceInfo,
+    pub content: String,
+    pub fontsize: f32,
+    pub color: u32,
+    pub width: Option<f32>,
+    pub height: Option<f32>,
+}
+
+impl Component for TextBox {
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
+}
+
+impl Default for TextBox {
+    fn default() -> Self {
+        Self {
+            font: crate::resources::registry::PIXELFONT,
+            content: String::new(),
+            fontsize: 40.0,
+            color: core::u32::MAX,
+            width: None,
+            height: None,
+        }
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, Component)]
+#[storage(NullStorage)]
+pub struct Glyph;
 
 #[derive(Debug, Clone, Component)]
 #[storage(VecStorage)]
 pub struct Sprite {
     pub id: u32,
+    pub sub_id: u64,
 }
 
 #[derive(Debug, Default, Clone, Copy, Component)]

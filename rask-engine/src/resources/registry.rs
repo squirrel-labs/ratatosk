@@ -36,6 +36,7 @@ resources! {
     (EMPTY,             Texture,        "empty.png"              ),
     (THIEF,             Texture,        "thief.png"              ),
     (SOUND,             Sound,          "theme_song.mp3"         ),
+    (PIXELFONT,         Font,           "pixel.ttf"              ),
     (CHAR,              Character,      Character {
                           texture:   "Thief/Thief.png",
                           atlas:     "Thief/Thief.atlas",
@@ -53,6 +54,7 @@ pub enum ResourceVariant {
     Texture = resource_types::TEXTURE,
     Character = resource_types::CHARACTER,
     Sound = resource_types::SOUND,
+    Font = resource_types::FONT,
 }
 
 #[derive(Debug, Clone, Copy)]

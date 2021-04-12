@@ -4,6 +4,9 @@ use crate::communication::{RESOURCE_TABLE, SYNCHRONIZATION_MEMORY};
 use crate::error::ClientError;
 use rask_engine::resources::{GetTextures, Texture};
 
+/// Width of the internal render buffer
+pub const RENDER_BUFFER_WIDTH: u32 = 240;
+pub const RENDER_BUFFER_HEIGHT: u32 = RENDER_BUFFER_WIDTH / super::webgl::WORLD_ASPECT as u32;
 type RenderBackend = WebGl2;
 static mut RENDERER: Option<Renderer<RenderBackend>> = None;
 
@@ -32,7 +35,7 @@ impl<T: GraphicsApi> Renderer<T> {
     pub fn new() -> Result<Self, ClientError> {
         // TODO: Do not hardcode pixelated framebuffer size
         log::debug!("Creating graphics buffer");
-        T::new(240, 135).map(|api| Self { graphics: api })
+        T::new(RENDER_BUFFER_WIDTH, RENDER_BUFFER_HEIGHT).map(|api| Self { graphics: api })
     }
 
     pub fn render(&mut self) -> Result<(), ClientError> {

@@ -5,7 +5,7 @@ use std::sync::atomic::AtomicBool;
 use rask_engine::events::{Event, KeyModifier, MouseEvent};
 use rask_engine::network::protocol::op_codes;
 
-pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = 128;
+pub const MESSAGE_QUEUE_ELEMENT_COUNT: usize = 512;
 
 #[repr(C, u32)]
 #[derive(Debug, Clone)]
