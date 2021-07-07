@@ -42,7 +42,6 @@ impl TextureRange {
     }
 }
 
-#[cfg(feature = "nightly")]
 impl TextureIds {
     pub const fn empty() -> Self {
         Self {

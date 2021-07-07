@@ -1,8 +1,8 @@
 { inCI ? false }:
 
 with import (fetchTarball {
-  url = https://github.com/NixOS/nixpkgs/archive/d971fd7cbaa7794b4cb632ad17ecbfbe3c17f8ee.tar.gz;
-  sha256 = "19p52y2s9m7hc0z5ngjwj5dy6fm9yz2bn8fxsa0brbfwpw2xbl56";
+  url = https://github.com/NixOS/nixpkgs/archive/7f46b19d767b9e085c4ee656ed2ee3f25e35e0af.tar.gz;
+  sha256 = "17mg4g3zqfgcj3v7xks48vfkpifhrq9w917n0ps3r95i1yyqjxz1";
 }) { };
 
 mkShell {
@@ -16,7 +16,17 @@ mkShell {
     cargo
     openssl
     cargo-make
-    binaryen
+    (binaryen.overrideAttrs (lib.const rec {
+      name = "binaryen-${version}";
+      version = "100";
+      src = fetchFromGitHub {
+        owner = "WebAssembly";
+        repo = "binaryen";
+        rev = "version_${version}";
+        sha256 = "sha256-FgvOy8G6Yb0Zy75KoRK/TaUGiojXfT+KN4+DSFfcuFM=";
+      };
+      patches = [];
+    }))
   ] ++ lib.optionals (!inCI) [
     cargo-audit
     wabt

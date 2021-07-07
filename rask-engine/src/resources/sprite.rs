@@ -1,4 +1,4 @@
-use rask_engine::{math, resources::character::AnimationState};
+use crate::{math, resources::character::AnimationState};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Sprite {

@@ -4,7 +4,7 @@ use super::Resource;
 use super::RESOURCE_COUNT;
 use crate::EngineError;
 
-#[cfg_attr(not(feature = "nightly"), repr(transparent))]
+#[repr(transparent)]
 /// The library is used to store and retrieve resources.
 pub struct ResourceTable([Resource; RESOURCE_COUNT as usize]);
 
@@ -15,6 +15,24 @@ macro_rules! get_store {
                 self.index_check(id.into())?;
                 match &self.0[id.into()] {
                     Resource::$enum_type(value) => Ok(&value),
+                    Resource::None => Err(EngineError::ResourceMissing(format!(
+                        "Could not find requested resource #{}",
+                        id.into(),
+                    ))),
+                    _ => Err(EngineError::ResourceType(format!(
+                        "Wrong resource type, required \"{}\"",
+                        stringify!($type),
+                    ))),
+                }
+            }
+
+            fn get_mut<U: Into<usize> + Debug + Copy>(
+                &mut self,
+                id: U,
+            ) -> Result<&mut $type, EngineError> {
+                self.index_check(id.into())?;
+                match &mut self.0[id.into()] {
+                    Resource::$enum_type(ref mut value) => Ok(value),
                     Resource::None => Err(EngineError::ResourceMissing(format!(
                         "Could not find requested resource #{}",
                         id.into(),
@@ -37,6 +55,7 @@ macro_rules! get_store {
 pub trait GetStore<T> {
     /// Retrieve a resource from the library.
     fn get<U: Into<usize> + Debug + Copy>(&self, id: U) -> Result<&T, EngineError>;
+    fn get_mut<U: Into<usize> + Debug + Copy>(&mut self, id: U) -> Result<&mut T, EngineError>;
 
     /// Store a resource to the library
     fn store(&mut self, data: T, id: usize) -> Result<(), EngineError>;
@@ -64,17 +83,13 @@ impl Default for ResourceTable {
 }
 
 impl ResourceTable {
-    /// Create a new library initialized with None resources.
-    #[cfg(feature = "nightly")]
     pub const fn new() -> Self {
-        Self([Resource::None; RESOURCE_COUNT as usize])
+        const RESOURCE_NONE: Resource = Resource::None;
+        ResourceTable([RESOURCE_NONE; RESOURCE_COUNT as usize])
     }
 
-    /// Create a new library initialized with None resources.
-    #[cfg(not(feature = "nightly"))]
-    pub fn new() -> Self {
-        let bytes = [0u8; std::mem::size_of::<Self>()];
-        unsafe { std::mem::transmute(bytes) }
+    pub fn resource_present(&self, id: usize) -> bool {
+        !matches!(self.0.get(id), None | Some(Resource::None))
     }
 
     fn index_check(&self, id: usize) -> Result<(), EngineError> {

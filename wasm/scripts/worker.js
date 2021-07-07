@@ -56,14 +56,14 @@ const imports = {
         canvasHeight = canvas.height;
         return (canvas.width << 16) | canvas.height;
     },
-    set_canvas_size: function (w, h, vx, vy, vw, vh, sx, sy) {
+    set_canvas_size: function (w, h, vx, vy, vw, vh, sx, sy, ox, oy) {
         canvas.width = w;
         canvas.height = h;
         canvasX = vx;
         canvasY = vy;
         canvasWidth = vw;
         canvasHeight = vh;
-        gl.uniform2fv(stretchLoc, [sx, sy]);
+        gl.uniform4fv(stretchLoc, [sx, sy, ox, oy]);
     },
     gl_get_error: function () {
         return gl.getError();
@@ -250,19 +250,18 @@ onmessage = async function ({data}) {
         }
     });
     if (!is_subworker && !has_canvas) {
-        wasm.exports.__wasm_init_memory();
         const tls = wasm.exports.init(wasm.exports.__heap_base.value, mem.buffer.byteLength, wasm.exports.__tls_size.value);
         wasm.exports.__wasm_init_tls(tls);
         wasm.exports.run_logic();
     } else if (is_subworker && has_work) {
-        wasm.exports.__sp.value = data.stack_top;
+        wasm.exports.set_stack_pointer(data.stack_top);
         wasm.exports.__wasm_init_tls(data.tls);
         wasm.exports.run_pool(data.work);
     } else if (has_canvas) {
         vs = data.shader.vertex;
         fs = data.shader.fragment;
         canvas = data.canvas;
-        wasm.exports.__sp.value = data.stack_top;
+        wasm.exports.set_stack_pointer(data.stack_top);
         wasm.exports.__wasm_init_tls(data.tls);
         // see 'https://www.khronos.org/registry/webgl/specs/latest/1.0/' for documentation
         gl = canvas.getContext('webgl2', {

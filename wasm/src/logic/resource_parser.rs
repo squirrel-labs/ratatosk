@@ -3,7 +3,6 @@ use std::convert::TryInto;
 
 use crate::communication::message_queue::Message;
 use crate::communication::RESOURCE_TABLE;
-use crate::ClientError;
 use rask_engine::network::{
     packet::{self, ResourceData},
     protocol::{self, resource_types},
@@ -34,9 +33,9 @@ impl ResourceParser {
     }
 
     /// Fetch resource via javascript
-    pub fn fetch_resource(&mut self, info: ResourceInfo) -> Result<(), ClientError> {
+    pub fn fetch_resource(&mut self, info: ResourceInfo) -> Result<(), EngineError> {
         if self.buffer_table.contains_key(&info.id) {
-            return Err(ClientError::ResourceError(format!(
+            return Err(EngineError::ResourceFetchConflict(format!(
                 "resource: {:?} is already being fetched",
                 info
             )));
@@ -54,9 +53,9 @@ impl ResourceParser {
     }
 
     /// Fetch character resource via javascript
-    pub fn fetch_character_resource(&mut self, info: CharacterInfo) -> Result<(), ClientError> {
+    pub fn fetch_character_resource(&mut self, info: CharacterInfo) -> Result<(), EngineError> {
         if self.char_parts_table.contains_key(&info.id) {
-            return Err(ClientError::ResourceError(format!(
+            return Err(EngineError::ResourceFetchConflict(format!(
                 "character: {:?} is already being fetched",
                 info
             )));
@@ -85,9 +84,9 @@ impl ResourceParser {
     }
 
     /// Allocates a new buffer and returns the pointer to it.
-    pub fn alloc(&mut self, id: u32, size: u32) -> Result<(), ClientError> {
+    pub fn alloc(&mut self, id: u32, size: u32) -> Result<(), EngineError> {
         if self.buffer_table.contains_key(&id) {
-            return Err(ClientError::ResourceError(format!(
+            return Err(EngineError::ResourceFetchConflict(format!(
                 "buffer for resource: {} is already allocated",
                 id
             )));
@@ -103,7 +102,7 @@ impl ResourceParser {
     }
 
     /// Assumes a resource has been written to the buffer `id` and parses its content.
-    pub fn parse(&mut self, id: u32) -> Result<(), ClientError> {
+    pub fn parse(&mut self, id: u32) -> Result<(), EngineError> {
         let mapping = self.mapping_table.get(&id);
         if let Some(buffer) = self.buffer_table.get_mut(&id) {
             unsafe { buffer.set_len(buffer.capacity()) }
@@ -113,13 +112,13 @@ impl ResourceParser {
                 self.parse_ws_package(id)
             }
         } else {
-            Err(ClientError::ResourceError(
+            Err(EngineError::ResourceFetchConflict(
                 "Requested Buffer not allocated".into(),
             ))
         }
     }
 
-    fn parse_ws_package(&mut self, id: u32) -> Result<(), ClientError> {
+    fn parse_ws_package(&mut self, id: u32) -> Result<(), EngineError> {
         let data = self.pop_buffer(id).unwrap();
         let msg = packet::WebSocketPacket::deserialize(data.as_slice())?;
         log::trace!("parsing: optcode: {}", msg.op_code);
@@ -129,7 +128,7 @@ impl ResourceParser {
                 resource_types::TEXTURE => ResourceParser::parse_texture(data)?,
                 resource_types::CHARACTER => ResourceParser::parse_char(data)?,
                 _ => {
-                    return Err(ClientError::ResourceError(
+                    return Err(EngineError::ResourceFormat(
                         "unknown ResourceType while parsing".into(),
                     ));
                 }
@@ -142,12 +141,12 @@ impl ResourceParser {
         &mut self,
         id: u32,
         mapping: (u32, u32, ResourceVariant),
-    ) -> Result<(), ClientError> {
+    ) -> Result<(), EngineError> {
         let (parent_id, part_id, variant) = mapping;
         match variant {
             ResourceVariant::Texture => {
                 let data = self.pop_buffer(id).ok_or_else(|| {
-                    ClientError::ResourceError(format!(
+                    EngineError::ResourceFetchConflict(format!(
                         "Tried to parse resource id {} for wich no buffer is allocated",
                         id
                     ))
@@ -171,7 +170,7 @@ impl ResourceParser {
                 }
             }
             _ => {
-                return Err(ClientError::ResourceError(
+                return Err(EngineError::ResourceType(
                     "unknown ResourceType while parsing".into(),
                 ));
             }
@@ -179,7 +178,7 @@ impl ResourceParser {
         Ok(())
     }
 
-    fn parse_texture(res: packet::NetworkResource) -> Result<(), ClientError> {
+    fn parse_texture(res: packet::NetworkResource) -> Result<(), EngineError> {
         match res.data {
             ResourceData::ResourceVec(image) => ResourceParser::store_texture(res.res_id, image),
             _ => {
@@ -188,15 +187,15 @@ impl ResourceParser {
         }
     }
 
-    fn store_texture(id: u32, image: &[u8]) -> Result<(), ClientError> {
-        log::info!("decoding texture {} len: {}", id, image.len());
+    fn store_texture(id: u32, image: &[u8]) -> Result<(), EngineError> {
+        log::debug!("decoding texture {} len: {}", id, image.len());
         let img = Texture::from_memory(image)?;
         RESOURCE_TABLE.write().store(img, id as usize)?;
         Ok(())
     }
 
-    fn store_owned_texture(id: u32, image: Vec<u8>) -> Result<(), ClientError> {
-        log::info!("decoding texture {} len: {}", id, image.len());
+    fn store_owned_texture(id: u32, image: Vec<u8>) -> Result<(), EngineError> {
+        log::debug!("decoding texture {} len: {}", id, image.len());
         rayon::spawn(move || {
             log::debug!("{}", image.len());
             let img = Texture::from_memory(image.as_slice()).unwrap();
@@ -205,8 +204,8 @@ impl ResourceParser {
         Ok(())
     }
 
-    fn parse_char(res: packet::NetworkResource) -> Result<(), ClientError> {
-        log::info!("decoding char {}", res.res_id);
+    fn parse_char(res: packet::NetworkResource) -> Result<(), EngineError> {
+        log::debug!("decoding char {}", res.res_id);
         let chr: Character = res.data.try_into()?;
         RESOURCE_TABLE
             .write()
@@ -219,7 +218,7 @@ impl ResourceParser {
         texture: Vec<u8>,
         animation: Vec<u8>,
         atlas: Vec<u8>,
-    ) -> Result<(), ClientError> {
+    ) -> Result<(), EngineError> {
         let chr: Character =
             Character::from_memory(texture.as_slice(), animation.as_slice(), atlas.as_slice())?;
         RESOURCE_TABLE.write().store(Box::new(chr), id as usize)?;

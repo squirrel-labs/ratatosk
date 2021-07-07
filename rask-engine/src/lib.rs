@@ -2,12 +2,12 @@
 //! This includes math utilities such as vectors and matrices, a trait for collisions and multiple
 //! boxes for modeling objects.
 
-#![cfg_attr(feature = "nightly", feature(const_in_array_repeat_expressions))]
 pub mod boxes;
 pub mod collide;
 pub mod engine;
 pub mod error;
 pub mod events;
+pub mod io;
 pub mod math;
 pub mod network;
 pub mod resources;
@@ -16,7 +16,4 @@ pub mod resources;
 pub use error::EngineError;
 
 #[doc(inline)]
-pub use engine::GameEngine;
-
-#[doc(inline)]
-pub use engine::RaskEngine;
+pub use engine::{GameEngine, RaskEngine};

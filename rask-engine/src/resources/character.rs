@@ -5,10 +5,12 @@ use super::Texture;
 use crate::network::packet::ResourceData;
 use crate::{math::Mat3, math::Vec3, EngineError};
 use image::DynamicImage;
-use spine::atlas::Atlas;
 use spine::skeleton::Skeleton;
+use spine::{atlas::Atlas, skeleton::animation::skin::SkinAnimation};
 use std::convert::TryFrom;
 use std::hash::{Hash, Hasher};
+
+use ouroboros::self_referencing;
 
 #[derive(Debug)]
 struct OwnedSpriteState {
@@ -71,9 +73,17 @@ impl<'a> Iterator for AnimationStates<'a> {
     }
 }
 
+#[self_referencing]
+struct Skel {
+    pub skeleton: Box<Skeleton>,
+    animation_name: String,
+    #[borrows(skeleton)]
+    animation: Option<SkinAnimation<'this>>,
+}
+
 pub struct Character {
-    skeleton: Skeleton,
     atlas: HashMap<u64, Texture>,
+    animation: Skel,
 }
 
 impl Character {
@@ -101,7 +111,17 @@ impl Character {
     }
 
     pub fn from_parts(skeleton: Skeleton, atlas: HashMap<u64, Texture>) -> Self {
-        Self { skeleton, atlas }
+        let skel = SkelBuilder {
+            skeleton: Box::new(skeleton),
+            animation_name: "".to_owned(),
+            animation_builder: |_| None,
+        }
+        .build();
+
+        Self {
+            atlas,
+            animation: skel,
+        }
     }
 
     pub fn from_memory(
@@ -116,43 +136,75 @@ impl Character {
     }
 
     pub fn skeleton(&self) -> &Skeleton {
-        &self.skeleton
+        &self.animation.with_skeleton_contents(|skeleton| skeleton)
+    }
+
+    pub fn animation_name(&self) -> &str {
+        self.animation.with_animation_name(|name| name)
     }
 
     pub fn atlas(&self) -> &HashMap<u64, Texture> {
         &self.atlas
     }
 
-    pub fn skeleton_mut(&mut self) -> &mut Skeleton {
-        &mut self.skeleton
-    }
-
     pub fn atlas_mut(&mut self) -> &mut HashMap<u64, Texture> {
         &mut self.atlas
     }
 
-    pub fn interpolate(&self, time: f32, anim_name: &str) -> Result<AnimationStates, EngineError> {
-        let animated_skin = self
-            .skeleton
-            .get_animated_skin("default", Some(anim_name))?;
-        let time = time.rem_euclid(animated_skin.get_duration());
-        Ok(AnimationStates::new(
-            animated_skin
-                .interpolate(time)
-                .ok_or_else(|| {
-                    EngineError::Animation(format!(
-                        "Could not interpolate animation at time {}",
-                        time,
-                    ))
-                })?
-                .map(|s| OwnedSpriteState {
-                    attachment: s.attachment.to_owned(),
-                    transform: s.to_matrix3(),
-                })
-                .collect::<Vec<_>>()
-                .into_iter(),
-            &self.atlas,
-        ))
+    pub fn set_animation(
+        &mut self,
+        anim_name: &str,
+        current_time: f32,
+        start_offset: f32,
+        fade_time: f32,
+    ) -> Result<(), EngineError> {
+        self.animation.with_mut(|fields| {
+            let animation = if let Some(anim) = &fields.animation {
+                anim.get_animated_skin_with_transiton(
+                    &fields.skeleton_contents,
+                    "default",
+                    anim_name,
+                    current_time,
+                    start_offset,
+                    fade_time,
+                )
+            } else {
+                fields
+                    .skeleton_contents
+                    .get_animated_skin("default", Some(anim_name))
+            };
+            match animation {
+                Ok(animation) => {
+                    *fields.animation = Some(animation);
+                    *fields.animation_name = anim_name.to_owned();
+                    Ok(())
+                }
+                Err(e) => Err(EngineError::Animation(format!("{}", e))),
+            }
+        })
+    }
+    pub fn interpolate(&self, time: f32) -> Result<AnimationStates, EngineError> {
+        if let Some(animated_skin) = self.animation.with_animation(|anim| anim) {
+            Ok(AnimationStates::new(
+                animated_skin
+                    .interpolate(time)
+                    .ok_or_else(|| {
+                        EngineError::Animation(format!(
+                            "Could not interpolate animation at time {}",
+                            time,
+                        ))
+                    })?
+                    .map(|s| OwnedSpriteState {
+                        attachment: s.attachment.to_owned(),
+                        transform: s.to_matrix3(),
+                    })
+                    .collect::<Vec<_>>()
+                    .into_iter(),
+                &self.atlas,
+            ))
+        } else {
+            Err(EngineError::Animation("No animation has been set".into()))
+        }
     }
 }
 

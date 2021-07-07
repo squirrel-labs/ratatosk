@@ -2,10 +2,10 @@
 
 const WORKER_URI = 'scripts/worker.js'
 const WEBSOCKET_URI = 'ws://localhost:5001/'
-const MESSAGE_ITEM_SIZE = 32;
 const RESOURCE_PREFIX = '../../res/'
 const MEMORY_MB = 32;
 let decoder = new TextDecoder('utf-8', {ignoreBOM: true, fatal: true});
+let MESSAGE_ITEM_SIZE;
 let SYNCHRONIZATION_MEMORY;
 let MESSAGE_QUEUE = null;
 let MESSAGE_QUEUE_LENGTH;
@@ -13,25 +13,28 @@ let SYNC_MOUSE;
 let SYNC_CANVAS_SIZE;
 let SYNC_PLAYER_STATE;
 let SYNC_OTHER_STATE;
-let queue = null;
+let GAME_STATE_SIZE;
 let params = new URLSearchParams(document.location.search.substring(1));
 let token = params.get("token");
 token = "Token-42";
 let workers = [];
 let memory;  // global for debugging
-let ws = new WebSocket(WEBSOCKET_URI, [token, "tuesday"]);
-ws.binaryType = 'arraybuffer';
 let connected = false
 
+let ws;
+try {
+    ws = new WebSocket(WEBSOCKET_URI, [token, "tuesday"]);
+    ws.binaryType = 'arraybuffer';
+} catch (error) {console.error("Failed to establish websocket connection", error);}
 let mousex = 0;
 let mousey = 0;
-const audio_context = new AudioContext();
-
+let audio_context = null;
+let audio_callbacks = [];
 
 class MessageQueueWriter {
-    constructor(pos, size) {
+    constructor(pos, length) {
         this.pos = pos;
-        this.size = size;
+        this.length = length;
         this.index = 0;
         this._queue = [];
         this._locked = false;
@@ -44,14 +47,14 @@ class MessageQueueWriter {
             Atomics.store(memoryView32, ++iptr, i);
         }
         Atomics.store(memoryView32, ptr, 0);
-        this.index %= this.size;
+        this.index %= this.length;
         this._dequeue()
     }
     write_i32(task) {
+        this._queue.push(task);
         if (this.pos === null) {
             return;
         }
-        this._queue.push(task);
         if (!this._locked) this._dequeue();
     }
     _dequeue() {
@@ -65,7 +68,8 @@ class MessageQueueWriter {
     }
 }
 
-queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_ITEM_SIZE);
+// initialize a dummy queue that stores all events
+let queue = new MessageQueueWriter(null, null);
 
 async function responseText(promise) {
     return await (await promise).text();
@@ -87,6 +91,7 @@ function postWorkerDescriptor(worker, desc) {
 function spawnModule(module) {
     let worker = new Worker(WORKER_URI);
     postWorkerDescriptor(worker, module);
+    worker.addEventListener("message", LogicMessage);
     return worker;
 }
 let wasm_module;
@@ -183,13 +188,23 @@ function LogicMessage(e) {
     } else if (optcode === PREPARE_AUDIO) {
         const res = fetch(RESOURCE_PREFIX + str_from_mem(x[2], x[3]));
         res.then(async function (data) {
-            let buffer = await data.arrayBuffer();
-            let audio_buffer = await audio_context.decodeAudioData(buffer);
-            audio_map.set(x[1], audio_buffer);
-            queue.write_i32([AUDIO_LOADED, x[1]]);
-            console.debug("done fetching audio " + x[1]);
+            let f = async function () {
+                let buffer = await data.arrayBuffer();
+                let audio_buffer = await audio_context.decodeAudioData(buffer);
+                audio_map.set(x[1], audio_buffer);
+                queue.write_i32([AUDIO_LOADED, x[1]]);
+                console.debug("done fetching audio " + x[1]);
+            };
+            if (audio_context) {
+                await f();
+            } else {
+                audio_callbacks.push(f);
+            }
         })
     } else if (optcode === PLAY_SOUND) {
+        if (!audio_context) {
+            console.error("Tried to play a sound before a key was pressed");
+        }
         let audio_buffer = audio_map.get(x[1]);
         let source = audio_context.createBufferSource();
         source.buffer = audio_buffer;
@@ -198,6 +213,9 @@ function LogicMessage(e) {
         source_map.set(x[1], source);
         console.debug("start playing audio " + x[1]);
     } else if (optcode === STOP_SOUND) {
+        if (!audio_context) {
+            console.error("Tried to play a sound before a key was pressed");
+        }
         let source = source_map.get(x[1]);
         source.stop();
         source.disconnect(audio_context.destination);
@@ -226,12 +244,15 @@ function LogicMessage(e) {
         SYNCHRONIZATION_MEMORY = x[1] >> 2;
         MESSAGE_QUEUE = x[2];
         MESSAGE_QUEUE_LENGTH = x[3];
+        MESSAGE_ITEM_SIZE = x[4];
+        GAME_STATE_SIZE = x[5]
         SYNC_MOUSE = SYNCHRONIZATION_MEMORY + 1;
         SYNC_CANVAS_SIZE = SYNC_MOUSE + 2;
-        SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + 2;
-        SYNC_OTHER_STATE = SYNC_PLAYER_STATE + 3;
+        SYNC_PLAYER_STATE = SYNC_CANVAS_SIZE + GAME_STATE_SIZE;
+        SYNC_OTHER_STATE = SYNC_PLAYER_STATE + GAME_STATE_SIZE;
         resize_canvas();
-        queue = new MessageQueueWriter(MESSAGE_QUEUE, MESSAGE_QUEUE_LENGTH);
+        queue.pos = MESSAGE_QUEUE;
+        queue.length = MESSAGE_QUEUE_LENGTH;
     } else if (optcode === SET_TEXT_MODE) {
         if (x[1] === 0) {
             window.addEventListener('input', input);
@@ -275,11 +296,11 @@ const fps_sampling_count = 5;
 let fps_sampling_n = 0;
 async function wakeLogic() {
     if (connected) {
-        let x = new Uint32Array(4);
-        x[0] = 128;
-        x[1] = Atomics.load(memoryView32, SYNC_PLAYER_STATE);
-        x[2] = Atomics.load(memoryView32, SYNC_PLAYER_STATE + 1);
-        x[3] = Atomics.load(memoryView32, SYNC_PLAYER_STATE + 2);
+        let x = new Uint32Array(GAME_STATE_SIZE + 1);
+        x[0] = PUSH_GAME_STATE;
+        for (i = 0; i < GAME_STATE_SIZE; i++) {
+            x[i + 1] = Atomics.load(memoryView32, SYNC_PLAYER_STATE + i);
+        }
         //ws.send(x.buffer); TODO
     }
 
@@ -293,6 +314,22 @@ async function wakeLogic() {
     Atomics.store(memoryView32, SYNC_MOUSE, Math.floor(mousex));
     Atomics.store(memoryView32, SYNC_MOUSE + 1, Math.floor(mousey));
     Atomics.notify(memoryView32, SYNCHRONIZATION_MEMORY, +Infinity);
+}
+
+function waitForSocketConnection(socket, callback) {
+    setTimeout(
+        function () {
+            if (socket.readyState === 1) {
+                if (callback != null) {
+                    callback();
+                }
+            } else if (socket.readyState > 1) {
+                console.error("websocket connection could not be established");
+            } else {
+                waitForSocketConnection(socket, callback);
+            }
+
+        }, 5);
 }
 
 function setup_ws() {
@@ -314,15 +351,15 @@ function setup_ws() {
         if (opcode === PUSH_RESOURCE) {
             upload_resource(e.data);
         } else if (opcode === PUSH_GAME_STATE) {
-            Atomics.store(memoryView32, SYNC_OTHER_STATE, data[1]);
-            Atomics.store(memoryView32, SYNC_OTHER_STATE + 1, data[2]);
-            Atomics.store(memoryView32, SYNC_OTHER_STATE + 2, data[3]);
+            for (i = 0; i < GAME_STATE_SIZE; i++) {
+                Atomics.store(memoryView32, SYNC_OTHER_STATE + i, data[i + 1]);
+            }
         } else {
             console.error("unknown opcode: " + opcode);
         }
     });
 }
-setup_ws();
+waitForSocketConnection(ws, setup_ws);
 
 function hashCode(str) {
     var hash = 0;
@@ -360,6 +397,12 @@ window.addEventListener('resize', resize_canvas);
 window.addEventListener('keydown', e => {
     const key = evalKey(e);
     const mod = keyMod(e);
+    if (!audio_context) {
+        audio_context = new AudioContext();
+        audio_callbacks.forEach(function (f) {
+            f();
+        });
+    }
     if (key !== undefined && key !== 0 && mod !== undefined) {queue.write_i32([KEY_DOWN, mod, key]);}
 });
 

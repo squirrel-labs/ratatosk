@@ -16,8 +16,8 @@ use crate::logic::LogicContext;
 #[cfg(target_arch = "wasm32")]
 use crate::{
     communication::{
-        Message, MessageQueue, SynchronizationMemory, MESSAGE_QUEUE_ELEMENT_COUNT,
-        SYNCHRONIZATION_MEMORY,
+        message_queue::MessageQueueElement, Message, SynchronizationMemory,
+        MESSAGE_QUEUE_ELEMENT_COUNT, SYNCHRONIZATION_MEMORY,
     },
     mem,
     wasm_log::{init_panic_handler, WasmLog},
@@ -30,6 +30,10 @@ use nobg_web_worker::set_global_thread_pool;
 
 #[cfg(target_arch = "wasm32")]
 static LOGGER: WasmLog = WasmLog;
+
+#[allow(unused_imports)]
+#[cfg(target_arch = "wasm32")]
+use wasm_set_stack_pointer::*;
 
 #[cfg(target_arch = "wasm32")]
 #[global_allocator]
@@ -61,7 +65,7 @@ pub extern "C" fn init(heap_base: u32, mem_size: u32, tls_size: u32) -> u32 {
     log::set_logger(&LOGGER).unwrap();
     // change the log level to only show certain errors
     log::set_max_level(log::LevelFilter::Debug);
-    log::info!("mem_size: {}", mem_size - heap_base);
+    log::debug!("mem_size: {}", mem_size - heap_base);
     mem::alloc_tls() as u32
 }
 
@@ -94,13 +98,15 @@ pub extern "C" fn run_logic() {
 
     #[cfg(target_arch = "wasm32")]
     {
-        let syn_addr = unsafe { &SYNCHRONIZATION_MEMORY as *const SynchronizationMemory as u32 };
+        let sync_addr = unsafe { &SYNCHRONIZATION_MEMORY as *const SynchronizationMemory as u32 };
         // send memory offset to the main thread -> initialize graphics
-        Message::Memory(
-            syn_addr,
-            &game.message_queue as *const MessageQueue as u32,
-            MESSAGE_QUEUE_ELEMENT_COUNT as u32,
-        )
+        Message::Memory {
+            sync_addr,
+            queue_addr: game.get_message_queue_pos() as u32,
+            queue_length: MESSAGE_QUEUE_ELEMENT_COUNT as u32,
+            element_size: std::mem::size_of::<MessageQueueElement>() as u32,
+            game_state_size: std::mem::size_of::<rask_engine::network::GameState>() as u32,
+        }
         .send();
         let stack = mem::alloc_stack(mem::GRAPHICS_STACK_SIZE);
         let tls = mem::alloc_tls();
@@ -112,7 +118,6 @@ pub extern "C" fn run_logic() {
     loop {
         game.tick()
             .unwrap_or_else(|e| log::error!("Error occurred game_context.tick(): {:?}", e));
-        log::trace!("wait_for_main_thread_notify()");
         // use wasm's atomic wait instruction to sleep until waken by the main thread
         #[cfg(target_arch = "wasm32")]
         unsafe {
