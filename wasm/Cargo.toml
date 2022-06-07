@@ -2,7 +2,7 @@
 name = "rask-wasm"
 version = "0.1.0"
 authors = ["natrixaeria", "Dennis Kobert <dennis@kobert.dev>"]
-edition = "2018"
+edition = "2021"
 description = "WebAssembly frontend of the rask project"
 
 [lib]

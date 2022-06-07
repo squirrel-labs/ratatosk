@@ -2,7 +2,7 @@
 name = "rask-engine"
 version = "0.2.0"
 authors = ["konsumlamm <konsumlamm@gmail.com>", "Dennis Kobert <dennis@kobert.dev>", "NatrixAeria"]
-edition = "2018"
+edition = "2021"
 
 [features]
 nightly = []

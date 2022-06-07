@@ -2,7 +2,7 @@
 name = "rask-server"
 version = "0.1.0"
 authors = ["natrixaeria", "truedoctor"]
-edition = "2018"
+edition = "2021"
 description = "A general game server for connections to web clients. Currently (on the way to) deploying a skribbl.io like game."
 
 [dependencies]

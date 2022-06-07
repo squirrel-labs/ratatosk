@@ -2,7 +2,7 @@
 name = "rask-wasm-processor"
 version = "0.1.0"
 authors = ["Dennis Kobert <dennis@kobert.dev>"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 walrus = "0.19"
