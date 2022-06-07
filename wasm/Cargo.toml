@@ -12,9 +12,9 @@ crate-type = ["cdylib", "lib"]
 log = "0.4"
 lazy_static = "1.4"
 rect_packer = "0.2"
-linked_list_allocator = "0.8.3"
-rayon = "1.1.0"
-spin = "0.5"
+linked_list_allocator = "0.9"
+rayon = "1.5"
+spin = "0.9"
 
 [dependencies.rask-engine]
 version = "0.2.0"

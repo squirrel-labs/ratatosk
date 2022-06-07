@@ -5,5 +5,5 @@ authors = ["Dennis Kobert <dennis@kobert.dev>"]
 edition = "2018"
 
 [dependencies]
-walrus = "0.18"
+walrus = "0.19"
 anyhow = "1.0"

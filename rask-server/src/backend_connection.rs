@@ -28,22 +28,22 @@ pub struct TokenResponse {
 /// Make a plaintext get request to API_ENDPOINT/{location}.
 pub fn request(location: &str) -> Option<String> {
     let uri = &format!("{}{}", API_ENDPOINT, location);
-    reqwest::get(uri)
-        .and_then(|mut res| res.text())
+    reqwest::blocking::get(uri)
+        .and_then(|res| res.text())
         .map_err(|err| log::warn!("request on \"{}\" failed: {}", uri, err))
         .ok()
 }
 
 /// Verify the token validity.
 pub fn verify_token(token: i32) -> Result<TokenResponse, ServerError> {
-    let mut res = reqwest::get(&format!("{}api/lobby/tokens/{}", API_ENDPOINT, token))
+    let res = reqwest::blocking::get(&format!("{}api/lobby/tokens/{}", API_ENDPOINT, token))
         .map_err(ServerError::BackendRequest)?;
     let token_res: Result<TokenResponse, _> = res.json();
     token_res.map_err(|e| {
         warn!("{}", e);
         ServerError::InvalidToken(format!(
             "The Backend Response did not contain valid group information: {:?}",
-            res.text()
+            e
         ))
     })
 }

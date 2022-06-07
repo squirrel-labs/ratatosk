@@ -65,14 +65,7 @@ impl Default for ResourceTable {
 
 impl ResourceTable {
     /// Create a new library initialized with None resources.
-    #[cfg(feature = "nightly")]
     pub const fn new() -> Self {
-        Self([Resource::None; RESOURCE_COUNT as usize])
-    }
-
-    /// Create a new library initialized with None resources.
-    #[cfg(not(feature = "nightly"))]
-    pub fn new() -> Self {
         let bytes = [0u8; std::mem::size_of::<Self>()];
         unsafe { std::mem::transmute(bytes) }
     }

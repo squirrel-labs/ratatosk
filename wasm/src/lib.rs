@@ -31,7 +31,6 @@
 #![feature(stdsimd)]
 #![feature(arbitrary_enum_discriminant)]
 #![feature(panic_info_message)]
-#![feature(const_in_array_repeat_expressions)]
 
 pub mod communication;
 pub mod entries;
