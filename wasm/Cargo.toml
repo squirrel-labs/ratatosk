@@ -22,7 +22,7 @@ path = "../rask-engine"
 features = ["nightly"]
 
 [dependencies.nobg-web_worker]
-version = "=0.3.2"
+version = "=0.3.3"
 features = ["std_atomics"]
 git = "https://github.com/squirrel-labs/web_worker/"
 branch = "feature/remove-wasm-bindgen"
